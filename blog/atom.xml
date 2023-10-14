@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://arkitekt.live/doks/blog</id>
+    <id>https://arkitekt.live/blog</id>
     <title>Arkitekt Blog</title>
     <updated>2022-10-11T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://arkitekt.live/doks/blog"/>
+    <link rel="alternate" href="https://arkitekt.live/blog"/>
     <subtitle>Arkitekt Blog</subtitle>
-    <icon>https://arkitekt.live/doks/img/favicon.svg</icon>
+    <icon>https://arkitekt.live/img/favicon.svg</icon>
     <entry>
         <title type="html"><![CDATA[Arkitekt]]></title>
-        <id>https://arkitekt.live/doks/blog/first-blog-post</id>
-        <link href="https://arkitekt.live/doks/blog/first-blog-post"/>
+        <id>https://arkitekt.live/blog/first-blog-post</id>
+        <link href="https://arkitekt.live/blog/first-blog-post"/>
         <updated>2022-10-11T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Welcome to the arkitekt blog, this blog will be used to announce the latest news regarding the arkitekt platform. Stay tuned!]]></summary>
         <content type="html"><![CDATA[<p>Welcome to the arkitekt blog, this blog will be used to announce the latest news regarding the arkitekt platform. Stay tuned!

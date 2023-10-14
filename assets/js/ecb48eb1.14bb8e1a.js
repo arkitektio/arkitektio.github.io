@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[1452],{4260:e=>{e.exports=JSON.parse('{"title":"Terminology","slug":"/category/terminology","permalink":"/doks/docs/category/terminology","navigation":{"previous":{"title":"Why?","permalink":"/doks/docs/design/security/why"},"next":{"title":"App","permalink":"/doks/docs/design/terminology/app"}}}')}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[322],{42604:s=>{s.exports=JSON.parse('{"title":"Python","slug":"/category/python","permalink":"/doks/docs/category/python","navigation":{"previous":{"title":"Installation","permalink":"/doks/docs/developers/javascript/installation"},"next":{"title":"Basics","permalink":"/doks/docs/category/basics"}}}')}}]);

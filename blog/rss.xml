@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title>Arkitekt Blog</title>
-        <link>https://arkitekt.live/doks/blog</link>
+        <link>https://arkitekt.live/blog</link>
         <description>Arkitekt Blog</description>
         <lastBuildDate>Tue, 11 Oct 2022 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
@@ -10,8 +10,8 @@
         <language>en</language>
         <item>
             <title><![CDATA[Arkitekt]]></title>
-            <link>https://arkitekt.live/doks/blog/first-blog-post</link>
-            <guid>https://arkitekt.live/doks/blog/first-blog-post</guid>
+            <link>https://arkitekt.live/blog/first-blog-post</link>
+            <guid>https://arkitekt.live/blog/first-blog-post</guid>
             <pubDate>Tue, 11 Oct 2022 00:00:00 GMT</pubDate>
             <description><![CDATA[Welcome to the arkitekt blog, this blog will be used to announce the latest news regarding the arkitekt platform. Stay tuned!]]></description>
             <content:encoded><![CDATA[<p>Welcome to the arkitekt blog, this blog will be used to announce the latest news regarding the arkitekt platform. Stay tuned!
