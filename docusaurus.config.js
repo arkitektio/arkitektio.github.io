@@ -33,8 +33,8 @@ const flussConf = {
 const config = {
   title: "Arkitekt",
   tagline: "streaming analysis for microscopy",
-  url: "https://arkitekt.live/",
-  baseUrl: "/doks/",
+  url: "https://arkitektio.github.io/",
+  baseUrl: "/",
   trailingSlash: false,
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
