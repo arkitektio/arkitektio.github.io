@@ -1,0 +1,86 @@
+---
+id: Usage
+title: Usage
+sidebar_label: Usage
+---
+
+# Usage
+
+```python
+from arkitekt import easy
+
+app = easy("your_app_name", "your_app_version")
+
+with app:
+    # do stuff with arkitekt
+
+
+```
+
+A few words about this setup:
+
+1. Arkitekt apps are configured through builder functions in this case through the `easy` function.
+   Depending on the builder, different services are configured. The `easy` builder configures
+   arkitekt to mostly autoconfigure itself. This means that it will try to discover and connect
+   to the backend automatically and will authenticate the user and the app through opening a browser
+   window. Depending on your user environment you can also use different builders like the `jupy`
+   builder to ehanve arkitekt for use in a jupyter notebook.
+2. Arkitekt relies on the concept of an application context. This is a context manager that
+   is used to manage the lifecycle of the application (e.g setup connections to the backend
+   and tear down these connections). This is used to ensure that the
+   application is properly closed when it is no longer needed.
+3. Within this context, you can use the `app` object to access the various services that
+   Arkitekt provides. These services are available as attributes on the `app` object.
+   For example, to access the `Fakts` service, you can use `app.fakts`.
+4. The context manager also sets some context specific variables (contextvars).
+   This means that some functionaly within this context will automatically use the governing
+   app context. This allows for more declarative and functional code. For example, you can use simply call
+   `from_xarray` to save an xarray on the mikro instance of the governing app context, without
+   explicitly passing the app context to the function. You can always opt out of this behaviour
+   by specifically passing the desired context to the function.
+
+   ```python
+    from arkitekt import Arkitekt
+    from mikro import from_xarray
+    import xarray as xr
+
+    app = easy()
+
+    with app:
+        image = from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"])) # stores the xarray on the mikro instance of the governing app context
+   ```
+
+   :::note
+   This behaviour allows for more functional and concise code but can also lead to unexpected
+   behaviour. For example, if you have multiple app contexts running in parallel, the
+   `from_xarray` function will use the app context that is currently active. This can lead to
+   unexpected behaviour if you are not aware of this.
+   :::
+
+5. Within the context you should avoid setting attributes on the `app`. Arkitekt was designed
+   to be configured before entering the context.
+
+6. Apps work both in async and synchronous contexts. This means that you can use the `app`
+   object in both async and sync code. The `app` object will automatically detect the context
+   and use the correct backend (check the documentation of koil for this). This means that you can use the same code in both async and
+   sync code.
+
+   ```python
+    from arkitekt import Arkitekt
+    import asyncio
+
+    app = easy()
+
+    async def main():
+        async with app:
+            # do stuff with arkitekt
+
+    asyncio.run(main())
+   ```
+
+   :::note
+   Arkitekt always uses an `asyncio` event loop internally to manage the app context. In the non-async context, this event loop is
+   run in a separate thread. Koil ensures that this threaded event loop is properly closed when the app context is closed, and bridges
+   the calls between the threaded event loop and the main thread to ensure threadsafety. Btw: Threads started through rekuest are also
+   able to call async / syncfuntions or the governing app context.
+   :::

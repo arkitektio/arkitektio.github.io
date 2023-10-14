@@ -1,0 +1,78 @@
+---
+title: Installation
+sidebar_label: Installation
+sidebar_position: 1
+---
+
+import { DownloadGrid } from "../../src/components/layout/Button";
+import Image from '@theme/IdealImage';
+import thumbnail from './installer.png';
+
+## Before we start
+
+Before you start, allow a few comments about the installation of the arkitekt platform. Arkitekt
+is a web-server platform, that was designed to scale from the needs of one person to the needs of
+a large organization. You can install it on your own computer, or on a server in your company, or
+on a server in the cloud. Depending on the scenario, the installation process will differ
+as you might want to adjust the platform and its dependencies to your needs.
+
+The core strategies of the installation process are:
+
+- **Graphical Installer**, that will guide you through the installation process and will install
+  all dependencies for you. This is the **recommended** way to install arkitekt on your own computer,
+  if you are not familiar with the command line, and want to get started quickly. The installer
+  will guide you through the installation and install the most common modules of the platform.
+
+- **Docker-Compose**, this strategy includes a docker-compose configuration that sets up the platform
+  exposing you to some decent amount of configuration options. This is the recommended way to install 
+  arkitekt if you want to participate in the development of the platform, or if you want to integrate
+  it in a larger infrastructure of your company that is powered by docker-compose.
+
+- **Helm Charts ** (coming soon), this strategy includes a helm chart that sets up the platform
+  exposing you on a kubernetes cluster.
+
+- **Custom Installation**, you shouldn't really choose this strategy, unless you are a developer and
+  are already familiar with the platform and its smaller subservices. Your on your own here, but
+  you can find some hints in the.
+
+
+## Graphical installer
+
+Go ahead and download our installer for your operating system "Konstruktor" , and follow the instructions:
+
+<DownloadGrid/>
+
+
+This installer ( once installed) will guide you through the installation process and the deployment of the  platform on your specific hardware. It will also give you a rough estimate of the resources you will need for the installation. Once installed it will serves  simple desktop app that  additionaly acts as an updater ,  as well as and admin interface to the platform and allows you to **start** and **stop** the platform. Additionaly it will act as a beacon
+that advertises the platform on your local network, so that other users can find it.
+
+Konstruktor necessitates the installation of a container runtime (Docker) on the machine where you want to install arkitekt.
+If you don't have docker installed, you can download it from [here](https://www.docker.com/products/docker-desktop). Docker
+is available for Windows, Mac and Linux and is the sole outside dependency of the arkitekt platform. Please check out
+the FAQ section for more information about the installation of docker especially when you are seeking to use GPU support
+on your machine.
+
+<Image img={thumbnail} />
+
+
+## Docker-Compose
+
+If you are familiar with docker-compose, you can use the docker-compose configuration to set up the platform. We maintain
+an active repository with the docker-compose configuration that you can find [here](https://github.com/jhnnsrs/arkitekt-server).
+This includes already the configuration for the most common modules of the platform, and when cloned with the submodules
+(`git clone --recurse-submodules``) will also include the source code of the platform. If you encounter any problems with
+the docker-compose configuration, please open an issue in the repository.
+
+
+## Helm Charts
+
+We are currently working on a helm chart that will allow you to install arkitekt on a kubernetes cluster. This will be
+available soon. You can find the repository [here](https://github.com/jhnnsrs/arkitekt-helm). For now, you can use the
+docker-compose configuration to set up the platform on a kubernetes cluster using the [kompose](https://kompose.io/) tool.
+
+## Custom installation
+
+From here be dragons. You can find some hints in the  developer section of each module and consult each sub
+modules documentation for more information about the installation of the platform. At this point however you are on your
+own. If you encounter any problems, please open an issue in the respective repository.
+

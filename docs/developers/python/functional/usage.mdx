@@ -1,0 +1,103 @@
+---
+id: getting-started
+title: Getting Started
+sidebar_label: Getting Started
+---
+
+import { Terminal } from "../../../../src/components/Terminal";
+
+# Getting Started
+
+So you installed arkitekt and now you want to start using it. This guide will help you get started.
+This tutorial assumes you have a basic (really basic) understanding of the command line
+and have arkitekt installed on your computer.
+
+## Lets check things are setup correctly
+
+Before we start, lets make sure that arkitekt is installed correctly. To do this, we will
+run the following command.
+
+<Terminal src={"/doks/casts/johannes.cast"} />
+
+If you dont see the following output, then you need to go back and install arkitekt. If it still
+doesnt work, then please check out our FAQ or open an issue and
+we will help you get it working.
+
+## Creating a new app
+
+When utilizing arkitekt, you will be working with apps. An app is a collection of functionality
+that you will be able to expose to your lab members.
+
+For example, you might have an app thatallows your lab members to process images in various ways, or to analysis data in a particular
+way.
+
+Generally speaking, you will want to create a new folder and a new python project for each application
+you create. This will make it easier to manage your apps and to keep them separate from each other.
+It will also make it easier to deploy your apps to users in the future. For this tutorial, we will
+create a new folder called `myapp` and then create a new arkitekt project inside of it.
+
+<Terminal src={"/doks/casts/arkitekt-init.cast"} />
+
+### What just happened?
+
+When you run the `arkitekt init` command, arkitekt will ask you a few questions about your app and create
+the ".arkitekt" folder inside your directory, which containers a manifest about your app.
+and what they will be used for. The CLI will also create an app.py file for you, which will be the entrypoint
+for your app.
+
+### Why we need a manifest
+
+The manifest is a file that contains information about your app. It contains information about your app,
+such as its name, version, and entrypoint. It also contains information about how your app will be built
+and deployed. The manifest is used by arkitekt to build and deploy your app. It is also used by the arkitekt
+web interface to display information about your app and to allow users to run your app.
+
+#### About your name
+
+Well this is simple enough. Its just your name. When others will be using your app on your arkitekt they will
+see your name associated with it, and might be able to contact you if they have questions about your app.
+
+#### Your apps name
+
+Arkitekt will ask you a few questions about your app. The first question is the name of your app.
+This is the name that will be used to identify on the arkitekt web interface. The name _should_ be
+unique, so if you are creating an app that is similar to an existing app by another user, you might have
+problems of connecting your apps to the arkitekt web interface. If you are unsure, you can always
+
+#### Your version
+
+Also note that we will ask you for the current version of your app. The version can be used to track changes
+in your code and your deployments. It is recommended that you use [semantic versioning](https://semver.org/)
+but we are not enforcing it. Versions are optional, but we recommend that you use them, especially if you plan
+on deploying your app to users.
+
+#### The entrypoint
+
+The entrypoint is the file that will be used to start your app. This is the file that will contain all of your
+functions that you want to register with arkitekt. The entrypoint file should **NOT** contain any code that is being
+executed when the file is imported. This is because arkitekt will import your entrypoint file to register your
+functions with the arkitekt web interface. If you have code that is being executed when the file is imported, it will
+be executed every time a user runs your app (or you run in in dev mode). You can however have arbitary code inside
+a `if __name__ == "__main__":` block, which will only be executed when the file is run directly.
+
+Ok:
+
+```python
+if __name__ == "__main__":
+   print("Hello World") # will only be executed when the file is run directly
+```
+
+Not ok:
+
+```python
+print("Hello World") # will be executed every time the file is imported
+```
+
+#### The builder
+
+The builders are functions that will create your arkitekt app. Through defining different builders, you can
+highly customize how your app is being created, which services it will use and how it connects to your arkitekt instance
+For example the `easy` builder provides you with a simple way to create a new user-bound app and
+authenticate itthrough the arkitekt web interface, while the `port`, builder will try to find its configuration from environment variables,
+that are by default set within port containers. You can read more about the different builders in the builders section.
+As a default though you don't need to worry about this, and can just use the `easy` builder.

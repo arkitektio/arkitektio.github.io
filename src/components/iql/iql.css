@@ -1,0 +1,50 @@
+.graphiql-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.graphiql-main {
+  padding: 0;
+}
+
+.graphiql-sessions {
+  margin: 0 !important;
+}
+
+.graphiql-session {
+  padding: 0 !important;
+}
+
+.graphiql-editors {
+  padding: 0 !important;
+}
+
+.graphiql-query-editor {
+  padding: 0 !important;
+}
+.graphiql-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.graphiql-main {
+  padding: 0;
+}
+
+.graphiql-sessions {
+  margin: 0 !important;
+}
+
+.graphiql-session {
+  padding: 0 !important;
+}
+
+.graphiql-editors {
+  padding: 0 !important;
+}
+
+.graphiql-query-editor {
+  padding: 0 !important;
+}
