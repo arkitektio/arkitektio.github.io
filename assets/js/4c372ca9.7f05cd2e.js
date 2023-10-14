@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[7712],{96899:e=>{e.exports=JSON.parse('{"title":"Repo","slug":"/category/repo","permalink":"/doks/docs/category/repo","navigation":{"previous":{"title":"Intro","permalink":"/doks/docs/developers/intro"},"next":{"title":"MikroJ","permalink":"/doks/docs/repo/mikroj"}}}')}}]);

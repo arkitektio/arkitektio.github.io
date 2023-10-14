@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[274],{17977:e=>{e.exports=JSON.parse('{"title":"Design","slug":"/category/design","permalink":"/doks/docs/category/design","navigation":{"previous":{"title":"Mikro","permalink":"/doks/docs/services/mikro"},"next":{"title":"Calling your App","permalink":"/doks/docs/design/arkitektrpc"}}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[4233],{8950:e=>{e.exports=JSON.parse('{"title":"Security","slug":"/category/security","permalink":"/doks/docs/category/security","navigation":{"previous":{"title":"Real-time","permalink":"/doks/docs/design/real-time"},"next":{"title":"Why?","permalink":"/doks/docs/design/security/why"}}}')}}]);
