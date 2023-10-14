@@ -34,7 +34,7 @@ const config = {
   title: "Arkitekt",
   tagline: "streaming analysis for microscopy",
   url: "https://arkitekt.live/",
-  baseUrl: "/doks/",
+  baseUrl: "/",
   trailingSlash: false,
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
