@@ -138,7 +138,7 @@ const config = {
           },
           { to: "/blog", label: "Blog", position: "left" },
           {
-            href: "https://github.com/jhnnsrs/doks",
+            href: "https://github.com/arkitektio/arkitektio.github.io",
             label: "GitHub",
             position: "right",
           },
@@ -170,7 +170,7 @@ const config = {
               },
               {
                 label: "Twitter",
-                href: "https://twitter.com/arkitekt",
+                href: "https://twitter.com/jhnnsrs",
               },
             ],
           },
@@ -183,7 +183,7 @@ const config = {
               },
               {
                 label: "GitHub",
-                href: "https://github.com/jhnnsrs/doks",
+                href: "https://github.com/arkitektio/arkitektio.github.io",
               },
             ],
           },

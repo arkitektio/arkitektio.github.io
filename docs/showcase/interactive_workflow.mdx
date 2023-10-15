@@ -1,0 +1,69 @@
+---
+title: Interactive Workflow
+sidebar_label: Interactive Workflow
+sidebar_position: 1
+---
+
+
+import { DownloadGrid } from "../../src/components/layout/Button";
+import Image from '@theme/IdealImage';
+import interactive from './interactive.png';
+
+
+The following workflow and online showcase is an example of how arkitekt enables an interactive workflow, spanning multiple bioimage apps and deep learning enabled
+denoising. With this workflow we would like to demonstrate that by leveraging a tight and timely interaction between the apps, users can get immediate
+feedback on the results of their actions.
+
+Here we set out to use Arkitekt to build a workflow that allows users to interactively denoise and segment cells in regions of interest in a 3D image.
+The workflow is composed of three apps: 
+
+- **Napari** a python based 3D volume  viewer that will allow the users to interactively annotate regions of interest in an image, while eeasily exploring
+the 3D volume, as well as the app that will be used to display the results of the workflow.
+
+- **Care Denoising**, a deep learning based denoising app that will be used to denoise the regions of interest selected by the user in Napari.
+
+- **Fiji** (ImageJ), and its "Analyze Particles" plugin, that will be used to segment the denoised regions of interest.
+
+
+<div className="mt-2 p-6">
+<Image img={interactive} />
+
+<div className="text-gray-400 mb-2">
+<small>The interactive workflow with loopback analytical insight </small>
+</div>
+</div>
+
+## The why
+
+The main motivation for showcasing this workflow, is the core believe that interactive workflows are a key component of the current and future bioimage analysis
+landscape. We believe that the ability to interactively explore and annotate data, and to get immediate feedback on the results of the analysis, is a key necessity
+for the current analysis where human insight is determing where we look for when analysis our data.  And while automation will continue to grow in importance,
+we believe that the human in the loop will, continue to play a key component of the analtical process.
+
+## Lets get started
+
+Well lets jump right in and see how we can run this workflow. You could of course build this workflow from scratch, but we have already done that for you, and
+you can easily import it into your arkitekt instance. To do so, please [connect](/docs/apps/) this website to your arkitekt instance and then simply click on the "import" button below,
+which will import it directly into your arkitekt instance.
+
+If you havent installed any of the apps yet, your Arkitekt instance will tell you that you are missing some apps implementing the nodes. So of course make sure you
+install the apps that are missing. In this case you will need to install the following apps:
+
+- [Napari](
+    https://napari.org/stable/)
+    with the mikro-napari plugin, which you can install easily via the napari plugin manager.
+    or via the command line with `pip install mikro-napari`
+
+- [Kare Denoising](
+    https://github.com/jhnnsrs/kare)
+    which is an Arkitekt enabled app, which on clicking install can be installed via the arkitekt plugin page.
+
+- [Fiji](
+    https://imagej.net/Fiji)
+    which is a popular image analysis app, that can be installed through the Fiji homepage
+
+- [MikroJ](https://github.com/jhnnsrs/mikroj)
+    which is the FIJI wrapper app that allows your Fiji instance to be connected to Arkitekt.
+
+
+Once you have installed all the apps, you can simply reserve the workflow on your Arkitekt web interface or right here on the webinterface, and then run it.

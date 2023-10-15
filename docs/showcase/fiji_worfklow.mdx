@@ -1,0 +1,84 @@
+---
+title: Fiji Automation
+sidebar_label: Fiji Automation
+sidebar_position: 1
+---
+
+
+import { DownloadGrid } from "../../src/components/layout/Button";
+import Image from '@theme/IdealImage';
+import thumbnail from './mikroj.png';
+
+# Fiji Automation
+
+While Arkitekt is primarily designed to allow for workflows spanning multiple apps, it can also be used to automate work within a single app. 
+In this showcase we will look at how Arkitekt enables this pattern for the Fiji app, and how you can use the same visual
+workflow editor to automate work within Fiji, as you would when automating work across apps.
+
+:::info 
+This is not a simple tutorial that will help you get you started with using Fiji in Arkitekt, this is a showcase that will give you an idea of what is possible, when using
+and adopting some of the Arkitekt features. If you are looking for a tutorial, you can find one [here](/docs/tutorials/fiji).
+:::
+
+## The why
+
+But first, why would you want to automate work within a single app? And why is this so substanially different from automating work across apps?
+As explain the documentation about workflows [here](/docs/design/workflows), workflows are graphically constructed pipeline, that
+span multiple nodes where each node represents a functionality provided by an app, and that process your data (the edges) as it flows through the pipeline.
+In the standard setting when you want to run this workflow then, you would assign it to an app that becomes the 'scheduler' for the workflow, e.g the
+entity that will take care of taking calling arkitekt and its connected app according to your workflow blueprint. During the workflow run the data that gets altered
+and send from app to app gets stored centrally on the arkitekt server, so that apps can easily interchange and share data.
+
+We believe, tjis parardigm works great when automating work across apps, as keeping  track of your intermediate results , might not only allow you to inspect
+potential mistakes in your analysis, but it allows the arkitekt platform to establish means of data provenance, where you can track the origin of your data, and
+the steps that were taken to arrive at your final result. 
+
+However, this paradigm falls short in scenaiours where you would consider these intermediary results as completely irrelevant, and where you would want to
+keep your data local to your app, to benefit from the performance gains that this might bring. In these cases, all of the roundtrips to Arkitekt and the central
+storage of your data might be considered unnecessary overhead and in cases of real-time processing, might constitued a deal-breaking bottleneck.
+
+For these scenarious Arktitekt offers the possibility to run workflow tasks locally, where the data may be kept local in memory in your app, and where the 
+scheduling of the workflow tasks is done locally within your app. This is what we will explore in this showcase.
+
+## The how
+
+So how does this work? Well, its actually not that different from the standard workflow setting. As Arkitekt workflows are just blueprints, 
+that are schedule by an app, we can just instruct the scheduling app to schedule tasks on nodes that are locally available, directly in memory, instead of
+requesting Arkitekt to schedule the tasks for us. This enables us to assing tasks to nodes that are locally available, with minimal/zero latency and only
+resort to Arkitekt when we need to call functionality that is not available locally. But what about the data? First, all data that is send from app to app
+needs to still be stored centrally on the Arkitekt server, so that apps can easily interchange and share data. However, as Node can define arbitary Inputs and Outputs,
+we can define Inputs and Outputs that are not stored centrally, but that are kept local to the node. These Input and output Structures are termed **locally scoped**, which means
+that Arkitekt will make sure that you can only wire up nodes that have the same local scope, in the workflow. To now perform a single or series of workflow task locally, we can just convert
+the data that is stored centrally to a locally scoped data structure (a tasks done by a "BRIDGE" node), send it to a node that has locally scoped inputs and then consequentlly
+convert the locally scoped output back to a centrally stored (global scoped) data structure (again done by a "BRIDGE" node).
+
+
+
+This is best illustrated with the example of how we
+use that in Fiji.
+
+
+
+### Our workflow
+
+Fiji is a popular image processing app, that is used by many in the scientific community. Arguably, this is because it provides a set of nice image data types to work with
+and that are easily processed by plugins in the same app. One of these data types is the ImagePlus, which is a data type that is used to represent images in Fiji.
+In this showcase we will look at how we can use Arkitekt to automate work within Fiji, by using the ImagePlus data type as the data that flows through our workflow.
+
+The goal of our workflow is now to take an image, and to apply a series of image processing steps in fiji to it, to arrive at a final result. While we would like to run this
+workflow on a centrally stored image and store the final result centrally, we would like to keep all intermediate results local to our app, to benefit from the performance
+gains of only working with in memory items.
+
+
+
+
+
+<div className="mt-2">
+<Image img={thumbnail} />
+
+<div className="text-gray-400 mb-2">
+<small>The in app Workflow design where a globally scoped Image (backed by micro) is bridged to the ImageJ data type of an ImagePlus, that then gets
+parsed via an imagej macro (which code is a constant paramter of the workflow). The output is then bridged again back to the central server, here also ensuring 
+the propagration of the metadata of the original image as an origin to the new image. </small>
+</div>
+</div>
