@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[8999],{48264:e=>{e.exports=JSON.parse('{"title":"Features","slug":"/category/features","permalink":"/docs/category/features","navigation":{"previous":{"title":"Streaming Analysis","permalink":"/docs/showcase/streaming_workflow"},"next":{"title":"Live Graphs","permalink":"/docs/features/live_graphs"}}}')}}]);
