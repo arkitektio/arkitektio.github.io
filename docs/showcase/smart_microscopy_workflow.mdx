@@ -3,11 +3,30 @@ title: Smart Microscopy
 sidebar_label: Smart Microscopy
 sidebar_position: 1
 ---
-
-import { DownloadGrid } from "../../src/components/layout/Button";
 import Image from '@theme/IdealImage';
 import thumbnail from './smart.png';
+import { ShowWorkflow} from "../../src/components/reaktion/ShowWorkflow";
+import { DisplayWorkflow} from "../../src/components/reaktion/DisplayWorkflow";
+import { Guard} from "../../src/components/Guard";
+import acquireSmallWorkflow from './acquire_small.json';
 
+To illustrate Arkitekt readiness for Smart Microscopy, a simple but powerful no-code example
+of a Smart Microscopy workflow was designed to perform the 3D live monitoring of cell
+clusters with a 40X objective, while scanning a large field of view with a 20X objective. In this
+workflow, the Micro-Manager open-source software (Edelstein et al. 2014) was used for the
+multidimensional acquisition. The user interactively set up a grid of positions on large sample
+area (2.61mm x 2.61mm, corresponding to 4*4 stage positions) containing living fluorescent 
+cells placed under an inverted microscope, with a 20X magnification objective. All the defined
+positions were then acquired at 20X magnification every 30 minutes for 24 hours. For every
+acquired 20X magnification image, nuclei were automatically segmented on a remote
+computer using Stardist (Weigert et al. 2020) algorithm, and cell clusters computed with
+DBSCAN algorithms (Ester et al. 1996) with certain properties were identified and marked.
+When one or more of such identified clusters were detected, the ROIs central coordinates and
+dimensions were translated to stage coordinates and sent back to the microscope. 3D stacks
+of these positions (25 planes, 0.5µm step size) were then collected at higher magnification
+(40X) on a well-adjusted ROI fitting the cell clusters size. After all the positive events were
+detected, acquired in 3D high-resolution and displayed on the web-interface, the next image
+was acquired at 20X magnification
 
 <div className="mt-2">
 <Image img={thumbnail} />
@@ -16,3 +35,12 @@ import thumbnail from './smart.png';
 <small>The Smart Microscopy Workflow</small>
 </div>
 </div>
+
+
+<DisplayWorkflow flow={acquireSmallWorkflow}/>
+
+<div className="text-gray-400 mb-2">
+<small>Once connected this pane will also give you an overview over the apps that still need to be installed, nodes in green have been installed, nodes in yellow still lack an implementation. Of course
+feel free to explore this graph more interactively in your orkestrator interface</small>
+</div>
+

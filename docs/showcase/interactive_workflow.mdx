@@ -8,7 +8,11 @@ sidebar_position: 1
 import { DownloadGrid } from "../../src/components/layout/Button";
 import Image from '@theme/IdealImage';
 import interactive from './interactive.png';
-
+import { ShowWorkflow} from "../../src/components/reaktion/ShowWorkflow";
+import { DisplayWorkflow} from "../../src/components/reaktion/DisplayWorkflow";
+import { LatestImage} from "../../src/components/mikro/LatestImage";
+import { Guard} from "../../src/components/Guard";
+import interactiveAnalysisFlow from './interactive_analysis.json';
 
 The following workflow and online showcase is an example of how arkitekt enables an interactive workflow, spanning multiple bioimage apps and deep learning enabled
 denoising. With this workflow we would like to demonstrate that by leveraging a tight and timely interaction between the apps, users can get immediate
@@ -33,7 +37,7 @@ the 3D volume, as well as the app that will be used to display the results of th
 </div>
 </div>
 
-## The why
+## Why?
 
 The main motivation for showcasing this workflow, is the core believe that interactive workflows are a key component of the current and future bioimage analysis
 landscape. We believe that the ability to interactively explore and annotate data, and to get immediate feedback on the results of the analysis, is a key necessity
@@ -67,3 +71,11 @@ install the apps that are missing. In this case you will need to install the fol
 
 
 Once you have installed all the apps, you can simply reserve the workflow on your Arkitekt web interface or right here on the webinterface, and then run it.
+
+<DisplayWorkflow flow={interactiveAnalysisFlow}/>
+
+<div className="text-gray-400 mb-2">
+<small>Once connected this pane will also give you an overview over the apps that still need to be installed, nodes in green have been installed, nodes in yellow still lack an implementation. Of course
+feel free to explore this graph more interactively in your orkestrator interface</small>
+</div>
+

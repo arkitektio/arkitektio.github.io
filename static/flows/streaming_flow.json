@@ -1,0 +1,595 @@
+{
+    "__typename": "Flow",
+    "id": "2",
+    "graph": {
+        "__typename": "FlowGraph",
+        "nodes": [
+            {
+                "__typename": "ArgNode",
+                "id": "1",
+                "position": {
+                    "__typename": "Position",
+                    "x": 0,
+                    "y": 50
+                },
+                "typename": "ArgNode",
+                "parentNode": null,
+                "instream": [
+                    []
+                ],
+                "outstream": [
+                    []
+                ],
+                "constream": [
+                    []
+                ],
+                "constants": null,
+                "name": "",
+                "description": "No description"
+            },
+            {
+                "__typename": "ReturnNode",
+                "id": "2",
+                "position": {
+                    "__typename": "Position",
+                    "x": 1500,
+                    "y": 50
+                },
+                "typename": "ReturnNode",
+                "parentNode": null,
+                "instream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "return0",
+                            "label": null,
+                            "identifier": "@mikro/era",
+                            "scope": "GLOBAL",
+                            "kind": "STRUCTURE",
+                            "description": "The Back",
+                            "assignWidget": {
+                                "__typename": "Widget",
+                                "kind": "SearchWidget",
+                                "query": "query SearchEras($search: String, $values: [ID]) {\n  options: eras(name: $search, limit: 30, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                                "hook": null,
+                                "ward": "mikro",
+                                "min": null,
+                                "step": null,
+                                "placeholder": null,
+                                "max": null,
+                                "choices": null,
+                                "asParagraph": null
+                            },
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        },
+                        {
+                            "__typename": "Port",
+                            "key": "arg1",
+                            "label": null,
+                            "identifier": null,
+                            "scope": "GLOBAL",
+                            "kind": "UNSET",
+                            "description": null,
+                            "assignWidget": null,
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "outstream": [
+                    []
+                ],
+                "constream": [
+                    []
+                ],
+                "constants": null,
+                "name": "",
+                "description": "No description"
+            },
+            {
+                "__typename": "KwargNode",
+                "id": "3",
+                "position": {
+                    "__typename": "Position",
+                    "x": 750,
+                    "y": 400
+                },
+                "typename": "KwargNode",
+                "parentNode": null,
+                "instream": [
+                    []
+                ],
+                "outstream": [
+                    []
+                ],
+                "constream": [
+                    []
+                ],
+                "constants": null,
+                "name": "",
+                "description": "No description"
+            },
+            {
+                "__typename": "ArkitektNode",
+                "id": "arkid-92349dc5-9fc9-4f40-b9ae-59ebe6a84074",
+                "position": {
+                    "__typename": "Position",
+                    "x": 507,
+                    "y": 66
+                },
+                "typename": "ArkitektNode",
+                "parentNode": null,
+                "hash": "2873b4c20e312fe30cf662941981ea60738ded47d30e3be236c6ab41590ad780",
+                "kind": "FUNCTION",
+                "defaults": null,
+                "mapStrategy": "MAP",
+                "allowLocal": false,
+                "binds": null,
+                "assignTimeout": 100000,
+                "yieldTimeout": 100000,
+                "reserveTimeout": 100000,
+                "maxRetries": 3,
+                "instream": [
+                    []
+                ],
+                "outstream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "return0",
+                            "label": null,
+                            "identifier": "@mikro/era",
+                            "scope": "GLOBAL",
+                            "kind": "STRUCTURE",
+                            "description": "The Back",
+                            "assignWidget": {
+                                "__typename": "Widget",
+                                "kind": "SearchWidget",
+                                "query": "query SearchEras($search: String, $values: [ID]) {\n  options: eras(name: $search, limit: 30, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                                "hook": null,
+                                "ward": "mikro",
+                                "min": null,
+                                "step": null,
+                                "placeholder": null,
+                                "max": null,
+                                "choices": null,
+                                "asParagraph": null
+                            },
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "constream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "name",
+                            "label": null,
+                            "identifier": null,
+                            "scope": "GLOBAL",
+                            "kind": "STRING",
+                            "description": null,
+                            "assignWidget": null,
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": true
+                        }
+                    ]
+                ],
+                "constants": null,
+                "name": "Create Era Now",
+                "description": "Creates an era with the current time as a starttime",
+                "retryDelay": 2000
+            },
+            {
+                "__typename": "ArkitektNode",
+                "id": "arkid-c84aeee6-bdb2-4275-8054-ee8d75dca92d",
+                "position": {
+                    "__typename": "Position",
+                    "x": 1001,
+                    "y": 56
+                },
+                "typename": "ArkitektNode",
+                "parentNode": null,
+                "hash": "c1c7d852c59a1e39388d4b2bc177f7008c639988f285032b1d46a59b110ca16c",
+                "kind": "FUNCTION",
+                "defaults": null,
+                "mapStrategy": "MAP",
+                "allowLocal": false,
+                "binds": null,
+                "assignTimeout": 100000,
+                "yieldTimeout": 100000,
+                "reserveTimeout": 100000,
+                "maxRetries": 3,
+                "instream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "rep",
+                            "label": "rep",
+                            "identifier": "@mikro/representation",
+                            "scope": "GLOBAL",
+                            "kind": "STRUCTURE",
+                            "description": "The image",
+                            "assignWidget": {
+                                "__typename": "Widget",
+                                "kind": "SearchWidget",
+                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                                "hook": null,
+                                "ward": "mikro",
+                                "min": null,
+                                "step": null,
+                                "placeholder": null,
+                                "max": null,
+                                "choices": null,
+                                "asParagraph": null
+                            },
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "outstream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "return0",
+                            "label": null,
+                            "identifier": "@mikro/metric",
+                            "scope": "GLOBAL",
+                            "kind": "STRUCTURE",
+                            "description": "The Back",
+                            "assignWidget": null,
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "constream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "key",
+                            "label": "key",
+                            "identifier": null,
+                            "scope": "GLOBAL",
+                            "kind": "STRING",
+                            "description": "The key to use for the metric. Defaults to \"max\".",
+                            "assignWidget": null,
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": true
+                        }
+                    ]
+                ],
+                "constants": null,
+                "name": "Measure Sum",
+                "description": "Measures the sum of all values of an image",
+                "retryDelay": 2000
+            },
+            {
+                "__typename": "ArkitektNode",
+                "id": "arkid-2a1dd138-a881-4161-8016-bab0eb35da47",
+                "position": {
+                    "__typename": "Position",
+                    "x": 1089,
+                    "y": 158
+                },
+                "typename": "ArkitektNode",
+                "parentNode": null,
+                "hash": "313d447692b15fd8038e0f930f7d7c3ed76f3c52632a96af8d807d17a397214b",
+                "kind": "FUNCTION",
+                "defaults": null,
+                "mapStrategy": "MAP",
+                "allowLocal": false,
+                "binds": null,
+                "assignTimeout": 100000,
+                "yieldTimeout": 100000,
+                "reserveTimeout": 100000,
+                "maxRetries": 3,
+                "instream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "rep",
+                            "label": "rep",
+                            "identifier": "@mikro/representation",
+                            "scope": "GLOBAL",
+                            "kind": "STRUCTURE",
+                            "description": "The image",
+                            "assignWidget": {
+                                "__typename": "Widget",
+                                "kind": "SearchWidget",
+                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                                "hook": null,
+                                "ward": "mikro",
+                                "min": null,
+                                "step": null,
+                                "placeholder": null,
+                                "max": null,
+                                "choices": null,
+                                "asParagraph": null
+                            },
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "outstream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "return0",
+                            "label": null,
+                            "identifier": null,
+                            "scope": "GLOBAL",
+                            "kind": "LIST",
+                            "description": "The Back",
+                            "assignWidget": null,
+                            "returnWidget": null,
+                            "child": {
+                                "__typename": "PortChild",
+                                "identifier": "@mikro/metric",
+                                "kind": "STRUCTURE",
+                                "scope": "GLOBAL",
+                                "nullable": false,
+                                "assignWidget": null,
+                                "returnWidget": null,
+                                "child": null,
+                                "variants": null
+                            },
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "constream": [
+                    []
+                ],
+                "constants": null,
+                "name": "Measure Basic Metrics",
+                "description": "Measures basic meffffftrics of an image like max, mifffffn, mean",
+                "retryDelay": 2000
+            },
+            {
+                "__typename": "ReactiveNode",
+                "id": "reactive-5029e12c-3f3e-48f1-9eb1-39c2a101eb2c",
+                "position": {
+                    "__typename": "Position",
+                    "x": 853,
+                    "y": 129
+                },
+                "typename": "ReactiveNode",
+                "parentNode": null,
+                "implementation": "ZIP",
+                "defaults": null,
+                "instream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "return0",
+                            "label": null,
+                            "identifier": "@mikro/era",
+                            "scope": "GLOBAL",
+                            "kind": "STRUCTURE",
+                            "description": "The Back",
+                            "assignWidget": {
+                                "__typename": "Widget",
+                                "kind": "SearchWidget",
+                                "query": "query SearchEras($search: String, $values: [ID]) {\n  options: eras(name: $search, limit: 30, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                                "hook": null,
+                                "ward": "mikro",
+                                "min": null,
+                                "step": null,
+                                "placeholder": null,
+                                "max": null,
+                                "choices": null,
+                                "asParagraph": null
+                            },
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ],
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "arg1",
+                            "label": null,
+                            "identifier": null,
+                            "scope": "GLOBAL",
+                            "kind": "UNSET",
+                            "description": null,
+                            "assignWidget": null,
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "outstream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "return0",
+                            "label": null,
+                            "identifier": "@mikro/era",
+                            "scope": "GLOBAL",
+                            "kind": "STRUCTURE",
+                            "description": "The Back",
+                            "assignWidget": {
+                                "__typename": "Widget",
+                                "kind": "SearchWidget",
+                                "query": "query SearchEras($search: String, $values: [ID]) {\n  options: eras(name: $search, limit: 30, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                                "hook": null,
+                                "ward": "mikro",
+                                "min": null,
+                                "step": null,
+                                "placeholder": null,
+                                "max": null,
+                                "choices": null,
+                                "asParagraph": null
+                            },
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        },
+                        {
+                            "__typename": "Port",
+                            "key": "arg1",
+                            "label": null,
+                            "identifier": null,
+                            "scope": "GLOBAL",
+                            "kind": "UNSET",
+                            "description": null,
+                            "assignWidget": null,
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "constream": [],
+                "constants": null,
+                "name": "",
+                "description": "No description"
+            }
+        ],
+        "edges": [
+            {
+                "__typename": "LabeledEdge",
+                "id": "reactflow__edge-1return_0-arkid-92349dc5-9fc9-4f40-b9ae-59ebe6a84074arg_0",
+                "source": "1",
+                "sourceHandle": "return_0",
+                "target": "arkid-92349dc5-9fc9-4f40-b9ae-59ebe6a84074",
+                "targetHandle": "arg_0",
+                "typename": "LabeledEdge",
+                "stream": []
+            },
+            {
+                "__typename": "LabeledEdge",
+                "id": "reactflow__edge-arkid-92349dc5-9fc9-4f40-b9ae-59ebe6a84074return_0-reactive-5029e12c-3f3e-48f1-9eb1-39c2a101eb2carg_0",
+                "source": "arkid-92349dc5-9fc9-4f40-b9ae-59ebe6a84074",
+                "sourceHandle": "return_0",
+                "target": "reactive-5029e12c-3f3e-48f1-9eb1-39c2a101eb2c",
+                "targetHandle": "arg_0",
+                "typename": "LabeledEdge",
+                "stream": [
+                    {
+                        "__typename": "StreamItem",
+                        "key": "return0",
+                        "kind": "STRUCTURE",
+                        "identifier": "@mikro/era",
+                        "scope": "GLOBAL",
+                        "nullable": false,
+                        "child": null,
+                        "variants": null
+                    }
+                ]
+            },
+            {
+                "__typename": "LabeledEdge",
+                "id": "reactflow__edge-reactive-5029e12c-3f3e-48f1-9eb1-39c2a101eb2creturn_0-2arg_0",
+                "source": "reactive-5029e12c-3f3e-48f1-9eb1-39c2a101eb2c",
+                "sourceHandle": "return_0",
+                "target": "2",
+                "targetHandle": "arg_0",
+                "typename": "LabeledEdge",
+                "stream": [
+                    {
+                        "__typename": "StreamItem",
+                        "key": "return0",
+                        "kind": "STRUCTURE",
+                        "identifier": "@mikro/era",
+                        "scope": "GLOBAL",
+                        "nullable": false,
+                        "child": null,
+                        "variants": null
+                    },
+                    {
+                        "__typename": "StreamItem",
+                        "key": "arg1",
+                        "kind": "UNSET",
+                        "identifier": null,
+                        "scope": "GLOBAL",
+                        "nullable": false,
+                        "child": null,
+                        "variants": null
+                    }
+                ]
+            }
+        ],
+        "globals": [],
+        "args": [],
+        "returns": [
+            {
+                "__typename": "Port",
+                "key": "return0",
+                "label": null,
+                "identifier": "@mikro/era",
+                "scope": "GLOBAL",
+                "kind": "STRUCTURE",
+                "description": "The Back",
+                "assignWidget": {
+                    "__typename": "Widget",
+                    "kind": "SearchWidget",
+                    "query": "query SearchEras($search: String, $values: [ID]) {\n  options: eras(name: $search, limit: 30, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                    "hook": null,
+                    "ward": "mikro",
+                    "min": null,
+                    "step": null,
+                    "placeholder": null,
+                    "max": null,
+                    "choices": null,
+                    "asParagraph": null
+                },
+                "returnWidget": null,
+                "child": null,
+                "variants": null,
+                "nullable": false
+            },
+            {
+                "__typename": "Port",
+                "key": "arg1",
+                "label": null,
+                "identifier": null,
+                "scope": "GLOBAL",
+                "kind": "UNSET",
+                "description": null,
+                "assignWidget": null,
+                "returnWidget": null,
+                "child": null,
+                "variants": null,
+                "nullable": false
+            }
+        ]
+    },
+    "restrict": [],
+    "name": "hazy-magnolia-kangaroo",
+    "screenshot": null,
+    "createdAt": "2023-10-17T13:13:12.164363+00:00",
+    "workspace": {
+        "__typename": "Workspace",
+        "id": "1"
+    }
+}

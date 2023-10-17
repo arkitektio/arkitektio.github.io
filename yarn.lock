@@ -1989,10 +1989,10 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
-"@jhnnsrs/arkitekt@^0.0.33":
-  version "0.0.33"
-  resolved "https://registry.yarnpkg.com/@jhnnsrs/arkitekt/-/arkitekt-0.0.33.tgz#68f1675eb05c70bbdcccbe9462bb43d1857fd7c6"
-  integrity sha512-clCQJ9C56JntgitDMsxjQjvnx6SHqrlri0UYHwUxojHYYBa3esSl3LD6lxTRwFyx7dUPJgLIIqB56fYqz2PUgA==
+"@jhnnsrs/arkitekt@0.0.36":
+  version "0.0.36"
+  resolved "https://registry.yarnpkg.com/@jhnnsrs/arkitekt/-/arkitekt-0.0.36.tgz#989482ee99b1dba8ef5acbefecc1dbda8098f2a7"
+  integrity sha512-64n1Gxos6ItN2uGn6pQw6haTZMaaqM0ID5Nm2WQOttyisTRQ8ZBuCga+KkD6awMyeHfkQFwiO1N35ixtedozpQ==
   dependencies:
     "@jhnnsrs/datalayer" "^0.0.8"
     "@jhnnsrs/fakts" "^0.0.17"
@@ -2071,7 +2071,7 @@
     apollo-upload-client "^17.0.0"
     subscriptions-transport-ws "^0.11.0"
 
-"@jhnnsrs/rekuest@^0.0.15":
+"@jhnnsrs/rekuest@0.0.15", "@jhnnsrs/rekuest@^0.0.15":
   version "0.0.15"
   resolved "https://registry.yarnpkg.com/@jhnnsrs/rekuest/-/rekuest-0.0.15.tgz#494cc0817fcd2322376b003d8b4b3b7d03deaf2d"
   integrity sha512-NjvE1k2wiDXd5DTbBgRc3ffDiui6YEjKrgrihuykuIrgJUcm+Ab1ZZCdt8pK2tvlufBYMRZ1DQ1jDsbT/dlkkg==

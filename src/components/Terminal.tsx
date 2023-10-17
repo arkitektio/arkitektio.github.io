@@ -32,6 +32,8 @@ export const InnerTerminal = ({
       setPlayer(p);
     });
   }, []);
+
+  
   useEffect(() => {
     const currentRef = ref.current;
     console.log(src);
