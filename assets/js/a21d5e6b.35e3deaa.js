@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[6913],{14723:s=>{s.exports=JSON.parse('{"title":"Showcases","slug":"/category/showcases","permalink":"/docs/category/showcases","navigation":{"previous":{"title":"MikroJ","permalink":"/docs/repo/mikroj"},"next":{"title":"Fiji Automation","permalink":"/docs/showcase/fiji_worfklow"}}}')}}]);
