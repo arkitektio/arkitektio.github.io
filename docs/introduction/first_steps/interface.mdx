@@ -1,0 +1,133 @@
+---
+title: Installing our interface
+sidebar_label: 1. Interface
+sidebar_position: 4
+---
+
+import { OrkestratorGrid } from "../../../src/components/layout/Button";
+import Image from '@theme/IdealImage';
+import thumbnail from './server.png';
+import oauth from './oauth.png';
+import data from './data.png';
+
+
+## Interface
+
+Our first step into the Arkitekt world will be to get familiar with its interface. But lets make the first steps to connect it to your Arkitekt
+Server. By the end of this section, you will be able to:
+
+- Connect your first App (Orkestrator) to your Arkitekt server
+- Login with your Arkitekt server with your user account
+- Understand the authenticate and authorization process
+- Get familiar with the Orkestrator interface
+
+Small Steps to get you started!
+
+### Prerequisites
+
+Before you can start using Arkitekt, you need to have the Arkitekt server platform installed, please refer to the
+[installation guide](/docs/introduction/installation) for more information.
+
+### About Orkestrator
+
+Now that you have the Arkitekt server installed, you can start using our default interface **Orkestrator**, which will be your main tool to interact with the Arkitekt server.
+As previously mentioned all interaction with the Arkitekt server happens through apps, and Orkestrator is the default app that comes with the Arkitekt server. Orkestrator itself
+comes in two flavours: a desktop app and a webapp. The desktop app is a native app that you can download and install on your computer, while the webapp is a web-based app and can be accessed
+through your browser. Both apps have similar funcitionality, but the desktop app has some additional features that are not available in the webapp. We strongly recommend that you use the desktop app
+for your day-to-day work, and use the webapp only when you are not able to install the desktop app on your computer.So let's get started!
+
+:::info On why we recommend the desktop app
+
+As Arkitekt is a webservice platform you might wonder why we recommend the desktop app. This is primarly because of the restrictions of modern webbrowsers to access webservices in your local network. While 
+you can perfectly access your Arkitekt server hosten on *your* computer through your browser, you might have problems accessing it from *another* computer in your network. To circumvent this restriction, 
+we have developed a desktop app that can be installed on your computer and that can access any Arkitekt server without restrictions, additionaly it can help you find local arkitekt servers in your network.
+without any searching for IP addresses, and syncronize your data with the server. It's worth it!
+
+:::
+
+#### Download the desktop app
+
+One more installation to go. You can download the desktop app from the github release page of the Arkitekt server. You can find the latest release [here](https://github.com/jhnnsrs/orkestrator/releases/latest).
+Or just click on the button below, depending on your operating system.
+
+<OrkestratorGrid/>
+
+#### I don't want to install the desktop app
+
+That's perfectly understandable, you can also use the webapp. Just click [here](http://localhost:8010/) open the webapp in your browser. If you are not able to access the webapp, please refer to the [troubleshooting section](/docs/introduction/troubleshooting) for more information.
+Be aware that we will assume that you are using the desktop app in the following sections, so some of the screenshots might look different in the webapp.
+
+# Lets Finally get started
+
+### Very first steps
+
+After you have installed the desktop app, you should see the following screen, when you open the app. If you are using the webapp, you should see a similar screen in your browser.
+
+<div className="mt-2 p-6">
+<Image img={thumbnail} />
+
+<div className="text-gray-400 mb-2">
+<small>The orkestrator desktop app startscreen </small>
+</div>
+</div>
+
+The big coloured button in the center of the screen is the main button to connect to your Arkitekt server. If you click on it, you will instruct this app to connect to 
+the named server (this is the name of the "deployment" you gave during the installation). During this connection process Orkestrator will understand which services are available on the server and will
+potentially will negotaite access rights negotiations. Every app that can connect to Arkitekt has to undergo this connection step.
+
+:::info On the connection process
+
+The connection process is a very important step in the Arkitekt ecosystem. It is the first step to ensure that apps can reliable interface with the Arkitekt server and potential third party modules. It is also
+an important step that system administrators can use to control which apps can connect to the server, or if they want to restrict access to the server or submodules of the server. 
+
+:::
+
+### Almost there
+
+Now that we have connected to the Arkitekt Server we can start using the app. But first Arkitekt needs to understand who we are, which is why we need to login to the server.
+Once clicking login a webpage will open in your default **webbrowser** and you will be prompted to provide your login details 
+These should be the user account details that you have created during the installation of the Arkitekt server. (defaults: user: `demo`, password: `demo`).
+
+
+:::warning No Admin Login
+
+During the installation you were prompted to create both an admin account and various user accounts. You should **never** use the admin account to login to the server, 
+as this account is only used to manage the server.
+
+:::
+
+Shortly after you have logged in, you should see the following screen in the Orkestrator app. If you are using the webapp, you should see a similar screen in your browser.
+
+<div className="mt-2 p-6 rounded rounded-md">
+<Image img={oauth} className="rounded rounded-xl overflow-hidden" />
+
+<div className="text-gray-400 mb-2">
+<small>The authorization screen powered by Oauth2</small>
+</div>
+</div>
+
+This is the OAuth screen, which is used to grant the Orkestrator app access to your user account. 
+This is a very important step and every App that connects to Arkitekt needs to undergo this step (don't worry only once). During this step you will grant the **app** access to your user account, 
+and tell Arkitekt which actions the app is allowed to perform on your behalf. We are working on a comprehensive documentation for this, but for this tutorial we will just grant the app full access to your account.
+To do this, click on the **Authorize** button. You will be redirected back to the Orkestrator app and you are finally go to go.
+
+:::info On the OAuth process
+
+This authentication and authorization process is a very important step in the Arkitekt ecosystem. It is the first step to ensure a secure and trustworthy connection between the Arkitekt server and the app. As we believe data 
+privacy and security is a very important topic, every app needs to alert what it can potentially do with your data. As Arkitekt is a very flexible platform, we cannot know what every app can do, so we need to ask you to grant
+to make sure that you are always in control of your data.
+
+:::
+
+### Welcome to Orkestrator
+
+And now you are finally ready to use the Orkestrator app. Quite a few steps. But trust us, its worth it! You should now see the following screen in the Orkestrator app. 
+
+
+<div className="mt-2 p-6 rounded rounded-md">
+<Image img={data} className="rounded rounded-xl overflow-hidden" />
+
+<div className="text-gray-400 mb-2">
+<small>The data pane</small>
+</div>
+</div>

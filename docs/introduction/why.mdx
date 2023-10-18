@@ -1,0 +1,93 @@
+---
+title: Why?
+sidebar_label: Why?
+sidebar_position: 1
+---
+
+# Why?
+
+Let's first clarify a few reasons, why Arkitekt was created and what it is trying to solve. Arkitekt's Philosophy, if you will.
+
+
+# An ode to modern bioimage analysis
+
+Modern bioimage aquisition and analysis are awesome! In the last decade, we have seen
+tremendous advances in both fields. On the aquisition side, we have seen the development
+of new microscopy methods, such as light sheet microscopy, that can acquire image data at an
+unprecedented rate and resolution, letting us image entire organisms at the cellular level.
+Or technologies like super resolution microscopy, that helps us now resolve our imaging structures at the nanometer scale.
+
+On the analysis side, we have seen the development of new algorithms, such as deep
+learning, that can now solve long standing analysis challenges such as automated cell segmentation with
+unimaginable accuracy. Or large scale omics analysis, that leverages the power of our modern data
+centers to analyze terabytes of biological data in a single experiment.
+
+And as these two fields are more closly intertwined than ever before, we also have seen the development of new
+acquistion techniques powered by the insights we gain through our analysis. For example, in Smart Microscopy
+we can now use deep learning to guide our microscopes to acquire only the most relevant data, saving us time and allowing
+us to feedback on our increasingly challenging microscopic setups.
+
+Deep learning has revolutionized the field of computer vision and
+especially image segmentation. Long standing problems such as cell segmentation are now
+solved with unprecedented accuracy and speed. We now have microscopes, such as light sheet microscopy. that can acquire image data at an unprecedented
+rate and resolution, letting us image entire organisms at the cellular level. 
+
+However with these advances, we also face new challenges.
+
+Long gone are the days, where a single image analysis software like ImageJ could do it all.
+Today, a typical modern bioimage analysis workflow consiis powered by a variety of different tools and software,
+each with their own **strengths** but also their weaknesses. These tools often grew out of the necessity to
+solve a specific problem, in a highly specific setup (on highly specific hardware) and now excel at providing specialized solution for that problem.
+And thats great! But it also means, that these tools are increasingly difficult to adapt to other problemset and into new single managable and interoperable workflow
+with other tools. We really miss ImageJ.
+
+Furthermore, the terabyte big data we analysis in our tools is
+often stored in a variety of different formats, making it difficult to combine and analyze
+them. Futher data is often stored in a variety of different places, such as hard
+drives, network drives or cloud storage, not to mention in barely managable folder setups. Keeping track of the data and to share it with others,
+remains a challenge in itself and hinders collaboration and reproducibility.
+
+Lastly and consequently because of the data and tool fragmentation, modern bioimage analysis has become
+a tedious and time consuming task, if not expertly patched. Aforementioned smart microscopes rely on 
+highly trained programmatic experts to setup and run them in real-time. Non-programming experts
+are often left to only glance at the results in the papers or are led on a long journey to become
+experts themselves. While this journey is often rewarding, sometimes it is just not feasible and
+,sadly, not fun.
+
+# Lets have fun again
+
+And thats why we designed Arkitekt. To make modern bioimage analysis fun again. We probably made it only half-way, but we tried ;)
+Arkitekt was therefore designed around some guiding principles:
+
+1. *Tools know best*
+
+Modern tools are awesome and forcing them to do things they are not designed for is not fun. We believe that while ImageJ as a central image hub
+stands as a great solution, but that specialised niche tools won't go away. Arkitekt therefore tries to utilize the power of existing tools and software and 
+to connect them in a way that lets the workflow designer choose the best tools for the job. It is there desgined as a sound backbone of bioiamge analysis 
+that offloads computation to these apps and the hardware they run on.
+
+2. *We need a fast and reliable Middleman*
+
+Orchestrating tools in Workflows is hard. This is especially true, if these tools are not designed to work together. Letting tools communicate directly with each other, trying to figure this out is probably (and arguably) 
+not the best idea. We therefore designed Arkitekt as a middleman between the tools, a central authority that tools can talk to, and that ensures that they can rely on each other and the analysis they provide. As a middleman, Arkitekt also tries to
+interact with another central part of the workflow: the user. It was  designed to let user design workflows in a graphical user interface, spanning multiple
+apps. It then also turns into A workflow scheduler, that takes tehese workflows and schedules them in real-time. No more batch processing, no more waiting for the results.
+
+3. *Data is king*
+
+As uncovering previously unaccounted bioloical relationships in our data becomes more and more important, and the realization that machine readable data is the key 
+to more FAIR science, we believe that central data management is essential to modern bioimage analysis. Arkitekt was therefore designed as a multi-user data hub, providing a central storage for all the data
+your lab generates and throughout its entire lifecycle. It was designed to explore your data and metadata from anywhere, at in real-time as it is being produced. Integrating the knowledge from
+which tools you used to process your data with, Arkitekt will keep track of what happend to your data when and where. And lastly, because sharing is fun, Arkitekt was designed to let you share your data with others,
+and to let others share their data with you, enabing social features such as comments and notes and collaborative data exploration, while ensuring means for provenance and data integrity.
+
+4. *Open Modulariy is key*
+
+As we believe in the power of existing tools, we also believe in the power of modularirty. Arkitekt was therefore designed as a modular system, that can be extended and merge with new functionality
+from other tools or software. It is of course open source and provides a myriad building blocks that might help someone else a bioimage problem here and there. While we hope that a standard Arkitekt installation
+will be enough for some users, we are hoping that others will take out parts, replace them, merge them with their own tools and software and create something new and awesome. We are excited to see what you will come up with!
+
+
+# Enough marketing, lets get started
+
+We hope this page gives you an idea about the **philosophy** of Arkitekt lets get started with the **practical** stuff.

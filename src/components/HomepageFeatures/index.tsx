@@ -14,8 +14,8 @@ const FeatureList: FeatureItem[] = [
     Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
     description: (
       <>
-        Arkitekt is a framework that allows you to use the tools you want and
-        leverage their full power. No compromises.
+        Arkitekt is a framework to make your bioimage tools more interoperable
+        and orchestratable allow you to use the tools the way you know them.
       </>
     ),
   },
@@ -24,8 +24,8 @@ const FeatureList: FeatureItem[] = [
     Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
     description: (
       <>
-        Arkitekt allows you to orchestrate your real-time bioimage workflows in
-        graphical workflows, with a focus on reproducibility and ease of use.
+        Arkitekt allows you to orchestrate your bioimage workflows in
+        graphical workflows, with a focus on reproducibility and real-time data.
       </>
     ),
   },

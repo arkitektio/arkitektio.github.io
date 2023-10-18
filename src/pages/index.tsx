@@ -22,7 +22,7 @@ function HomepageHeader() {
             className="bg-white rounded-md text-slate-600 px-4 py-2"
             to="/docs/intro"
           >
-            Arkitekt Tutorial - 5min ⏱️
+            Arkitekt Tutorial
           </Link>
         </div>
       </div>

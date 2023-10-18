@@ -1,7 +1,7 @@
 ---
 title: Installation
 sidebar_label: Installation
-sidebar_position: 1
+sidebar_position: 3
 ---
 
 import { DownloadGrid } from "../../src/components/layout/Button";
@@ -11,7 +11,7 @@ import thumbnail from './installer.png';
 ## Before we start
 
 Before you start, allow a few comments about the installation of the arkitekt platform. Arkitekt
-is a web-server platform, that was designed to scale from the needs of one person to the needs of
+is a server platform, that was designed to scale from the needs of one person to the needs of
 a large organization. You can install it on your own computer, or on a server in your lab, or
 on a server in the cloud. Depending on the scenario, the installation process will differ
 as you might want to adjust the platform and its dependencies to your needs.
@@ -31,10 +31,6 @@ The core strategies of the installation process are:
 - **Helm Charts ** (coming soon), this strategy includes a helm chart that sets up the platform
   exposing you on a kubernetes cluster.
 
-- **Custom Installation**, you shouldn't really choose this strategy, unless you are a developer and
-  are already familiar with the platform and its smaller subservices. Your on your own here, but
-  you can find some hints in the.
-
 
 ## Graphical installer
 
@@ -43,8 +39,9 @@ Go ahead and download our installer for your operating system "Konstruktor" , an
 <DownloadGrid/>
 
 
-This installer ( once installed) will guide you through the installation process and the deployment of the  platform on your specific hardware. It will also give you a rough estimate of the resources you will need for the installation. Once installed it will serves  simple desktop app that  additionaly acts as an updater ,  as well as and admin interface to the platform and allows you to **start** and **stop** the platform. Additionaly it will act as a beacon
-that advertises the platform on your local network, so that other users can find it.
+This installer ( once installed) will guide you through the installation process and the deployment of the  platform on your specific hardware.
+Once installed it will serves simple desktop app that  additionaly acts as an updater, as well as and admin interface to the platform and allows you to **start** and **stop** the platform. 
+Additionaly it will act as a beacon that advertises the platform on your local network, so that other users can find it.
 
 Konstruktor necessitates the installation of a container runtime (Docker) on the machine where you want to install arkitekt.
 If you don't have docker installed, you can download it from [here](https://www.docker.com/products/docker-desktop). Docker
@@ -53,6 +50,16 @@ the FAQ section for more information about the installation of docker especially
 on your machine.
 
 <Image img={thumbnail} />
+
+
+:::note About Channels
+
+Konstruktor allows you to install different versions (termed "channels") of the platform. The default current channel is the
+**"paper"** channel, which is the most stable version of the platform and designed to faciliate workflows of the original paper.
+If you want to try out the latest features of the platform and the "lessons learned" from the paper, you can switch to the
+"next" channel which is a more recent version that is only managable by developers.
+
+:::
 
 
 ## Docker-Compose

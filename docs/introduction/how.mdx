@@ -1,0 +1,102 @@
+---
+title: How?
+sidebar_label: How?
+sidebar_position: 2
+---
+
+import Image from '@theme/IdealImage';
+import thumbnail from './stateless.png';
+import techstack from './techstack.png';
+
+
+# How?
+
+Okay now that the marketing and philosophy is out of the way, lets get started with the practical stuff. What is Arkitekt and how does it work?
+
+
+## Basics
+
+Good question. Arkitekt is software platform for image analysis. As explained in the [philosophy](/docs/philosophy) section, Arkitekt wants to act as 
+a middleman and datahub that stands between the user and the image analysis tools. As such Arkitekt, is an installable app that runs on a computer in your
+lab (or just yours if you don't want to share). In more programmatic terms this app is in actually server platform, that provides a graphical webinterface for the user to interact with, and also some
+programming endpoints for the tools to interact with. We acknowledge that even the word server can be a bit daunting, and comes with a lot of connotations of some tedious explainations
+from the IT department for some of you. But don't worry, we have tried to make it as easy as possible to get started and its perfectly fine to just think of it as an app.
+
+Anyway, when you install Arkitekt, you are installing that server app. It will now run on your computer, in the background, and advertise itself on your local network, so that
+Apps can easily find and connect to it. We will talk more about Apps later on, but for now just think of them as the image analysis tools that you want to use. 
+You on the other hand, will interact with Arkitekt through a webbrowser or a graphical desktop app (Orkestrator). These graphical interfaces, that we mentioned earlier, will allow you to remotely interact with the
+Arkitekt server diretly and through that, with all of the connected Apps. Importantly this means that you can use Arkitekt from any computer on your local network or even remotely over the internet (if you chose to connect it).
+
+For most users, this is all you need to know about the software design of Arkitekt. You install it, and then you can use it to run image analysis tools. The rest of this section is intended for more technically
+inclined users who want to know more about the inner workings of Arkitekt. If you are not interested in that, you can safely skip to the next section, please make sure to read a little bit in the design
+section or go through our tutorial to get a better understanding of how to use Arkitekt.
+
+
+
+
+:::note 
+
+While Arkitekt comes with a graphical interface, it is not a requirement to use it. Arkitekt can be used entirely through its programming interface, and you can even build your own graphical interface if you want to.
+Indeed there is nothing special about the prebuilt Arkitekt interface, for all intents and purposes it is just another App that connects to the Arkitekt server.   
+
+:::
+
+<div className="mt-2 p-6">
+<Image img={thumbnail} />
+
+<div className="text-gray-400 mb-2">
+<small>Arkitekts core design of a cental webserver middleman </small>
+</div>
+</div>
+
+### Arkitekt a few steps down
+
+This section is intended to shed some more light on the inner workings of Arkitekt, for those who are a bit more technically inclined. Most of this is not necessary to know to use Arkitekt, but it might be helpful to understand
+some of the design decisions that went into Arkitekt, especially for web developers who want to build their own interfaces for Arkitekt.
+
+As mentioned above, Arkitekt is a server platform that is compromised of various smaller web (micro-services) that make up the whole functionality of Arkitekt and are backed by popular open-source projected.
+These webservices and maintained in docker containers and orchestrated by docker-compose (at least in the default one computer setup). All webservices follow
+an API First Design and expose a comprehensive GraphQL API (More on GraphQL in its ([section](/design/api)). All webservices are able to work standalone. The main webservices are:
+
+- **Lok**: A platform wide authorization and authentication system that handles user accounts and app-level permissions (see [Security](/design/security)). It is based on the popular Oauth2/OpenID standard, and provides
+decentralized authentication and authorization for all Arkitekt services through signed json web tokens. Lok also provides the endpoints for the fakts API 
+( a asynchronous configuration protocol developed in parallel with and for Arkitekt), which allows connecting Apps to configure and authorize them securely with an Arkitekt servers.
+
+
+- **Rekuest**: A platform wide request and response system that handles the communication between the Arkitekt server and its connected Apps. It provides a central connection point for a all connected apps, and manages their
+functionality as [Nodes](/design/nodes) in a central discoverable repository. Assignment of tasks to the App can happen through various protocols but by default is powered by a websocket connection that connect to a RabbitMQ instance
+Rekuest also provides a central logging system for all connected apps and assinged tasks.
+
+
+- **Fluss**: A basic webservice to manage the storage of workflows and their execution transcripts.
+
+- **Port**: A webservice to allow for  the  installation and management of container powered plugin apps that run directly on the Arkitekt server.
+
+- **Mikro**: The only service of Arkitekt that is inherently adapted to work with bioimages. It is powered by a relational database that stores all the metadata of the images and their analysis results, as well
+as providing a central storage for the binary data (powered by Zarr and backed by S3). 
+
+Coupling of these services is kept to a minimum, and they can be used standalone. For example, you can use Lok to manage user accounts and authentication for your own webapp, or you can use Rekuest to manage the communication
+between your own apps. 
+
+
+
+
+
+
+
+
+<div className="mt-2 max-w-[30%]">
+<Image img={techstack} />
+
+<div className="text-gray-400 mb-2">
+<small>The Arkitekt tech-stack with underlying  </small>
+</div>
+</div>
+
+
+:::note Handling State in Arkitekt
+
+As a webservice platform, Arkitekt is designed to be stateless, with all state being managed by the underlying databases. This means that Arkitekt can be scaled horizontally by simply adding more instances of the underlying
+webservice if needed. The only exception to this is the Rekuest Service which needs to maintain a connection to all connected App through a websocket connection, and keeps track of the state of all connected apps. While theoretically
+this could be scaled horizontally as well, it is currently highly experimental and not recommended.
+:::
