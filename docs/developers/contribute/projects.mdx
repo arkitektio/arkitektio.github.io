@@ -1,0 +1,140 @@
+---
+title: Projects
+sidebar_label: Projects
+sidebar_position: 2
+---
+
+# Projects
+
+The Arkitekt platform is a multi-project platform, each of which can develop on its own pace and with its own development team. These projects align with
+the Arktiekt platform's architecture and therefore its (micro)-services, all of which are managed in seperate github repositories, that include an increasing
+set of automation tools to help with the development process. With this multi-project approach we would like to ensure more agile development process, where each project can
+be developed and released independently of the other projects, and that you can choose which projects you want to use in your own Arkitekt platform.
+
+On this page now you will be able to find an overview of all the projects that are part of the Arkitekt platform, and links to their respective repositories.
+
+:::info On the Arkitekt platform's architecture
+
+The sheer number of projects that are part of the Arkitekt platform might seem overwhelming at first, but you will have to only interact with a small subset of them.
+Also if you don't know which part of the platform you encounter a problem with just post it on the main [github issues page](https://github.com/arkitektio/arkitektio.github.io/issues)
+and we will make sure to help you out and point you in the right direction.
+:::
+
+## Arkitekt Core
+
+The Arkitekt Core project is the core of the Arkitekt platform, and contains the core services that are required to run the Arkitekt platform. This includes the
+the webservers that are required to run the standard Arkitekt platform, but also the projects that are required to run the Arkitekt platform in a custom configuration.
+
+####  Services
+
+- [Lok](https://github.com/jhnnsrs/lok-server): Authorization and Authentication service
+- [Rekuest](https://github.com/jhnnsrs/rekuest-server): Node Repository and Task-Assignment
+- [Port](https://github.com/jhnnsrs/port-server): Vritualization of plugin apps
+- [Mikro](https://github.com/jhnnsrs/mikro-server): Microscopy Data Management
+- [Fluss](https://github.com/jhnnsrs/port-server): Workflow management
+
+####  GUI Clients
+
+- [Orkestrator](https://github.com/jhnnsrs/orkestrator): The standard Arkitekt platform client (both desktop-app and web-app)
+
+#### Management Tools
+
+- [Konstruktor](https://github.com/jhnnsrs/konstruktor): The Arkitekt platform management tool (installer + admin)
+
+
+## Arkitekt SDK
+
+The Arkitekt SDK is a set of tools that can be used to develop apps and plugins for the Arkitekt platform. The SDK is currently available in Python 
+and partially in Javascript/Typescript (currently restricted to the React framework).
+
+### Python
+
+The python SDK is a set of tools that can be used to develop apps and plugins for the Arkitekt platform. You can find a global documentation for the 
+tools here in the documentation. The modules however also have their own documentation, which you can find in the respective repositories. All projects
+are managed with poetry.
+
+#### Meta Packages
+- [arkitekt](https://github.com/jhnnsrs/arkitekt): A one-stop-shop for all the Arkitekt SDK tools for Python (includes the `arkitekt` CLI tool)
+
+#### Core library
+
+- [rekuest](https://github.com/jhnnsrs/rekuest): A Python client for the Rekuest service, with convenience methods for quickly creating and running nodes
+- [mikro](https://github.com/jhnnsrs/mikro): A Python client for the Mikro service, with convenience methods to interact with your data through common python abstractions (numpy, pandas, xarray, ...)
+- [fluss](https://github.com/jhnnsrs/fluss): A Python client for Fluss service, to retrieve and alter workflows
+- [unlok](https://github.com/jhnnsrs/unlok): A Python client for the Lok service, to interact with users, write comments, and manage permissions
+- [port](https://github.com/jhnnsrs/port): A Python client for Fluss service,  with convenience methods to create and run plugins
+- [reaktion](https://github.com/jhnnsrs/reaktion): A Scheduler for Fluss workflows, that can execute locally or use arkitekt to to run nodes remotely
+
+#### Supporting libraries
+
+These libaries provide non arkitekt specific functionality, but are used in the Arkitekt SDK.
+
+- [fakts](https://github.com/jhnnsrs/fakts): An asynchronous configuration retriever, that can help in automatically retrieving configuration from the Arkitekt platform
+- [herre](https://github.com/jhnnsrs/herre): An asynchronous Oauth2 client, that provides various strategies to authenticate users with Arkitekt
+- [turms](https://github.com/jhnnsrs/turms): An easy code-generator that can help bridge Arkitekt GraphQL queries to native python objects
+- [rath](https://github.com/jhnnsrs/rath): A GraphQL client for Python, that can be used to interact with any GraphQL API
+- [koil](https://github.com/jhnnsrs/koil): An async-sync bridge, that faciliates the integration of the async Arkitekt SDK with syncronous code or other event-loops e.g. in Jupyter notebooks, or in a QTApp
+ 
+
+### Typescript
+
+The Typescript SDK is primarily designed around enabling the development of React apps for the Arkitekt platform. As Arkitekt is a web-server based 
+platform this SDK is currently  wrapping the GraphQL API of the Arkitekt platform very slimly without too many convenience methods. The organisation
+closely mimics the python SDK, with a few exceptions. All projects are managed with yarn.
+
+#### Meta Packages
+- [arkitekt-ts](https://github.com/jhnnsrs/arkitekt-ts): A one-stop-shop for all the Arkitekt SDK tools for Python (includes the `arkitekt` CLI tool)
+
+#### Core library
+
+- [rekuest-ts](https://github.com/jhnnsrs/rekuest-ts): A Python client for the Rekuest service, with convenience methods for quickly creating and running nodes
+- [mikro-ts](https://github.com/jhnnsrs/mikro-ts): A Python client for the Mikro service, with convenience methods to interact with your data through common python abstractions (numpy, pandas, xarray, ...)
+- [fluss-ts](https://github.com/jhnnsrs/fluss-ts): A Python client for Fluss service, to retrieve and alter workflows
+- [port-ts](https://github.com/jhnnsrs/port-ts): A Python client for Fluss service,  with convenience methods to create and run plugins
+
+#### Supporting libraries
+
+These libaries provide non arkitekt specific functionality, but are used in the Arkitekt SDK.
+
+- [fakts-ts](https://github.com/jhnnsrs/fakts-ts): An asynchronous configuration retriever, that can help in automatically retrieving configuration from the Arkitekt platform
+- [herre-ts](https://github.com/jhnnsrs/herre-ts): An asynchronous Oauth2 client, that provides various strategies to authenticate users with Arkitekt
+
+
+
+## Arkitekt Apps
+
+Additionaly to the Arkitekt platform, we manage a set of apps that are developed by the Arkitekt team, and that can be used to interact with the Arkitekt platform.
+They are all open-source and can be used as a starting point for your own apps.
+
+### Standalone GUI Applications
+
+- [mikroj](https://github.com/jhnnsrs/mikroj): The Arktitekt FIJI bridge (powered by pyimagej)
+- [gucker](https://github.com/jhnnsrs/gucker): The Arkitekt FileWatcher App (used in streaming worfklows)
+- [mikro-manager](https://github.com/jhnnsrs/mikro-manager): The Arkitekt MikroManager Bridge (powered by pycro-manager)
+
+### Third-Party Plugins 
+
+- [mikro-napari](https://github.com/jhnnsrs/mikro-napari): The Napari plugin (powered by napari)
+
+### Arkitekt Plugin-Apps
+
+- [stdlib](https://github.com/jhnnsrs/stdlib): The Arkitekt standard library with basic functionality
+- [omero](https://github.com/jhnnsrs/omero): A basic bioformats conversion plugin
+- [renderfarm](https://github.com/jhnnsrs/renderfarm): A basic video and image rendering plugin
+- [reaktor](https://github.com/jhnnsrs/reaktor): An internal scheduling apps for Fluss workflows
+- [kare](https://github.com/jhnnsrs/kare): The CARE plugin
+- [segmentor](https://github.com/jhnnsrs/segmentor): The Stardist Plugin
+
+### Arkitekt Plugin-Apps (in development)
+
+- [rektifier](https://github.com/jhnnsrs/rektifier): A plugin to rectify images along a Line ROI
+
+
+
+### Arkitekt Next 
+
+Arkitekt next services are the next generation of Arkitekt services, with lessons learned from this iteration, that are currently in development. They are not yet ready for external use, but 
+will provide a more flexible and scalable architecture for the Arkitekt platform, based on the [Strawberry](https://strawberry.rocks/) GraphQL framework.
+The transition to the new architecture will be gradual, and (besided mikro-next) will not require changes to the Arkitekt SDK. However 
+the new architecture will require a new set of GUI clients, that are devleoped in paralel. Once deemed stable a migration guide will be provided.
+The progress of the development is currently not public, but if you are interested please ask any time.
