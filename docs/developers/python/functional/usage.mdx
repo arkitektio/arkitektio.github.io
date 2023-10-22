@@ -17,87 +17,211 @@ and have arkitekt installed on your computer.
 Before we start, lets make sure that arkitekt is installed correctly. To do this, we will
 run the following command.
 
-<Terminal src={"/casts/johannes.cast"} />
+<Terminal src={"/casts/init.cast"} />
+<div className="mt-2"></div>
 
-If you dont see the following output, then you need to go back and install arkitekt. If it still
-doesnt work, then please check out our FAQ or open an issue and
-we will help you get it working.
+If you dont see the following output, then you need to go back and install arkitekt. If you are still not greeted by
+the CLI, try to install arkitekt in a new virtual environment (conda or venv) and try again. 
 
 ## Creating a new app
 
-When utilizing arkitekt, you will be working with apps. An app is a collection of functionality
-that you will be able to expose to your lab members.
+Now that things are setup correctly, lets create a new app. To do this, we will run the following command.
 
-For example, you might have an app thatallows your lab members to process images in various ways, or to analysis data in a particular
-way.
+Create a new folder for your app, which we will call `demo` and then navigate into it.
+```bash
+mkdir demo
+cd demo
+```
 
-Generally speaking, you will want to create a new folder and a new python project for each application
-you create. This will make it easier to manage your apps and to keep them separate from each other.
-It will also make it easier to deploy your apps to users in the future. For this tutorial, we will
-create a new folder called `myapp` and then create a new arkitekt project inside of it.
+Inside the folder, we will run the following command to create a new arkitekt app.
 
-<Terminal src={"/casts/arkitekt-init.cast"} />
+```bash
+arkitekt init
+```
+
+This will launch the arkitekt CLI and ask you a few questions about your app. Don't worry, you can always change
+these settings later. For now, lets just use what the CLI suggests.
+
+
+<Terminal src={"/casts/first.cast"} />
 
 ### What just happened?
 
-When you run the `arkitekt init` command, arkitekt will ask you a few questions about your app and create
-the ".arkitekt" folder inside your directory, which containers a manifest about your app.
-and what they will be used for. The CLI will also create an app.py file for you, which will be the entrypoint
-for your app.
+Arkitekt jsut initialized a new app for you. If you inspect the folder you will see that a new file called `app.py`
+has been created as well as a new folder called `.arkitekt`. Lets briefly go over what these files are and what they
+are used for.
 
-### Why we need a manifest
 
-The manifest is a file that contains information about your app. It contains information about your app,
-such as its name, version, and entrypoint. It also contains information about how your app will be built
-and deployed. The manifest is used by arkitekt to build and deploy your app. It is also used by the arkitekt
-web interface to display information about your app and to allow users to run your app.
 
-#### About your name
+### The .arkitekt folder
 
-Well this is simple enough. Its just your name. When others will be using your app on your arkitekt they will
-see your name associated with it, and might be able to contact you if they have questions about your app.
+The `.arkitekt` folder is a folder that contains information about your app. Most Importantly, it contains the 
+manifest for your app, which is a file that contains information about your app, such as its name, version, and entrypoint,
+but also information about which rights your app needs to run, and how it should be built and deployed. This manifest is a 
+crucial part of your app, and you should not delete it. You can read more about the manifest in the manifest section.
 
-#### Your apps name
+Lets look at the manifest that was created for us, if you chose the `filter` template:
 
-Arkitekt will ask you a few questions about your app. The first question is the name of your app.
-This is the name that will be used to identify on the arkitekt web interface. The name _should_ be
-unique, so if you are creating an app that is similar to an existing app by another user, you might have
-problems of connecting your apps to the arkitekt web interface. If you are unsure, you can always
-
-#### Your version
-
-Also note that we will ask you for the current version of your app. The version can be used to track changes
-in your code and your deployments. It is recommended that you use [semantic versioning](https://semver.org/)
-but we are not enforcing it. Versions are optional, but we recommend that you use them, especially if you plan
-on deploying your app to users.
-
-#### The entrypoint
-
-The entrypoint is the file that will be used to start your app. This is the file that will contain all of your
-functions that you want to register with arkitekt. The entrypoint file should **NOT** contain any code that is being
-executed when the file is imported. This is because arkitekt will import your entrypoint file to register your
-functions with the arkitekt web interface. If you have code that is being executed when the file is imported, it will
-be executed every time a user runs your app (or you run in in dev mode). You can however have arbitary code inside
-a `if __name__ == "__main__":` block, which will only be executed when the file is run directly.
-
-Ok:
-
-```python
-if __name__ == "__main__":
-   print("Hello World") # will only be executed when the file is run directly
+```yaml
+author: jhnnsrs
+entrypoint: app
+identifier: demo
+requirements: []
+scopes:
+- read
+version: 0.0.1
 ```
 
-Not ok:
+This is a very simple manifest. It contains information about the author of the app, the entrypoint, the name of the app,
+So far we have only very basic access rights (we can read data from the platform, but not write to it), but we will change
+this later. Also note that we have not defined any requirements for our app. Requirements let us define hardware and software
+requirements for our app, when it is being deployed as an PluginApp. We will also change this later.
+
+You will also note that the ".arktiekt" folder containts some additional files such as ".gitignore" and ".dockerignore".
+These files are used to prevent git and docker from including cached secrests (such as accesstokens) in your git repository
+or docker image. You should not delete these files, as they are crucial for the security of your app.
+
+
+
+:::info I dont see the .arkitekt folder
+
+By default, the `.arkitekt` uses the "." prefix, to hide it from the file explorer on your computer. This is a common
+practice for folders that are used to store configuration files, such as the `.git` folder. If you are using a file
+explorer that does not show hidden files, you might not see the `.arkitekt` folder. Dont' worry though, most IDEs will
+show hidden files by default, and you can always use the terminal to navigate into the folder.
+
+:::
+
+
+### The app.py file
+
+The app.py file is the entrypoint for your app. When you run your app, this is the file that will be executed.
+Arkitekt will import this file and register all of the functions that are defined (and decorated) with your arkitekt
+instance, enabling them as nodes. You can imaging the app.py file as the "main" file of your app, for all things 
+"arkitekt" related. 
+
+
+
+Lets take a look at the app.py file that was created for us, if you chose the `filter` template:
 
 ```python
-print("Hello World") # will be executed every time the file is imported
+from arkitekt import register
+from mikro.api.schema import RepresentationFragment, from_xarray
+
+
+@register
+def max_intensity_projection(image: RepresentationFragment) -> RepresentationFragment:
+    """Z-Project the Maximum Intensity
+
+    This function projects the maximum intensity of the input image
+    along the z-axis
+
+    Parameters
+    ----------
+    image : RepresentationFragment
+        The input image
+
+    Returns
+    -------
+    RepresentationFragment
+        The projected image
+
+    """
+    image = image.data.max(dim="z")
+    return from_xarray(
+        image, name="Max Intensity Projection" + image.name, origins=[image]
+    )
 ```
 
-#### The builder
+This is the `hello world` of arkitekt apps. A simple function that takes an image as input and returns a new image
+as output. Lets break it down.
 
-The builders are functions that will create your arkitekt app. Through defining different builders, you can
-highly customize how your app is being created, which services it will use and how it connects to your arkitekt instance
-For example the `easy` builder provides you with a simple way to create a new user-bound app and
-authenticate itthrough the arkitekt web interface, while the `port`, builder will try to find its configuration from environment variables,
-that are by default set within port containers. You can read more about the different builders in the builders section.
-As a default though you don't need to worry about this, and can just use the `easy` builder.
+```python
+from arkitekt import register
+from mikro.api.schema import RepresentationFragment, from_xarray
+```
+
+First we import the `register` decorator from the arkitekt package. This is the decorator that we will use to register
+our functions with the arkitekt instance. We also import the `RepresentationFragment` and `from_xarray` functions from
+the mikro package (which will help us interact with the Mikro service on the connected instance).  Calling `from_xarray` will create a new representation/image from any xarray or numpy object.
+
+```python
+@register
+def max_intensity_projection(image: RepresentationFragment) -> RepresentationFragment:
+    """Z-Project the Maximum Intensity
+
+    This function projects the maximum intensity of the input image
+    along the z-axis
+
+    Parameters
+    ----------
+    image : RepresentationFragment
+        The input image
+
+    Returns
+    -------
+    RepresentationFragment
+        The projected image
+
+    """
+    ...
+```
+
+And this is our function. It takes a single argument, which is an image, and returns a new image. The function is decorated
+with the `@register` decorator, which will register the function with the arkitekt instance when the app is run. A lot of
+the information that is needed to register the function is extracted from the function signature. For example, the name of
+the function is extracted from the function name, the description is extracted from the docstring, and the input and output
+types are extracted from the function signature. The `@register` decorator also takes a few optional arguments, which can
+be used to customize the registration process. You can read more about the `@register` decorator in the decorators section.
+
+```python
+image = image.data.max(dim="z")
+return from_xarray(
+    image, name="Max Intensity Projection" + image.name, origins=[image]
+)
+```
+
+And this is the body of our function. When calling our function, the arkitekt instance will pass in a `RepresentationFragment`
+object, which contains the input data. We can access the data by calling `image.data`. The data is stored as an xarray object,
+which we can use to perform our calculations. In this case, we are calculating the maximum intensity projection of the image
+along the z-axis. We then create a new Image on the platform from the calculated data and return it, through the `from_xarray`
+function. (Note that we are also adding a prefix to the name of the image, to make it easier to distinguish between the input
+and output images)
+
+
+:::info Why Representation Fragment?
+
+If you are wondering why our image is called a `RepresentationFragment` and not just an image, please read the [mikro](https://mikro.dev)
+and graphql sections of the docs. But in short, a `RepresentationFragment` is a representation of an image that is stored
+on a mikro instance. It contains information about the image, such as its name, description, and data. Besides the data,
+it also contains a "fragment" of metadata from all of the metadata that is associated with the image. The nomenclature is
+a bit confusing, and we *will definetly* change it in the future, but for now, just think of it as an image.
+
+:::
+
+:::note A few things to note
+
+-  The app.py file should **NOT** contain any code that is being executed when the file is imported. It should rather
+   contain a collection of function that are being registered with the arkitekt instance. If you have code that is being
+   executed when the file is imported, it will be executed every time a user runs your app (or you run and change your
+   file in dev mode
+
+   Ok:
+   ```python
+   if __name__ == "__main__":
+      print("Hello World") # will only be executed when the file is run directly
+   ```
+   Not ok:
+   ```python
+   print("Hello World") # will be executed every time the file is imported
+   ```
+
+-  The app.py should **NOT** contain an app instance (e.g. when calling `easy("app", "version")`), as this will be
+   created by the arkitekt CLI when you run your app. 
+
+:::
+
+
+## Running Demo
+
+Now that we have created our app, lets run it. Lets start by running it in dev mode.  Follow on to the next section.

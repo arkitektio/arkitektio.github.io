@@ -6,6 +6,18 @@ sidebar_label: Usage
 
 # Usage
 
+### Design
+
+Arkitekt's client SDK is designed to be used in a declarative and functional way, with a focus on reusable functions
+and composability. This means that a lot of functionality is provided through functions rather than through classes.
+Like this we hope that the SDK fits right in with the python ecosystem and patterns of the scientific python developer.
+
+When using Arkitekt in the classic way you will therefore mostly use functions to interact with the backend. The only 
+exceptions to this are the Arkitekt `App`, which encapsulates all of the stateful logic that needs to be managed (e.g. 
+authentication, waiting for assignemnts from the server, etc.). This App object is highly configurable and can be 
+adjusted to fit your exact configuration need by using different builders (more on this later).
+
+
 ```python
 from arkitekt import easy
 
@@ -16,6 +28,8 @@ with app:
 
 
 ```
+
+This is the backbone for each Arkitekt app. Just like this you can use the app to interact with the backend.
 
 A few words about this setup:
 
@@ -31,7 +45,7 @@ A few words about this setup:
    application is properly closed when it is no longer needed.
 3. Within this context, you can use the `app` object to access the various services that
    Arkitekt provides. These services are available as attributes on the `app` object.
-   For example, to access the `Fakts` service, you can use `app.fakts`.
+   For example, to access the `Fakts` (for example to inspect the configration) service, you can use `app.fakts`.
 4. The context manager also sets some context specific variables (contextvars).
    This means that some functionaly within this context will automatically use the governing
    app context. This allows for more declarative and functional code. For example, you can use simply call
@@ -53,8 +67,8 @@ A few words about this setup:
    :::note
    This behaviour allows for more functional and concise code but can also lead to unexpected
    behaviour. For example, if you have multiple app contexts running in parallel, the
-   `from_xarray` function will use the app context that is currently active. This can lead to
-   unexpected behaviour if you are not aware of this.
+   `from_xarray` function will use the app context that is currently active. You can always opt out of this behaviour
+   by specifically passing the desired context to the function.
    :::
 
 5. Within the context you should avoid setting attributes on the `app`. Arkitekt was designed
