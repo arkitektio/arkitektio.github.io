@@ -4,34 +4,36 @@ import styles from "./styles.module.css";
 
 type FeatureItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<"svg">>;
+  Svg?: React.ComponentType<React.ComponentProps<"svg">>;
+  Png?: string;
   description: JSX.Element;
 };
 
 const FeatureList: FeatureItem[] = [
   {
     title: "Your tools, your way",
-    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
+    Png: "/img/apps.png",
     description: (
       <>
-        Arkitekt is a framework to make your bioimage tools more interoperable
-        and orchestratable allow you to use the tools the way you know them.
+        Arkitekt is a open source middleman that interactvs with your favorite
+        bioimage tools, like Napari and Fiji, but also with your scripts and
+        robotic devices.
       </>
     ),
   },
   {
     title: "Your worfklows, but easy",
-    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
+    Png: "/img/workflows.png",
     description: (
       <>
-        Arkitekt allows you to orchestrate your bioimage workflows in
-        graphical workflows, with a focus on reproducibility and real-time data.
+        Arkitekt allows you to orchestrate your bioimage workflows in graphical
+        workflows, with a focus on reproducibility and real-time data.
       </>
     ),
   },
   {
     title: "Your data, your rules",
-    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
+    Png: "/img/data.png",
     description: (
       <>
         Arkitekt organizes your data in a fully searchable database. No more
@@ -41,11 +43,12 @@ const FeatureList: FeatureItem[] = [
   },
 ];
 
-function Feature({ title, Svg, description }: FeatureItem) {
+function Feature({ title, Svg, Png, description }: FeatureItem) {
   return (
     <div className={clsx("col col--4")}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        {Svg && <Svg className={styles.featureSvg} role="img" />}
+        {Png && <img src={Png} className="w-60" role="img" />}
       </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>

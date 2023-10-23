@@ -1,20 +1,19 @@
 ---
-title: Installing our interface
-sidebar_label: 1. Interface
-sidebar_position: 4
+title: Let's interface
+sidebar_label: 1. Let's interface
+sidebar_position: 1
 ---
 
 import { OrkestratorGrid } from "../../../src/components/layout/Button";
 import Image from '@theme/IdealImage';
 import thumbnail from './server.png';
+import dashboard from './dashboard.png';
 import oauth from './oauth.png';
 import data from './data.png';
 
 
-## Interface
 
-Our first step into the Arkitekt world will be to get familiar with its interface. But lets make the first steps to connect it to your Arkitekt
-Server. By the end of this section, you will be able to:
+Our first step into the Arkitekt world will be to get familiar with its non-developer interface. By the end of this section, you will be able to:
 
 - Connect your first App (Orkestrator) to your Arkitekt server
 - Login with your Arkitekt server with your user account
@@ -25,8 +24,19 @@ Small Steps to get you started!
 
 ### Prerequisites
 
-Before you can start using Arkitekt, you need to have the Arkitekt server platform installed, please refer to the
-[installation guide](/docs/introduction/installation) for more information.
+Before you can start using Arkitekt, you need to have the Arkitekt server platform installed and **started**. Please refer to the
+[installation guide](/docs/introduction/installation) for more information. If you are using "konstruktor" to manage your Arkitekt server, 
+you should be seing a screen similar to the one below.
+
+<div className="mt-2 p-6">
+<Image img={dashboard} />
+
+<div className="text-gray-400 mb-2">
+<small>The konstruktor dashboard of a started Arkitekt app. Make sure that all services are highlighted green before 
+proceeding. Depending on your hardware configuration this might take a few seconds. If a service remains red or 
+keeps restarting check our troubleshooting section. </small>
+</div>
+</div>
 
 ### About Orkestrator
 
@@ -54,7 +64,7 @@ Or just click on the button below, depending on your operating system.
 
 #### I don't want to install the desktop app
 
-That's perfectly understandable, you can also use the webapp. Just click [here](http://localhost:8010/) open the webapp in your browser. If you are not able to access the webapp, please refer to the [troubleshooting section](/docs/introduction/troubleshooting) for more information.
+That's perfectly understandable, you can also use the webapp. Just click [here](http://127.0.0.1:8010/) open the webapp in your browser. If you are not able to access the webapp, please refer to the [troubleshooting section](/docs/introduction/troubleshooting) for more information.
 Be aware that we will assume that you are using the desktop app in the following sections, so some of the screenshots might look different in the webapp.
 
 # Lets Finally get started
@@ -82,12 +92,24 @@ an important step that system administrators can use to control which apps can c
 
 :::
 
+:::caution I don't see my server
+
+If you are not seing a button with the name of your server, this might be because the server is not running (check the konstruktor dashboard) or because the server is not reachable from your computer.
+Make sure to advertise your server from the konstruktor interface if all services are running. If you are still not able to connect to the server, please refer to the [troubleshooting section](/docs/troubleshooting) for more information.
+:::
+
 ### Almost there
 
-Now that we have connected to the Arkitekt Server we can start using the app. But first Arkitekt needs to understand who we are, which is why we need to login to the server.
+Now that we have connected to the Arkitekt Server there is one more step before we can start using the app. Arkitekt needs to understand who we are, which is why we need to login to the server.
 Once clicking login a webpage will open in your default **webbrowser** and you will be prompted to provide your login details 
 These should be the user account details that you have created during the installation of the Arkitekt server. (defaults: user: `demo`, password: `demo`).
 
+:::info On the login process
+
+If you are using the orkestrator app, for the first time you may be prompted by your firewall to allow access to network.
+This is a security feature of your operating system and you should allow access to the network.
+
+:::
 
 :::warning No Admin Login
 
@@ -106,14 +128,14 @@ Shortly after you have logged in, you should see the following screen in the Ork
 </div>
 </div>
 
-This is the OAuth screen, which is used to grant the Orkestrator app access to your user account. 
+This is the *Authentication* screen, which is used to grant the Orkestrator app access to your user account. 
 This is a very important step and every App that connects to Arkitekt needs to undergo this step (don't worry only once). During this step you will grant the **app** access to your user account, 
 and tell Arkitekt which actions the app is allowed to perform on your behalf. We are working on a comprehensive documentation for this, but for this tutorial we will just grant the app full access to your account.
 To do this, click on the **Authorize** button. You will be redirected back to the Orkestrator app and you are finally go to go.
 
 :::info On the OAuth process
 
-This authentication and authorization process is a very important step in the Arkitekt ecosystem. It is the first step to ensure a secure and trustworthy connection between the Arkitekt server and the app. As we believe data 
+This authentication and authorization process is a arguely important step in the Arkitekt ecosystem. It is the first step to ensure a secure and trustworthy connection between the Arkitekt server and the app. As we believe data 
 privacy and security is a very important topic, every app needs to alert what it can potentially do with your data. As Arkitekt is a very flexible platform, we cannot know what every app can do, so we need to ask you to grant
 to make sure that you are always in control of your data.
 

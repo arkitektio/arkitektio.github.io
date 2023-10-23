@@ -1,0 +1,168 @@
+---
+title: Our first tool
+sidebar_label: 3. Our first tool
+sidebar_position: 3
+---
+
+import Image from '@theme/IdealImage';
+import upAndDownURL from './upload_video.webm';
+import thumbnail from './node_explaination.png';
+
+You might have noticed that so far there is not really a lot that we can do with the Arkitekt server so far. We can create datasets, but we cannot really do anything with them.
+Sure we might comment on them. But that's not really what we want to do. We want to use the data to create something. So its time to install our first `App`.
+
+In this section we will explore:
+
+- What are Apps 
+- What are Plugins
+- Install our first Arkitekt Plugin (A File Converter)
+- Understand Nodes and Reservations
+- Convert a file 
+
+## Apps and Nodes
+
+Before we start using Apps, we need to understand what the term Apps means in the Arkitekt ecosystem. You already go to know "Orkestrator", which is the main app to interface with
+Arkitekt, it provides us with the graphical interface to tell arkitekt what to do. But who is going to do the work? 
+
+Well, that's also Apps. Apps are tools that do the image analysis work. They can be anything from a simple file converter script, to  GUI Applications like FIJI or Napari, or complex machine learning algorithm. 
+The only thing that they really have in common is that they interface with the Arkitekt server, and tell it what they can do. They do this by providing so called
+`Nodes` to the platform. A `Node` is a (conceptual defnition of a) functionality an app can provide. It can be as simple as "I can convert. Give me a file from format A and i convert it to format B" or "I can
+segment, track and analyze cells in a movie, and can give you the tracks as a Table", or a more complex "I can train a machine learning model to segment cells from your data".
+
+
+<div className="mt-2 p-6 w-full">
+<Image img={thumbnail} />
+
+<div className="text-gray-400 mb-2">
+<small>The concept of a `Node` in Arkitekt. Nodes are [abstract](/docs/design/terminology/node) defintions of bioimage tasks, that help organize 
+the functinality inside the Arkitekt platform. All outside functionality that can be used with Arkitekt must be defined as a node. </small>
+</div>
+</div>
+
+:::info About Inputs and Outputs
+The node inputs and outputs are of most important to understand. They define what the app expects as input, and what it will give you as output.
+It is exactly that information that will help us map the data in our server (e.g. a File, or a Dataset) to a correspoing functionality of the app.
+:::
+
+Of course the name Node suggests that this is something that is part of a graph. And we will see about it when we start using a Workflow.
+But for now, lets start simple and find a tool that can convert our data.
+Well wouldn't it be nice if we had that convert node right now? Well, let's install it.
+
+
+## Installing our First App
+
+Before we will use some functionality from an outside app (and another installation), lets start simple and let us install an Arkitekt `PluginApp`. `PluginApps` 
+are *just* `Apps` that are installed and running inside the Arkitekt server. They are not different from any other app, except that they are easily installed
+through the Arkitekt interface, and can run completely veritualized  seperate from your operating system (More about that in ["Arkitekt and Containers"](/docs/design/containers)).
+Installation of Plugin Apps is a prettry straightforward process and can be done in a few steps:
+
+1. Click on the `Whale/Docker` button in the left hand Navigation.
+
+This opens the `Plugin Store` of Arkitekt. Currently it is completely empty, but we will change that soon. (We will probably add some default apps to easily
+install in the future, but for now lets do this manually, as it will also help you understand what is happening in the background).
+
+2. Click on the `Add Repository` button in the action bar.
+
+This will prompt you for a repository URL. A repository is a collection of (versioned) apps, that can be installed on the Arkitekt server. 
+These repositories are nothign else than a git repository, that contains a some Arkitekt specific configuration that was provided by the app
+developer. You don't need to worry about this, just copy the following values into the prompt:
+
+User: "jhnnsrs"
+Repository: "omero"
+Branch: "master"
+
+3. Click on the `Add Repository` button.
+
+This will add the repository to the list of available repositories. It should have popped up in your Repository list.
+
+4. Right click on the repository and click on `Scan`.
+
+This will scan the repository for available apps. You should see new apps popping up in the list..
+It is important to note that each app (or plugin) has a version number. This version number is an important element of the
+Arkitekt ecosystem. More about this in [Why we version](/docs/design/why_we_version).
+
+5. Right click on the "Scan" and click on "Appify".
+
+Now this is one of the most important steps. This will create a new `App` from the plugin. During this process you will be 
+asked if you trust this app with your (and potential your teams) data, similar to how you trusted the Orkestrator app with your data.
+This App is trustworthy and we can trust it with our data. So click on "Appify".
+
+:::info About Trust
+Trust is a very important concept in Arkitekt. It seats at the core of the entire platform. Only through these elements of trust do
+we feel like we can build a platform that is truly open and collaborative, and protect users from potential harmfull apps. 
+:::
+
+6. Right click on the newly created Whale  and click on the "Deploy" button.
+
+Last and final step, Deployment. Only when hitting deploy will Arkitekt actually download your app, and install it on the server.
+This procedure might take quite a while (depending on your internet connection), as it will download the app, and all its dependencies
+and run in inside a container on the server. But don't worry, you can continue working while this is happening in the background.
+
+:::caution About the Plugin system
+
+The plugin system is still in its early stages. We are working on making this process more streamlined, and we will some 
+default repositories that you can install from. But for now, this is the way to install apps on the Arkitekt server. Also note that the
+"progress" indicator is (even though) functional not really accurate. It will show you the progress of the download, and 
+unzipping. But it will not show you the progress of the actual installation. This is something that we will improve in the future.
+:::
+
+### Why do we go through this hurdles.
+
+You might ask yourself, why do we need to have repositories, and why do we need to go through this process. Well, there are a few reasons for this:
+
+- **Security**: We want to make sure that the apps that you install on your server are trustworthy. We don't want to have apps that can potentially
+harm your data, or your server.
+- **Updatability**: We want to make sure that apps can be updated. This is important for security reasons, but also to make sure that you can always
+rely on the latest and greatest version of your app. Arkitekt will periodically check for updates of your apps, and will notify you if there are updates
+available.
+- **Versioning**: We want to make sure that you can always rely on the same version of an app. This is important for reproducibility, and to make sure
+that you can always rely on the same functionality. If you want to learn more about this, read [Why we version](/docs/design/why_we_version).
+
+## And we are almost done
+
+Puh that was a lot, but we are almost done. Now that we have installed our first app, we can start using it. We can now leave the plugin store and
+go to the dashboard screen.
+
+<video controls autoplay muted className="rounded rounded-md" width={"100%"}>
+  <source src={upAndDownURL}/>
+</video>
+
+
+When dragging and dropping your data, Arkitekt will give you contextual help about `Actions` that you can perform on this particular data. For example
+when you drag and drop a file, and you just started your drag-n-drop arkitekt will give you contextually relevant  `Actions` that you can perform on the
+data *itself*. Here, for example you can see a button for delete and a download button (sadly not working currently on the app, but only on the webapp),
+if you hover over the file itself. 
+However these Actions can also be *associative*: If you drag over the `Dataset` with the `File`, you will see that you can move the file to another `Dataset`. 
+ 
+
+If that doesn't make sense to you, don't worry. We will explain this in more detail in the next few sections. For now, just remember that you can drag and drop
+items over each other, and Arktiekt will give you information about what to do with your data. One more things however: broadly  `Actions` fall into two categories:
+
+1.  `Manage Actions`: These actions are integrated platform actions that help you manage your data. For example you can delete data, or move it to another
+`Dataset`. `Manage Actions` are however no image processing actions. These actions are always available.
+
+2.  `Tool Actions`: These actions are provided by your tools that you have installed on the platform. We haven't seen any of these yet, but we will see them
+in the next section. These actions are powered by the nodes that your applications might provide.
+
+
+
+
+
+:::info About Accessibility
+
+As show Drag and Drop plays a crucial role when interfacing with the Orkestrator interface. Most of the time, you will be able to drag and drop
+data to associate with each other, or to organize it. However drag and drop is not the most accessible technology. Therefore Orkestrator provides also a set of functionality that is entirely keyboard accessible (and screen reader friendly). Allmost all commands 
+can be also accessed through the [PowerMenu](/docs/features/powermenu) (Meta-M) or (Ctrl-M) and "non associative actions" can be accessed through a right click on 
+the item.
+
+:::
+
+
+
+## Just one more file
+
+Before we move on, lets upload one more file. This time we will upload a 3D image. You can download it [here](static/demos/test.ome.tif).
+
+
+
+

@@ -1,7 +1,7 @@
 ---
 title: Our first Data interaction
 sidebar_label: 2. Upload your data
-sidebar_position: 4
+sidebar_position: 2
 ---
 
 import upAndDownURL from './upload_video.webm';
@@ -12,16 +12,81 @@ In this section, we will upload our first data to the platform, and convert it t
 Here you will learn how to:
 
 - Upload data to the platform
-- Install our first plugin tool to convert data
-- Convert our data to an Image
-- Visualize our data on the Arkitekt platform
+- Familiarize yourself with the Orkestrator drag-n-drop
+- Have a first look at the contextual help that Orkestrator provides
+- Organize your data in `Datasets`
 
 ## Upload data
 
 Uploading data to the platform is easy. You can simple drag and drop your data into the platform. Multiple files can be uploaded at once. 
-The platform will try to auomatically detect the file type and show you the file type in the file list.
+The platform will try to auomatically detect the file type and show you the file type in the file list. Currently you can upload any
+datatype to the Arktiekt platform, and Arkitekt should support any filesize.
 
-<video controls autoplay muted className="rounded rounded-md" width={"100%"}>
+Lets try this out. Download the following file to your computer: [here](static/demos/test.tif).
+
+
+:::info About the data
+
+Of course you can use any data you want. However, for the sake of this tutorial, and to make sure that everything works, we recommend to use the
+provided file. It is a 2D image of some cells that we will use in the next section to create a 3D image.
+
+:::
+
+
+
+<video  autoPlay muted loop className="rounded rounded-md" width={"100%"}>
   <source src={upAndDownURL}/>
 </video>
+
+Thats it. Your data is now uploaded to the platform. You can see it in the file list on the left. You can also see that the file type is detected.
+
+## Organize your data
+
+Because things might get crowded really soon, lets organize our data a bit, by creating a `Dataset`. `Dataset` are Arkitekt's way of organizing
+data in a hierarchical way, just like you would organize your files in folders. To create a new `Dataset` click on the `Create Dataset` button in the
+action bar. Just give it a name and hit enter. A new `Dataset` will be created. You can now drag and drop your data into the
+`Dataset` to organize it. Let's see this in action:
+
+<video  autoPlay muted className="rounded rounded-md" width={"100%"}>
+  <source src={upAndDownURL}/>
+</video>
+
+
+When dragging and dropping your data, Arkitekt will give you contextual help about `Actions` that you can perform on this particular data. For example
+when you drag and drop a file, and you just started your drag-n-drop arkitekt will give you contextually relevant  `Actions` that you can perform on the
+data *itself*. Here, for example you can see a button for delete and a download button (sadly not working currently on the app, but only on the webapp),
+if you hover over the file itself. 
+However these Actions can also be *associative*: If you drag over the `Dataset` with the `File`, you will see that you can move the file to another `Dataset`. 
+ 
+
+If that doesn't make sense to you, don't worry. We will explain this in more detail in the next few sections. For now, just remember that you can drag and drop
+items over each other, and Arktiekt will give you information about what to do with your data. One more things however: broadly  `Actions` fall into two categories:
+
+1.  `Manage Actions`: These actions are integrated platform actions that help you manage your data. For example you can delete data, or move it to another
+`Dataset`. `Manage Actions` are however no image processing actions. These actions are always available.
+
+2.  `Tool Actions`: These actions are provided by your tools that you have installed on the platform. We haven't seen any of these yet, but we will see them
+in the next section. These actions are powered by the nodes that your applications might provide.
+
+
+
+
+
+:::info About Accessibility
+
+As show Drag and Drop plays a crucial role when interfacing with the Orkestrator interface. Most of the time, you will be able to drag and drop
+data to associate with each other, or to organize it. However drag and drop is not the most accessible technology. Therefore Orkestrator provides also a set of functionality that is entirely keyboard accessible (and screen reader friendly). Allmost all commands 
+can be also accessed through the [PowerMenu](/docs/features/powermenu) (Meta-M) or (Ctrl-M) and "non associative actions" can be accessed through a right click on 
+the item.
+
+:::
+
+
+
+## Just one more file
+
+Before we move on, lets upload one more file. This time we will upload a 3D image. You can download it [here](static/demos/test.ome.tif).
+
+
+
 
