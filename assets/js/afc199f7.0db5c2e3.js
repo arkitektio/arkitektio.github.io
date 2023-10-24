@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[4069],{58045:e=>{e.exports=JSON.parse('{"title":"Services","slug":"/category/services","permalink":"/docs/category/services","navigation":{"previous":{"title":"6. Our first workflow","permalink":"/docs/introduction/first_steps/first_workflow"},"next":{"title":"Mikro","permalink":"/docs/services/mikro"}}}')}}]);
