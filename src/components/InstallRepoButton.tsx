@@ -53,12 +53,12 @@ export const InstallRepoButton = portGuarded(
         {data?.githubRepo ? (
           <div className={className + "bg-green-300"}> ✅ {tag}</div>
         ) : (
-          <button onClick={handleClick} className={className + "bg-back-200"}>
-            Install {tag}
+          <button onClick={handleClick} className={className + "bg-yellow-200"}>
+            🪄 Install {tag}
           </button>
         )}
       </>
     );
   },
-  <div className={className + "bg-back-600"}>Available when connected</div>
+  <div className={className + "bg-back-600"}> 🎱 Connect to install</div>
 );
