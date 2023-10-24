@@ -1,0 +1,38 @@
+---
+title: Mikro
+sidebar_label: Mikro
+sidebar_position: 1
+---
+
+import Image from '@theme/IdealImage';
+import schema from './schema.png'; 
+
+
+# Mikro
+
+Mikro is the Arkitekt go to solution for all things microscopy.  It provides 
+the datamodels and services for managing microscopy data, and connects a binary
+storage system around the [Minio](https://min.io/) object store, with a relational
+database [Postgres](https://postgressql.org)  for metadata storage. 
+
+As an API first system, Mikro provides a GraphQL API for all of its operations that
+can be used by any client.  It also provides a web based admin UI for interacting with
+the system through a browser.
+
+## Schema
+
+The Mikro schema is the core of the system.  It defines the data models and relationships
+that are used to store and retrieve data.  The schema is defined in [GraphQL](https://graphql.org)
+and provides the only interface to the system.  You can inspect a recent [schema.graphql](/schema.graphql)
+Or you can use the [GraphQL Playground](http://localhost:8020/graphql) to interact with the system
+directly.
+
+<div className="mt-2 p-6 w-full">
+<Image img={schema} />
+
+<div className="text-gray-400 mb-2">
+<small>An excerpt of the Arkitekt Schema with some Metadata models that are attached to the images.</small></div>
+</div>
+
+
+

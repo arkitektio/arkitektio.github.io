@@ -1,6 +1,6 @@
 ---
-title: Our first tool
-sidebar_label: 3. Our first tool
+title: Our first Tool
+sidebar_label: 3. Our first Tool
 sidebar_position: 3
 ---
 
@@ -75,13 +75,13 @@ Branch: "master"
 
 This will add the repository to the list of available repositories. It should have popped up in your Repository list.
 
-4. Right click on the repository and click on `Scan`.
+4. Click on the repository
 
-This will scan the repository for available apps. You should see new apps popping up in the list..
+When clicking on the repository you should see a list of apps that are available in this repository.
 It is important to note that each app (or plugin) has a version number. This version number is an important element of the
 Arkitekt ecosystem. More about this in [Why we version](/docs/design/why_we_version).
 
-5. Right click on the "Scan" and click on "Appify".
+5. Right click on the latest (highest version number) app and click on "Appify".
 
 Now this is one of the most important steps. This will create a new `App` from the plugin. During this process you will be 
 asked if you trust this app with your (and potential your teams) data, similar to how you trusted the Orkestrator app with your data.
@@ -92,11 +92,15 @@ Trust is a very important concept in Arkitekt. It seats at the core of the entir
 we feel like we can build a platform that is truly open and collaborative, and protect users from potential harmfull apps. 
 :::
 
-6. Right click on the newly created Whale  and click on the "Deploy" button.
+6. Right click on the newly created App and click on the "Deploy" button.
 
 Last and final step, Deployment. Only when hitting deploy will Arkitekt actually download your app, and install it on the server.
 This procedure might take quite a while (depending on your internet connection), as it will download the app, and all its dependencies
-and run in inside a container on the server. But don't worry, you can continue working while this is happening in the background.
+and run in inside a container on the server. Arkitekt will also ask you about an [instance](docs/design/multiinstance) name. Just leave main as it is, and click on
+"Deploy". This will start the installation process.
+
+But don't worry, you can continue working while this is happening in the background, and
+of course it only happens once.
 
 :::caution About the Plugin system
 
@@ -108,7 +112,7 @@ unzipping. But it will not show you the progress of the actual installation. Thi
 
 ### Why do we go through this hurdles.
 
-You might ask yourself, why do we need to have repositories, and why do we need to go through this process. Well, there are a few reasons for this:
+You might ask yourself, why do we need to have repositories and why do we need to go through this process. Well, there are a few reasons for this:
 
 - **Security**: We want to make sure that the apps that you install on your server are trustworthy. We don't want to have apps that can potentially
 harm your data, or your server.
@@ -120,49 +124,59 @@ that you can always rely on the same functionality. If you want to learn more ab
 
 ## And we are almost done
 
-Puh that was a lot, but we are almost done. Now that we have installed our first app, we can start using it. We can now leave the plugin store and
-go to the dashboard screen.
+Now that was some steps but we are almost done. If you go back to the `Plugin Store` you should see that the app is now installed and running.
+If you click on the running Application you can inspect what is happening in the container (it will show you the command line in that container),
+and you can also stop the app if you want to. But for now, lets leave it running.
+
+## So how do we use it?
+
+And this is the most important question. How do we use this app? Where are our nodes? Can we just start using it on our data? Well, not quite yet.
+There is one last step that we need to do. We need to tell Arkitekt that we want to use some of the functionality of this app. We do this by `Reserving``
+our desired nodes.
+
+:::info About Reservations
+
+Reservations are a core concept of the Arkitekt platform. They represent a contract of use between you and the Arkitekt platform, which will try to provide
+you the reserved `Node`, and inform you if its currently not available, (Maybe because the connected application is not started yet).
+Reservations are always bound to a specific `User` and a specific `Node`, and connect the `Node` to a realworld implementation(s) (e.g. our plugin app).
+To learn more about reservations, read [Reservations](/docs/design/reservations).
+
+:::
+
+So lets see how we can reserve a node.
 
 <video controls autoplay muted className="rounded rounded-md" width={"100%"}>
   <source src={upAndDownURL}/>
 </video>
 
+1. Click the `Dashboard` button in the left hand navigation.
 
-When dragging and dropping your data, Arkitekt will give you contextual help about `Actions` that you can perform on this particular data. For example
-when you drag and drop a file, and you just started your drag-n-drop arkitekt will give you contextually relevant  `Actions` that you can perform on the
-data *itself*. Here, for example you can see a button for delete and a download button (sadly not working currently on the app, but only on the webapp),
-if you hover over the file itself. 
-However these Actions can also be *associative*: If you drag over the `Dataset` with the `File`, you will see that you can move the file to another `Dataset`. 
- 
+The Dashboard is another core view of the Arkitekt platform. It shows you all of your reservations (i.e. reserved functionality/node) that are currently active on the platform
+(currently none) and the status of the connected applications (you should now see the omero app in green), as well as status on ongoing tasks that you have assigned to the platform.
 
-If that doesn't make sense to you, don't worry. We will explain this in more detail in the next few sections. For now, just remember that you can drag and drop
-items over each other, and Arktiekt will give you information about what to do with your data. One more things however: broadly  `Actions` fall into two categories:
+2. Open the `Search Sidebar` by clicking on the `Search` button in the button left corner.
 
-1.  `Manage Actions`: These actions are integrated platform actions that help you manage your data. For example you can delete data, or move it to another
-`Dataset`. `Manage Actions` are however no image processing actions. These actions are always available.
+The search sidebar is a platform wide search for functionality (i.e. nodes) that are available on the platform, irrespective of the applications. You can start typing in the search bar, and it will show you
+all the nodes that match your search, should appear. Search for "Convert" and you should see a node called "Convert Omero". This is the node that we want to reserve.
 
-2.  `Tool Actions`: These actions are provided by your tools that you have installed on the platform. We haven't seen any of these yet, but we will see them
-in the next section. These actions are powered by the nodes that your applications might provide.
+3. Drag and Drop or Right Click on the node and click on "Reserve".
 
+This will open a dialog that will ask you for some information about the reservation. Here you can tell Arkitekt specific requests for your reservation. Do you want to use on
+specific app, do you want to parellize it, do you want to give it a specific name. For now, just leave everything as it is, and click on "Reserve". This will use the "Auto", Scheduler
+and will reserve the node automatically on the first available app.
 
+4. You should now see a new reservation in your dashboard.
 
+Congratulations, you have now reserved your first node. You have now told Arkitekt that you want to use the "Convert Omero" node, and Arkitekt will inform you when it is ready to use.
+It should now appear green in your dashboard. If you click on it, you can see some more information about the reservation, and you can also cancel it if you want to.
 
+:::info Why Reservations
 
-:::info About Accessibility
-
-As show Drag and Drop plays a crucial role when interfacing with the Orkestrator interface. Most of the time, you will be able to drag and drop
-data to associate with each other, or to organize it. However drag and drop is not the most accessible technology. Therefore Orkestrator provides also a set of functionality that is entirely keyboard accessible (and screen reader friendly). Allmost all commands 
-can be also accessed through the [PowerMenu](/docs/features/powermenu) (Meta-M) or (Ctrl-M) and "non associative actions" can be accessed through a right click on 
-the item.
+You might ask yourself, why do we need to reserve nodes? Why can't we just use them? Well, this is a highly involved topic and hopefully we will be able to explain it in more detail in the 
+design section of this documentation. For now, just rest assured that you only have to reserve nodes *once*, Arkitekt will keep track of them until you say otherwise.
 
 :::
+## Convert a file
 
-
-
-## Just one more file
-
-Before we move on, lets upload one more file. This time we will upload a 3D image. You can download it [here](static/demos/test.ome.tif).
-
-
-
-
+But lets finally do the conversion.
+See you in the next section.

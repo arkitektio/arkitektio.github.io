@@ -10,35 +10,4 @@ Arkitekt comes with experimental support for KraphQL, which is an extension of G
 allows you to describe the data of your plots in a declarative way.
 This is useful for building dashboards and other applications that need to display live data.
 
-Let's discover **Live Graphs in less than 5 minutes**.
-
-```kraphql live
-query {
-  GROUP: dataset(id: 8) {
-    OBJECT: id
-    TYPE: __typename
-    NAME: name
-
-    DATA: representations(variety: VOXEL, limit: 10) {
-      FLATDATUM_OBJECT_AS_INDEX: id
-      FLATDATUM_VALUE_FROM_INT_AS_INDEX: id
-      FLATDATUM_TYPE_AS_INDEX: __typename
-
-
-
-      DATUM_AS_INCREASING: metric(key: "Increasing") {
-        OBJECT: id
-        VALUE_FROM_FLOAT: value
-
-      }
-
-
-      DATUM_AS_DECREASING: metric(key: "Decreasing") {
-        OBJECT: id
-        VALUE_FROM_FLOAT: value
-
-      }
-    }
-  }
-}
-```
+TODO

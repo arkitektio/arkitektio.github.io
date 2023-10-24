@@ -1,0 +1,97 @@
+---
+title: Our first Task
+sidebar_label: 4. Our first Task
+sidebar_position: 4
+---
+
+import Image from '@theme/IdealImage';
+import upAndDownURL from './upload_video.webm';
+import thumbnail from './node_explaination.png';
+
+Four steps in an we still haven't performed anything useful on our data. But that's about to change. In this section we will:
+
+- Convert our first File
+- Inspect the result on the webpage
+- Mark a ROI (Region of Interest) in our Image
+- Optional: Look at the ROI in Napari
+
+
+## Convert our first File
+
+We will start by converting our first file. Utilizing our just reserved "Convert Omero" node. And lets perform that on our
+first file. The one we uploaded in the previous section.
+
+
+<video  autoPlay muted loop className="rounded rounded-md my-3" width={"100%"}>
+  <source src={upAndDownURL}/>
+</video>
+
+
+1. Navigate to our data in the "Data" tab
+
+Lets inspect our data in the "Data" tab. We should see our data in the "Data" tab. (If you are doing this part of the tutorial,
+on another day you might need to open the "Home", sidebar and step back one day to see your data.)
+
+2. Drag and Drop or right click the file we want to convert
+
+This time in our Action menu we will see a new option. "Convert Omero", this is our first `Tool Action`. Lets drop on it (or click it).
+
+3. You are prompted with a dialog. 
+
+This dialog is our first encounter with an Arkitekt assign dialog. Here we can specify paramters to the connected tool, that will be sent 
+to the tool when it is executed. For our initial conversion we will not specify any parameters. So just click "Assign". And lets see what happens.
+
+4. Inspect the progress and result.
+
+After a few seconds you should now be prompted with a popup in the bottom right that will show you your converted image. Also an Image 
+should have appeared in the "Data" tab. If you click on it you should see the image in the "Preview" tab.
+
+:::info What just happened?
+
+We just performed our first conversion. We took a file from our Server and converted it to the internal Arkitekt format based on Zarr, again storing
+it on our server. In practicallity this meant that our "Omero" PluginApp streamed the file from the server, converted it and then uploaded the 
+converted zarr dataset again to the server. More on that in [How Assignemtn Works](#assignment).
+
+:::
+
+## Lets inspect our image
+
+Lets inspect our image. You can do that in different ways. Either you can click on the just generated image in the "Data" tab. Or directly by clicking on the image when it 
+popups in the bottom right. Additionality because Arkitekt kept track about our relationship with the  old file we can also inspect the old file. And click on `created
+image` from that pane.
+
+
+<video  autoPlay muted loop className="rounded rounded-md" width={"100%"}>
+  <source src={upAndDownURL}/>
+</video>
+
+In this steps you will for the first time see the Arkitekt image tab. In this tab you can explore the image and associated metadata, as well as perform some really basic 2D 
+visualitaizon of the image. You can choose different channels, and different z-planes.
+
+:::info Visualization within Orkestrator
+
+Orkestrator is not meant to be a dedicated visualization tool and would rather like to integrate with other tools. 
+For example we will later see how we can use [Napari](https://napari.org/) to visualize our data. 
+We would love to integrate [Viv](https://github.com/hms-dbmi/vizarr) into Orkestrator, if you are interested in that please let us know.
+
+:::
+
+:::note On Mikro next
+
+After some lessons learned about metadata handling in Arkitekt we are currently working on a new version of "Mikro" (the storage service) that will be able to handle
+metadata in a more flexible way. This will also allow us to provide more advanced visualization options in the future. If you want to read more about this you can
+read more about it in the [Mikro Next](/docs/services/next/mikro_next) section.
+
+:::
+## Lets mark a ROI
+
+Besides just converting our data we can also perform some basic operations on our data. Lets start by marking a ROI on our image. Just click on the rectangle 
+icon in the bottom left corner and draw a rectangle on the image. You should see this ROI appear. This roi is now also part of our datagraph. And we can use it
+in the next few steps.
+
+<video  autoPlay muted loop className="rounded rounded-md" width={"100%"}>
+  <source src={upAndDownURL}/>
+</video>
+
+But lets first inspect our ROI in a GUI app of our choice. For this tutorial we will use [Napari](https://napari.org/). But you can also use [Fiji](https://fiji.sc/).
+Or better even develop your own app. If you want to do that you can read more about that in the [Developer](/docs/developing/into) section.
