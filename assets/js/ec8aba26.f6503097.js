@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[5749],{15156:e=>{e.exports=JSON.parse('{"title":"Companion Apps","slug":"/category/companion-apps","permalink":"/docs/category/companion-apps","navigation":{"previous":{"title":"mikro_next","permalink":"/docs/services/next/mikro_next"},"next":{"title":"MikroJ","permalink":"/docs/apps/mikroj"}}}')}}]);
