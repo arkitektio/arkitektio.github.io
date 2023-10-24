@@ -27,7 +27,7 @@
     "@edno/docusaurus2-graphql-doc-generator": "^1.13.1",
     "@graphql-tools/url-loader": "^7.16.4",
     "@headlessui/react": "^1.7.13",
-    "@jhnnsrs/arkitekt": "0.0.36",
+    "@jhnnsrs/arkitekt": "^0.1.0",
     "@jhnnsrs/datalayer": "^0.0.8",
     "@jhnnsrs/fakts": "^0.0.17",
     "@jhnnsrs/fluss": "^0.0.2",

@@ -1,0 +1,54 @@
+---
+title: Our first workflow
+sidebar_label: 6. Our first workflow
+sidebar_position: 6
+---
+
+import Image from '@theme/IdealImage';
+import upAndDownURL from './upload_video.webm';
+import thumbnail from './node_explaination.png';
+
+We now have a basic understanding of how to call an conversion node on your data, we can visualize the results, now lets put it all together and create our first workflow,
+spanning the most basic nodes.
+
+Here we will use our uploaded image, mark a ROI in Napari and then crop the image around that roi and max project it.
+Sounds simple enough, lets get started.
+
+## Before we start
+
+You are familiar with this by now, there are a few things we need to do before we can start. First what do we mean with  Workflow? 
+A workflow in the arkitekt sense is a processing pipeline, that uses a series of nodes to process your data. Nodes just like 
+our previously mentioned "Show on Napari" or "Convert File" nodes. You can either stitch them together in the GUI or you can import them from a file or 
+even this website. We will do the first, but you can find more information on the other two options in the [documentation](/docs/). One important
+feature to understand in Arkitekt is that Workflows are not that different from Nodes, indeed they are just a special type of node. This means that
+you can use workflows in workflows, and you can use workflows just as nodes on your data. So lets get started.
+
+## New plugins
+
+We will need two new plugins for this workflow, so lets install them. One plugin will provide the functionality to actually crop the image and to max project it.
+The other plugin will be used to actually run the workflow in the background. So lets install them.
+
+First lets install the Standard Libary plugin [`Stdlib`](https://github.com/jhnnsrs/stdlib) plugin, which provides a batter of basic
+image processing nodes. You can install it by clicking on the "Plugin Store", and adding the "Stdlib" repository. 
+Users: `jhnnsrs`, Repository: `stdlib`, Branch: `master`. You then follow the [previously outlined](./first_tool#installing-our-first-app) steps to Appify the latest stdlib version, and deploy it
+to your server. 
+
+Then we will need the [`Reaktor`](https://github.com/jhnnsrs/reaktor) plugin, which will acts a `scheduler` for our workflow. Don't worry
+you will understand what that means in a second. You can install it by clicking on the "Plugin Store", and adding the "Reaktor" repository.
+Users: `jhnnsrs`, Repository: `reaktor`, Branch: `main`. Again followig the [previously outlined](./first_tool#installing-our-first-app) steps to Appify the latest reaktor version, and deploy it
+
+If you now search for `Deploy Flow` and `Crop Image` in the search bar, you should find the two nodes we just installed.
+If you don't, make sure you have the correct repository selected in the search bar, and your installation was successful.
+
+## Creating the workflow
+
+Now that we have the nodes we need, lets create the workflow. For this we can finally go to the "Workflow" tab in the sidebar.
+Here we can see a list of all our workflows, and we can create a new one by clicking on the "Create Workflow" button.
+
+You will be presented by the Arkitekt Workflow Designer, which is a drag and drop interface to create workflows.
+You can drag nodes from the nodes side bar into the workflow, and connect them by dragging the output of one node to the input of another.
+
+Lets see the design in progress.
+
+
+

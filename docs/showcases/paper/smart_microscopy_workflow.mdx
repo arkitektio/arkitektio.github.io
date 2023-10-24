@@ -1,7 +1,7 @@
 ---
 title: Smart Microscopy 
 sidebar_label: Smart Microscopy
-sidebar_position: 1
+sidebar_position: 4
 ---
 import Image from '@theme/IdealImage';
 import thumbnail from './smart.png';
@@ -10,23 +10,26 @@ import { DisplayWorkflow} from "../../../src/components/reaktion/DisplayWorkflow
 import { Guard} from "../../../src/components/Guard";
 import acquireSmallWorkflow from './acquire_small.json';
 
-To illustrate Arkitekt readiness for Smart Microscopy, a simple but powerful no-code example
-of a Smart Microscopy workflow was designed to perform the 3D live monitoring of cell
-clusters with a 40X objective, while scanning a large field of view with a 20X objective. In this
-workflow, the Micro-Manager open-source software (Edelstein et al. 2014) was used for the
-multidimensional acquisition. The user interactively set up a grid of positions on large sample
+Arkitekt was designed for the increasingly complex real-time microscopy workflows of today.
+To illustrate Arkitekt readiness for `Smart Microscopy`, we deviced this simply no-code example
+of a `Smart Microscopy` workflow to perform the 3D live monitoring of cell
+clusters with a 40X objective, while scanning a large field of view with a 20X objective. 
+
+In this workflow, the Micro-Manager open-source software (Edelstein et al. 2014) is setup for a
+multidimensional acquisition. The user then interactively sets up a grid of positions on large sample
 area (2.61mm x 2.61mm, corresponding to 4*4 stage positions) containing living fluorescent 
-cells placed under an inverted microscope, with a 20X magnification objective. All the defined
-positions were then acquired at 20X magnification every 30 minutes for 24 hours. For every
-acquired 20X magnification image, nuclei were automatically segmented on a remote
-computer using Stardist (Weigert et al. 2020) algorithm, and cell clusters computed with
-DBSCAN algorithms (Ester et al. 1996) with certain properties were identified and marked.
-When one or more of such identified clusters were detected, the ROIs central coordinates and
-dimensions were translated to stage coordinates and sent back to the microscope. 3D stacks
-of these positions (25 planes, 0.5µm step size) were then collected at higher magnification
-(40X) on a well-adjusted ROI fitting the cell clusters size. After all the positive events were
+cells. 
+
+During the workflow defined positions are then acquired at 20X magnification every 30 minutes for 24 hours. 
+For every acquired 20X magnification image, nuclei are then automatically segmented on a remote
+computer using the Stardist (Weigert et al. 2020) algorithm, and cell clusters are computed with the help of 
+DBSCAN (Ester et al. 1996).
+When one or more of such identified clusters are detected, the ROIs central coordinates and
+dimensions are translated back to stage coordinates and sent back to the microscope. 3D stacks
+of these positions (25 planes, 0.5µm step size) are then collected at higher magnification
+(40X) on a well-adjusted cameroa ROI fitting the cell clusters size. After all the positive events are
 detected, acquired in 3D high-resolution and displayed on the web-interface, the next image
-was acquired at 20X magnification
+is acquired at 20X magnification
 
 <div className="mt-2">
 <Image img={thumbnail} />
@@ -36,6 +39,65 @@ was acquired at 20X magnification
 </div>
 </div>
 
+
+### Prerequisites
+
+:::tip Please read 
+
+We **strongly** suggest to go through the [Getting Started](/docs/introduction/first_steps) guide before attempting to run this workflow.
+It will guide you through the installation of the Arkitekt platform and the setup of your first workflow, as well as how to install plugins
+and apps.
+:::
+
+This workflow is designed to run on a microscope computer running Windows 10 as well as on a remote analysis computer 
+that will power the Arkitekt platform and the image analysis. To enable GPU acceleration for the Stardist
+segmentation, the analysis computer needs to have access to a CUDA 11 enabled GPU (tested on Nvidia GeforceRTX 2080Ti).
+The microscope computer will need to be connected to thevthe same network as the remote computer.
+
+Additionally to run this workflow you will need to have the following installed on your microscope computer:
+
+- [Micro-Manager](https://micro-manager.org/) (version 2.0.1 2023.05.23 (later versions might work as well))
+- [MikroManager](https://github.com/jhnnsrs/mikro-manager) (version 0.0.1) [Download here](https://github.com/jhnnsrs/mikro-manager/releases/tag/6589964173)
+
+As well as the following plugins installed on your Arkitekt computer:
+
+- Stdlib Plugin (version 0.3.6) from the repository [https://github.com/jhnnsrs/stdlib](https://github.com/jhnnsrs/stdlib)
+- Segmentor Plugin (version 0.3.1 ) from the repository [https://github.com/jhnnsrs/segmentor](https://github.com/jhnnsrs/segmentor)
+
+
+<details>
+  <summary>Test Environment</summary>
+  <div>
+    This workflow was tested on the following environments:
+    <br/>
+
+    Acquisition Computer:
+        - Intel Core i7-8700K CPU @ 3.70GHz
+        - 32GB RAM
+        - Nikon Ti2-E Microscope
+        - Windows 10
+        - Micro-Manager 2.0.1 2023.05.23
+        - MikroManager 0.0.1
+
+    Analysis Computer
+        - Intel Core i9-8700K CPU @ 3.70GHz
+        - Ubuntu 22.04
+        - Arkitekt Paper Channel
+        - Segmentor Plugin 0.3.1
+        - Stdlib Plugin 0.3.6
+    
+    
+  </div>
+</details>
+
+### Installing the Workflows
+
+This workflow is composed of two workflows, with one workflow being nested in the other. The first workflow is the
+`acquire_small` workflow, which is the workflow that will acquire a 20X Image, segment it, detect cluster and send the coordinates
+to the microscope to acquire all clusters with a 40X objective. The second workflow is the `acquire_large` workflow, which is the
+workflow that will run this workflow in a multidimensional acquistions for all position every 30 minutes for 24 hours.
+
+To install these workflows connect this website to you Arkitekt instance and click on the button below:
 
 <DisplayWorkflow flow={acquireSmallWorkflow}/>
 
