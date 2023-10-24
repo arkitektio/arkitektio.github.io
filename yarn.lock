@@ -170,6 +170,25 @@
     tslib "^2.3.0"
     zen-observable-ts "^1.2.5"
 
+"@apollo/client@^3.8.6":
+  version "3.8.6"
+  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.8.6.tgz#d90f2a9b0147d8fc96c7a867588b5b2165cc4085"
+  integrity sha512-FnHg3vhQP8tQzgBs6oTJCFFIbovelDGYujj6MK7CJneiHf62TJstCIO0Ot4A1h7XrgFEtgl8a/OgajQWqrTuYw==
+  dependencies:
+    "@graphql-typed-document-node/core" "^3.1.1"
+    "@wry/context" "^0.7.3"
+    "@wry/equality" "^0.5.6"
+    "@wry/trie" "^0.4.3"
+    graphql-tag "^2.12.6"
+    hoist-non-react-statics "^3.3.2"
+    optimism "^0.17.5"
+    prop-types "^15.7.2"
+    response-iterator "^0.2.6"
+    symbol-observable "^4.0.0"
+    ts-invariant "^0.10.3"
+    tslib "^2.3.0"
+    zen-observable-ts "^1.2.5"
+
 "@ardatan/sync-fetch@^0.0.1":
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@ardatan/sync-fetch/-/sync-fetch-0.0.1.tgz#3385d3feedceb60a896518a1db857ec1e945348f"
@@ -1989,17 +2008,17 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
-"@jhnnsrs/arkitekt@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@jhnnsrs/arkitekt/-/arkitekt-0.1.0.tgz#6ed6285583fc4fba7f2811f34d39564f9c483f07"
-  integrity sha512-vWpAQsR1lNfKf+/WZGZjVowVhZdARIsvagAmM0C0Hn1OwiQOnq6ZU609iTtOg2+YigsobAZV2J6suE/WZVlV4Q==
+"@jhnnsrs/arkitekt@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@jhnnsrs/arkitekt/-/arkitekt-0.1.2.tgz#4f00b3af36936481d12631e1b38822461f2a093a"
+  integrity sha512-HG4Rmo6ikSTlvPwiBxDZPrpBUct0pIgeyuoRNMZctk59Uc0kf24hjBZNhkwQcTmkc2Sqm796Ced/asiRPrfOuQ==
   dependencies:
     "@jhnnsrs/datalayer" "^0.0.8"
     "@jhnnsrs/fakts" "^0.0.17"
     "@jhnnsrs/fluss" "^0.0.2"
     "@jhnnsrs/herre" "^0.0.12"
     "@jhnnsrs/mikro" "^0.0.9"
-    "@jhnnsrs/port" "^0.0.2"
+    "@jhnnsrs/port" "^0.0.4"
     "@jhnnsrs/rekuest" "^0.0.15"
     cancelable-promise "^4.3.0"
 
@@ -2072,10 +2091,10 @@
     apollo-upload-client "^17.0.0"
     subscriptions-transport-ws "^0.11.0"
 
-"@jhnnsrs/port@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@jhnnsrs/port/-/port-0.0.2.tgz#466976f40f293b1f402cf3552c5efd09a5fb97f5"
-  integrity sha512-k86BOIkaNOzru3Igi36UeqCWP1siLP1nmX9QIEzm4ZFnKX5rvCzWSH1qDq+Gk18ZlFb28ysTe3plXftYFGCHww==
+"@jhnnsrs/port@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@jhnnsrs/port/-/port-0.0.4.tgz#77d3b7c3b0de991d3b8dc46b68b6a8cec833de65"
+  integrity sha512-7PfzlCATm2aagoH9tV4Mc9ZNJxCOcS9ZwYDwZ/bJ9sIAG9R9s1Qnj1x6LWZCAhRngJgtCfwtjjFAWeCBp3G1LA==
   dependencies:
     subscriptions-transport-ws "^0.11.0"
 

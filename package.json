@@ -19,7 +19,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@apollo/client": "^3.8.1",
+    "@apollo/client": "^3.8.6",
     "@docusaurus/core": "^2.4.1",
     "@docusaurus/plugin-ideal-image": "^2.4.1",
     "@docusaurus/preset-classic": "^2.4.1",
@@ -27,7 +27,7 @@
     "@edno/docusaurus2-graphql-doc-generator": "^1.13.1",
     "@graphql-tools/url-loader": "^7.16.4",
     "@headlessui/react": "^1.7.13",
-    "@jhnnsrs/arkitekt": "^0.1.0",
+    "@jhnnsrs/arkitekt": "^0.1.2",
     "@jhnnsrs/datalayer": "^0.0.8",
     "@jhnnsrs/fakts": "^0.0.17",
     "@jhnnsrs/fluss": "^0.0.2",
