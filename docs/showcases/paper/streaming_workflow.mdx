@@ -7,7 +7,83 @@ sidebar_position: 3
 
 import { DownloadGrid } from "../../../src/components/layout/Button";
 import Image from '@theme/IdealImage';
-import interactive from './mikroj.png';
+import interactive from './streaming.png';
 
 
 import interactiveAnalysisFlow from './interactive_analysis.json';
+
+
+Biological systems can be highly reactive, and closely monitoring them during long-run acquisitions is necessary for ensuring a stable environment in an ongoing experiment. This can range from just checking that the acquisition is running properly (e.g., no loss of focus or some illumination problem), to monitoring the evolution of live biological samples (e.g., premature cell death). Classically, images are batch-processed once the acquisition is complete, i.e., when all of the data have been fully acquired and stored, leaving no chance for real-time analysis and feedback. In this second workflow, we illustrate how Arkitekt with its ability for streaming analysis (i.e., processing immediately after each acquisition event), enables to display real-time feedback on the running acquisition.
+Here we used Arkitekt to perform real-time quantitative monitoring of soSPIM 21,22 3D microscopy data using the popular StarDist 23 deep-learning segmentation algorithm, while they were being acquired (Fig. 3). A user-defined directory located on the microscope’s computer was monitored for new data, and all the analysis steps were performed remotely on each newly acquired data, in parallel with the acquisition, minimizing the risks of slowing the acquisition down or causing its crash.
+As the deep learning-based segmentation steps can be highly time-consuming, several processes were run in parallel and distributed on 3 different available hardware. Visualization of both the 3D acquisition and the results were performed in Napari 7 on a remote and mobile computer, as well as through the web-interface, where results (here the number of nuclei and the average volume)  were plotted on a live-dashboard, accessible to other remote members of the lab. (see Supp. Video 5)
+
+
+<div className="mt-2">
+<Image img={interactive} />
+
+<div className="text-gray-400 mb-2">
+<small>The Streaming Microscopy Workflow</small>
+</div>
+</div>
+
+
+### Prerequisites
+
+:::tip Please read 
+
+We **strongly** suggest to go through the [Getting Started](/docs/introduction/first_steps) guide before attempting to run this workflow.
+It will guide you through the installation of the Arkitekt platform and the setup of your first workflow, as well as how to install plugins
+and apps.
+:::
+
+This workflow is designed to run on a microscope computer running Windows 10 as well as on a remote analysis computer 
+that will power the Arkitekt platform and the image analysis. To enable GPU acceleration for the Stardist
+segmentation, the analysis computer needs to have access to a CUDA 11 enabled GPU (tested on Nvidia GeforceRTX 2080Ti).
+The microscope computer will need to be connected to thevthe same network as the remote computer.
+
+Additionally to run this workflow you will need to have the following installed on your microscope computer:
+
+- Your microscope Software of choice (we used Metamorph)
+- [Gucker](https://github.com/jhnnsrs/gucker) (version 0.0.1) [Download here](https://github.com/jhnnsrs/gucker/releases/latest)
+
+As well as the following plugins installed on your Arkitekt computer:
+
+- Stdlib Plugin (version 0.3.6) from the repository [https://github.com/jhnnsrs/stdlib](https://github.com/jhnnsrs/stdlib)
+- Segmentor Plugin (version 0.3.1 ) from the repository [https://github.com/jhnnsrs/segmentor](https://github.com/jhnnsrs/segmentor)
+
+
+<details>
+  <summary>Test Environment</summary>
+  <div>
+    This workflow was tested on the following environments:
+    <br/>
+
+    Acquisition Computer:
+        - Intel Core i7-8700K CPU @ 3.70GHz
+        - 32GB RAM
+        - Nikon Ti2-E Microscope
+        - Windows 10
+        - Micro-Manager 2.0.1 2023.05.23
+        - MikroManager 0.0.1
+
+    Analysis Computer
+        - Intel Core i9-8700K CPU @ 3.70GHz
+        - Ubuntu 22.04
+        - Arkitekt Paper Channel
+        - Segmentor Plugin 0.3.1
+        - Stdlib Plugin 0.3.6
+    
+    
+  </div>
+</details>
+
+### Installing the Workflows
+
+This workflow is composed of two workflows, with one workflow being nested in the other. The first workflow is the
+`acquire_small` workflow, which is the workflow that will acquire a 20X Image, segment it, detect cluster and send the coordinates
+to the microscope to acquire all clusters with a 40X objective. The second workflow is the `acquire_large` workflow, which is the
+workflow that will run this workflow in a multidimensional acquistions for all position every 30 minutes for 24 hours.
+
+To install these workflows connect this website to you Arkitekt instance and click on the button below:
+
+<DisplayWorkflow flow={interactiveAnalysisFlow}/>
