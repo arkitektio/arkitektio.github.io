@@ -4,7 +4,9 @@ sidebar_label: 2. Upload your data
 sidebar_position: 2
 ---
 
-import upAndDownURL from './upload_video.webm';
+import upload from './upload.webm';
+import createDataset from './create_dataset.webm';
+import dataset_drop from './dataset_drop.webm';
 
 # Upload your data
 
@@ -22,7 +24,7 @@ Uploading data to the platform is easy. You can simple drag and drop your data i
 The platform will try to auomatically detect the file type and show you the file type in the file list. Currently you can upload any
 datatype to the Arktiekt platform, and Arkitekt should support any filesize.
 
-Lets try this out. Download the following file to your computer: [here](static/demos/test.tif).
+Lets try this out. Download the following file to your computer: [here](static/demos/cells1.TIF).
 
 
 :::info About the data
@@ -34,8 +36,8 @@ provided file. It is a 2D image of some cells that we will use in the next secti
 
 
 
-<video  autoPlay muted loop className="rounded rounded-md" width={"100%"}>
-  <source src={upAndDownURL}/>
+<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={upload}/>
 </video>
 
 Thats it. Your data is now uploaded to the platform. You can see it in the file list on the left. You can also see that the file type is detected.
@@ -47,8 +49,8 @@ data in a hierarchical way, just like you would organize your files in folders. 
 action bar. Just give it a name and hit enter. A new `Dataset` will be created. You can now drag and drop your data into the
 `Dataset` to organize it. Let's see this in action:
 
-<video  autoPlay muted className="rounded rounded-md" width={"100%"}>
-  <source src={upAndDownURL}/>
+<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={createDataset}/>
 </video>
 
 
@@ -85,7 +87,7 @@ the item.
 
 ## Just one more file
 
-Before we move on, lets upload one more file. This time we will upload a 3D image. You can download it [here](static/demos/test.ome.tif).
+Before we move on, lets upload one more file. This time we will upload a 3D image. You can download it [here](static/demos/cells2.TIF).
 
 
 

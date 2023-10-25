@@ -167,7 +167,7 @@ export const Connect = () => {
       >
         <Popover.Panel
           static
-          className="absolute right-0 mt-2 mr-2 w-56 origin-top-right divide-y divide-gray-100 border border-1 border-gray-400 rounded-md bg-back-800 shadow-lg shadow ring-1 ring-black ring-opacity-5 focus:outline-none"
+          className="z-10 absolute right-0 mt-2 mr-2 w-56 origin-top-right divide-y divide-gray-100 border border-1 border-gray-400 rounded-md bg-back-800 shadow-lg shadow ring-1 ring-black ring-opacity-5 focus:outline-none"
         >
          <div className="px-2 py-2">
               <div className="text-slate-200 ">Lets get you connected!</div>

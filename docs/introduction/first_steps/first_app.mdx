@@ -5,7 +5,10 @@ sidebar_position: 5
 ---
 
 import Image from '@theme/IdealImage';
-import upAndDownURL from './upload_video.webm';
+import openNapari from './open_napari.webm';
+import napariVisualize from './napari_visualize.webm';
+import connectImageJ from './connect_imagej.webm';
+import visualizeImageJ from './visualize_imagej.webm';
 import thumbnail from './node_explaination.png';
 
 Every analysis starts with the visualization of our data. And we have a great selection of tools in the bioimage world to help us.
@@ -71,6 +74,11 @@ use the unbundled version of napari (the "pip" install version.) This recommenda
 Once you have installed the plugin, you can start Napari and you should see a new button in the left hand navigation called "Provide". Click on it and you should see 
 the connection process starting.
 
+<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={openNapari}/>
+</video>
+
+
 
 A few words about this connection process:
 
@@ -102,6 +110,9 @@ To visualize your data in Napari, you can simple search for the "Show on Napari"
 you can run it directly from the image pane where it will appear in the bottom right corner. If you leave the "show roi layer" on, you should even see 
 the ROIs that you have created in the browser. 
 
+<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={napariVisualize}/>
+</video>
 
 
 
@@ -140,7 +151,13 @@ does not support Mac. We are working on a solution, but for now, you need to use
 #### Installation
 
 To connect Fiji to Arkitekt you need to install [MikroJ](https://github.com/jhnnsrs/mikroj), our Fiji wrapping app. MikroJ is a small installable python app, that
-will interface with your Fiji installation and allows us to connect Fiji to Arkitekt. 
+will interface with your Fiji installation and allows us to connect Fiji to Arkitekt. You can find more about the design of MikroJ [here](docs/apps/mikroj). 
+
+<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={connectImageJ}/>
+</video>
+
+
 
 1.  Just download MikroJ from our [Github page](https://github.com/jhnnsrs/mikroj) and extract it to a folder of your choice. 
     Then double click on the "MikroJ.exe" file to start the app. Please do *NOT* start your FIJI installation. MikroJ will start Fiji for you.
@@ -155,7 +172,7 @@ will interface with your Fiji installation and allows us to connect Fiji to Arki
     :::caution Important
 
     This initial setup is only required once. MikroJ will remember your Fiji installation and will start it automatically for you in the future.
-    However this step might take a few seconds and cause an UI freeze. This is normal, and should resolve in a few seconds to a minute, while MikroJ
+    However this step might take a few seconds and cause an UI freeze (on our buglist). This is normal, and should resolve in a few seconds to a minute, while MikroJ
     and maven (the Java packaging tool that we use) are resolving some dependencies.
 
     :::
@@ -174,6 +191,9 @@ to the process explained in the Napari section. So we will not go into too much 
 To visualize your data in ImageJ, you can simple search for the "Load into Imagej" node, and reserve it in your dashboard. Once you have reserved the node,
 you can run it directly from the image pane where it will appear in the bottom right corner. 
 
+<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={visualizeImageJ}/>
+</video>
 
 
 

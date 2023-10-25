@@ -51,7 +51,7 @@ export const InstallRepoButton = portGuarded(
     return (
       <>
         {data?.githubRepo ? (
-          <div className={className + "bg-green-300"}> ✅ {tag}</div>
+          <button className={className + "bg-green-300"}> ✅ {tag}</button>
         ) : (
           <button
             onClick={handleClick}

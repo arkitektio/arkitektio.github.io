@@ -1,20 +1,20 @@
 ---
-id: intro
-title: Arkitekt and the GPU
-sidebar_label: GPU Support
+id: graphql
+title: GraphQL
+sidebar_label: GraphQL
 sidebar_position: 1
 ---
 
 import Image from "@theme/IdealImage";
-import thumbnail from './docker_gpu.png';
+import thumbnail from './graphql.png';
 
-# Arkitekt and the GPU
+# GraphQL
 
 Quite a lot of modern image analysis tools, especially those based on deep learning, are designed to run on GPUs. Arkitekt aims 
 to make it easy to use these tools, and to make it easy to run them on GPUs. However there are a few things to be aware of, as
 Arkitekt is not a magical solution to all GPU problems.
 
-## GPU Support
+## Schema
 
 There are two different ways to use GPUs with Arkitekt. The first is to use the GPU support built into the standalone tools themselves and
 on their hardware. This is probably the case when this tool exists primarily outside of the Arkitekt ecosystem, and Arkitekt is just being used to bridge it.
@@ -23,6 +23,11 @@ You can then just connect this tool like any other tool, and Arkitekt will run i
 The second way is to use the GPU support built into Arkitekt itself. This is the case when the tool is designed to run inside Arkitekt as a PluginApp. See more
 in the [developer](/docs/developer) section on how to build an Arkitekt plugin. Here Arkitekt uses the docker support system to run the plugin in a docker container
 within the Arkitekt server.  
+
+
+
+# What does this boil down to?
+
 
 
 <div className="mt-2 w-20">
@@ -34,17 +39,47 @@ and request GPU access from the underlying service (docker engine). This </small
 </div>
 </div>
 
-# GPU Support on Windows
 
-Luckily the easy of integration of the CUDA support into docker containers has gotten **a lot** easier in the last two years. 
-Windows users will no longer need to install the NVIDIA Container Toolkit, but can instead use the WSL2 backend of Docker Desktop.
-The installation instructions for this can be found [here](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#installing-nvidia-drivers).
 
-- Install the **latest** NVIDIA drivers on your host machine (https://docs.docker.com/desktop/install/windows-install/)
-- Install Docker Desktop and enable the WSL2 backend (https://docs.docker.com/desktop/wsl/)
-- Run Konstruktor (which will check if your system is ready for GPU support)
+## Why we like GraphQL
 
-## GPU Support on Linux
+Ask a developer about API design and you'll probably get an earful about which paradigm to use. REST, SOAP, RPC, and GraphQL are all popular choices.
+We chose GraphQL for Arkitekt because it's a modern, flexible, and powerful way to design APIs that deal with relational and federated data in a type-safe way.
+Lets look at these in more detail.
 
-The same is true for Linux users. The NVIDIA Container Toolkit is no longer needed, and the docker engine can be used directly.
-The installation instructions for this can be found [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker).
+### Relational
+
+Modern image analysis relies heavily on relational data 
+
+
+
+
+
+## React developer? Try it out Here
+
+We can talk ages about the ease of use of graphql. But you can try it out yourself. Here is a simple example of a React component that uses graphql to fetch data from yur local Arkitekt server.
+You can just change the query to fetch any data you want.
+
+
+```jsx live
+function Display(props) {
+  const { data } = useMikroQuery(
+    gql`
+      query {
+        representations(limit: 3) {
+          id
+          name
+          store
+          shape
+        }
+      }
+    `
+  );
+
+  return (
+    <div className="flex flex-col gap-2">
+      {data && data.representations.map((image) => <div className="bg-green-200">{image.name} </div>)}
+    </div>
+  );
+}
+```

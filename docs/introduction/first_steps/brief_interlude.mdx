@@ -1,0 +1,119 @@
+---
+title: Brief Interlude
+sidebar_label: 6. A brief interlude
+sidebar_position: 6
+---
+
+import Image from '@theme/IdealImage';
+import upAndDownURL from './upload_video.webm';
+import thumbnail from './node_explaination.png';
+import { HerreGuard} from "@jhnnsrs/herre"
+import { FaktsGuard} from "@jhnnsrs/fakts"
+import { InstallRepoButton} from "../../../src/components/InstallRepoButton";
+import Admonition from '@theme/Admonition';
+
+We now have a basic understanding of how to call an conversion node on your data, we can visualize the results, now before we continue, lets address a few things.
+
+### 😭 So many steps...
+
+You may have noticed that we have to do a lot of steps to get to the point where we can visualize our data on an app. You might think that's to much hassle for nothing (and 
+you might be right). But let us briefly explain we think its actually a good thing.
+
+- **Seperation of Concerns**: We already installed 3 Apps to our Arkitekt instance. Omero, Napari and Fiji. Their provided functionality would
+    have been easily possible to implement in a single App (actually Fiji would have been able to do that easily) But we think that seperating the functionality into multiple Apps has a few advantages. 
+    - First of all, it allows 
+    these tools to concentrate on what they are really good at. Napari is first and foremost a visualization tool, it does not need to know anything about how to convert
+    data from one format to another. 
+    - Secondly, it allows us to reuse the functionality of these Apps in other Apps. For example as we can later 
+
+- 
+
+That being said!
+
+We understand that their might be alot of installation of tools or management of plugins involved and for a platform that is supposed to be used for automation, this is a bit
+ironic. But don't you worry. ..
+
+
+
+### We have an App for that!
+
+Yes. Apps to the rescue. But this one is especially sweet because there is no installation. And you have been using it all along. 
+What?
+
+You're right! It's actually **this** documentation website.
+
+You see, a lot of things can be an Arkitekt app and that includes this website. So we can actually use this website to install repositories or workflows to our Arkitekt instance.
+You might have noticed the `Connect` button in the top right corner of this website. And if you click on it and you run this website on the same machine as your Arkitekt instance,
+you will see a familiar connect screen that will prompt you to connect to your Arkitekt instance.
+
+So just connect. We will wait here.
+
+
+<FaktsGuard fallback={
+<>
+<div className="bg-back-800 p-3 text-center rounded rounded-md mb-2">
+ 😊 Just one connection away... 
+</div>
+ 
+<Admonition type="warning" title="Not able to connect?"> 
+
+If you are not able to connect to your Arkitekt instance (because you cannot have a webbrowser where you installed arkitekt). You can always install the plugins manually through the same interface we saw before. We just can't give you
+to much interactive help about it.
+
+</Admonition>
+ 
+</>
+ 
+ 
+ }> 
+<HerreGuard fallback={<div className="bg-back-800 p-3 text-center rounded rounded-md  mb-2 "> 🥹 Almost there... Just login! </div>}>
+
+
+<div className="bg-green-300 text-center text-black p-3 rounded rounded-md ">
+    You did it 🥰! We are connected 
+</div>
+
+### What that means for you
+
+Well now that we are connected, we can actually install repositories and workflows directly from this website. So lets do that before we start with the next chapter.
+Because we will need two more `PluginApps` for our first workflow for that.
+
+#### First plugin: Standard Library
+
+Finally you will be able to do some proper image analysis work, this is the Arkitekt Standard Library, which comes with an ever increasing number of nodes that you can use
+to analyze your data. They are not as fancy as the ones we have seen so far, but they are very useful. So lets install it.
+
+Look at this button. It will install the Standard Library to your Arkitekt instance. Just click it.
+
+<InstallRepoButton repo={"stdlib"} user={"jhnnsrs"} branch={"master"}/>
+
+Turned green? Great! You now have the Standard Library Repository installed. We will do that in the next chapter.
+
+#### Second plugin: Reaktor 
+
+The second plugin we will install is called Reaktor. This is a weird one, because it is not really a plugin that does anything. It is a plugin that will allow use to run 
+(schedule) your workflows directly on the Arkitekt server. You might not understand what that means right now, but you will later. So lets install it.
+
+Same procedure as before, just click the button.
+
+<InstallRepoButton repo={"reaktor"} user={"jhnnsrs"} branch={"master"}/>
+
+Turned green? Great! You now have the Reaktor Repository installed. Next chapter.
+
+:::tip We love this feature
+
+We love this feature so much, as it allows us to provide you with a fully interactive documentation. You can show to install plugins and workflows directly from the documentation.
+But most importantly, everyone can do that. You can create your own documentation website and use it to install your own plugins and workflows. Just check out the github repo for
+this documentatoin.
+
+:::
+
+</HerreGuard>
+</FaktsGuard>
+
+
+
+
+
+
+

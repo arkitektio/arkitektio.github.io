@@ -9,6 +9,7 @@ export default function Root({ children }) {
     >
       <AutoConfiguration wellKnownEndpoints={["localhost:8000"]} />
       <UnkoverProvider>{children}</UnkoverProvider>
+
     </EasyProvider>
   );
 }

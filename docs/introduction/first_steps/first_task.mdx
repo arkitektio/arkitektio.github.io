@@ -5,7 +5,9 @@ sidebar_position: 4
 ---
 
 import Image from '@theme/IdealImage';
-import upAndDownURL from './upload_video.webm';
+import convert from './convert.webm';
+import visualize from './visualize.webm';
+import markRoi from './roi_mark.webm';
 import thumbnail from './node_explaination.png';
 
 Four steps in an we still haven't performed anything useful on our data. But that's about to change. In this section we will:
@@ -22,8 +24,8 @@ We will start by converting our first file. Utilizing our just reserved "Convert
 first file. The one we uploaded in the previous section.
 
 
-<video  autoPlay muted loop className="rounded rounded-md my-3" width={"100%"}>
-  <source src={upAndDownURL}/>
+<video  autoPlay muted loop controls className="rounded rounded-md my-3" width={"100%"}>
+  <source src={convert}/>
 </video>
 
 
@@ -61,8 +63,8 @@ popups in the bottom right. Additionality because Arkitekt kept track about our 
 image` from that pane.
 
 
-<video  autoPlay muted loop className="rounded rounded-md" width={"100%"}>
-  <source src={upAndDownURL}/>
+<video autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={visualize}/>
 </video>
 
 In this steps you will for the first time see the Arkitekt image tab. In this tab you can explore the image and associated metadata, as well as perform some really basic 2D 
@@ -83,14 +85,14 @@ metadata in a more flexible way. This will also allow us to provide more advance
 read more about it in the [Mikro Next](/docs/services/next/mikro_next) section.
 
 :::
-## Lets mark a ROI
+## Lets comment and Mark a ROI
 
 Besides just converting our data we can also perform some basic operations on our data. Lets start by marking a ROI on our image. Just click on the rectangle 
 icon in the bottom left corner and draw a rectangle on the image. You should see this ROI appear. This roi is now also part of our datagraph. And we can use it
 in the next few steps.
 
-<video  autoPlay muted loop className="rounded rounded-md" width={"100%"}>
-  <source src={upAndDownURL}/>
+<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={markRoi}/>
 </video>
 
 But lets first inspect our ROI in a GUI app of our choice. For this tutorial we will use [Napari](https://napari.org/). But you can also use [Fiji](https://fiji.sc/).

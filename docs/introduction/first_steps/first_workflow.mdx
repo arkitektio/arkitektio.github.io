@@ -7,29 +7,92 @@ sidebar_position: 6
 import Image from '@theme/IdealImage';
 import upAndDownURL from './upload_video.webm';
 import thumbnail from './node_explaination.png';
+import { HerreGuard } from '@jhnnsrs/herre';
 import { InstallRepoButton} from "../../../src/components/InstallRepoButton";
+import { DisplayWorkflow} from "../../../src/components/reaktion/DisplayWorkflow";
+import simpleWorkflow from './simple.json';
+import createWorkflow from './create_workflow.webm';
 
 We now have a basic understanding of how to call an conversion node on your data, we can visualize the results, now lets put it all together and create our first workflow,
 spanning the most basic nodes.
 
-Here we will use our uploaded image, mark a ROI in Napari and then crop the image around that roi and max project it.
-Sounds simple enough, lets get started.
+Here we will use our uploaded image, max project it,  threshold it (yeah analysis), and then measure the fraction of the image that is above the threshold (
+yeah quantification). 
 
 ## Before we start
 
-You are familiar with this by now, there are a few things we need to do before we can start. First what do we mean with  Workflow? 
-A workflow in the arkitekt sense is a processing pipeline, that uses a series of nodes to process your data. Nodes just like 
-our previously mentioned "Show on Napari" or "Convert File" nodes. You can either stitch them together in the GUI or you can import them from a file or 
-even this website. We will do the first, but you can find more information on the other two options in the [documentation](/docs/). One important
-feature to understand in Arkitekt is that Workflows are not that different from Nodes, indeed they are just a special type of node. This means that
-you can use workflows in workflows, and you can use workflows just as nodes on your data. So lets get started.
+You are familiar with this by now.. There are a few things we need to do before we can start. 
+First what do we mean with `Workflow`? 
+
+A workflow in the arkitekt sense is a processing pipeline, that uses a series of `Nodes` to process your data in a stream. Nodes just like 
+our previously mentioned `Show on Napari` or `Convert File` nodes. You can either stitch them together in the GUI or you can import them from a file or 
+even this website. We will do the first, for this one. To familiarize you a bit more with the UI . 
+
+
+Lets look first at the workflow we would like to create, and then we will go through the steps to create it.
+
+<DisplayWorkflow flow={simpleWorkflow} blockImport/>
+<div className="text-gray-400 mb-2">
+    <small> This is the workflow we would like to create. For now we disabled the import feature.. You should really try to create it on your own </small>
+</div>
+
+This is probably the most basic workflow you can create, but it will teach you a lot about the Arkitekt workflow and its design. A few things to note here.
+
+-   This is an **Arkitekt workflow** that we just exported from Arkitekt and then provided to this website. 
+
+    Arkitekt workflows are just visual representations of a workflow. They are stored in a JSON file, and can be imported and exported from Arkitekt.
+    You can also import them from this website, but we will get to that later.
+
+-   About the `Nodes`.
+
+    Nodes in Arkitekt Workflows are front and center. They are the building blocks of your workflow, and thusly the building blocks of your analysis. Each node
+    has inputs and outputs that you can connect to other nodes. This connection then defines the flow of data through your workflow. Importantly you will 
+    notice the node termed `Input` and `Output`. These are special nodes that are part of each workflow. They are the entry and exit points, to your analysis.
+    When you connect a node to the `Input` node, you are telling Arkitekt that your workflow will expect the input type of that node as a parameter when you run it.
+    Equally you connect a node to the `Output` node, you are telling Arkitekt that your workflow will return the output type of that node when you run it. 
+
+    :::info Workflows are Just Nodes
+
+    This abstraction of Input and Output nodes is core to the concept of a workflow in Arkitekt. Each workflow has exactly one `Input` and one `Output` node.
+    And as our workflows are just nodes, these inputs and outputs will then be the inputs and outputs of the workflow node. This means that you can use workflows
+    in workflows, and you can use workflows just as nodes on your data. But we will get to that later.
+
+    :::
+
+    
+-   About their colors:    
+
+    If you have connected the website and followed the tutorial just until now, you might notice that the color of the `All Nodes` node is yellow. This is because
+    we have not yet installed apps that provide the functionality for the nodes in this workflow. This illustrates another core feature of Arkitekt. The separation
+    of the workflow design and the workflow execution. You can design and share a workflow, irrespective of the apps that provide the functionality for the nodes in the workflow.
+    This means that you can design a workflow, and potentially share it with others, even though they might run in on completely different apps. This makes workflows
+    a great way to share analysis pipelines, and to make them reproducible and **universal**
+
+ 
+-   About the data as a stream:
+
+    Arkitekt workflows are adapted to process your data as a [stream](/docs/design/real-time), rather than as a batch. This means that each node will process your data as it comes in, and then
+    pass it on to the next node. Nodes will not wait for all data to be processed, but will process it as it comes in. This means that you can process data as fast as
+    possible, and importantly you can process data that is still being generated. This is a core feature of Arkitekt, and we will get to it later
+
+
+## Enough talking, lets create our first workflow
+
+Lets start by creating a new workflow. You can do this by clicking on the "Workflow" tab in the sidebar, and then clicking on the "Create Workflow" button.
+
+
 
 ## New plugins
+
+<HerreGuard fallback={<div>
+
+But don't you worry, we will guide you through it.
+
 
 We will need two new plugins for this workflow, so lets install them. One plugin will provide the functionality to actually crop the image and to max project it.
 The other plugin will be used to actually run the workflow in the background. So lets install them.
 
-First lets install the Standard Libary plugin [`Stdlib`](https://github.com/jhnnsrs/stdlib) plugin, which provides a batter of basic
+First lets install the Standard Libary plugin [`Stdlib`](https://github.com/jhnnsrs/stdlib) plugin, which provides a battery of basic
 image processing nodes. You can install it by clicking on the "Plugin Store", and adding the "Stdlib" repository. 
 Users: `jhnnsrs`, Repository: `stdlib`, Branch: `master`. You then follow the [previously outlined](./first_tool#installing-our-first-app) steps to Appify the latest stdlib version, and deploy it
 to your server. 
@@ -40,6 +103,18 @@ Users: `jhnnsrs`, Repository: `reaktor`, Branch: `main`. Again followig the [pre
 
 If you now search for `Deploy Flow` and `Crop Image` in the search bar, you should find the two nodes we just installed.
 If you don't, make sure you have the correct repository selected in the search bar, and your installation was successful.
+</div>
+}>
+
+<div className="flex flex-row gap-2">
+<InstallRepoButton repo={"stdlib"} user={"jhnnsrs"} branch={"master"}/>
+<InstallRepoButton repo={"reaktor"} user={"jhnnsrs"} branch={"master"}/>
+</div>
+</HerreGuard>
+
+
+
+
 
 ## Creating the workflow
 
@@ -52,5 +127,7 @@ You can drag nodes from the nodes side bar into the workflow, and connect them b
 Lets see the design in progress.
 
 
-<InstallRepoButton repo={"reaktor"} user={"jhnnsrs"} branch={"master"}/>
+<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={createWorkflow}/>
+</video>
 
