@@ -1,0 +1,85 @@
+---
+id: startup
+title: Help! My Server doesn't work
+sidebar_label: Startup Troubles
+sidebar_position: 1
+---
+
+import Image from "@theme/IdealImage";
+
+Puh. We are sorry about that! This is probably the worst case scenario, and one of the hardest to debug. But don't worry, we will get you through this.
+
+## Before we start
+This troubleshooting section will assume you have read the [Getting Started](/docs/introduction) section and have a basic understanding of how Arkitekt works.
+This section will also assume that you are using [Konstruktor](/docs/apps/konstruktor) to start your server. If you are using the docker compose setup, we 
+would kindly ask you to switch to Konstruktor for the time being, and see if you can get it to work there. It will make it easier for us to help you.
+
+:::note Please open an Issue on GitHub
+
+No matter if you find an easy solution to your problem, if you have the time, please open an Issue on our [GitHub](https://github.com/arkitektio/arkitektio.github.io) and explain your problem, especially if you think it's a bug.
+Every general feedback and improvement notes are always welcome there.
+
+:::
+
+
+
+
+Lets start with the basics. Where did you get stuck? We will guide you through a few checkpoints.
+
+Step Zero: The basics
+- [I couldn't even install Docker](#docker-installation)
+- I wasn't able to install `Konstruktor`
+- I started `Konstruktor`, but it crashed immediately
+
+Step One: The Konstruktor
+- Konstruktor claimed it couldn't find docker
+- Konstruktor claimed it couldn't find my GPU
+- I coudn't install the "Paper" channel deployment
+- Konstruktor showed me an error message
+
+Step Three: The Deployment
+- I couldn't open the Dashboard of my Deployment
+- I couldn't initialize my Deployment
+- I couldn't start my Deployment 
+- The services of my deployment keep crashing
+- I never see all my services turn green
+- I couldn't advertise my Deployment
+
+Step Four: The Access
+- My Deployment is running, but it doesnt appear in Orkestrator
+- I can't access my server from another computer
+
+
+## Docker Installation
+
+Installing Docker has recently become way more straightforward and easy. 
+If you are using Windows or Mac, you can simply download the installer from the [Docker Website](https://www.docker.com/products/docker-desktop). 
+If you are using Linux, you can follow the instructions for your distribution [here](https://docs.docker.com/engine/install/). 
+
+### Help I can't install Docker on Windows
+
+Installing of Docker on Windows has become way easier recently. But it's still the trickiest of all operation systems. 
+And it's not always clear what the problem is. So let's try to figure out what's going on. First things first:
+
+- You need to have `Administrator rights` on your computer. If you are using a university computer, you might need to ask your IT department to install Docker for you.
+
+- Docker requires Windows 10 and higher, that means you need to have one of the following Windows versions installed:
+    - Windows 11 64-bit: Home or Pro version 21H2 or higher, or Enterprise or Education version 21H2 or higher.
+    - Windows 10 64-bit: Home or Pro 22H2 (build 19045) or higher, or Enterprise or Education 22H2 (build 19045) or higher.
+
+Docker needs to be able to run a `Virtualization` layer on your computer. For this it can use either `Hyper-V` or `Windows Subsystem for Linux 2 (WSL2)`.
+We **strongly recommend** using WSL2, as it is much faster and more stable, and has become the default option for docker.
+
+If you are using Windows 10, you can check if you have WSL2 installed by opening a `PowerShell` and running the following command:
+
+```powershell
+wsl --list --verbose
+```
+
+Otherwise you can follow the instructions [here](https://learn.microsoft.com/en-us/windows/wsl/install) to install WSL2.
+
+### Help I can't install Docker on Mac
+
+Installing Docker on Mac is usually pretty straightforward. If you encounter any problems, it's probably because you are using an older Mac,
+or something in your system is blocking the installation. Please open an Issue on our [GitHub](https://github.com/arkitektio/arkitektio.github.io)
+and we will try to help you.

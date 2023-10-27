@@ -13,35 +13,40 @@ import data from './data.png';
 
 
 
-Our first step into the Arkitekt world will be to get familiar with its non-developer interface. By the end of this section, you will be able to:
+Our first step into the Arkitekt world will be to get familiar with its non-developer interface. By the end of this section, we will have shown 
+you how to:
 
-- Connect your first App (Orkestrator) to your Arkitekt server
+- Connect your first App (`Orkestrator`) to your Arkitekt server
 - Login with your Arkitekt server with your user account
-- Understand the authenticate and authorization process
-- Get familiar with the Orkestrator interface
+- Understand the basics of the [Authentication and Authorization](/docs/design/security) process
+- Get familiar with the `Orkestrator` interface
 
-Small Steps to get you started!
+Small steps to get you started!
 
 ### Prerequisites
 
 Before you can start using Arkitekt, you need to have the Arkitekt server platform installed and **started**. Please refer to the
-[installation guide](/docs/introduction/installation) for more information. If you are using "konstruktor" to manage your Arkitekt server, 
-you should be seing a screen similar to the one below.
+[installation guide](/docs/introduction/installation) for more information. If you are using `Konstruktor` to manage your Arkitekt server, 
+you should be seing a screen similar to the one below, before you continue with this tutorial.
 
 <div className="mt-2 p-6">
 <Image img={dashboard} />
 
 <div className="text-gray-400 mb-2">
-<small>The konstruktor dashboard of a started Arkitekt app. Make sure that all services are highlighted green before 
-proceeding. Depending on your hardware configuration this might take a few seconds. If a service remains red or 
-keeps restarting check our troubleshooting section. </small>
+<small>
+The konstruktor dashboard of a started Arkitekt app. Make sure that all services are highlighted green before 
+proceeding. Depending on your hardware configuration this might take a few seconds, after you press <b>Start</b>. If a service remains red or 
+keeps restarting check our <a href="/docs/troubleshooting/startup">troubleshooting section</a>
+</small>
 </div>
 </div>
 
 ### About Orkestrator
 
-Now that you have the Arkitekt server installed, you can start using our default interface **Orkestrator**, which will be your main tool to interact with the Arkitekt server.
-As previously mentioned all interaction with the Arkitekt server happens through apps, and Orkestrator is the default app that comes with the Arkitekt server. Orkestrator itself
+Now that you have the Arkitekt server installed, you can start using our default interface `Orkestrator`,
+which will be your main tool to interact with the Arkitekt server.
+
+As previously mentioned all interaction with the Arkitekt server happens through apps, and `Orkestrator` is the default app that comes with the Arkitekt server. `Orkestrator` itself
 comes in two flavours: a desktop app and a webapp. The desktop app is a native app that you can download and install on your computer, while the webapp is a web-based app and can be accessed
 through your browser. Both apps have similar funcitionality, but the desktop app has some additional features that are not available in the webapp. We strongly recommend that you use the desktop app
 for your day-to-day work, and use the webapp only when you are not able to install the desktop app on your computer.So let's get started!
@@ -51,95 +56,111 @@ for your day-to-day work, and use the webapp only when you are not able to insta
 As Arkitekt is a webservice platform you might wonder why we recommend the desktop app. This is primarly because of the restrictions of modern webbrowsers to access webservices in your local network. While 
 you can perfectly access your Arkitekt server hosten on *your* computer through your browser, you might have problems accessing it from *another* computer in your network. To circumvent this restriction, 
 we have developed a desktop app that can be installed on your computer and that can access any Arkitekt server without restrictions, additionaly it can help you find local arkitekt servers in your network.
-without any searching for IP addresses, and syncronize your data with the server. It's worth it!
+without the need to know their IP addresses. It will *soon* also boast features like file synchronization with the Server. It's worth it!
 
 :::
 
+
 #### Download the desktop app
 
-One more installation to go. You can download the desktop app from the github release page of the Arkitekt server. You can find the latest release [here](https://github.com/jhnnsrs/orkestrator/releases/latest).
+You can download the desktop app from the github release page of the Arkitekt server. You can find the latest release [here](https://github.com/jhnnsrs/orkestrator/releases/latest).
 Or just click on the button below, depending on your operating system.
 
 <OrkestratorGrid/>
 
 #### I don't want to install the desktop app
 
-That's perfectly understandable, you can also use the webapp. Just click [here](http://127.0.0.1:8010/) open the webapp in your browser. If you are not able to access the webapp, please refer to the [troubleshooting section](/docs/introduction/troubleshooting) for more information.
+That's perfectly understandable, you can also use the webapp. Just click [here](http://127.0.0.1:8010/) open the webapp in your browser. 
+If you are not able to access the webapp, please refer to the [troubleshooting section](/docs/introduction/troubleshooting/startup) for more information.
 Be aware that we will assume that you are using the desktop app in the following sections, so some of the screenshots might look different in the webapp.
 
 # Lets Finally get started
 
-### Very first steps
-
-After you have installed the desktop app, you should see the following screen, when you open the app. If you are using the webapp, you should see a similar screen in your browser.
+After you have installed the desktop app, you should see the following screen, when you open the app. 
+If you are using the webapp, you should see a similar screen in your browser.
+Allow us to guide you through this section, as it will give you a first impression of how Arkitekt `Apps` work, 
+and how we ensure that your data is [safe and secure](/docs/design/security)
 
 <div className="mt-2 p-6">
 <Image img={thumbnail} />
 
 <div className="text-gray-400 mb-2">
-<small>The orkestrator desktop app startscreen </small>
+<small>The Orkestrator desktop app startscreen, if you have never conntected to an Arkitekt server </small>
 </div>
 </div>
 
-The big coloured button in the center of the screen is the main button to connect to your Arkitekt server. If you click on it, you will instruct this app to connect to 
-the named server (this is the name of the "deployment" you gave during the installation). During this connection process Orkestrator will understand which services are available on the server and will
+This is the `Connection Screen` of the Orkestrator app. 
+The big coloured button in the center of the screen is the start button to connect to your Arkitekt server. If you click on it, you will instruct this app to connect to 
+the named server (this is the name of the "deployment" you gave during the installation). During this connection process `Orkestrator` will understand which services are available on the server and will
 potentially will negotaite access rights negotiations. Every app that can connect to Arkitekt has to undergo this connection step.
 
 :::info On the connection process
 
 The connection process is a very important step in the Arkitekt ecosystem. It is the first step to ensure that apps can reliable interface with the Arkitekt server and potential third party modules. It is also
-an important step that system administrators can use to control which apps can connect to the server, or if they want to restrict access to the server or submodules of the server. 
+an important step that system administrators can use to control which apps can connect to the server, or if they want to restrict access to the server or submodules of the server. More in the
+[Configuration section](/docs/design/configuration) of the documentation.
 
 :::
 
 :::caution I don't see my server
 
-If you are not seing a button with the name of your server, this might be because the server is not running (check the konstruktor dashboard) or because the server is not reachable from your computer.
-Make sure to advertise your server from the konstruktor interface if all services are running. If you are still not able to connect to the server, please refer to the [troubleshooting section](/docs/troubleshooting) for more information.
+If you are not seing a button with the name of your server, this might be because the server is not running (check the `Konstruktor` dashboard and validate all items are highlighted green) or because the server is not reachable from your computer.
+Make sure to advertise your server from the `Konstruktor` interface if all services are running. If you are still not able to connect to the server, please refer to the [troubleshooting section](/docs/troubleshooting/startup) for more information.
 :::
 
 ### Almost there
 
-Now that we have connected to the Arkitekt Server there is one more step before we can start using the app. Arkitekt needs to understand who we are, which is why we need to login to the server.
-Once clicking login a webpage will open in your default **webbrowser** and you will be prompted to provide your login details 
+Now that we have connected to the Arkitekt Server there is one more step before we can start using the app. Arkitekt needs to understand who we are, which is why we need to **login** with our  server.
+Once clicking login a webpage will open in your default **webbrowser** and you will be prompted to provide your login details in the `Authentication` screen.
 These should be the user account details that you have created during the installation of the Arkitekt server. (defaults: user: `demo`, password: `demo`).
 
 :::info On the login process
 
-If you are using the orkestrator app, for the first time you may be prompted by your firewall to allow access to network.
-This is a security feature of your operating system and you should allow access to the network.
+If you are using the `Orkestrator` app for the first time you may be prompted by your firewall to allow access to network.
+This is a security feature of your operating system and you should allow access to the network. Don't worry Arkitekt will not send any data to the internet,
+just check out the [source code](/docs/developers/contribute), if you are worried 😉.
 
 :::
 
 :::warning No Admin Login
 
 During the installation you were prompted to create both an admin account and various user accounts. You should **never** use the admin account to login to the server, 
-as this account is only used to manage the server.
+as this account is only used to manage the server. Please use one of the user accounts that you have created during the installation process.
 
 :::
 
-Shortly after you have logged in, you should see the following screen in the Orkestrator app. If you are using the webapp, you should see a similar screen in your browser.
+Shortly after you have logged in, you should see the following screen in the `Orkestrator` app. If you are using the webapp, you should see a similar screen in your browser.
 
 <div className="mt-2 p-6 rounded rounded-md">
 <Image img={oauth} className="rounded rounded-xl overflow-hidden" />
 
 <div className="text-gray-400 mb-2">
-<small>The authorization screen powered by Oauth2</small>
+<small>The Authorization screen powered by Oauth2</small>
 </div>
 </div>
 
-This is the *Authentication* screen, which is used to grant the Orkestrator app access to your user account. 
-This is a very important step and every App that connects to Arkitekt needs to undergo this step (don't worry only once). During this step you will grant the **app** access to your user account, 
-and tell Arkitekt which actions the app is allowed to perform on your behalf. We are working on a comprehensive documentation for this, but for this tutorial we will just grant the app full access to your account.
+This is the `Authorization` screen, which is used to grant the `Orkestrator` App access to your user account. 
+This is a very important step and every App that connects to Arkitekt needs to undergo this step. During this step you will grant the **App** access to your user account, 
+and tell Arkitekt which actions the App is allowed to perform on **your behalf**. We are working on a comprehensive documentation for this and give you detailed information
+about the App Rights (so called `Scopes`) in the future. For this tutorial we will just grant the app full access to your account.
 To do this, click on the **Authorize** button. You will be redirected back to the Orkestrator app and you are finally go to go.
 
 :::info On the OAuth process
 
-This authentication and authorization process is a arguely important step in the Arkitekt ecosystem. It is the first step to ensure a secure and trustworthy connection between the Arkitekt server and the app. As we believe data 
+This Authentication and Authorization process is the arguely one of the most important concept in the Arkitekt design. It is the first step to ensure a secure and trustworthy connection between the Arkitekt server and the app. As we believe data 
 privacy and security is a very important topic, every app needs to alert what it can potentially do with your data. As Arkitekt is a very flexible platform, we cannot know what every app can do, so we need to ask you to grant
 to make sure that you are always in control of your data.
 
 :::
+
+:::warning We are not production ready
+
+While the Authentication and Authorization process might give you the impression that Arkitekt is safe and sound and production ready, we are **not**. Some of the security features have been disabled in the `Paper` channel deployment or are not fully implemented yet.
+Safety is our top priority, but we are still in the early stages of development. For now Arkitekt should be safe by `Design` not by `Implementation`.  Online features of Arkitekt should stil be happening in a controlled environment such as a local network or a [secure VPN](docs/features/vpn).
+If you are interested in helping us to make Arkitekt production ready, please check out our [contribution guide](/docs/developers/contribute).
+
+:::
+
 
 ### Welcome to Orkestrator
 
@@ -154,16 +175,15 @@ And now you are finally ready to use the Orkestrator app. Quite a few steps. But
 </div>
 </div>
 
-Before we go any further. Just explore this webinterface. No worries you cannot break anything (thats not already broken ;)). You can click on the different buttons and see what happens.
+Before we go any further. Just explore this webinterface. No worries you cannot break anything (thats not already broken 😉). You can click on the different buttons and see what happens.
 Three things are important to know:
 
-- *Navigation* throughout the app is done through the sidebar on the left. Here the main sections of the app are listed (which we will explore in the next sections). The bottom left item is
+- `Navigation` throughout the app is done through the sidebar on the left. Here the main sections of the app are listed (which we will explore in the next sections). The bottom left item is
 your user account, which you can use to logout from the app or the server
-- The main content of the app is displayed in the center of the screen. This is where you will see the data/workflow/etc that you are working with.
-
-- Each Main View has multipe sidebars that can be opened both on the left and the right side of the screen. These sidebars can be used to display additional information or to configure the main view.
+- The `Main View` of the app is displayed in the center of the screen. This is where you will see the data/workflow/etc that you are working with.
+- Each `Main View has multipe *sidebars* that can be opened both on the left and the right side of the screen. These sidebars can be used to display additional information or to configure the main view.
 Left Sidebars are often used to search for data, while right sidebars are often used to configure the view or provide more details about the data.
-- In the bottom right corner of the screen you will find the action buttons. These button provide access to the most important actions that can be performed in the current view. Importantly these
-actions are context sensitive, so they will change depending on the data you are currently in, and can also be functionality that will be executed on an connected app. (e.g. Max Project Intensity)
+- In the bottom right corner of the screen you will find the `Action Buttons`. These buttons provide access to the most important actions that can be performed in the current view. Importantly these
+actions are context sensitive, so they will change depending on the data you are currently working with, and can also display functionality that will be executed on an connected app.
 
 Lets explore the different views in the next sections.

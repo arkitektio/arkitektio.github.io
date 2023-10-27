@@ -7,6 +7,10 @@ sidebar_position: 3
 import { DownloadGrid } from "../../src/components/layout/Button";
 import Image from '@theme/IdealImage';
 import thumbnail from './installer.png';
+import installation from './installation.webm';
+
+
+
 
 ## Before we start
 
@@ -31,25 +35,72 @@ The core strategies of the installation process are:
 - **Helm Charts ** (coming soon), this strategy includes a helm chart that sets up the platform
   exposing you on a kubernetes cluster.
 
+## System Requirements 
 
-## Graphical installer
+The arkitekt platform is designed to run on a variety of different hardware and different operating systems.
+However as a quite involved platform that is at the moment not heavily optimized to run on low-end hardware,
+we recommed to not install Arkitekt on a machine with less than **16GB of RAM** and a **decent modern CPU (i7 or i9)** while
+reserving  **at least 50GB of free disk space** on a **SSD drive**.
+While it is perfectly possible to run the platform on a machine with less resources (indeed it works on a Raspberry Pi 4),
+especially the transfer of large amounts of data will be slow and the platform will be sluggish. 
+
+If you want to use Arkitekt with GPU enabled (deep learning modules), we also recommend to have a **CUDA 11** enabled **Nvidia GPU** with at least
+**8GB of VRAM**. If you want to use the GPU for training, we recommend to have at least **16GB of VRAM**.
+
+:::note About GPU support
+
+Arkitekt makes us of the modern pattern of [Docker GPU Support](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html)
+to enable GPU support for the platform. This means that you **do not** have to install the CUDA toolkit on your machine, but you need to make sure
+that you are running the latest NVIDIA drivers on your machine. Arkitekt will take care of the rest. 
+
+:::
+
+:::caution About Apple Silicon
+
+Arkitekt is currently build for the x86-64 architecture. This means that it will run in an **emulated mode** on Apple Silicon. This emulated mode
+while functional is not optimized for performance and will be slower than on a native x86-64 machine. We are currently in the midst of transitioning
+our services also to other architectures and will provide native support for Apple Silicon in the future. For now we highly recommend to use a
+Windows or Linux machine to run Arkitekt.
+:::
+
+
+
+
+
+
+
+## Graphical installer (recommended)
+
+
+<Image img={thumbnail} />
+
+Arkitekts installer  and admin interface ( once installed) will guide you through the installation process and the deployment of the  platform on your specific hardware.
+Once installed it will serves simple desktop app that  additionaly acts as an updater, as well as and admin interface to the platform and allows you to **start** and **stop** the platform. 
+Additionaly it will act as a beacon that advertises the platform on your local network, so that other users can find it.
 
 Go ahead and download our installer for your operating system "Konstruktor" , and follow the instructions:
 
 <DownloadGrid/>
 
 
-This installer ( once installed) will guide you through the installation process and the deployment of the  platform on your specific hardware.
-Once installed it will serves simple desktop app that  additionaly acts as an updater, as well as and admin interface to the platform and allows you to **start** and **stop** the platform. 
-Additionaly it will act as a beacon that advertises the platform on your local network, so that other users can find it.
+
 
 Konstruktor necessitates the installation of a container runtime (Docker) on the machine where you want to install arkitekt.
 If you don't have docker installed, you can download it from [here](https://www.docker.com/products/docker-desktop). Docker
-is available for Windows, Mac and Linux and is the sole outside dependency of the arkitekt platform. Please check out
-the FAQ section for more information about the installation of docker especially when you are seeking to use GPU support
-on your machine.
+is available for Windows, Mac and Linux and is the sole outside dependency of the arkitekt platform. You do *not* need to create 
+a docker acount in order to use it for Arkitekt. Please check out the FAQ section for more information about the installation of 
+docker especially when you are seeking to use GPU support on your machine.
 
-<Image img={thumbnail} />
+
+<video autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={installation}/>
+</video>
+
+<div className="text-gray-400 mb-2">
+<small>A quick runthrough the Arkitekt isntallation. Konstruktor needs the docker runtime to be installed beforehand to properly
+function.</small>
+</div>
+
 
 
 :::note About Channels
