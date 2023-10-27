@@ -2,7 +2,7 @@
 id: intro
 title: Intro 
 sidebar_label: Intro
-sidebar_position: 5
+sidebar_position: 1
 ---
 
 # Welcome to the Arkitekt Design Docs
