@@ -13,7 +13,7 @@ If you feel like we have missed something, or if you have a suggestion for a bet
 
 ## Before we start
 
-This document assumes that you have a basic understanding of what arkitekt is, and what it is used for. If you don't, we recommend that you take a look at the [Introduction](/docs/intro.mdx) page.
+This document assumes that you have a basic understanding of what arkitekt is, and what it is used for. If you don't, we recommend that you take a look at the [Introduction](/docs/introduction) page.
 
 ## A short visual guide
 

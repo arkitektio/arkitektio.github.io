@@ -2,7 +2,7 @@
 id: middleman
 title: Arkitekt the Middleman
 sidebar_label: Middleman
-sidebar_position: 1
+sidebar_position: 3
 ---
 
 # How we see the landscape of bioimage analysis
