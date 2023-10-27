@@ -21,14 +21,17 @@ you might be right). But let us briefly explain we think its actually a good thi
 
 - **Seperation of Concerns**: We already installed 3 Apps to our Arkitekt instance. Omero, Napari and Fiji. Their provided functionality would
     have been easily possible to implement in a single App (actually Fiji would have been able to do that easily) But we think that seperating the functionality into multiple Apps has a few advantages. 
-    - First of all, it allows 
-    these tools to concentrate on what they are really good at. Napari is first and foremost a visualization tool, it does not need to know anything about how to convert
-    data from one format to another. 
-    - Secondly, it allows us to reuse the functionality of these Apps in other Apps. For example as we can later 
+    First of all, it allows these tools to concentrate on what they are really good at. Napari is first and foremost a visualization tool, it does not need to know anything about how to convert
+    data from one format to another. Secondly it allows App developers to easily update their Apps without having to worry about breaking other Apps.
 
-- 
+- **Reusability**: The concept of Nodes might seem alien at the start, but it allows for a more worry free design of your workflows. You can easily use nodes from different apps
+    in your workflow, and not worry about how they are implemented. 
 
-That being said!
+- **Customizability**: The concept of Nodes and Plugins allows you to easily extend the functionality of your Arkitekt instance, without having to worry about breaking anything. Arkitekt 
+only provides very little functionality out of the box, but you can easily extend and customize your installtion with the functionality you need.
+
+That being said..
+
 
 We understand that their might be alot of installation of tools or management of plugins involved and for a platform that is supposed to be used for automation, this is a bit
 ironic. But don't you worry. ..
@@ -38,11 +41,10 @@ ironic. But don't you worry. ..
 ### We have an App for that!
 
 Yes. Apps to the rescue. But this one is especially sweet because there is no installation. And you have been using it all along. 
-What?
-
-You're right! It's actually **this** documentation website.
+What? It's actually **this** documentation website.
 
 You see, a lot of things can be an Arkitekt app and that includes this website. So we can actually use this website to install repositories or workflows to our Arkitekt instance.
+
 You might have noticed the `Connect` button in the top right corner of this website. And if you click on it and you run this website on the same machine as your Arkitekt instance,
 you will see a familiar connect screen that will prompt you to connect to your Arkitekt instance.
 
@@ -102,9 +104,9 @@ Turned green? Great! You now have the Reaktor Repository installed. Next chapter
 
 :::tip We love this feature
 
-We love this feature so much, as it allows us to provide you with a fully interactive documentation. You can show to install plugins and workflows directly from the documentation.
-But most importantly, everyone can do that. You can create your own documentation website and use it to install your own plugins and workflows. Just check out the github repo for
-this documentatoin.
+We love this feature, as it allows us to provide you with increaingly more and more interactive documentation. You can look at and  install plugins and workflows directly from the documentation.
+But most importantly, we love it because everyone can do that. You can create your own documentation website and use it to install your own plugins and workflows. Just check out the github repo for
+this documentatoin. Its not that complicated.
 
 :::
 

@@ -25,7 +25,7 @@ In this section you will learn:
 ## Team Napari or Team Fiji?
 
 We love Napari and we love Fiji. And we think that both tools have their place in the bioimage analysis world. So we want to make sure that you can use both tools
-with Arkitekt and together in your workflows. Of course feel free to skip the section that is not relevant to you.
+with Arkitekt and together in your workflows. So lets try install them both and see how we can connect them to Arkitekt.
 
 :::note Our darling 
 
@@ -54,6 +54,7 @@ To install the Napari bridge plugin for Arkitekt you can choose from two options
 
   ```bash
   pip install mikro-napari
+  pip install napari pyqt5 # if you do not have napari installed yet
   ```
 
   This also allows you to start all of the widgets directly from the command line with the plugin installed:
@@ -71,24 +72,22 @@ use the unbundled version of napari (the "pip" install version.) This recommenda
 
 #### Connecting Napari to Arkitekt
 
-Once you have installed the plugin, you can start Napari and you should see a new button in the left hand navigation called "Provide". Click on it and you should see 
+Once you have installed the plugin, you can start Napari and you should see a new button in the left hand navigation called `Provide`. Click on it and you should see 
 the connection process starting.
 
 <video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
   <source src={openNapari}/>
 </video>
 
-
-
 A few words about this connection process:
 
 1. **The Magic Bar**:
-    What you see in the bottom left corner is the "Magic Bar", a widget provided by the mikro-napari plugin, and the core UI element that allows apps to connect to Arkitekt.
+    What you see in the bottom left corner is the `Magic Bar`, a widget provided by the mikro-napari plugin, and the core UI element that allows apps to connect to Arkitekt.
     While developers can choose to implement their own UI elements to connect to Arkitekt, the MagicBar is a common UI element that is provided by the arkitekt package, and
-    you will encounter it in almost all apps that currently connect to Arkitekt.
+    you will encounter it in almost all apps that currently conncan connectect to Arkitekt.
 2. **The Connection screen**:
     On initial setup you will see a screen that allows you to connect to your Arkitekt server. If you run Arkitekt locally you will see your instance automatically detected.
-    For remote instances, [advertised](docs/introduction/installation#advertisting) Instances will be automatically detected and should be listed in the dropdown menu. If 
+    For remote instances, [advertised](/docs/introduction/installation#advertising) Instances will be automatically detected and should be listed in the dropdown menu. If 
     your instance is not advertised, you can also enter the URL manually.
 3.  **Login in the Browser**:
     To connect to your Arkitekt instance, you need to login. This is done in the browser, and you will be redirected to the login page of your Arkitekt instance. Please allow
@@ -101,7 +100,7 @@ connection process. Again. Only once if you so wish.
 
 :::
 
-Once you have connected to your Arkitekt instance, your Napari instance should now both appear on the Dashboard and the provide button should now be blinking red (red means
+Once you have connected to your Arkitekt instance, your Napari instance should now both appear on the Dashboard and the `Magic Button` button should now say `Cancel Provide` and blink red (red means
 that the connection is active and listening for requests / red means recordings.). You are set to go and can now start visualizing your data in Napari.
 
 #### Visualizing your data in Napari
@@ -160,12 +159,12 @@ will interface with your Fiji installation and allows us to connect Fiji to Arki
 
 
 1.  Just download MikroJ from our [Github page](https://github.com/jhnnsrs/mikroj) and extract it to a folder of your choice. 
-    Then double click on the "MikroJ.exe" file to start the app. Please do *NOT* start your FIJI installation. MikroJ will start Fiji for you.
+    Then double click on the `MikroJ.exe`file to start the app. Please do **NOT*Ü start your FIJI installation. MikroJ will start Fiji for you.
     The initial setup can take a few seconds, but once it is done, you should the app screen.
 
 2.  You will see a screen that allows you to both connect to your local Fiji instance and to your Arkitekt instance. Acting as a Bridge.
 
-3.  Click on Connect ImageJ. This will open a dialog and prompt you to navigate to your "Fiji.App" folder that contains your ImageJ installation.
+3.  Click on `Initialize ImageJ`. This will open a dialog and prompt you to navigate to your "Fiji.App" folder that contains your ImageJ installation.
     Once you have selected the folder, MikroJ will start Fiji for you and you should see it popping. It it is important that you do not move your Fiji installation after you have connected it to MikroJ. If you do, you need to reconnect it
     to MikroJ.
 
@@ -173,13 +172,13 @@ will interface with your Fiji installation and allows us to connect Fiji to Arki
 
     This initial setup is only required once. MikroJ will remember your Fiji installation and will start it automatically for you in the future.
     However this step might take a few seconds and cause an UI freeze (on our buglist). This is normal, and should resolve in a few seconds to a minute, while MikroJ
-    and maven (the Java packaging tool that we use) are resolving some dependencies.
+    and maven (the Java packaging tool that PyImageJ uses) are resolving some dependencies.
 
     :::
 
 4. Optional: Create a shortcut to MikroJ on your desktop. This will allow you to start MikroJ directly from the shortcut.
 
-If nothing happens after you click on "Connect ImageJ", please refer to the [troubleshooting section](/docs/troubleshooting/app).
+If nothing happens after you click on `Initialize ImageJ`, please refer to the [troubleshooting section](/docs/troubleshooting/app).
 
 ### Connecting Fiji to Arkitekt
 
@@ -188,7 +187,7 @@ to the process explained in the Napari section. So we will not go into too much 
 
 #### Visualizing your data in ImageJ
 
-To visualize your data in ImageJ, you can simple search for the "Load into Imagej" node, and reserve it in your dashboard. Once you have reserved the node,
+To visualize your data in ImageJ, you can simple search for the `Load into Imagej` node, and reserve it in your dashboard. Once you have reserved the node,
 you can run it directly from the image pane where it will appear in the bottom right corner. 
 
 <video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
@@ -200,16 +199,16 @@ you can run it directly from the image pane where it will appear in the bottom r
 A few words about this process:
 
 1. *Cross Talk*:
-    When calling the "Load Into Imagej" node, MikroJ will download the whole image into memory and share this image with Fiji. This means that you can
+    When calling the `Load Into Imagej` node, MikroJ will download the whole image into memory and share this image with Fiji. This means that you can
     close the browser and the image will still be available in Fiji. 
 
 2. *ROIs*:
-    We currently do not support syncing ROIS between Fiji and the Arkitekt Instance, automatically. This is defintely on our roadmap, but we have not
-    yet found a good solution. If you have any ideas, please reach out.
+    We currently do not support syncing ROIS between Fiji and the Arkitekt Instance automatically. This is defintely on our roadmap, but we have not
+    yet found a good solution. If you have any ideas, please reach out. You can however extract the ROIS on an Image in Fiji through a `Node`.
 
 3. *Alterations*:
     Whatever alterations you make to the image in Fiji, will stay in Fiji. So if you want to save your alterations back to the server, you need to
-    use the "Upload active Image" node. More on that later.
+    use the `Retrieve from ImageJ` node. More on that in the advanced tutorial.
 
 
 

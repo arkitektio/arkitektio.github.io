@@ -20,7 +20,7 @@ Four steps in an we still haven't performed anything useful on our data. But tha
 
 ## Convert our first File
 
-We will start by converting our first file. Utilizing our just reserved "Convert Omero" node. And lets perform that on our
+We will start by converting our first file, utilizing our just reserved "Convert Omero" node. Lets perform this conversion on our
 first file. The one we uploaded in the previous section.
 
 
@@ -29,36 +29,37 @@ first file. The one we uploaded in the previous section.
 </video>
 
 
-1. Navigate to our data in the "Data" tab
+1. Navigate to our data in the `Data` tab
 
-Lets inspect our data in the "Data" tab. We should see our data in the "Data" tab. (If you are doing this part of the tutorial,
-on another day you might need to open the "Home", sidebar and step back one day to see your data.)
+  Lets inspect our data in the `Data` tab. We should see our data in the `Data` tab. (If you are doing this part of the tutorial,
+  on another day you might need to open the "Home", sidebar and step back one day to see your data.)
 
 2. Drag and Drop or right click the file we want to convert
 
-This time in our Action menu we will see a new option. "Convert Omero", this is our first `Tool Action`. Lets drop on it (or click it).
+  This time in our Action menu, a new option should appear: `Convert Omero`. This is our first `Tool Action`. Lets drop on it (or click it).
 
 3. You are prompted with a dialog. 
 
-This dialog is our first encounter with an Arkitekt assign dialog. Here we can specify paramters to the connected tool, that will be sent 
-to the tool when it is executed. For our initial conversion we will not specify any parameters. So just click "Assign". And lets see what happens.
+  This dialog is our first encounter with an Arkitekt assign dialog. Assign Dialogs help us define the parameters of our analysis.This parameters will then be sent 
+  to the tool when it is executed. For our initial conversion we will not specify any parameters. So just click `Assign?. And lets see what happens.
 
 4. Inspect the progress and result.
 
-After a few seconds you should now be prompted with a popup in the bottom right that will show you your converted image. Also an Image 
-should have appeared in the "Data" tab. If you click on it you should see the image in the "Preview" tab.
+  After a few seconds you should now be prompted with a popup in the bottom right that will show you your converted image. Also an Image 
+  should have appeared in the `Data` tab. If you click on it you should see the image in its detail view. 
 
 :::info What just happened?
 
 We just performed our first conversion. We took a file from our Server and converted it to the internal Arkitekt format based on Zarr, again storing
 it on our server. In practicallity this meant that our "Omero" PluginApp streamed the file from the server, converted it and then uploaded the 
-converted zarr dataset again to the server. More on that in [How Assignemtn Works](#assignment).
-
+converted zarr dataset again to the server. More on that in [How Assignment Works](/docs/design/assignation). You will notice that 
+first conversion takes a bit longer. This is because we only start the Java process that performs the conversion when we need it.
+On subsequent conversions this process will already be running and the conversion should be much faster.
 :::
 
 ## Lets inspect our image
 
-Lets inspect our image. You can do that in different ways. Either you can click on the just generated image in the "Data" tab. Or directly by clicking on the image when it 
+Lets inspect our image. You can do that in different ways. Either you can click on the just generated image in the `Data` tab. Or directly by clicking on the image when it 
 popups in the bottom right. Additionality because Arkitekt kept track about our relationship with the  old file we can also inspect the old file. And click on `created
 image` from that pane.
 
@@ -85,6 +86,8 @@ metadata in a more flexible way. This will also allow us to provide more advance
 read more about it in the [Mikro Next](/docs/services/next/mikro_next) section.
 
 :::
+
+
 ## Lets comment and Mark a ROI
 
 Besides just converting our data we can also perform some basic operations on our data. Lets start by marking a ROI on our image. Just click on the rectangle 
@@ -95,5 +98,6 @@ in the next few steps.
   <source src={markRoi}/>
 </video>
 
-But lets first inspect our ROI in a GUI app of our choice. For this tutorial we will use [Napari](https://napari.org/). But you can also use [Fiji](https://fiji.sc/).
-Or better even develop your own app. If you want to do that you can read more about that in the [Developer](/docs/developing/into) section.
+## Before we start our analysis!
+
+Looking at our Data on the Website might be fun. But lets first inspect our Image in a GUI app of our choice. We prefer [Napari](https://napari.org/), but you can also use [Fiji](https://fiji.sc/).

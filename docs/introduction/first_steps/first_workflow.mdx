@@ -41,24 +41,24 @@ Lets look first at the workflow we would like to create, and then we will go thr
     <small> This is the workflow we would like to create. For now we disabled the import feature.. You should really try to create it on your own </small>
 </div>
 
-This is probably the most basic workflow you can create, but it will teach you a lot about the Arkitekt workflow and its design. A few things to note here.
+This is probably the most basic workflow you can create, but it will teach you a lot about the Arkitekt `Workflow` and its design. A few things to note here.
 
--   This is an **Arkitekt workflow** that we just exported from Arkitekt and then provided to this website. 
+-   This is an Arkitekt `Workflow` that we just exported from Arkitekt and then embeded in this website. 
 
-    Arkitekt workflows are just visual representations of a workflow. They are stored in a JSON file, and can be imported and exported from Arkitekt.
+    Arkitekt workflows are just visual representations of a processing workflow. They are stored in a JSON file, and can be imported and exported from Arkitekt.
     You can also import them from this website, but we will get to that later.
 
 -   About the `Nodes`.
 
-    Nodes in Arkitekt Workflows are front and center. They are the building blocks of your workflow, and thusly the building blocks of your analysis. Each node
-    has inputs and outputs that you can connect to other nodes. This connection then defines the flow of data through your workflow. Importantly you will 
-    notice the node termed `Input` and `Output`. These are special nodes that are part of every workflow. They are the entry and exit points to your analysis.
+    Nodes in Arkitekt Workflows are front and center. They are the building blocks of your workflow, and thusly the building blocks of your analysis. As you have seen 
+    in the previous section every `Node` has inputs and outputs that you can connect to other nodes. This connection then defines the **flow of data** through your workflow. Importantly you will 
+    notice the nodes termed `Input` and `Output`. These are special nodes that are part of every workflow, and are the entry and exit points to your analysis.
     When you connect a node to the `Input` node, you are telling Arkitekt that your workflow will expect the input type of that node as a parameter when you run it.
     Equally you connect a node to the `Output` node, you are telling Arkitekt that your workflow will return the output type of that node when you run it. 
 
     :::info Workflows are Just Nodes
 
-    This abstraction of Input and Output nodes is core to the concept of a workflow in Arkitekt. Each workflow has exactly one `Input` and one `Output` node.
+    This abstraction of `Input` and `Output` nodes is core to the concept of a workflow in Arkitekt. Each workflow has exactly one `Input` and one `Output` node.
     And as our workflows are just nodes, these inputs and outputs will then be the inputs and outputs of the workflow node. This means that you can use workflows
     in workflows, and you can use workflows just as nodes on your data. But we will get to that later.
 
@@ -67,7 +67,7 @@ This is probably the most basic workflow you can create, but it will teach you a
     
 -   About their colors:    
 
-    If you have connected the website and followed the tutorial just until now, you might notice that the color of the nodes is yellow. This is because
+    If you have connected the website and followed the tutorial until now, you might notice that the color of the nodes is yellow. This is because
     we have not yet installed apps that provide the functionality for the nodes in this workflow. This illustrates another core feature of Arkitekt. The separation
     of the workflow design and the workflow execution. You can design and share a workflow, irrespective of the apps that provide the functionality for the nodes in the workflow.
     This means that you can design a workflow, and potentially share it with others, even though they might run in on completely different apps. This makes workflows
@@ -77,8 +77,8 @@ This is probably the most basic workflow you can create, but it will teach you a
 -   About the data as a stream:
 
     Arkitekt workflows are adapted to process your data as a [stream](/docs/design/real-time), rather than as a batch. This means that each node will process your data as it comes in, and then
-    pass it on to the next node. Nodes will not wait for all data to be processed, but will process it as it comes in. This means that you can process data as fast as
-    possible, and importantly you can process data that is still being generated. This is a core feature of Arkitekt, and we will get to it later. You will also
+    pass it on to the next node. Nodes will not wait for all data to be processed, but will process it autonomously as it comes in. This means that you can process data ridicously fast,
+    and importantly you can process data that is still being generated. This is a core feature of Arkitekt, and we will get to it later. You will also
     note that the edges are labeled with `@mikro/representatoin` and `@mikro/metric`. These labels correspond to the data types that are passed between the nodes. The `@` symbol
     indicates that these are [mikro](/docs/service/mikro) data types and the `representation` and `metric` indicate the type of data.
     The first two nodes will manipulate an image to an image (images are represented as `representation`), and the last node will return a `metric` (metrics are scalar values attached
@@ -232,18 +232,18 @@ Lets see the design in progress.
 
     Some nodes require you to specify parameters. You can do that by clicking on the node, and then setting the parameters in the sidebar. For example the `Otsu Threshold` node requires you to specify
     if you want to use a gaussian blur before thresholding.This is not necessary for our workflow, so we can leave it at the default value. However you can change the value that should be measure
-    by the `Measure Fraction` node. You can do that by clicking on the node, and then setting the parameters in the sidebar. We are interested in the `Fraction` of the image that is above the threshold,
-    so we can leave it at the default value ("1", As all values above the threshold will be set to 1).
+    by the `Measure Fraction` node. You can do that by clicking on the node, and then setting the parameters in the sidebar. We are interested in the `Fraction` of the image that is below the threshold,
+    so we can change it at to the 0 value. Also we can rename the Metric key to "Background Fraction", to be more descriptive.
 
 5. Save the workflow
 
-    You can save the workflow by clicking on the "Save" button on the bottom right. This will save the workflow to your server, mkaing it ready to be deployed.
+    You can save the workflow by clicking on the "Save" button on the bottom right. This will save the workflow to your server, making it ready to be deployed.
 
 6. Deploy the workflow
 
     This is now the final step. We now have a workflow, but we need to deploy it to a `Scheduler`. For this we can use the `Deploy Flow` node we reserved in the previous step.
     Arkitekt will automatically prompt us with this Node when we click deploy on a workflow. So lets do that. Click on the `Deploy` button on the bottom right. You will be prompted with a dialog
-    where you can now select our "Deploy Flow" reservation. This will open an  Assign dialog where you can give the Node a dedicated Name (this is the name of the node that will be created on the platform)
+    where you can now select our `Deploy Flow` reservation. This will open an Assign dialog where you can give the Node a dedicated Name (this is the name of the node that will be created on the platform)
     and choose advanced paramters like the `Stream behaviour` don't worry about that right now. You can leave it at the default value. Click on `Assign` and you are done. 
 
 7. You should now see a Popup in the bottom right

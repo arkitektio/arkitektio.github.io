@@ -1,6 +1,6 @@
 {
     "__typename": "Flow",
-    "id": "4",
+    "id": "3",
     "graph": {
         "__typename": "FlowGraph",
         "nodes": [
@@ -9,8 +9,8 @@
                 "id": "1",
                 "position": {
                     "__typename": "Position",
-                    "x": -84,
-                    "y": 102
+                    "x": 0,
+                    "y": 50
                 },
                 "typename": "ArgNode",
                 "parentNode": null,
@@ -117,15 +117,15 @@
             },
             {
                 "__typename": "ArkitektNode",
-                "id": "arkid-a3a43b05-31b7-4e19-a2d5-8dc695df5a3f",
+                "id": "arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8",
                 "position": {
                     "__typename": "Position",
-                    "x": 727,
-                    "y": 50
+                    "x": 681,
+                    "y": 46
                 },
                 "typename": "ArkitektNode",
                 "parentNode": null,
-                "hash": "c428c5d61f9147bd7a662b22a0dcf620567199c9ca5a3bfae674a696068d0f46",
+                "hash": "57d45410523b5fc52e33a89c2ae0174666ef7afefe2028df1e16649a750bf0a4",
                 "kind": "FUNCTION",
                 "defaults": null,
                 "mapStrategy": "MAP",
@@ -220,15 +220,15 @@
             },
             {
                 "__typename": "ArkitektNode",
-                "id": "arkid-fce17644-45b1-4534-8e49-bf61e53c606d",
+                "id": "arkid-cb5fee92-01e0-4f97-8d81-80bed3757576",
                 "position": {
                     "__typename": "Position",
-                    "x": 316,
+                    "x": 344,
                     "y": 56
                 },
                 "typename": "ArkitektNode",
                 "parentNode": null,
-                "hash": "eb469fdae3318571be7eead640ef0ef0bcc3bcb7949d23fd63e77b871255b357",
+                "hash": "3bbc2f84cc1f9c92045a66993b7bca99966d28ae285491905cedcf26fa48510c",
                 "kind": "FUNCTION",
                 "defaults": null,
                 "mapStrategy": "MAP",
@@ -308,17 +308,21 @@
             },
             {
                 "__typename": "ArkitektNode",
-                "id": "arkid-861ff8a3-da54-4e17-b8d0-361b8c8d96ef",
+                "id": "arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887",
                 "position": {
                     "__typename": "Position",
-                    "x": 1171,
-                    "y": 62
+                    "x": 1093,
+                    "y": 59
                 },
                 "typename": "ArkitektNode",
                 "parentNode": null,
-                "hash": "c9322c23e8bd87a95a6c329d42caad5b3cb4f162d7b428ebfa937068aab97eb8",
+                "hash": "a0a7371a828e5104e953d955e69d6d14ceba2d6d58ccd2fd8609f417732f0d8e",
                 "kind": "FUNCTION",
-                "defaults": null,
+                "defaults": {
+                    "key": "Background Fraction",
+                    "rep": null,
+                    "value": 0
+                },
                 "mapStrategy": "MAP",
                 "allowLocal": false,
                 "binds": null,
@@ -415,10 +419,10 @@
         "edges": [
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-1return_0-arkid-fce17644-45b1-4534-8e49-bf61e53c606darg_0",
+                "id": "reactflow__edge-1return_0-arkid-cb5fee92-01e0-4f97-8d81-80bed3757576arg_0",
                 "source": "1",
                 "sourceHandle": "return_0",
-                "target": "arkid-fce17644-45b1-4534-8e49-bf61e53c606d",
+                "target": "arkid-cb5fee92-01e0-4f97-8d81-80bed3757576",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -436,10 +440,10 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-fce17644-45b1-4534-8e49-bf61e53c606dreturn_0-arkid-a3a43b05-31b7-4e19-a2d5-8dc695df5a3farg_0",
-                "source": "arkid-fce17644-45b1-4534-8e49-bf61e53c606d",
+                "id": "reactflow__edge-arkid-cb5fee92-01e0-4f97-8d81-80bed3757576return_0-arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8arg_0",
+                "source": "arkid-cb5fee92-01e0-4f97-8d81-80bed3757576",
                 "sourceHandle": "return_0",
-                "target": "arkid-a3a43b05-31b7-4e19-a2d5-8dc695df5a3f",
+                "target": "arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -457,10 +461,10 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-a3a43b05-31b7-4e19-a2d5-8dc695df5a3freturn_0-arkid-861ff8a3-da54-4e17-b8d0-361b8c8d96efarg_0",
-                "source": "arkid-a3a43b05-31b7-4e19-a2d5-8dc695df5a3f",
+                "id": "reactflow__edge-arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8return_0-arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887arg_0",
+                "source": "arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8",
                 "sourceHandle": "return_0",
-                "target": "arkid-861ff8a3-da54-4e17-b8d0-361b8c8d96ef",
+                "target": "arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -478,8 +482,8 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-861ff8a3-da54-4e17-b8d0-361b8c8d96efreturn_0-2arg_0",
-                "source": "arkid-861ff8a3-da54-4e17-b8d0-361b8c8d96ef",
+                "id": "reactflow__edge-arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887return_0-2arg_0",
+                "source": "arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887",
                 "sourceHandle": "return_0",
                 "target": "2",
                 "targetHandle": "arg_0",
@@ -545,11 +549,11 @@
         ]
     },
     "restrict": [],
-    "name": "trippy-carmine-capuchin",
+    "name": "scummy-green-sparrow",
     "screenshot": null,
-    "createdAt": "2023-10-25T16:23:21.647792+00:00",
+    "createdAt": "2023-10-27T16:42:25.175566+00:00",
     "workspace": {
         "__typename": "Workspace",
-        "id": "1"
+        "id": "2"
     }
 }

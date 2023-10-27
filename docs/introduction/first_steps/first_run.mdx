@@ -24,7 +24,7 @@ In this section you will learn:
 
 ## How to reserve a workflow
 
-Lets start by reserving our workflow. For this we will navigate to the "Workflows" tab. And then click on the "Reserve" button. This will reserve our workflow for us.
+Lets start by reserving our workflow. For this we will navigate to the `Dashboard` tab. Search our Workflow title (which is now a Node) and right-click on the "Reserve" button. This will reserve our workflow for us.
 
 <video  autoPlay muted loop controls className="rounded rounded-md my-3" width={"100%"}>
   <source src={reserveWorkflow}/>
@@ -45,7 +45,8 @@ the linked application.
 
 The monitor page illustrates an important concept of the platform. As Arkitekt with a distributed system, we need to keep track of what can run when. Workflows are a perfect
 example of this. In order to run a workflow we need to make sure that all the nodes are available. This `Dependency Graph Management` is a core feature of the platform, and will
-find its explaination in the [Provision and Reservation](/docs/design/provisions) section.
+find its explaination in the [Provision and Reservation](/docs/design/provisions) section. Btw, in the next generation of rekuest, we will make this a lot more intuitive. That's
+the hope at least.
 
 :::
 
@@ -59,7 +60,7 @@ And now we can finally run our analysis. Lets start by navigating to the "Data" 
 </video>
 
 
-1. Navigate to our data in the "Data" tab
+1. Navigate to our data in the `Data` tab
 
 Lets inspect our data in the "Data" tab. We should see our data in the "Data" tab. (If you are doing this part of the tutorial,
 on another day you might need to open the "Home", sidebar and step back one day to see your data.)
@@ -70,7 +71,7 @@ This time in our Action menu we will see a new option. "Analysis Run", this is o
 
 3. You are prompted with a dialog. 
 
-This dialog is our first encounter with an Arkitekt assign dialog. Here Arkitekt will ask us to confirm the assignment.
+This dialog is our first encounter with an Arkitekt `Assign` dialog. Here Arkitekt will ask us to confirm the assignment.
 
 4. This is new!
 
@@ -82,7 +83,7 @@ and you can scan through the history of your run (current bug, you might need to
 
 Everytime you run a workflow, Arkitekt will create a `Run` for you. This run will keep track of the progress of your workflow, and will also keep track of the result of your workflow.
 A run is not only an indicator of the live progress of your workflow, but will also be your go to point to inspect the processing pipeline and potential debug entrypoint. All data is
-linked in your run and can be exported (e.g. in your methods section just like here)
+linked in your run and can be exported (e.g. in your methods section just like here). You can find your latest runs in the `Workflow` tab.
 
 :::
 
@@ -91,6 +92,10 @@ linked in your run and can be exported (e.g. in your methods section just like h
   <source src={replay}/>
 </video>
 
+<div className="text-gray-400 mb-2">
+<small>When double clicking on the node in replay or live mode in a run, you can inspect the data flowing through the graph. Not to helpful here, but very much so
+in the advanced workflows. </small>
+</div>
 
 
 
@@ -103,8 +108,8 @@ But lets not only look at our workflow. Just like we did in the previous section
   <source src={provenance}/>
 </video>
 
-While you click on your image, you will now see that there is derived images that are linked to your image. These are the images that are created by the workflow.
-Just explore this datagraph.
+While you click on your image, you will now see that there is derived images that are linked to your image. These are the images that are created throughout the workflow.
+Just explore this datagraph. You can click on the images and inspect them.
 
 :::info The Data Graph vs the Provenance Graph
 
