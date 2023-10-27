@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[8593],{8195:e=>{e.exports=JSON.parse('{"title":"Design","slug":"/category/design","permalink":"/docs/category/design","navigation":{"previous":{"title":"MikroJ","permalink":"/docs/apps/mikroj"},"next":{"title":"Arkitekt and Containers","permalink":"/docs/design/containers"}}}')}}]);
