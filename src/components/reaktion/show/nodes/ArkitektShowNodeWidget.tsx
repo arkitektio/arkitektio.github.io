@@ -5,7 +5,11 @@ import { ArkitektNodeData, ArkitektNodeProps } from "../../types";
 import { NodeShowLayout } from "./layout/NodeTrack";
 import { RekuestGuard, useRekuestQuery} from "@jhnnsrs/rekuest"
 import gql from "graphql-tag";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../../../ui/popover"
 
 const UninstalledNode = () => {
   return <div className="h-2 w-2 rounded rounded-full bg-yellow-200 my-auto"/>
@@ -26,24 +30,23 @@ const ShowNodeDetails = (props: { data: ArkitektNodeData }) => {
   );
 
 
-  return error ? <div className="flex flex-col gap-2">
+  return <div className="flex flex-row gap-2 h-full"> {error ? 
     <div className="flex flex-row gap-2">
   <UninstalledNode/>
   <div className="text-yellow-500 my-auto"> {props.data?.name} </div>
   </div>
-  <div className="text-gray-500 my-auto"> {props.data?.description} </div>
   
   
-  </div> : <div className="flex flex-col gap-2">
+  : 
     <div className="flex flex-row gap-2">
     <InstalledNode/>
     <div className="text-green-500 my-auto"> {data?.node?.name} </div>
-  </div>
-  <div className="text-gray-500 my-auto"> {props.data?.description} </div>
   
   
   
-  </div>
+  
+  
+  </div>}<Popover><PopoverTrigger className="bg-back-700 rounded rounded-md cursor-pointer">?</PopoverTrigger><PopoverContent className="text-xs bg-back-800 my-auto"> {props.data?.description}</PopoverContent></Popover></div>
 
 
 
@@ -116,9 +119,11 @@ export const ArkitektShowNodewidget: React.FC<ArkitektNodeProps> = withLayout(
             }
           />
         ))}
-        <div className="flex flex-row justify-between custom-drag-handle w-full ">
+        <div className="flex flex-row justify-between custom-drag-handle w-full h-full ">
         <RekuestGuard fallback={<> {data?.name}</>}>
             <ShowNodeDetails data={data} />
+            
+
         </RekuestGuard>
         {isExpanded && (
           <>

@@ -55,7 +55,7 @@ const ImportButton = ({flow, blockImport}: { flow: FlowFragment, blockImport?: b
 
 
 
-  return <button onClick={() => importFlow()} disabled={blockImport} className="bg-primary-300 hover:bg-primary-400 py-2 px-3 rounded rounded-md disabled:bg-back-800">Re-Import into Arkitekt</button>
+  return <button onClick={() => importFlow()} disabled={blockImport} className="bg-primary-300 hover:bg-primary-400 py-2 px-3 rounded rounded-md disabled:bg-back-800 cursor-pointer">Re-Import into Arkitekt</button>
        
 
 }
