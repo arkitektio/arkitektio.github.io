@@ -1,20 +1,21 @@
 ---
-title: Deep Learning
-sidebar_label: Deep Learning
-sidebar_position: 1
+title: Bridging Deep Learning
+sidebar_label: Deep Learning Bridge
+sidebar_position: 3
 ---
 
 import deepL from './deep_l.json';
+import napariL from './napari_l.json';
 import { DisplayWorkflow} from "../../../src/components/reaktion/DisplayWorkflow";
 import Image from '@theme/IdealImage';
 import thumbnail from './segmentation.png';
-
-# Deep Learning
+import fijiVideo from './fiji_segmentation.webm';
+import { InstallRepoButton} from "../../../src/components/InstallRepoButton";
 
 Deep learning is taking over the world of bioimage analysis, and for good reason. However it is not always easy to get started and use
 the deep learning tools that are available.
 In this section of the documentation we will try to show you how to get started with deep learning and how Arkitekt can help you,
-by showing you how to create a simple "deep learning enabled" workflow. 
+by showing you how to create a simple "deep learning enabled" workflow, that you can use to predict the segmentation of nuclei in a cell culture.
 
 
 ## Prerequisites
@@ -25,8 +26,9 @@ To get started with deep learning and Arkitekt you should:
 - Have gone through the [basics of Arkitekt](/docs/introduction/first_steps).
 - Have a CUDA capable GPU. If you don't have a GPU, you should still be able to follow along, but the prediction
 will be very slow.
+- Either Mikro-Napari or Fiji with MikroJ installed. If you don't have either of these, you can still follow along, but you won't be able to run the workflow.
 
-# Our task at hand 
+# Our task 
 
 We would like to create a workflow that can take an image of nuclei in a cell culture and predict the segmentation of the nuclei. 
 We will be using a deep learning model based on [Stardist](https://github.com/stardist/stardist) to do the prediction.
@@ -34,7 +36,7 @@ We will be using the same dataset that we have used in the [basics of Arkitekt](
 
 <Image img={thumbnail}/>
 
-## The problem we are trying to solve
+## The problems we are trying to solve
 
 In this tutorial we would like to show you how to create a simple deep learning workflow in Arkitekt, and how Arkitekt can solve some common issues, 
 that you might encounter when trying to create your own deep learning workflows. 
@@ -67,14 +69,67 @@ Arkitet is not trying to replace these solutions, but rather complement them. We
 
 :::
 
-## Fiji Segmentation 
 
-Lets first have a look at the workflow we would like to create. We will be using Fiji for this example, buy further down we will also show you how to do the same thing in [`Napari`](#napari-segmentation).
+## How to use Deep Learning in Arkitekt
+
+So how do we install Stardist? Well just like any other plugin. You can add the `segmentor` repository to your Arkitekt installation by clicking on the button below.
+
+<InstallRepoButton repo="segmentor" user="jhnnsrs" branch="master"/>
+<br/>
+<br/>
+
+And then you can install the latest version of segmentor by deploying it as an plugin, as you learned in the [basics of Arkitekt](/docs/introduction/first_steps/first_tool#installing-our-first-app).
+For the rest of this tutorial we will assume that you have installed the `segmentor` plugin.
+
+### Testing the plugin
+
+Once the plugin is installed you can easily test it out by running it on images that are stored on your arkitekt image. For this tutorial we will be using a pretrained model, that is already included in the plugin.
+You can run the prediction on your image by utilizing the `Segment Fluo2` node.
+
+## Integrate with ImageJ
+
+Now that we have tested our plugin, we would like to integrate it with our favourite bioimage analysis app. In this case we will be using Fiji through MikroJ, but you can use any other app that is supported by Arkitekt.
+For this we will be using two nodes provided by Fiji, the `Upload Image` node and the `Show Image` node. The `Upload Image` node will take the image from Fiji and upload it to the Arkitekt server, 
+where it will be processed by the `Segment Fluo2` node of the `segmentor` plugin. The result will then be piped back to Fiji, where it will be shown using the `Show Image` node.
+
 
 <DisplayWorkflow flow={deepL}/>
 <div className="text-gray-400 mb-2">
     <small> This is the workflow we would like to create. Upload our active image, segment it using a pretrained model, and show the result on ImageJ</small>
 </div>
 
+Just import this workflow into your Arkitekt instance, and deploy it on the `reaktor` scheduler just like you did in the [basics of Arkitekt](/docs/introduction/first_workflows#reserving-a-scheduler).
+Feel free to also create that workflow on your own, if you want to get some more practice.
+
+After reserving the workflow, you can run it directly from the `Dashboard` of Orkestrator. Just make sure that you have an image open in Fiji, and then click on the `Run` button of the workflow.
 
 
+<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
+  <source src={fijiVideo}/>
+</video>
+<div className="text-gray-400 mb-2">
+    <small> The workflow in action utilizing MikroJ</small>
+</div>
+
+
+## Integrate with Napari
+
+Now that we have seen how to integrate with ImageJ, let's try to do the same with Napari. Its quite similar to the ImageJ integration, but this time we will be using the `Upload Layer` node and the `Show on Napari` node provided by Napari.
+
+<DisplayWorkflow flow={napariL}/>
+<div className="text-gray-400 mb-2">
+    <small> This is the workflow we would like to create. Upload our active image, segment it using a pretrained model, and show the result on ImageJ</small>
+</div>
+
+Import, deploy, reserve and run, just like you did with the ImageJ workflow. Its the same workflow, just with different nodes.
+
+:::info  On universal Workflows 
+
+You might have noticed that the workflow, is similar to the one we created for ImageJ, but not the same. We could have created a universal workflow, that would work for both ImageJ and Napari, by 
+utilizing the `Upload Image` node and the `Show Image` node, and before deployment let the user choose which app he wants to use. This will be thematized in a later tutorial.
+:::
+
+
+## Our own model
+
+Here we have used a pretrained model, but what if we want to use our own model? Well that's easy. Training your own model on the segmentor plugin is also quite easy, but lets explore that in the [next tutorial](/docs/introduction/advanced_tutorial/training)

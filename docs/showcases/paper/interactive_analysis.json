@@ -1,6 +1,6 @@
 {
     "__typename": "Flow",
-    "id": "428",
+    "id": "37",
     "graph": {
         "__typename": "FlowGraph",
         "nodes": [
@@ -59,8 +59,8 @@
                 "id": "2",
                 "position": {
                     "__typename": "Position",
-                    "x": 1580,
-                    "y": 86
+                    "x": 1496,
+                    "y": 55
                 },
                 "typename": "ReturnNode",
                 "parentNode": null,
@@ -102,17 +102,20 @@
             },
             {
                 "__typename": "ArkitektNode",
-                "id": "arkid-34c01cf7-23b9-4815-b81e-359bed78ffec",
+                "id": "arkid-2aead44b-cb77-4fff-8311-e98f6135dc13",
                 "position": {
                     "__typename": "Position",
-                    "x": 265,
-                    "y": -18
+                    "x": 240,
+                    "y": -3
                 },
                 "typename": "ArkitektNode",
                 "parentNode": null,
                 "hash": "da4e74c9f67d7ffc8855087ebb6268ce996c58df4a7050066bed4269fbe5c9b0",
                 "kind": "GENERATOR",
-                "defaults": null,
+                "defaults": {
+                    "rep": null,
+                    "show_old_rois": false
+                },
                 "mapStrategy": "MAP",
                 "allowLocal": false,
                 "binds": null,
@@ -205,15 +208,15 @@
             },
             {
                 "__typename": "ArkitektNode",
-                "id": "arkid-09ce3a01-abf0-4837-ba27-e9a7b203c658",
+                "id": "arkid-2c5e7786-e6a1-45e3-9881-72e082490ca4",
                 "position": {
                     "__typename": "Position",
-                    "x": 589,
-                    "y": -129
+                    "x": 494,
+                    "y": -81
                 },
                 "typename": "ArkitektNode",
                 "parentNode": null,
-                "hash": "3ef4c41648da6f52726037a42b5391cd5d0b42168128a11967cbae6c25b07825",
+                "hash": "26dbfdcb8b5f98b157a960bcf6fe3085acee863931ce7a5e05b48adbbf897824",
                 "kind": "FUNCTION",
                 "defaults": null,
                 "mapStrategy": "MAP",
@@ -320,15 +323,15 @@
             },
             {
                 "__typename": "ArkitektNode",
-                "id": "arkid-7ef4c9e3-9928-4f4c-8af9-64144789da01",
+                "id": "arkid-8b1b9409-a3bd-49f6-ad6e-c711397ecf29",
                 "position": {
                     "__typename": "Position",
-                    "x": 847,
-                    "y": -165
+                    "x": 770,
+                    "y": -172
                 },
                 "typename": "ArkitektNode",
                 "parentNode": null,
-                "hash": "a0dea949e9ae82db19298290b0b937838578fdc5c543a22e63a301273ad69501",
+                "hash": "0441be4d576765367c37786d2ef743f33865d4a4f146ad100e0c04d5283edb0e",
                 "kind": "FUNCTION",
                 "defaults": null,
                 "mapStrategy": "MAP",
@@ -408,15 +411,15 @@
             },
             {
                 "__typename": "ArkitektNode",
-                "id": "arkid-9688e201-ab12-4c20-813d-a6d32e333ab7",
+                "id": "arkid-a11e3cc0-cb2b-46ff-9f4a-37c0b2e7c285",
                 "position": {
                     "__typename": "Position",
-                    "x": 583,
-                    "y": 196
+                    "x": 545,
+                    "y": 151
                 },
                 "typename": "ArkitektNode",
                 "parentNode": null,
-                "hash": "eb469fdae3318571be7eead640ef0ef0bcc3bcb7949d23fd63e77b871255b357",
+                "hash": "3bbc2f84cc1f9c92045a66993b7bca99966d28ae285491905cedcf26fa48510c",
                 "kind": "FUNCTION",
                 "defaults": null,
                 "mapStrategy": "MAP",
@@ -496,114 +499,11 @@
             },
             {
                 "__typename": "ArkitektNode",
-                "id": "arkid-5adb3107-830d-4d78-b40c-2acd9e4950cd",
+                "id": "arkid-15344e96-8c52-4e5a-812a-81ffead8dc37",
                 "position": {
                     "__typename": "Position",
-                    "x": 815,
-                    "y": 104
-                },
-                "typename": "ArkitektNode",
-                "parentNode": null,
-                "hash": "c428c5d61f9147bd7a662b22a0dcf620567199c9ca5a3bfae674a696068d0f46",
-                "kind": "FUNCTION",
-                "defaults": null,
-                "mapStrategy": "MAP",
-                "allowLocal": false,
-                "binds": null,
-                "assignTimeout": 100000,
-                "yieldTimeout": 100000,
-                "reserveTimeout": 100000,
-                "maxRetries": 3,
-                "instream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "rep",
-                            "label": "rep",
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The Image to be thresholded",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "outstream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "return0",
-                            "label": null,
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The thresholded image",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "constream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "gaussian_blur",
-                            "label": "gaussian_blur",
-                            "identifier": null,
-                            "scope": "GLOBAL",
-                            "kind": "BOOL",
-                            "description": "Whether to apply a gaussian blur before thresholding (kernel_size=5)",
-                            "assignWidget": null,
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": true
-                        }
-                    ]
-                ],
-                "constants": null,
-                "name": "Otsu Thresholding",
-                "description": "Binarizes the image based on a threshold, using Otsu's method\nwith option to guassian blur the image before, images are normalized\nfor each x,y slice before thresholding.",
-                "retryDelay": 2000
-            },
-            {
-                "__typename": "ArkitektNode",
-                "id": "arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2",
-                "position": {
-                    "__typename": "Position",
-                    "x": 1010,
-                    "y": 315
+                    "x": 971,
+                    "y": 200
                 },
                 "typename": "ArkitektNode",
                 "parentNode": null,
@@ -768,11 +668,114 @@
             },
             {
                 "__typename": "ArkitektNode",
-                "id": "arkid-5404889e-6113-4a05-bd25-6c4790bac792",
+                "id": "arkid-91167ee9-52f4-4c00-8652-c6243c2b9bf7",
                 "position": {
                     "__typename": "Position",
-                    "x": 1150,
-                    "y": 140
+                    "x": 769,
+                    "y": 70
+                },
+                "typename": "ArkitektNode",
+                "parentNode": null,
+                "hash": "57d45410523b5fc52e33a89c2ae0174666ef7afefe2028df1e16649a750bf0a4",
+                "kind": "FUNCTION",
+                "defaults": null,
+                "mapStrategy": "MAP",
+                "allowLocal": false,
+                "binds": null,
+                "assignTimeout": 100000,
+                "yieldTimeout": 100000,
+                "reserveTimeout": 100000,
+                "maxRetries": 3,
+                "instream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "rep",
+                            "label": "rep",
+                            "identifier": "@mikro/representation",
+                            "scope": "GLOBAL",
+                            "kind": "STRUCTURE",
+                            "description": "The Image to be thresholded",
+                            "assignWidget": {
+                                "__typename": "Widget",
+                                "kind": "SearchWidget",
+                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                                "hook": null,
+                                "ward": "mikro",
+                                "min": null,
+                                "step": null,
+                                "placeholder": null,
+                                "max": null,
+                                "choices": null,
+                                "asParagraph": null
+                            },
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "outstream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "return0",
+                            "label": null,
+                            "identifier": "@mikro/representation",
+                            "scope": "GLOBAL",
+                            "kind": "STRUCTURE",
+                            "description": "The thresholded image",
+                            "assignWidget": {
+                                "__typename": "Widget",
+                                "kind": "SearchWidget",
+                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                                "hook": null,
+                                "ward": "mikro",
+                                "min": null,
+                                "step": null,
+                                "placeholder": null,
+                                "max": null,
+                                "choices": null,
+                                "asParagraph": null
+                            },
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": false
+                        }
+                    ]
+                ],
+                "constream": [
+                    [
+                        {
+                            "__typename": "Port",
+                            "key": "gaussian_blur",
+                            "label": "gaussian_blur",
+                            "identifier": null,
+                            "scope": "GLOBAL",
+                            "kind": "BOOL",
+                            "description": "Whether to apply a gaussian blur before thresholding (kernel_size=5)",
+                            "assignWidget": null,
+                            "returnWidget": null,
+                            "child": null,
+                            "variants": null,
+                            "nullable": true
+                        }
+                    ]
+                ],
+                "constants": null,
+                "name": "Otsu Thresholding",
+                "description": "Binarizes the image based on a threshold, using Otsu's method\nwith option to guassian blur the image before, images are normalized\nfor each x,y slice before thresholding.",
+                "retryDelay": 2000
+            },
+            {
+                "__typename": "ArkitektNode",
+                "id": "arkid-1bab2614-55a4-43e1-bec0-6626c7f99d88",
+                "position": {
+                    "__typename": "Position",
+                    "x": 1237,
+                    "y": 37
                 },
                 "typename": "ArkitektNode",
                 "parentNode": null,
@@ -831,10 +834,10 @@
         "edges": [
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-1return_0-arkid-34c01cf7-23b9-4815-b81e-359bed78ffecarg_0",
+                "id": "reactflow__edge-1return_0-arkid-2aead44b-cb77-4fff-8311-e98f6135dc13arg_0",
                 "source": "1",
                 "sourceHandle": "return_0",
-                "target": "arkid-34c01cf7-23b9-4815-b81e-359bed78ffec",
+                "target": "arkid-2aead44b-cb77-4fff-8311-e98f6135dc13",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -852,10 +855,10 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-34c01cf7-23b9-4815-b81e-359bed78ffecreturn_0-arkid-09ce3a01-abf0-4837-ba27-e9a7b203c658arg_0",
-                "source": "arkid-34c01cf7-23b9-4815-b81e-359bed78ffec",
+                "id": "reactflow__edge-arkid-2aead44b-cb77-4fff-8311-e98f6135dc13return_0-arkid-2c5e7786-e6a1-45e3-9881-72e082490ca4arg_0",
+                "source": "arkid-2aead44b-cb77-4fff-8311-e98f6135dc13",
                 "sourceHandle": "return_0",
-                "target": "arkid-09ce3a01-abf0-4837-ba27-e9a7b203c658",
+                "target": "arkid-2c5e7786-e6a1-45e3-9881-72e082490ca4",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -873,10 +876,10 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-09ce3a01-abf0-4837-ba27-e9a7b203c658return_0-arkid-7ef4c9e3-9928-4f4c-8af9-64144789da01arg_0",
-                "source": "arkid-09ce3a01-abf0-4837-ba27-e9a7b203c658",
+                "id": "reactflow__edge-arkid-2c5e7786-e6a1-45e3-9881-72e082490ca4return_0-arkid-8b1b9409-a3bd-49f6-ad6e-c711397ecf29arg_0",
+                "source": "arkid-2c5e7786-e6a1-45e3-9881-72e082490ca4",
                 "sourceHandle": "return_0",
-                "target": "arkid-7ef4c9e3-9928-4f4c-8af9-64144789da01",
+                "target": "arkid-8b1b9409-a3bd-49f6-ad6e-c711397ecf29",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -894,10 +897,10 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-7ef4c9e3-9928-4f4c-8af9-64144789da01return_0-arkid-9688e201-ab12-4c20-813d-a6d32e333ab7arg_0",
-                "source": "arkid-7ef4c9e3-9928-4f4c-8af9-64144789da01",
+                "id": "reactflow__edge-arkid-8b1b9409-a3bd-49f6-ad6e-c711397ecf29return_0-arkid-a11e3cc0-cb2b-46ff-9f4a-37c0b2e7c285arg_0",
+                "source": "arkid-8b1b9409-a3bd-49f6-ad6e-c711397ecf29",
                 "sourceHandle": "return_0",
-                "target": "arkid-9688e201-ab12-4c20-813d-a6d32e333ab7",
+                "target": "arkid-a11e3cc0-cb2b-46ff-9f4a-37c0b2e7c285",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -915,10 +918,10 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-9688e201-ab12-4c20-813d-a6d32e333ab7return_0-arkid-5adb3107-830d-4d78-b40c-2acd9e4950cdarg_0",
-                "source": "arkid-9688e201-ab12-4c20-813d-a6d32e333ab7",
+                "id": "reactflow__edge-arkid-a11e3cc0-cb2b-46ff-9f4a-37c0b2e7c285return_0-arkid-91167ee9-52f4-4c00-8652-c6243c2b9bf7arg_0",
+                "source": "arkid-a11e3cc0-cb2b-46ff-9f4a-37c0b2e7c285",
                 "sourceHandle": "return_0",
-                "target": "arkid-5adb3107-830d-4d78-b40c-2acd9e4950cd",
+                "target": "arkid-91167ee9-52f4-4c00-8652-c6243c2b9bf7",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -936,10 +939,10 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-5adb3107-830d-4d78-b40c-2acd9e4950cdreturn_0-arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2arg_0",
-                "source": "arkid-5adb3107-830d-4d78-b40c-2acd9e4950cd",
+                "id": "reactflow__edge-arkid-91167ee9-52f4-4c00-8652-c6243c2b9bf7return_0-arkid-15344e96-8c52-4e5a-812a-81ffead8dc37arg_0",
+                "source": "arkid-91167ee9-52f4-4c00-8652-c6243c2b9bf7",
                 "sourceHandle": "return_0",
-                "target": "arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2",
+                "target": "arkid-15344e96-8c52-4e5a-812a-81ffead8dc37",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -957,10 +960,10 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2return_0-arkid-5404889e-6113-4a05-bd25-6c4790bac792arg_0",
-                "source": "arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2",
+                "id": "reactflow__edge-arkid-15344e96-8c52-4e5a-812a-81ffead8dc37return_0-arkid-1bab2614-55a4-43e1-bec0-6626c7f99d88arg_0",
+                "source": "arkid-15344e96-8c52-4e5a-812a-81ffead8dc37",
                 "sourceHandle": "return_0",
-                "target": "arkid-5404889e-6113-4a05-bd25-6c4790bac792",
+                "target": "arkid-1bab2614-55a4-43e1-bec0-6626c7f99d88",
                 "targetHandle": "arg_0",
                 "typename": "LabeledEdge",
                 "stream": [
@@ -978,8 +981,8 @@
             },
             {
                 "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-5404889e-6113-4a05-bd25-6c4790bac792return_0-2arg_0",
-                "source": "arkid-5404889e-6113-4a05-bd25-6c4790bac792",
+                "id": "reactflow__edge-arkid-1bab2614-55a4-43e1-bec0-6626c7f99d88return_0-2arg_0",
+                "source": "arkid-1bab2614-55a4-43e1-bec0-6626c7f99d88",
                 "sourceHandle": "return_0",
                 "target": "2",
                 "targetHandle": "arg_0",
@@ -991,7 +994,7 @@
             {
                 "__typename": "Global",
                 "toKeys": [
-                    "arkid-7ef4c9e3-9928-4f4c-8af9-64144789da01.model"
+                    "arkid-8b1b9409-a3bd-49f6-ad6e-c711397ecf29.model"
                 ],
                 "port": {
                     "__typename": "Port",
@@ -1000,7 +1003,7 @@
                     "identifier": "@mikro/model",
                     "scope": "GLOBAL",
                     "kind": "STRUCTURE",
-                    "description": "The model (maps to arkid-7ef4c9e3-9928-4f4c-8af9-64144789da01.model)",
+                    "description": "The model (maps to arkid-8b1b9409-a3bd-49f6-ad6e-c711397ecf29.model)",
                     "assignWidget": {
                         "__typename": "Widget",
                         "kind": "SearchWidget",
@@ -1023,7 +1026,7 @@
             {
                 "__typename": "Global",
                 "toKeys": [
-                    "arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2.min_size"
+                    "arkid-15344e96-8c52-4e5a-812a-81ffead8dc37.min_size"
                 ],
                 "port": {
                     "__typename": "Port",
@@ -1032,7 +1035,7 @@
                     "identifier": null,
                     "scope": "GLOBAL",
                     "kind": "INT",
-                    "description": "The minimum size of the particles (default: 0) (maps to arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2.min_size)",
+                    "description": "The minimum size of the particles (default: 0) (maps to arkid-15344e96-8c52-4e5a-812a-81ffead8dc37.min_size)",
                     "assignWidget": null,
                     "returnWidget": null,
                     "child": null,
@@ -1043,7 +1046,7 @@
             {
                 "__typename": "Global",
                 "toKeys": [
-                    "arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2.max_size"
+                    "arkid-15344e96-8c52-4e5a-812a-81ffead8dc37.max_size"
                 ],
                 "port": {
                     "__typename": "Port",
@@ -1052,7 +1055,7 @@
                     "identifier": null,
                     "scope": "GLOBAL",
                     "kind": "INT",
-                    "description": "The maximum size of the particles (default: None) (maps to arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2.max_size)",
+                    "description": "The maximum size of the particles (default: None) (maps to arkid-15344e96-8c52-4e5a-812a-81ffead8dc37.max_size)",
                     "assignWidget": null,
                     "returnWidget": null,
                     "child": null,
@@ -1063,7 +1066,7 @@
             {
                 "__typename": "Global",
                 "toKeys": [
-                    "arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2.min_circularity"
+                    "arkid-15344e96-8c52-4e5a-812a-81ffead8dc37.min_circularity"
                 ],
                 "port": {
                     "__typename": "Port",
@@ -1072,7 +1075,7 @@
                     "identifier": null,
                     "scope": "GLOBAL",
                     "kind": "FLOAT",
-                    "description": "The minimum circularity of the particles (default: 0.0) (maps to arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2.min_circularity)",
+                    "description": "The minimum circularity of the particles (default: 0.0) (maps to arkid-15344e96-8c52-4e5a-812a-81ffead8dc37.min_circularity)",
                     "assignWidget": {
                         "__typename": "Widget",
                         "kind": "SliderWidget",
@@ -1095,7 +1098,7 @@
             {
                 "__typename": "Global",
                 "toKeys": [
-                    "arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2.max_circularity"
+                    "arkid-15344e96-8c52-4e5a-812a-81ffead8dc37.max_circularity"
                 ],
                 "port": {
                     "__typename": "Port",
@@ -1104,7 +1107,7 @@
                     "identifier": null,
                     "scope": "GLOBAL",
                     "kind": "FLOAT",
-                    "description": "The maximum circularity of the particles (default: 1.0) (maps to arkid-5d6b8724-1cea-4930-bad6-ab79fe8841c2.max_circularity)",
+                    "description": "The maximum circularity of the particles (default: 1.0) (maps to arkid-15344e96-8c52-4e5a-812a-81ffead8dc37.max_circularity)",
                     "assignWidget": {
                         "__typename": "Widget",
                         "kind": "SliderWidget",
@@ -1156,11 +1159,11 @@
         "returns": []
     },
     "restrict": [],
-    "name": "hasty-ochre-octopus",
+    "name": "Interactive Analysis",
     "screenshot": null,
-    "createdAt": "2023-09-26T14:27:48.022466+00:00",
+    "createdAt": "2023-10-28T15:10:19.503243+00:00",
     "workspace": {
         "__typename": "Workspace",
-        "id": "170"
+        "id": "24"
     }
 }

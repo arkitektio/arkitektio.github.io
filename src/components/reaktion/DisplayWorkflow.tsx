@@ -5,6 +5,7 @@ import { ShowGuard } from "../ShowGuard";
 import { FlussGuard, useFluss} from "@jhnnsrs/fluss";
 import { gql,  useMutation } from "@apollo/client";
 import { edges_to_flowedges, flowedges_to_edges, flownodes_to_nodes, noTypename, nodes_to_flownodes, notEmpty } from "./utils";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 
 
 const ImportFlowMutation = gql`
@@ -27,6 +28,8 @@ const ImportButton = ({flow, blockImport}: { flow: FlowFragment, blockImport?: b
   const { client } = useFluss()
   const [mutate, data] = useMutation(ImportFlowMutation, {client: client})
 
+  const [showDialog, setShowDialog] = useState(false)
+
 
   const importFlow =  async () => {
 
@@ -42,6 +45,8 @@ const ImportButton = ({flow, blockImport}: { flow: FlowFragment, blockImport?: b
       };
 
       let x = await mutate({variables: {name: flow.name, graph: graphInput}})
+      setShowDialog(true)
+
     }
 
     catch (e) {
@@ -55,7 +60,22 @@ const ImportButton = ({flow, blockImport}: { flow: FlowFragment, blockImport?: b
 
 
 
-  return <button onClick={() => importFlow()} disabled={blockImport} className="bg-primary-300 hover:bg-primary-400 py-2 px-3 rounded rounded-md disabled:bg-back-800 cursor-pointer">Re-Import into Arkitekt</button>
+  return <>
+    <Dialog open={showDialog} onOpenChange={setShowDialog}>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Succesfully imported workflow</DialogTitle>
+        <DialogDescription>
+          We have imported the workflow into Arkitekt. You can now use it in your flows.
+
+        </DialogDescription>
+      </DialogHeader>
+    </DialogContent>
+  </Dialog>
+  
+  
+  
+  <button onClick={() => importFlow()} disabled={blockImport} className="bg-primary-300 hover:bg-primary-400 py-2 px-3 rounded rounded-md disabled:bg-back-800 cursor-pointer">Re-Import into Arkitekt</button></>
        
 
 }

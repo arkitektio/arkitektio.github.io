@@ -10,9 +10,12 @@ import Image from '@theme/IdealImage';
 import interactive from './interactive.png';
 import { ShowWorkflow} from "../../../src/components/reaktion/ShowWorkflow";
 import { DisplayWorkflow} from "../../../src/components/reaktion/DisplayWorkflow";
+import { InstallRepoButton} from "../../../src/components/InstallRepoButton";
+import { UploadModelButton} from "../../../src/components/UploadModelButton";
 import { LatestImage} from "../../../src/components/mikro/LatestImage";
 import { Guard} from "../../../src/components/Guard";
 import interactiveAnalysisFlow from './interactive_analysis.json';
+import model from './test.zip';
 
 The following workflow and online showcase is an example of how arkitekt enables an interactive workflow, spanning multiple bioimage apps and deep learning enabled
 denoising. With this workflow we would like to demonstrate that by leveraging a tight and timely interaction between the apps, users can get immediate
@@ -53,24 +56,49 @@ which will import it directly into your arkitekt instance.
 If you havent installed any of the apps yet, your Arkitekt instance will tell you that you are missing some apps implementing the nodes. So of course make sure you
 install the apps that are missing. In this case you will need to install the following apps:
 
-- [Napari](
-    https://napari.org/stable/)
-    with the mikro-napari plugin, which you can install easily via the napari plugin manager.
-    or via the command line with `pip install mikro-napari`
+#### [Napari](https://napari.org/stable/)
 
-- [Kare Denoising](
-    https://github.com/jhnnsrs/kare)
-    which is an Arkitekt enabled app, which on clicking install can be installed via the arkitekt plugin page.
+With the mikro-napari plugin, which you can install easily via the napari plugin manager.
+or via the command line with `pip install mikro-napari`
 
-- [Fiji](
-    https://imagej.net/Fiji)
-    which is a popular image analysis app, that can be installed through the Fiji homepage
+#### [Kare Denoising](https://github.com/jhnnsrs/kare)
 
-- [MikroJ](https://github.com/jhnnsrs/mikroj)
-    which is the FIJI wrapper app that allows your Fiji instance to be connected to Arkitekt.
+An Arkitekt plugin that allows you to denoise images using deep learning. You can install it through the PluginStore or when connected, by clicking on the button below.
+
+<InstallRepoButton repo={"kare"} user={"jhnnsrs"} branch={"master"}/>
+
+#### [Fiji](https://imagej.net/Fiji)
+
+A ImageJ instance with the "Analyze Particles" plugin installed (comes preinstalled with Fiji)
+
+#### [MikroJ](https://github.com/jhnnsrs/mikroj)
+    
+The Arkitekt enabled FIJI wrapper app that allows your Fiji instance to be connected to Arkitekt. Please install 
+the latest version of MikroJ.
+
+## Data Preparation
+
+This workflow was designed to work with the [Tribolium](https://publications.mpi-cbg.de/publications-sites/7207/) Dataset. However the examplary data used in this 
+workflow is only on noisy stack of the Tribolium dataset, which you can download [here](/demos/noisy_stack.tif).
+
+The Image Data was converted through the `Convert Omero` Node provided by
+<InstallRepoButton repo={"omero"} user={"jhnnsrs"} branch={"master"}/>
+
+## Model Preparation 
+
+For this workflow you can either use a pretrained model, or train your own model. If you want to train your own model, you can follow the instructions in the
+Deep Learning Training Tutorial to train your own model. If you want to use a pretrained model, you can upload the pretrained model directly from the link below.
 
 
-Once you have installed all the apps, you can simply reserve the workflow on your Arkitekt web interface or right here on the webinterface, and then run it.
+<UploadModelButton url={model}/>
+
+This model was trained on [this dataset here](/demos/training.zip).
+
+
+## The Workflow 
+
+Once you have installed all the apps, you can simply import the workflow by connecting your arkitekt instance and clicking on the button below.
+
 
 <DisplayWorkflow flow={interactiveAnalysisFlow}/>
 
@@ -78,6 +106,21 @@ Once you have installed all the apps, you can simply reserve the workflow on you
 <small>Once connected this pane will also give you an overview over the apps that still need to be installed, nodes in green have been installed, nodes in yellow still lack an implementation. Of course
 feel free to explore this graph more interactively in your orkestrator interface</small>
 </div>
+
+
+## Running the Workflow
+
+For the execution of the Workflow you will need to start the following apps:
+
+- Napari
+- Kare Denoising (through deployment of the kare plugin)
+- Fiji (through MikroJ)
+
+Once you have started all the apps, you can run the workflow directly from an image uploaded to your arkitekt instance. To do so, simply 
+start the workflow and select the image the converted you want to run the workflow on.
+
+
+
 
 <details>
   <summary>Test Environment</summary>
