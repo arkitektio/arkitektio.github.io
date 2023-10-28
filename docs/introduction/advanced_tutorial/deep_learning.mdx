@@ -1,0 +1,80 @@
+---
+title: Deep Learning
+sidebar_label: Deep Learning
+sidebar_position: 1
+---
+
+import deepL from './deep_l.json';
+import { DisplayWorkflow} from "../../../src/components/reaktion/DisplayWorkflow";
+import Image from '@theme/IdealImage';
+import thumbnail from './segmentation.png';
+
+# Deep Learning
+
+Deep learning is taking over the world of bioimage analysis, and for good reason. However it is not always easy to get started and use
+the deep learning tools that are available.
+In this section of the documentation we will try to show you how to get started with deep learning and how Arkitekt can help you,
+by showing you how to create a simple "deep learning enabled" workflow. 
+
+
+## Prerequisites
+
+To get started with deep learning and Arkitekt you should:
+
+- Have a basic understanding of deep learning, in the sense of what the words "Training" and "Inference" mean.
+- Have gone through the [basics of Arkitekt](/docs/introduction/first_steps).
+- Have a CUDA capable GPU. If you don't have a GPU, you should still be able to follow along, but the prediction
+will be very slow.
+
+# Our task at hand 
+
+We would like to create a workflow that can take an image of nuclei in a cell culture and predict the segmentation of the nuclei. 
+We will be using a deep learning model based on [Stardist](https://github.com/stardist/stardist) to do the prediction.
+We will be using the same dataset that we have used in the [basics of Arkitekt](/docs/introduction/first_steps). 
+
+<Image img={thumbnail}/>
+
+## The problem we are trying to solve
+
+In this tutorial we would like to show you how to create a simple deep learning workflow in Arkitekt, and how Arkitekt can solve some common issues, 
+that you might encounter when trying to create your own deep learning workflows. 
+
+
+-   How to maintain the **complex software requirements** that is needed for deep learning.
+
+    That's a perfect fit for `PluginApps`. Arkitekt plugins are containerized, so developers can already add in 
+    all of the software requirements that are needed for their specific deep learning algorithm. No need to install anything on your computer.
+
+
+-   How to **integrate** deep learning into your favourite bioimage analysis app.
+
+    That's what we have **bridging** `Workflows` for. You can create a workflow in Arkitekt, that will take your image from you
+    bioimage analysis app of choice, offload them to the Arkitet server, and just pipe the result back to the bioimage app, so you can continue your analysis
+    in the app you are used to.
+
+
+-   I **don't have GPUs** available on my computer, how can I still use deep learning?
+
+    Easy. Just use the distributed workflow to offload the prediction to any computer that has a GPU available (here you Arkitekt Server) but potentially 
+    also another computer in your lab / and or the ominous cloud. Oh and if you don't have a GPU available at all, you can still use the CPU version of Stardist.
+
+
+:::note On other solutions
+
+We are not the only ones trying to solve these problems. There are other great solutions out there, that you should definitely check out. One of it is [DeepImageJ](https://deepimagej.github.io).
+Arkitet is not trying to replace these solutions, but rather complement them. We are rather trying to provide a solution that is as generic as possible, so that you can use it with *any* deep learning algorithm
+(that might use a different framework, rely on heavy pre and postprocessing, ...) and *integrate* with any bioimage analysis app.
+
+:::
+
+## Fiji Segmentation 
+
+Lets first have a look at the workflow we would like to create. We will be using Fiji for this example, buy further down we will also show you how to do the same thing in [`Napari`](#napari-segmentation).
+
+<DisplayWorkflow flow={deepL}/>
+<div className="text-gray-400 mb-2">
+    <small> This is the workflow we would like to create. Upload our active image, segment it using a pretrained model, and show the result on ImageJ</small>
+</div>
+
+
+

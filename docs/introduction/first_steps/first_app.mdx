@@ -49,12 +49,12 @@ To install the Napari bridge plugin for Arkitekt you can choose from two options
 
 - Install it directly from the command line:
 
-  If you are familiar with command line and you have napari installed in a python environment, you can also install the plugin directly from the command line.
+  If you are familiar with command line and you have napari installed in a python (Python > 3.9) environment, you can also install the plugin directly from the command line.
   Just run the following command:
 
   ```bash
   pip install mikro-napari
-  pip install napari pyqt5 # if you do not have napari installed yet
+  pip install napari==0.4.17 pyqt5 # if you do not have napari installed yet (currently we have only tested with 0.4.17 but 0.4.18 should also work)
   ```
 
   This also allows you to start all of the widgets directly from the command line with the plugin installed:

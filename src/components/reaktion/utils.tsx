@@ -13,6 +13,8 @@ import {
 } from "./api";
 import { FlowEdge, FlowNode } from "./types";
 
+
+
 export const flussPortChildToStreamItem = (
   port: PortChildFragment
 ): StreamItemChild => {
@@ -21,6 +23,9 @@ export const flussPortChildToStreamItem = (
     identifier: port.identifier,
     nullable: port.nullable,
     scope: port.scope,
+    variants: port?.variants
+      ?.filter(notEmpty)
+      .map((x) => flussPortChildToStreamItem(x)),
     child: port.child && flussPortChildToStreamItem(port.child),
   };
 };
@@ -32,6 +37,9 @@ export const flussPortToStreamItem = (port: PortFragment): StreamItem => {
     identifier: port.identifier,
     nullable: port.nullable,
     scope: port.scope,
+    variants: port?.variants
+      ?.filter(notEmpty)
+      .map((x) => flussPortChildToStreamItem(x)),
     child: port.child && flussPortChildToStreamItem(port.child),
   };
 };
@@ -39,6 +47,7 @@ export const flussPortToStreamItem = (port: PortFragment): StreamItem => {
 export const globalArgKey = (id: string, key: string) => {
   return `${id}.${key}`;
 };
+
 
 export function notEmpty<TValue>(
   value: TValue | null | undefined
@@ -57,6 +66,15 @@ export function noTypename<T extends { [key: string]: any }>(obj: T): T {
   let z = JSON.parse(str);
   console.log(z);
   return z;
+}
+
+export function keyInObject(
+  key: string,
+  obj: any
+): obj is {
+  [key: string]: any;
+} {
+  return obj && key in obj;
 }
 
 export const nodes_to_flownodes = (
@@ -150,6 +168,7 @@ export const flownodes_to_nodes = (nodes: FlowNode[]): NodeInput[] => {
             position: { x: position.x, y: position.y },
             typename: type || "Fake type",
             name: (rest as any).name,
+            description: (rest as any).description,
             hash: (rest as any).hash,
             implementation: (rest as any).implementation,
             kind: (rest as any).kind,

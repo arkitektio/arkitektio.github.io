@@ -26,15 +26,20 @@ const ShowNodeDetails = (props: { data: ArkitektNodeData }) => {
   );
 
 
-  return error ? <div className="flex flex-row gap-2">
+  return error ? <div className="flex flex-col gap-2">
+    <div className="flex flex-row gap-2">
   <UninstalledNode/>
   <div className="text-yellow-500 my-auto"> {props.data?.name} </div>
+  </div>
+  <div className="text-gray-500 my-auto"> {props.data?.description} </div>
   
   
-  
-  </div> : <div className="flex flex-row gap-2">
-  <InstalledNode/>
-  <div className="text-green-500 my-auto"> {data?.node?.name} </div>
+  </div> : <div className="flex flex-col gap-2">
+    <div className="flex flex-row gap-2">
+    <InstalledNode/>
+    <div className="text-green-500 my-auto"> {data?.node?.name} </div>
+  </div>
+  <div className="text-gray-500 my-auto"> {props.data?.description} </div>
   
   
   
@@ -111,7 +116,7 @@ export const ArkitektShowNodewidget: React.FC<ArkitektNodeProps> = withLayout(
             }
           />
         ))}
-        <div className="flex flex-row justify-between custom-drag-handle w-full">
+        <div className="flex flex-row justify-between custom-drag-handle w-full ">
         <RekuestGuard fallback={<> {data?.name}</>}>
             <ShowNodeDetails data={data} />
         </RekuestGuard>
