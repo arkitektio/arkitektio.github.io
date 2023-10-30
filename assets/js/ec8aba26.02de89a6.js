@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[5749],{15156:e=>{e.exports=JSON.parse('{"title":"Companion Apps","slug":"/category/companion-apps","permalink":"/docs/category/companion-apps","navigation":{"previous":{"title":"Mikro","permalink":"/docs/services/mikro"},"next":{"title":"Orkestrator","permalink":"/docs/apps/gucker"}}}')}}]);
