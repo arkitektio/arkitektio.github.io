@@ -90,7 +90,7 @@ For this workflow you can either use a pretrained model, or train your own model
 Deep Learning Training Tutorial to train your own model. If you want to use a pretrained model, you can upload the pretrained model directly from the link below.
 
 
-<UploadModelButton url={model}/>
+<UploadModelButton url={model} name="Tribolium Model" kind="TENSORFLOW"/>
 
 This model was trained on [this dataset here](/demos/training.zip).
 
@@ -120,8 +120,6 @@ Once you have started all the apps, you can run the workflow directly from an im
 start the workflow and select the image the converted you want to run the workflow on.
 
 
-
-
 <details>
   <summary>Test Environment</summary>
   <div>
@@ -129,15 +127,19 @@ start the workflow and select the image the converted you want to run the workfl
     <br/>
 
     Analysis Computer
-        - Intel Core i9 CPU @ 3.70GHz TODO: add GPU
+        - Intel Core i9-8700K CPU @ 3.70GHz
         - Ubuntu 22.04
         - Arkitekt Paper Channel
         - Segmentor Plugin 0.3.1
         - Stdlib Plugin 0.3.6
-        - Napari 0.4.17
-        - MikroNapari 0.1.60
+
+    Analysis Computer
+        - Intel Core i9-8700K CPU @ 3.70GHz
+        - Windows 10
+        - Arkitekt Paper Channel
+        - Segmentor Plugin 0.3.1
+        - Stdlib Plugin 0.3.6
     
     
   </div>
 </details>
-

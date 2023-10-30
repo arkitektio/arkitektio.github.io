@@ -40,7 +40,7 @@ first file. The one we uploaded in the previous section.
 3. You are prompted with a dialog. 
 
   This dialog is our first encounter with an Arkitekt assign dialog. Assign Dialogs help us define the parameters of our analysis.This parameters will then be sent 
-  to the tool when it is executed. For our initial conversion we will not specify any parameters. So just click `Assign?. And lets see what happens.
+  to the tool when it is executed. For our initial conversion we will not specify any parameters. So just click `Assign`. And lets see what happens.
 
 4. Inspect the progress and result.
 
@@ -90,12 +90,37 @@ read more about it in the [Mikro Next](/docs/services/next/mikro_next) section.
 ## Lets comment and Mark a ROI
 
 Besides just converting our data we can also perform some basic operations on our data. Lets start by marking a ROI on our image. Just click on the rectangle 
-icon in the bottom left corner and draw a rectangle on the image. You should see this ROI appear. This roi is now also part of our datagraph. And we can use it
+icon in the bottom left corner of the image and draw a rectangle on the image. You should see this ROI appear. This roi is now also part of our datagraph. And we can use it
 in the next few steps.
 
 <video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
   <source src={markRoi}/>
 </video>
+
+A few words about the `Data Graph` in Arkitekt: 
+
+1. The `Data Graph` is a graph that describes the relationship between different data elements within Arkitekt and their metadata. As Arkitekt is designed as a modular system
+   you are currently exploring the `Data Graph` of the `Mikro` Service. Mikro is the service that stores our microscopy data, and metadata centrally in a database and provides
+  a unified interface to access it. You could also explore the `Data Graph` of the `Fluss` Service. This would show you how your workflows relate to each other.
+
+2. The `Data Graph` lives from interlinking data points. Here we created already a few points of interest. We have our original file, our converted file and our ROI. 
+   Currently they are linked in the following way
+
+  ```mermaid
+  flowchart TB
+    id1(Original File) -- origin of -->  id2(Image) -- "contains" --> id3(ROI1) & id4(ROI2) 
+    id4(ROI2) -- commented --> id5(Comment) 
+    id4(ROI2) -- marked by --> id6(User Demo) 
+
+  ```
+  This graph is currently not very interesting. But you will see later how we can use this graph to perform more complex analysis. 
+
+:::info A bit technical
+
+The Mikro `Data Graph` is a graph that is backed by a relational database, and is exposed via the GraphQL API. This means that you can also query the `Data Graph` directly
+via GraphQL. 
+
+:::
 
 ## Before we start our analysis!
 

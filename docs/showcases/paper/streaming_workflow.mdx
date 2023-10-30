@@ -8,9 +8,13 @@ sidebar_position: 3
 import { DownloadGrid } from "../../../src/components/layout/Button";
 import Image from '@theme/IdealImage';
 import interactive from './streaming.png';
+import { DisplayWorkflow} from "../../../src/components/reaktion/DisplayWorkflow";
+import { InstallRepoButton} from "../../../src/components/InstallRepoButton";
+import { UploadModelButton} from "../../../src/components/UploadModelButton";
+import organoidModel from "./organoid_model.zip";
 
-
-import interactiveAnalysisFlow from './interactive_analysis.json';
+import organoidAnalysis from './organoid.json';
+import createWorkflow from './organoid_workflow_creation.webm';
 
 
 Biological systems can be highly reactive, and closely monitoring them during long-run acquisitions is necessary for ensuring a stable environment in an ongoing experiment. This can range from just checking that the acquisition is running properly (e.g., no loss of focus or some illumination problem), to monitoring the evolution of live biological samples (e.g., premature cell death). Classically, images are batch-processed once the acquisition is complete, i.e., when all of the data have been fully acquired and stored, leaving no chance for real-time analysis and feedback. In this second workflow, we illustrate how Arkitekt with its ability for streaming analysis (i.e., processing immediately after each acquisition event), enables to display real-time feedback on the running acquisition.
@@ -27,29 +31,209 @@ As the deep learning-based segmentation steps can be highly time-consuming, seve
 </div>
 
 
-### Prerequisites
+## Prerequisites
 
 :::tip Please read 
 
 We **strongly** suggest to go through the [Getting Started](/docs/introduction/first_steps) guide before attempting to run this workflow.
 It will guide you through the installation of the Arkitekt platform and the setup of your first workflow, as well as how to install plugins
-and apps.
+and apps. Additionally, we suggest to go through the [Live Analysis Basics](/docs/advanced_tutorial/live) guide to get familiar with the Streaming
+capabilities of Arkitekt.
 :::
 
+### Hardware Requirements
+
 This workflow is designed to run on a microscope computer running Windows 10 as well as on a remote analysis computer 
-that will power the Arkitekt platform and the image analysis. To enable GPU acceleration for the Stardist
-segmentation, the analysis computer needs to have access to a CUDA 11 enabled GPU (tested on Nvidia GeforceRTX 2080Ti).
-The microscope computer will need to be connected to thevthe same network as the remote computer.
+that will power the Arkitekt platform and the image analysis (in the illustrated example running Ubuntu 22.04, but equally tested on 
+a Windows 10 Machine). To enable GPU acceleration for the Stardist segmentation, the analysis computer needs to have access to a CUDA 11 enabled GPU (tested on Nvidia GeforceRTX 2080Ti).
+The microscope computer will need to be connected to the same network as the remote computer.
 
-Additionally to run this workflow you will need to have the following installed on your microscope computer:
+Additionally to use the parallel processing capabilities of this workflow, you will need to have similarly configured computers (Ubuntu 22.04 or Windows 10, with a CUDA 11 enabled GPU, with Docker installed) 
+that will be used to run the parallel processes. These computers will need to be connected to the same network as the remote computer.
 
-- Your microscope Software of choice (we used Metamorph)
-- [Gucker](https://github.com/jhnnsrs/gucker) (version 0.0.1) [Download here](https://github.com/jhnnsrs/gucker/releases/latest)
 
-As well as the following plugins installed on your Arkitekt computer:
+### Software Requirements
 
-- Stdlib Plugin (version 0.3.6) from the repository [https://github.com/jhnnsrs/stdlib](https://github.com/jhnnsrs/stdlib)
-- Segmentor Plugin (version 0.3.1 ) from the repository [https://github.com/jhnnsrs/segmentor](https://github.com/jhnnsrs/segmentor)
+#### Microscope Software
+
+Your microscope Software of choice (tested with [Metamorph](https://www.moleculardevices.com/), that is able to stream images to a directory on the microscope computer, in an 
+OME compliant format.
+
+####  [Gucker](https://github.com/jhnnsrs/gucker)
+
+This workflow uses the Gucker App to watch a directory for new files opn the Acquisition Computer. To install Gucker, download the latest release from the [Gucker Releases](https://github.com/jhnnsrs/gucker/releases/latest).
+You can also choose to install Gucker from source by following the instructions on the [Gucker Github](https://github.com/jhnnsrs/gucker).
+
+#### [Mikro-Napari](https://github.com/jhnnsrs/mikro-napari) and [Napari](https://napari.org/)
+
+For visualization of the 3D data, we use the Napari App. To install Napari, follow the instructions on the [Napari Website](https://napari.org/), as well as install
+the mikro-napari plugin by following the instructions [here](/docs/introduction/first_steps/first_app) or [here](/docs/apps/mikro-napari).
+
+#### PluginApps
+
+This workflow uses the following `PluginApps` installed through the Arkitekt Plugin Store. To install these plugins follow the instructions [here](/docs/introduction/first_steps/first_tool),
+or connect this website to your Arkitekt instance and click on the button below:
+
+<div className="flex flex-row gap-2">
+<InstallRepoButton repo="stdlib" user="jhnnsrs" branch="master"/>
+<InstallRepoButton repo="omero" user="jhnnsrs" branch="master"/>
+<InstallRepoButton repo="segmentor" user="jhnnsrs" branch="master"/>
+</div>
+
+#### *[Optional]: Parallization*
+
+To enable the parallelization of the Stardist segmentation, you will need to have access to a Docker enabled computer (Ubuntu 22.04 or Windows 10) with a CUDA 11 enabled GPU.
+Arkitekt does not need to be installed on this computer, but we will run the Segmentor Plugin on this computer through a  `docker run` command. 
+## Preparations
+
+### Analysis Computer
+
+1. Install Arkitekt on your analysis computer following the instructions [here](/docs/introduction/installation).
+
+2. Depending if you want to reproduce the results illustrated in the Paper, you can either install the Stardist Model which we used for the demo data, via the button below or train your own model by following the instructions [here](/docs/advanced_tutorial/training).
+
+  <UploadModelButton url={organoidModel} name="Organoid Model" kind="TENSORFLOW"/>
+
+
+### Acquisition Computer
+
+TODO: Video
+
+1. On the Acquisition Computer, you will need to setup your microscope software to save the images in an OME compliant format to a directory that is accessible to the analysis computer.
+For this example, we will assume that the images are saved to the directory `C://Data` on the microscope computer, any other directory can be used, but will need to be specified correctly in the Gucker App.
+
+2. Unzip the Gucker App, and execute on `Gucker.exe`. Initial startup might take a few seconds, as Gucker will need to precompile some code. Once the App is running, select your respective directory
+in the "Choose Directory" field. Additionally as Gucker also acts as a Data Exporter, you need to specify an "Export Directory". This should not be the same as the "Import Directory", but can be any other directory
+on your computer with write access.
+
+3. Connect and Login with the Arkitekt instance (if your Arkitekt instance does not show up, make sure you are [advertising](/docs/introduction/installation#advertisting) it)
+
+
+### Optional: Parallel Processing Computers
+
+
+1. To enable the parallel processing of the Stardist segmentation, we will manually start the Segmentor plugin on each of the parallel processing computers. This can be done by executing the following command in a terminal on each of the parallel processing computers:
+
+  ```bash
+  docker run -t --gpus all jhnnsrs/segmentor:0.3.4 arkitekt run prod -h --url $ANALYSIS_COMPUTER_HOSTNAME:8000 -i $THIS_INSTANCE_ID
+  ```
+  where `$ANALYSIS_COMPUTER_HOSTNAME` is the hostname of your analysis computer, and `$THIS_INSTANCE_ID` is the ID of the parallel processing computer. This ID can be any string, but needs to be unique for each parallel processing computer.
+
+
+
+## Installing the Workflows
+
+The streaming analysis workflow can be installed by clicking on the button below. One installed all correspoinding
+nodes should light up in the Arkitekt Workflow Editor.
+
+<DisplayWorkflow flow={organoidAnalysis}/>
+<br/>
+
+You can also follow the following steps to install the workflow manually:
+
+<video  autoPlay muted loop controls className="rounded rounded-md my-3" width={"100%"}>
+  <source src={createWorkflow}/>
+</video>
+
+A few notes on this workflow:
+
+1. On the dashboard we can see that three seperate instances of the segmentor app are currently active and
+    connected. These are the three parallel processing computers that we started in the previous step. If you do not see
+    any instances, make sure that you have started the Segmentor App on each of the parallel processing computers. Of course
+    you can also skip this part and just run the workflow on your analysis computer, but then the Stardist segmentation will
+    be run sequentially and not in parallel.
+
+1. Creating the Workflow follows the same patterns as illustrated in the Tutorials.
+
+2. Connect the nodes by dragging the output ports of one node to the input ports of another node. As illustrated in the [Live Analysis](/docs/introduction/advanced_tutorial/live), the
+   `Convert Omero` node is returning a list of Images (as some OME formats can contain multiple series), which is why we need to `Chunk` the list of images into single images, before we can
+   run the rest of the workflow on each image individually.
+
+3. You see that some parameters of the workflow are set to specific parameters right in the workflow. This are inherently linked to the workflow as you can then just copy the workflow to another
+   Arkitekt instance and it will work out of the box. Some parameters like the `Segmentation Model` of the `Predict Stardist` node are set to be "global parameters" (by clicking the ⬆️ next to parameter,
+   turning it bright red). This means that they will asked as constants when the workflow is run. This is useful if you want to run the same workflow with different parameters (e.g. different segmentatoin
+   models), without having to change the workflow itself.
+
+4. During the creation of the workflow around (2:25) we see the `Predict Stardist` node being configured. Here we can see that the `Segmentation Model` parameter is set to be a global parameter, and that
+    we are changing the "Reserve Params" to manually point to all three segmentor instances that we started in the previous step. This will send out incoming requests in a round robin manner to the three
+    segmentor instances, and will thus distribute the workload evenly between the three instances. *However* in the default configuratoin this will not parallelize the segmentation but rather wait for 
+    the first instance to finish, before sending the next image to the next instance. To enable parallelization, we can go to the "Advanced" tab and set the Map Strategy to "As completed". This will cause
+    Arkitekt to *NOT* wait for the first instance to finish, but send immediately the next image to the next instance. This will cause the three instances to run in parallel, and thus speed up the segmentation
+    n, however this may also cause the images to be segmented in a different order than they were acquired. If you want to make sure that the images are segmented in the same order as they were acquired, you
+    can set the Map Strategy to "Ordered", however this is not the most efficient way to parallelize the segmentation, as potential longer running segmentations will block the pipeline.
+
+:::note On Parallization in Arkitekt
+
+As you can see Arkitekt supports various parellization patterns, each coming with their own advantages and disadvantages. For more information on the different parellization patterns, please refer to the [Advanced Tutorial](/docs/advanced_tutorial/parallelization).
+
+:::
+
+
+## Deployment
+
+To deploy the workflow, click on the "Deploy" button in the Arkitekt Workflow Editor. This will deploy the workflow to your Arkitekt instance. If you want to enable
+the parellization feature and have imported the workflow, please make sure that you have selected all of the participating computers in the "Predict StarDist" node,
+before deploying the workflow.
+
+## Context Preparation
+
+During the creationg of our workflow, we set the Stage parameters of our `Convert Omero` node as a global parameter to our workflow. A few words about what that entails:
+
+A "Stage" is a metadata container provided by Arkitekt, specifically through its Mikro service.
+Its primary purpose is to put acquired data into a relevant biological context.
+
+For instance, in our example, when we capture multiple positions using our microscope, each position is saved as a separate file which  passes as a single item through our workflow. 
+This raises a question: How can we inform Arkitekt that all these files are part of the same multi-position acquisition?
+
+Well that's where the "Stage" comes in. In Arkitekt, a "Stage" is essentially a metadata label that groups positions, helping to recreate, for example, the spatial arrangement of our samples on the microscope.
+And since our files adhere to the OME standard, they contain position information in the OME metadata. By grouping our files by position, we can recreate the spatial arrangement of our samples on the microscope.
+automatically, and on the fly, and we can explore our data in a spatial context, directly from the webinterface. This is also why we gave the "Convert Omero" node a `Position Tolerance` parameter set to 40µm so that
+all motion-correcteed images that share the same position within 40µm will be grouped into the same position on the same stage.
+
+For this to work, we need to create a new `Stage` on the Arkitekt webinterface by going to the `Data` section and clicking on `Create New Stage`. Here we can give our stage a name, which could be 
+the name of multi-well experiment. This now empty stage can be passed as a parameter to our workflow and bthe `Convert Omero` node will use our stage to group all of  passed throug images into 
+the same stage. This will allow us to explore our data in a spatial context, directly from the webinterface.
+
+:::note On Stages
+
+If you are rerunning the workflow on the multi-well sample you won't need to change the stage, as the phyiscal position of the samples will not change. However if you are running the workflow on a different
+sample, or you have moved the sample on the microscope, you will need to create a new stage for the new sample. You can do this by going to the `Data` section and clicking on `Create New Stage`. 
+You can also use the `Create New Stage` node to create a new stage directly from within the workflow.
+
+:::
+
+
+## Reserving and Running the Workflow
+
+Reserve the deployed workflow either on the Arkitekt Workflow interface or on the Dashboard and once all of the Applications are started, Arkitekt should guide you
+on which applications need to be started. Once all of the applications are started, you can start the workflow, through right-click start on the Workflow. During the
+assignment Arkitekt will ask you for the global Parameters that we set in the workflow. 
+
+1. Model: Please choose here the model that we installed in the "Preparations" step. If you have trained your own model, you can also choose that model here.
+
+2. RegExp: This is a regular expression that will be used to filter the files that are found in the "Import Directory". In our case we want to only segment the images
+   that are saved in the TIF format, so we used the regular expression `*.TIF` to only select these files. If you want to segment other files, you can change
+   this regular expression to match your files.
+
+3. Stage: Just select the stage that you created in the "Context Preparation" step. 
+
+
+After assigned you should be shown the Workflow Run interface which will show you the progress of the workflow. 
+It will automatically update as new images are put into the directory on the microscope computer. You can now 
+start the acquisition on the microscope computer and the workflow will automatically start processing the images.
+
+## Results
+
+In addition to the Run Interface which should give you live feedback on the progress of the workflow, you can also use the stage view to explore the results of the workflow.
+Here Positions are shown as they were acquired on the microscope, and you can click on each position to see the results of the segmentation ( if it was already processed)
+
+
+
+
+
+
+
+
 
 
 <details>
@@ -59,31 +243,20 @@ As well as the following plugins installed on your Arkitekt computer:
     <br/>
 
     Acquisition Computer:
-        - Intel Core i7-8700K CPU @ 3.70GHz
-        - 32GB RAM
+        - Intel Xeon CPU E5-2620 v4 @ 2.10GHz
+        - 128GB RAM
         - Nikon Ti2-E Microscope
         - Windows 10
         - Micro-Manager 2.0.1 2023.05.23
         - MikroManager 0.0.1
 
     Analysis Computer
-        - Intel Core i9-8700K CPU @ 3.70GHz
+        - Intel(R) Core(TM) i9-10900KF CPU @ 3.70GHz
         - Ubuntu 22.04
         - Arkitekt Paper Channel
-        - Segmentor Plugin 0.3.1
-        - Stdlib Plugin 0.3.6
+        - Segmentor Plugin 0.3.4
+        - Stdlib Plugin 0.3.9
     
     
   </div>
 </details>
-
-### Installing the Workflows
-
-This workflow is composed of two workflows, with one workflow being nested in the other. The first workflow is the
-`acquire_small` workflow, which is the workflow that will acquire a 20X Image, segment it, detect cluster and send the coordinates
-to the microscope to acquire all clusters with a 40X objective. The second workflow is the `acquire_large` workflow, which is the
-workflow that will run this workflow in a multidimensional acquistions for all position every 30 minutes for 24 hours.
-
-To install these workflows connect this website to you Arkitekt instance and click on the button below:
-
-<DisplayWorkflow flow={interactiveAnalysisFlow}/>

@@ -105,7 +105,7 @@ that the connection is active and listening for requests / red means recordings.
 
 #### Visualizing your data in Napari
 
-To visualize your data in Napari, you can simple search for the "Show on Napari" node, and reserve it in your dashboard. Once you have reserved the node,
+To visualize your data in Napari, you can simple search for the `Show on Napari` node, and reserve it in your dashboard. Once you have reserved the node,
 you can run it directly from the image pane where it will appear in the bottom right corner. If you leave the "show roi layer" on, you should even see 
 the ROIs that you have created in the browser. 
 
@@ -199,7 +199,7 @@ you can run it directly from the image pane where it will appear in the bottom r
 A few words about this process:
 
 1. *Cross Talk*:
-    When calling the `Load Into Imagej` node, MikroJ will download the whole image into memory and share this image with Fiji. This means that you can
+    When calling the `Show on Imagej` node, MikroJ will download the whole image into memory and share this image with Fiji. This means that you can
     close the browser and the image will still be available in Fiji. 
 
 2. *ROIs*:
@@ -208,7 +208,7 @@ A few words about this process:
 
 3. *Alterations*:
     Whatever alterations you make to the image in Fiji, will stay in Fiji. So if you want to save your alterations back to the server, you need to
-    use the `Retrieve from ImageJ` node. More on that in the advanced tutorial.
+    use the `Upload from ImageJ` node. More on that in the advanced tutorial.
 
 
 

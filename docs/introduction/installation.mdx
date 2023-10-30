@@ -123,12 +123,32 @@ If you want to try out the latest features of the platform and the "lessons lear
 
 :::
 
-### Advertising
+## Updating
+
+Once installed, the installer will also act as an updater for the platform. Arkitekt is a rapidly evolving platform and we are constantly
+adding new features and fixing bugs. Updating of the platform is therefore a crucial part of the platform. You are encouraged to update
+your `channel` of the platform regularly to get the latest features and bugfixes. You can update the platform by clicking on the "Danger"
+button in the dashboard interface of the installer, and then selecting `Update`. The installer will then download the latest version of the
+platform images. This might take a while, depending on your internet connection. Once the download is finished, you can then apply the update
+by clicking on the `Start` button. This will cause a "rolling update" of the platform, which means that the platform should update without any
+downtime. If you encounter any problems with the update, please consult the [Troubleshooting section](/docs/troubleshooting/startup) for more information.
+
+:::note About updating
+
+At this early stage of the platform, updating is a crucial part of the platform. We are constantly adding new features and fixing bugs, and
+updating the platform is the only way to get the latest features and bugfixes. The updates in one channel should `always` be backwards compatible
+and your data should be safe. 
+
+:::
+
+
+
+## Advertising
 
 One benefirt of the graphical installer is that it can also advertise the platform on your local network. This means that
 other users and apps can find the platform on your local network and connect to it, without having to know the IP address of your
 machine. You will find the advertisement section in the dashboard interface of the installer. Just click on the "Network" adapters
-that you want to advertise the platform on. When in doubt.
+that you want to advertise the platform on. When in doubt just click on all of them.
 
 :::note About Advertising
 
@@ -139,7 +159,23 @@ of the platform, please consult the [Troubleshooting section](/docs/troubleshoot
 :::
 
 
-## Docker-Compose
+
+
+
+
+
+
+
+
+
+
+## Other installation strategies
+
+Here we will describe other installation strategies that you can use to install the platform. These strategies are not
+recommended for beginners, but might be useful if you want to integrate the platform in a larger infrastructure or if
+you want to participate in the development of the platform.
+
+### Docker-Compose
 
 If you are familiar with docker-compose, you can use the docker-compose configuration to set up the platform. We maintain
 an active repository with the docker-compose configuration that you can find [here](https://github.com/jhnnsrs/arkitekt-server).
@@ -148,16 +184,14 @@ This includes already the configuration for the most common modules of the platf
 the docker-compose configuration, please open an issue in the repository.
 
 
-## Helm Charts
+### Helm Charts
 
 We are currently working on a helm chart that will allow you to install arkitekt on a kubernetes cluster. This will be
-available soon. You can find the repository [here](https://github.com/jhnnsrs/arkitekt-helm). For now, you can use the
+available soon. You will find the repository [here](https://github.com/jhnnsrs/arkitekt-helm). For now, you can use the
 docker-compose configuration to set up the platform on a kubernetes cluster using the [kompose](https://kompose.io/) tool.
 
-## Custom installation
+### Custom installation
 
 From here be dragons. You can find some hints in the  developer section of each module and consult each sub
 modules documentation for more information about the installation of the platform. At this point however you are on your
 own. If you encounter any problems, please open an issue in the respective repository.
-
-

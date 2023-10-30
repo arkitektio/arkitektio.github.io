@@ -9,6 +9,7 @@ import { ShowWorkflow} from "../../../src/components/reaktion/ShowWorkflow";
 import { DisplayWorkflow} from "../../../src/components/reaktion/DisplayWorkflow";
 import { Guard} from "../../../src/components/Guard";
 import acquireSmallWorkflow from './acquire_small.json';
+import multidimensionalWorkflow from './acquire_small.json';
 
 Arkitekt was designed for the increasingly complex real-time microscopy workflows of today.
 To illustrate Arkitekt readiness for `Smart Microscopy`, we deviced this simply no-code example
@@ -52,7 +53,10 @@ and apps.
 This workflow is designed to run on a microscope computer running Windows 10 as well as on a remote analysis computer 
 that will power the Arkitekt platform and the image analysis. To enable GPU acceleration for the Stardist
 segmentation, the analysis computer needs to have access to a CUDA 11 enabled GPU (tested on Nvidia GeforceRTX 2080Ti).
-The microscope computer will need to be connected to thevthe same network as the remote computer.
+The microscope computer will need to be connected to the same network as the remote computer.
+
+
+#### Acquisition Computer
 
 Additionally to run this workflow you will need to have the following installed on your microscope computer:
 
@@ -61,38 +65,34 @@ Additionally to run this workflow you will need to have the following installed 
 
 As well as the following plugins installed on your Arkitekt computer:
 
-- Stdlib Plugin (version 0.3.6) from the repository [https://github.com/jhnnsrs/stdlib](https://github.com/jhnnsrs/stdlib)
-- Segmentor Plugin (version 0.3.1 ) from the repository [https://github.com/jhnnsrs/segmentor](https://github.com/jhnnsrs/segmentor)
+- Stdlib Plugin (>=version 0.3.10) from the repository [https://github.com/jhnnsrs/stdlib](https://github.com/jhnnsrs/stdlib)
+- Segmentor Plugin (>version 0.3.4 ) from the repository [https://github.com/jhnnsrs/segmentor](https://github.com/jhnnsrs/segmentor)
+
+<div className="flex flex-row gap-2">
+  <InstallRepoButton repo="stdlib" user="jhnnsrs" branch="master"/>
+  <InstallRepoButton repo="segmentor" user="jhnnsrs" branch="master"/>
+</div>
 
 
-<details>
-  <summary>Test Environment</summary>
-  <div>
-    This workflow was tested on the following environments:
-    <br/>
+## Installing the Workflows
 
-    Acquisition Computer:
-        - Intel Core i7-8700K CPU @ 3.70GHz
-        - 32GB RAM
-        - Nikon Ti2-E Microscope
-        - Windows 10
-        - Micro-Manager 2.0.1 2023.05.23
-        - MikroManager 0.0.1
+This Smart Microscopy workflow is composed of two smaller workflows, the `Acquire Clusters` workflow and the `Multi Dimensional` workflow.
+In Which the `Acquire Clusters` workflow will be nested in the `Multi Dimensional` workflow.
 
-    Analysis Computer
-        - Intel Core i9-8700K CPU @ 3.70GHz
-        - Ubuntu 22.04
-        - Arkitekt Paper Channel
-        - Segmentor Plugin 0.3.1
-        - Stdlib Plugin 0.3.6
-    
-    
-  </div>
-</details>
+### Acquire Clusters Workflow
 
-### Installing the Workflows
+The `Acquire Clusters` workflow is the workflow that will acquire a 20X Image, segment it, detect cluster and send the coordinates
+to the microscope to acquire all clusters with a 40X objective. To install this workflow connect this website to you Arkitekt instance and click on the Import buttom below:
 
-This workflow is composed of two workflows, with one workflow being nested in the other. The first workflow is the
+<DisplayWorkflow flow={acquireSmallWorkflow}/>
+
+
+
+### Multi Dimensional Workflow
+
+The `Multi Dimensional` workflow is the workflow that will run the above workflow in a multidimensional acquistions for all position every X minutes for X hours.
+
+The first workflow is the
 `acquire_small` workflow, which is the workflow that will acquire a 20X Image, segment it, detect cluster and send the coordinates
 to the microscope to acquire all clusters with a 40X objective. The second workflow is the `acquire_large` workflow, which is the
 workflow that will run this workflow in a multidimensional acquistions for all position every 30 minutes for 24 hours.
@@ -106,3 +106,30 @@ To install these workflows connect this website to you Arkitekt instance and cli
 feel free to explore this graph more interactively in your orkestrator interface</small>
 </div>
 
+
+
+
+<details>
+  <summary>Test Environment</summary>
+  <div>
+    This workflow was tested on the following environments:
+    <br/>
+
+    Acquisition Computer:
+        - Intel Xeon CPU E5-2620 v4 @ 2.10GHz
+        - 128GB RAM
+        - Nikon Ti2-E Microscope
+        - Windows 10
+        - Micro-Manager 2.0.1 2023.05.23
+        - MikroManager 0.0.1
+
+    Analysis Computer
+        - Intel(R) Core(TM) i9-10900KF CPU @ 3.70GHz
+        - Ubuntu 22.04
+        - Arkitekt Paper Channel
+        - Segmentor Plugin 0.3.4
+        - Stdlib Plugin 0.3.9
+    
+    
+  </div>
+</details>

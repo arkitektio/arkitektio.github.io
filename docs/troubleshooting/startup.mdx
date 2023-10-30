@@ -49,13 +49,15 @@ Step Four: The Access
 - [I can't access my server from another computer](#i-cant-access-my-server-from-another-computer)
 
 
-### Docker Installation
+### The basics
+
+#### Docker Installation
 
 Installing Docker has recently become way more straightforward and easy. 
 If you are using Windows or Mac, you can simply download the installer from the [Docker Website](https://www.docker.com/products/docker-desktop). 
 If you are using Linux, you can follow the instructions for your distribution [here](https://docs.docker.com/engine/install/). 
 
-#### Docker on Windows
+##### Docker on Windows
 
 Installing of Docker on Windows has become way easier recently. But it's still the trickiest of all operation systems. 
 And it's not always clear what the problem is. So let's try to figure out what's going on. First things first:
@@ -84,7 +86,9 @@ or something in your system is blocking the installation. Please open an Issue o
 and we will try to help you.
 
 
-### Installing Konstruktor
+### Konstruktor
+
+#### Installing Konstruktor
 
 Konstruktor is a small application based on the [Tauri](https://tauri.app)-Framework, which is still in active development, however we have not encountered any problems with it so far.
 It should work on all major platforms and we have tested the installation with Windows 10, Mac OS and Ubuntu 20.04. If you encounter any issues 
@@ -92,13 +96,13 @@ in the installation please make sure you have the latest version of Konstruktor 
     https://github.com/jhnnsrs/konstruktor/releases/latest/
 ).
 
-### Crashing Konstruktor
+#### Crashing Konstruktor
 
 This is definelty a bug from our side. Please post a screenshot of the crashed application and the error message as an Issue in our Konstruktor [GitHub](
     https://github.com/jhnnsrs/konstruktor/issues
 ). Sorry about that!
 
-### Konstruktor couldn't find Docker
+#### Konstruktor couldn't find Docker
 
 This is a common problem, and it's usually not a problem with Konstruktor, but with your installation of Docker, or because Docker is not running.
 Konstruktor will both tryto interface with your docker instance through the docker cli (command line interface) and through the docker socket. The majority of the
@@ -130,7 +134,7 @@ If all of these steps work, but Konstruktor still can't find docker, please open
 ). Sorry about that!
 
 
-### Couldn't install from Paper channel
+#### Couldn't install from Paper channel
 
 Channels are Konstruktor ways of creating a new deployment. You can think of them as templates. These templates are stored in a GitHub repository, and
 Konstruktor will try to download them from there. In the default configuration, Konstruktor will try to download the templates from the [konstruktor repository](
@@ -138,7 +142,7 @@ Konstruktor will try to download them from there. In the default configuration, 
 ). So make sure you have an internet connection, and that you can access GitHub. If you are behind a firewall, you might need to allow Konstruktor to access the Internet.
 
 
-### Konstruktor couldn't find my GPU
+#### Konstruktor couldn't find my GPU
 
 Konstruktor not being able to detect your GPU is not a problem of it one, your Arkitekt instance should still eb able to run, you **might** just 
 not be able to use GPU accelerated services. This step is just a warning, and you can safely ignore it if you don't need GPU acceleration.
@@ -174,14 +178,18 @@ If you are certain however that you have a GPU installed, and you want to use GP
     https://github.com/jhnnsrs/konstruktor/issues
 )
 
-### Konstruktor showed me an error message
+#### Konstruktor showed me an error message
 
 That sounds like an error on our side. Please open an Issue on our [GitHub](
     https://github.com/jhnnsrs/konstruktor/issues
 ). Sorry about that! You can defintely help us by posting a screenshot of the error message. 
 Sometimes a restart might help!
 
-### I couldn't open the Dashboard of my Deployment
+
+
+### The Deployment
+
+#### I couldn't open the Dashboard of my Deployment
 
 If you can't open the Dashboard of your Deployment, but it appears on the Dashboard of Konstruktor, its probably because 
 there is some file permission errors and Konstruktor can't access the files of your Deployment. This can happen if you are using
@@ -192,13 +200,13 @@ You can fix this by changing the permissions of the files. You can do this by ru
 sudo chown -R $USER:$USER .
 ```
 
-### I couldn't initialize my Deployment
+#### I couldn't initialize my Deployment
 
 The initialization of a Deployment is a very time consuming process. It can take up to 10 minutes, depending on your internet connection and
 hardware. During the initialization, Konstruktor will download all the necessary docker images for your Deployment. This can take a while. So please be patient.
 You should be able to see the progress in the popup window. If you are prompted with an error message. Please let us know !
 
-### I couldn't start my Deployment
+#### I couldn't start my Deployment
 
 After initialization you should be able to start your Deployment. This will take a few seconds and you should slowly see the services turning green.
 However if you are prompted with an error message, please let us know !
@@ -220,7 +228,7 @@ docker daemon to access the internet. If you are using a proxy, you might need t
 
 - Konstruktor can also update your deployment to the latest version. Just click on the `Danger` button in the Dashboard. Which allows you to maintain your deployment.
 
-### I can't see the logs of my Deployment
+#### I can't see the logs of my Deployment
 
 If you want to inspect why an service might be experiencing errors you can check the logs of the service. You can do this by clicking on the service in the Dashboard.
 This will open a popup window with the logs of the service. If no logs appear, your docker socket might be blocked. On a Windows machine, you might need to check if
@@ -241,7 +249,7 @@ docker compose logs $SERVICE_NAME
 
 With service name being the logs of the service you want to inspect. You can find the service name in the `docker-compose.yml` file of your deployment.
 
-### The services of my deployment keep crashing
+#### The services of my deployment keep crashing
 
 That's bad. This can have many reasons. If a service crashes, it will be restarted automatically. If it keeps crashing, it will be restarted a few times, and then
 the deployment will be stopped. You can check the logs of the service to see why it crashed. You can do this by clicking on the service in the Dashboard.

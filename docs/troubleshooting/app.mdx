@@ -7,20 +7,54 @@ sidebar_position: 4
 
 import Image from "@theme/IdealImage";
 
-So you wnat to connect your favourite app to Arkitekt but it doesn't work? Don't worry, we are here to help you. This page will guide you through the process of
-troubleshooting your app and help you find the right solution for your problem.
+So you wnat to connect your favourite app to Arkitekt but it doesn't work? Or you can't install the plugin, and have no idea why it doesn work?
+Don't worry, we are here to help you.
 
 ### General Troubleshooting
 
 First, we are sorry to hear that you are having issue. As an open source project in an early developmental stage, we are aware that there are still many bugs and issues to be fixed. 
 We are working hard to improve the stability of the platform and to fix bugs as soon as possible. Lets get started with some basic troubleshooting if you encounter any
-issues setting your app up. Here is some general 
+issues setting your app up.
 
+### Plugin 
 
+Lets start with the basics. Where did you get stuck? We will guide you through a few checkpoints.
 
+- [I cannot add a repository](#plugin-repository)
+- [I cannot appify a plugin or my repository is empty](#plugin-appify)
+- [I cannot download or install the plugin](#plugin-installation)
 
+#### Plugin Repository
 
-# RESTART EVERYTHING
+If you cannot add a repository, please make sure that you have entered the correct parameters of the repository. The URL should point to a valid git repository. Importantly
+also make sure that the repository is public. Currently we do not support private repositories. Currently the default branch is set to `main`. If you
+are using a different branch, please make sure to enter the branch name in the `Branch` field (e.g. `develop` or the legacy `master`). 
 
-It sounds stupid, but this is easily the easiest fix for most issues. If you encounter any issues, try restarting your App, the "Orkestrator" App and lastly the whole server *in that order*.
-Arkitekt's apps are designed to be stateless, so restarting them should not cause any issues. Your data that was stored on the platform should not be lost.
+#### Plugin Appify
+
+If you cannot appify a plugin, that you have selected in the repository, this is most likely due to the fact that the plugin may not be correctly configured. Please open
+open an issue in the repository of the plugin, and we will try to help you as soon as possible. If you are the developer of the plugin, please make sure that you have
+correctly configured the `manifest.json` file and `deployments.json` file in your ".arkitekt" folder and that it is published to the correct branch. 
+
+#### Plugin Installation
+
+While we are working on a more user friendly installation process, the current installation process is a bit too unintuitive, and we understand
+that it can be confusing. Lets go through the steps together.
+
+1. Validate that you have `Appified` the plugin. If you have not, please follow the steps in the [Appify a Plugin](#plugin-appify) section. If 
+   correctly appified you should see the `App` appear in the `Authorized Apps` section of the plugin page.
+
+2. Check if the docker image of your app was at least once downloaded. This is indicated by the `Last Updated` flag on the App Card. If the image
+   was never downloaded, you will set a "Needs to be downloaded" flag. If this is the case, please click on the `Pull` button on the App Context 
+   Menu. Also a "Deploy" will download the image if it is not present.
+
+3. If you encounter any apparent issues with the download, it is quite likely that the download is still ongoing and you need to wait a bit longer.
+   Currently there is no acurate progress bar or any other indication of the download progress. We are working on this, but for now, please be patient.
+   It can appear after a few minutes.
+
+4. If you feel like something is wrong during the installation you can always download the image directly to your docker instance in a terminal. 
+   To do so, please open a terminal and run the following command: `docker pull <image-name>`. You can find the image name in the `App` card.
+   On refresh the `Last Updated` flag should be set any time now.
+   
+5. If all above steps fail, please open an issue in the repository of the plugin, and we will try to help you as soon as possible. 
+

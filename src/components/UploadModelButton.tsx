@@ -17,7 +17,7 @@ const className = "my-2 p-2 rounded-md text-black text-center w-60 ";
 
 
 export const UploadModelButton = mikroGuarded(
-  ({ url }: { url: string }) => {
+  ({ url, name, kind }: { url: string, name: string, kind: string }) => {
     const { client } = useMikro();
 
     const handleClick = async () => {
@@ -36,7 +36,7 @@ export const UploadModelButton = mikroGuarded(
 
         const { data } = await client.mutate({
           mutation: CREATE_MODEL_ZIP,
-          variables: { name: "Tribolium Model", kind: "TENSORFLOW", data: file},
+          variables: { name, kind, data: file},
         });
 
 
@@ -52,7 +52,7 @@ export const UploadModelButton = mikroGuarded(
             onClick={handleClick}
             className={className + "cursor-pointer bg-yellow-200"}
           >
-            🪄 Install 
+            🪄 Install {name}
           </button>
       </>
     );

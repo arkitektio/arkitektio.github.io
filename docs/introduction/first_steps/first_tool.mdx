@@ -78,7 +78,7 @@ Installation of Plugin Apps is a prettry straightforward process and can be done
   Repository: `omero`
   Branch: `master`
 
-3. Click on the `Add Repository` button.
+3. Click on the `Submit` button.
 
   This will add the repository to the list of available repositories. It should have popped up in your Repository list.
 
@@ -92,7 +92,7 @@ Installation of Plugin Apps is a prettry straightforward process and can be done
 
   Now this is one of the most important steps. This will create a new `App` from the plugin. During this process you will be 
   asked if you trust this app with your (and potential your teams) data, similar to how you trusted the Orkestrator app with your data.
-  This App is trustworthy and we can trust it with our data. So click on "Appify".
+  This App is trustworthy and we can trust it with our data. So click on "Appify". Then Return to the `Plugin Store`.
 
 :::info About Trust
 Trust is a very important concept in Arkitekt. It seats at the core of the entire platform. Only through these elements of trust do
@@ -114,7 +114,9 @@ of course it only happens once.
 The plugin system is still in its early stages. We are working on making this process more streamlined, and we will some 
 default repositories that you can install from. But for now, this is the way to install apps on the Arkitekt server. Also note that the
 "progress" indicator is (even though) functional not really accurate. It will show you the progress of the download, and 
-unzipping. But it will not show you the progress of the actual installation. This is something that we will improve in the future.
+unzipping. But it will not show you the progress of the actual installation. This is something that we will improve in the future. If it
+seems like its freezing or not doing anything, just wait a little bit longer. It will eventually finish. (Sometime a [refresh](/docs/troubleshooting/general_help) of the page 
+can also help).
 :::
 
 ### Why do we go through this hurdles.
@@ -164,7 +166,7 @@ So lets see how we can reserve a node.
 1. Click the `Dashboard` button in the left hand navigation.
 
   The Dashboard is another core view of the Arkitekt platform. It shows you all of your reservations (i.e. reserved functionality/node) that are currently active on the platform
-  (you should see none display right now) and the status of the connected applications (you should now see the omero app in green). It will also show you the status of ongoing tasks 
+  (you should see none display right now) and the status of the connected applications (you should now see the omero app being display). It will also show you the status of ongoing tasks 
   that you have assigned to the platform.
 
 2. Open the `Search Sidebar` by clicking on the `Search` button in the button left corner.
@@ -178,16 +180,17 @@ So lets see how we can reserve a node.
   specific app, do you want to parellize it, do you want to give it a specific name. For now, just leave everything as it is, and click on "Reserve". This will use the "Auto", Scheduler
   and will reserve the node automatically on the first available app.
 
-4. You should now see a new `Reservation` on your dashboard.
+4. You should now see a new `Reservation` on your dashboard under the "This app uses" section.
 
-  Congratulations, you have now reserved your first node. You have  told Arkitekt that you want to use the "Convert Omero" node, and Arkitekt will inform you when it is ready to use.
+  Congratulations, you have now reserved your first node. You have told Arkitekt that you want to use the "Convert Omero" node, and Arkitekt will inform you when it is ready to use.
   It should now appear green in your dashboard. If you click on it, you can see some more information about the reservation, and you can also cancel/`unreserve` it if you want to. But
   for now, lets leave it as it is.
 
 :::info Why Reservations
 
 You might ask yourself, why do we need to reserve nodes? Why can't we just use them? Well, this is a highly involved topic and hopefully we will be able to explain it in more detail in the 
-design section of this documentation. In short they help Arkitekt keep track of the dependencies of your later workflows.. For now, just rest assured that you only have to reserve nodes *once*, Arkitekt will keep track of them until you say otherwise.
+design section of this documentation. In short they help Arkitekt keep track of the dependencies of your function and later our workflows.. For now, just rest assured that you only have to reserve nodes *once*,
+Arkitekt will keep track of them until you tell it otherwise.
 
 :::
 ## Convert a file

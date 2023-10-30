@@ -37,8 +37,8 @@ const ImportButton = ({flow, blockImport}: { flow: FlowFragment, blockImport?: b
       const flownodes = flownodes_to_nodes(nodes_to_flownodes(flow.graph.nodes));
       const flowedges = flowedges_to_edges(edges_to_flowedges(flow.graph.edges));
       let graphInput =  {
-        nodes: flownodes,
-        edges: flowedges,
+        nodes: flownodes.filter(notEmpty).map(noTypename),
+        edges: flowedges.filter(notEmpty).map(noTypename),
         globals: flow.graph.globals.filter(notEmpty).map(noTypename),
         args: flow.graph.args.filter(notEmpty).map(noTypename),
         returns: flow.graph.returns.filter(notEmpty).map(noTypename),
