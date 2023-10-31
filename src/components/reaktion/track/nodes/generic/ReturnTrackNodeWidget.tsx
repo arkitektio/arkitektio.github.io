@@ -44,5 +44,5 @@ export const ReturnTrackNodeWidget: React.FC<ReturnNodeProps> = withLayout(
         ))}
       </>
     );
-  }
+  },
 );

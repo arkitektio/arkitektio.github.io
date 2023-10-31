@@ -4,12 +4,12 @@ import { SidebarProps } from "./types";
 import { ArkitektNodeData, FlowNode } from "../../types";
 
 export const ArkitektTrackNodeSidebar = (
-  props: SidebarProps<FlowNode<ArkitektNodeData>>
+  props: SidebarProps<FlowNode<ArkitektNodeData>>,
 ) => {
   const { runState, run } = useTrackRiver();
 
   const latestEvent = runState?.events?.find(
-    (e) => e?.source === props.node.id
+    (e) => e?.source === props.node.id,
   );
 
   return (

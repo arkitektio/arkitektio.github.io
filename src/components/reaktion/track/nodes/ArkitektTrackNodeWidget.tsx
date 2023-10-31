@@ -84,5 +84,5 @@ export const ArkitektTrackNodeWidget: React.FC<ArkitektNodeProps> = withLayout(
         )}
       </NodeTrackLayout>
     );
-  }
+  },
 );

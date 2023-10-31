@@ -13,10 +13,8 @@ import {
 } from "./api";
 import { FlowEdge, FlowNode } from "./types";
 
-
-
 export const flussPortChildToStreamItem = (
-  port: PortChildFragment
+  port: PortChildFragment,
 ): StreamItemChild => {
   return {
     kind: port.kind,
@@ -48,9 +46,8 @@ export const globalArgKey = (id: string, key: string) => {
   return `${id}.${key}`;
 };
 
-
 export function notEmpty<TValue>(
-  value: TValue | null | undefined
+  value: TValue | null | undefined,
 ): value is TValue {
   if (value === null || value === undefined) return false;
   return true;
@@ -70,7 +67,7 @@ export function noTypename<T extends { [key: string]: any }>(obj: T): T {
 
 export function keyInObject(
   key: string,
-  obj: any
+  obj: any,
 ): obj is {
   [key: string]: any;
 } {
@@ -78,7 +75,7 @@ export function keyInObject(
 }
 
 export const nodes_to_flownodes = (
-  nodes: (FlowNodeFragment | null | undefined)[] | null | undefined
+  nodes: (FlowNodeFragment | null | undefined)[] | null | undefined,
 ): FlowNode[] => {
   const nodes_ =
     nodes
@@ -106,7 +103,7 @@ export const nodes_to_flownodes = (
 };
 
 export const edges_to_flowedges = (
-  edges: FlowFragment["graph"]["edges"]
+  edges: FlowFragment["graph"]["edges"],
 ): FlowEdge[] => {
   const flowedges =
     edges
@@ -156,13 +153,13 @@ export const flownodes_to_nodes = (nodes: FlowNode[]): NodeInput[] => {
           } = node;
           const node_: NodeInput = {
             outstream: outstream?.map((s) =>
-              s ? s.filter(notEmpty).map(noTypename) : []
+              s ? s.filter(notEmpty).map(noTypename) : [],
             ) || [[]], //InputType do not have a __typename
             constream: constream?.map((s) =>
-              s ? s.filter(notEmpty).map(noTypename) : []
+              s ? s.filter(notEmpty).map(noTypename) : [],
             ) || [[]], //
             instream: instream?.map((s) =>
-              s ? s.filter(notEmpty).map(noTypename) : []
+              s ? s.filter(notEmpty).map(noTypename) : [],
             ) || [[]], //
             id,
             position: { x: position.x, y: position.y },
@@ -216,7 +213,7 @@ export const flowedges_to_edges = (flowedges: FlowEdge[]): EdgeInput[] => {
 };
 
 export const flowglobals_to_globals = (
-  globals: (GlobalFragment | null | undefined)[] | null | undefined
+  globals: (GlobalFragment | null | undefined)[] | null | undefined,
 ): GlobalInput[] => {
   const edges =
     globals

@@ -12,16 +12,15 @@ Arkitekt's client SDK is designed to be used in a declarative and functional way
 and composability. This means that a lot of functionality is provided through functions rather than through classes.
 Like this we hope that the SDK fits right in with the python ecosystem and patterns of the scientific python developer.
 
-When using Arkitekt in the classic way you will therefore mostly use functions to interact with the backend. The only 
-exceptions to this are the Arkitekt `App`, which encapsulates all of the stateful logic that needs to be managed (e.g. 
-authentication, waiting for assignemnts from the server, etc.). This App object is highly configurable and can be 
+When using Arkitekt in the classic way you will therefore mostly use functions to interact with the backend. The only
+exceptions to this are the Arkitekt `App`, which encapsulates all of the stateful logic that needs to be managed (e.g.
+authentication, waiting for assignemnts from the server, etc.). This App object is highly configurable and can be
 adjusted to fit your exact configuration need by using different builders (more on this later).
-
 
 ```python
 from arkitekt import easy
 
-app = easy("your_app_name", "your_app_version")
+app = easy("your_app_name", version="your_app_version")
 
 with app:
     # do stuff with arkitekt
@@ -38,12 +37,12 @@ A few words about this setup:
    arkitekt to mostly autoconfigure itself. This means that it will try to discover and connect
    to the backend automatically and will authenticate the user and the app through opening a browser
    window. Depending on your user environment you can also use different builders like the `jupy`
-   builder to ehanve arkitekt for use in a jupyter notebook.
+   builder to enhance arkitekt for use in a jupyter notebook.
 2. Arkitekt relies on the concept of an application context. This is a context manager that
    is used to manage the lifecycle of the application (e.g setup connections to the backend
    and tear down these connections). This is used to ensure that the
    application is properly closed when it is no longer needed.
-3. Within this context, you can use the `app` object to access the various services that
+3. Within this context, you can use the `app` object to access the various modules and services that
    Arkitekt provides. These services are available as attributes on the `app` object.
    For example, to access the `Fakts` (for example to inspect the configration) service, you can use `app.fakts`.
 4. The context manager also sets some context specific variables (contextvars).
@@ -61,7 +60,7 @@ A few words about this setup:
     app = easy()
 
     with app:
-        image = from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"])) # stores the xarray on the mikro instance of the governing app context
+        image = from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="image name") # stores the xarray on the mikro instance of the governing app context
    ```
 
    :::note

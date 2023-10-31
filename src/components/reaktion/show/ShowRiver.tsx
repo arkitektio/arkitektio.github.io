@@ -35,10 +35,10 @@ export type Props = {
 
 export const ShowRiver: React.FC<Props> = ({ flow }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(
-    nodes_to_flownodes(flow.graph?.nodes)
+    nodes_to_flownodes(flow.graph?.nodes),
   );
   const [edges, setEdges, onEdgesChange] = useEdgesState(
-    edges_to_flowedges(flow.graph?.edges)
+    edges_to_flowedges(flow.graph?.edges),
   );
 
   return (

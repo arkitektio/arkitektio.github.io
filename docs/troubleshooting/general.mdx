@@ -1,6 +1,6 @@
 ---
 id: general
-title: Help! 
+title: Help!
 sidebar_label: General Help
 sidebar_position: 1
 ---
@@ -8,7 +8,7 @@ sidebar_position: 1
 import Image from "@theme/IdealImage";
 import turn from "./turn.jpeg";
 
-First, we are sorry to hear that you are having issue. As an open source project in an early developmental stage, we are aware that there are still many bugs and issues to be fixed. 
+First, we are sorry to hear that you are having issue. As an open source project in an early developmental stage, we are aware that there are still many bugs and issues to be fixed.
 We are working hard to improve the stability of the platform and to fix bugs as soon as possible. Lets get started with some basic troubleshooting if you encounter any
 issues when using the platform or one of the apps.
 
@@ -25,19 +25,19 @@ But first, allow us some general words about effective troubleshooting, with Ark
 
 ## Reload!, Restart!, Restart!
 
-<Image img={turn}/>
+<Image img={turn} />
 
-
-Arkitekt is a complex system with many different components. It is not always easy to find the source of a problem, but like a lot of errors in computer 
+Arkitekt is a complex system with many different components. It is not always easy to find the source of a problem, but like a lot of errors in computer
 science, the most likely scenarious is some weird state, that no-one anticipated. This is especially true for Arkitekt, as it is still in stages of development
-and some of the components are still in alpha or beta stage. But luckily we decided to design the core of Arkitekt in a way, so that resetting the system, to 
+and some of the components are still in alpha or beta stage. But luckily we decided to design the core of Arkitekt in a way, so that resetting the system, to
 a clean state is as easy as possible and won't cause to much harm.
 
 So, if you encounter any problems, the first thing you should try is to restart the smallest possible part of the system.
-- If you have a problem with a specific app, try to restart the app. 
-- If its a plugin, try to restart the plugin. 
+
+- If you have a problem with a specific app, try to restart the app.
+- If its a plugin, try to restart the plugin.
 - If the scheduling of a workflow goes wrong, try to restart the scheduler.
-- If you have a problem with the interface, try to **reload** or restart the interface. 
+- If you have a problem with the interface, try to **reload** or restart the interface.
 - And lastly if you have a problem with the server, try to restart the server.
 
 If you are not sure, what part of the system is causing the problem, the server should be your last resort. The Arkitekt server platform
@@ -51,39 +51,22 @@ Restart the smallest possible part of the system, that might cause the problem. 
 
 :::info But what about my Data
 
-The Arkitekt server platform is designed to be stateless. This means, that all data and state is stored in the database and the filesystem and not in the server itself. So even in the worst case 
-scenario, where you have to restart the server, you shouldn't loose any data. 
+The Arkitekt server platform is designed to be stateless. This means, that all data and state is stored in the database and the filesystem and not in the server itself. So even in the worst case
+scenario, where you have to restart the server, you shouldn't loose any data.
 
 :::
 
-
-## Update! 
-
+## Update!
 
 Arkitekt is constantly evolving and receiving updates. We are working hard to improve the stability of the platform and to fix bugs as soon as possible.
 So if you encounter any problems, the first thing you should try is to update the platform to the latest version. This version might already contain a fix for your problem.
 Importantly this also applies to the apps. If you encounter any problems with an app, you should always check if there is a newer version available.
 You can find information about how to update the platform and the apps in the [installation section](/docs/introduction/installation#updating).
 
-
 It is important to note, that the Arkitekt server platform and the Arkitekt Desktop Interface are two different components and are updated separately. So if you encounter any problems with the interface,
 you should have a look at the [Orkestrator](https://github.com/jhnnsrs/orkestrator/releases).
 
-
-
 :::info But I am already on the latest version
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### About Rekuest and Apps
 

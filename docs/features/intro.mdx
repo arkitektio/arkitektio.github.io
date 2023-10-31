@@ -6,11 +6,11 @@ sidebar_position: 1
 ---
 
 import Image from "@theme/IdealImage";
-import thumbnail from './docker_gpu.png';
+import thumbnail from "./docker_gpu.png";
 
 # Arkitekt and the GPU
 
-Quite a lot of modern image analysis tools, especially those based on deep learning, are designed to run on GPUs. Arkitekt aims 
+Quite a lot of modern image analysis tools, especially those based on deep learning, are designed to run on GPUs. Arkitekt aims
 to make it easy to use these tools, and to make it easy to run them on GPUs. However there are a few things to be aware of, as
 Arkitekt is not a magical solution to all GPU problems.
 
@@ -22,8 +22,7 @@ You can then just connect this tool like any other tool, and Arkitekt will run i
 
 The second way is to use the GPU support built into Arkitekt itself. This is the case when the tool is designed to run inside Arkitekt as a PluginApp. See more
 in the [developer](/docs/developer) section on how to build an Arkitekt plugin. Here Arkitekt uses the docker support system to run the plugin in a docker container
-within the Arkitekt server.  
-
+within the Arkitekt server.
 
 <div className="mt-2 w-20">
 <Image img={thumbnail} />
@@ -36,7 +35,7 @@ and request GPU access from the underlying service (docker engine). This </small
 
 # GPU Support on Windows
 
-Luckily the easy of integration of the CUDA support into docker containers has gotten **a lot** easier in the last two years. 
+Luckily the easy of integration of the CUDA support into docker containers has gotten **a lot** easier in the last two years.
 Windows users will no longer need to install the NVIDIA Container Toolkit, but can instead use the WSL2 backend of Docker Desktop.
 The installation instructions for this can be found [here](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#installing-nvidia-drivers).
 

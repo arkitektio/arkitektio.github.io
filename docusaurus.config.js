@@ -40,10 +40,10 @@ const config = {
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.svg",
   markdown: {
-    mermaid: true
+    mermaid: true,
   },
 
-  themes: ['@docusaurus/theme-live-codeblock', '@docusaurus/theme-mermaid'],
+  themes: ["@docusaurus/theme-live-codeblock", "@docusaurus/theme-mermaid"],
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -80,15 +80,16 @@ const config = {
     [
       "@edno/docusaurus2-graphql-doc-generator",
       { ...graphqlMarkdownConfig, ...flussConf, id: "fluss" },
-    ],[
-        '@docusaurus/plugin-ideal-image',
-        {
-          quality: 90,
-          max: 2000, // max resized image's size.
-          min: 640, // min resized image's size. if original is lower, use that size.
-          steps: 3, // the max number of images generated between min and max (inclusive)
-          disableInDev: false,
-        },
+    ],
+    [
+      "@docusaurus/plugin-ideal-image",
+      {
+        quality: 90,
+        max: 2000, // max resized image's size.
+        min: 640, // min resized image's size. if original is lower, use that size.
+        steps: 3, // the max number of images generated between min and max (inclusive)
+        disableInDev: false,
+      },
     ],
   ],
 
@@ -101,15 +102,13 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/jhnnsrs/doks/edit/master/",
+          editUrl: "https://github.com/jhnnsrs/doks/edit/master/",
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/jhnnsrs/doks/edit/master/",
+          editUrl: "https://github.com/jhnnsrs/doks/edit/master/",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),

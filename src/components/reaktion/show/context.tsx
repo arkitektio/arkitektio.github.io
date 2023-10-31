@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
-import { FlowFragment, GlobalFragment } from "../../fluss/api/graphql";
-import { ReserveState } from "../types";
+import { FlowFragment } from "../api";
 
 export type ShowRiverContextType = {
   flow?: FlowFragment | null;

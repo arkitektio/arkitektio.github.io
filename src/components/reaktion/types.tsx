@@ -87,7 +87,7 @@ export type CommonNode = FlowNodeCommonsFragment;
 
 export type Connector<
   X extends FlowNodeCommonsFragment = FlowNodeCommonsFragment,
-  Y extends FlowNodeCommonsFragment = FlowNodeCommonsFragment
+  Y extends FlowNodeCommonsFragment = FlowNodeCommonsFragment,
 > = (options: {
   params: Connection;
   sourceNode: FlowNode<X>;

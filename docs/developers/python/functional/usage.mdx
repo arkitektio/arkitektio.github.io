@@ -21,13 +21,14 @@ run the following command.
 <div className="mt-2"></div>
 
 If you dont see the following output, then you need to go back and install arkitekt. If you are still not greeted by
-the CLI, try to install arkitekt in a new virtual environment (conda or venv) and try again. 
+the CLI, try to install arkitekt in a new virtual environment (conda or venv) and try again.
 
 ## Creating a new app
 
 Now that things are setup correctly, lets create a new app. To do this, we will run the following command.
 
 Create a new folder for your app, which we will call `demo` and then navigate into it.
+
 ```bash
 mkdir demo
 cd demo
@@ -42,7 +43,6 @@ arkitekt init
 This will launch the arkitekt CLI and ask you a few questions about your app. Don't worry, you can always change
 these settings later. For now, lets just use what the CLI suggests.
 
-
 <Terminal src={"/casts/first.cast"} />
 
 ### What just happened?
@@ -51,13 +51,11 @@ Arkitekt jsut initialized a new app for you. If you inspect the folder you will 
 has been created as well as a new folder called `.arkitekt`. Lets briefly go over what these files are and what they
 are used for.
 
-
-
 ### The .arkitekt folder
 
-The `.arkitekt` folder is a folder that contains information about your app. Most Importantly, it contains the 
+The `.arkitekt` folder is a folder that contains information about your app. Most Importantly, it contains the
 manifest for your app, which is a file that contains information about your app, such as its name, version, and entrypoint,
-but also information about which rights your app needs to run, and how it should be built and deployed. This manifest is a 
+but also information about which rights your app needs to run, and how it should be built and deployed. This manifest is a
 crucial part of your app, and you should not delete it. You can read more about the manifest in the manifest section.
 
 Lets look at the manifest that was created for us, if you chose the `filter` template:
@@ -68,7 +66,7 @@ entrypoint: app
 identifier: demo
 requirements: []
 scopes:
-- read
+  - read
 version: 0.0.1
 ```
 
@@ -81,8 +79,6 @@ You will also note that the ".arktiekt" folder containts some additional files s
 These files are used to prevent git and docker from including cached secrests (such as accesstokens) in your git repository
 or docker image. You should not delete these files, as they are crucial for the security of your app.
 
-
-
 :::info I dont see the .arkitekt folder
 
 By default, the `.arkitekt` uses the "." prefix, to hide it from the file explorer on your computer. This is a common
@@ -92,15 +88,12 @@ show hidden files by default, and you can always use the terminal to navigate in
 
 :::
 
-
 ### The app.py file
 
 The app.py file is the entrypoint for your app. When you run your app, this is the file that will be executed.
 Arkitekt will import this file and register all of the functions that are defined (and decorated) with your arkitekt
-instance, enabling them as nodes. You can imaging the app.py file as the "main" file of your app, for all things 
-"arkitekt" related. 
-
-
+instance, enabling them as nodes. You can imaging the app.py file as the "main" file of your app, for all things
+"arkitekt" related.
 
 Lets take a look at the app.py file that was created for us, if you chose the `filter` template:
 
@@ -143,7 +136,7 @@ from mikro.api.schema import RepresentationFragment, from_xarray
 
 First we import the `register` decorator from the arkitekt package. This is the decorator that we will use to register
 our functions with the arkitekt instance. We also import the `RepresentationFragment` and `from_xarray` functions from
-the mikro package (which will help us interact with the Mikro service on the connected instance).  Calling `from_xarray` will create a new representation/image from any xarray or numpy object.
+the mikro package (which will help us interact with the Mikro service on the connected instance). Calling `from_xarray` will create a new representation/image from any xarray or numpy object.
 
 ```python
 @register
@@ -188,40 +181,41 @@ along the z-axis. We then create a new Image on the platform from the calculated
 function. (Note that we are also adding a prefix to the name of the image, to make it easier to distinguish between the input
 and output images)
 
-
 :::info Why Representation Fragment?
 
 If you are wondering why our image is called a `RepresentationFragment` and not just an image, please read the [mikro](https://mikro.dev)
 and graphql sections of the docs. But in short, a `RepresentationFragment` is a representation of an image that is stored
 on a mikro instance. It contains information about the image, such as its name, description, and data. Besides the data,
 it also contains a "fragment" of metadata from all of the metadata that is associated with the image. The nomenclature is
-a bit confusing, and we *will definetly* change it in the future, but for now, just think of it as an image.
+a bit confusing, and we _will definetly_ change it in the future, but for now, just think of it as an image.
 
 :::
 
 :::note A few things to note
 
--  The app.py file should **NOT** contain any code that is being executed when the file is imported. It should rather
-   contain a collection of function that are being registered with the arkitekt instance. If you have code that is being
-   executed when the file is imported, it will be executed every time a user runs your app (or you run and change your
-   file in dev mode
+- The app.py file should **NOT** contain any code that is being executed when the file is imported. It should rather
+  contain a collection of function that are being registered with the arkitekt instance. If you have code that is being
+  executed when the file is imported, it will be executed every time a user runs your app (or you run and change your
+  file in dev mode
 
-   Ok:
-   ```python
-   if __name__ == "__main__":
-      print("Hello World") # will only be executed when the file is run directly
-   ```
-   Not ok:
-   ```python
-   print("Hello World") # will be executed every time the file is imported
-   ```
+  Ok:
 
--  The app.py should **NOT** contain an app instance (e.g. when calling `easy("app", "version")`), as this will be
-   created by the arkitekt CLI when you run your app. 
+  ```python
+  if __name__ == "__main__":
+     print("Hello World") # will only be executed when the file is run directly
+  ```
+
+  Not ok:
+
+  ```python
+  print("Hello World") # will be executed every time the file is imported
+  ```
+
+- The app.py should **NOT** contain an app instance (e.g. when calling `easy("app", "version")`), as this will be
+  created by the arkitekt CLI when you run your app.
 
 :::
 
-
 ## Running Demo
 
-Now that we have created our app, lets run it. Lets start by running it in dev mode.  Follow on to the next section.
+Now that we have created our app, lets run it. Lets start by running it in dev mode. Follow on to the next section.

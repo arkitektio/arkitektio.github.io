@@ -5,12 +5,9 @@ sidebar_position: 3
 ---
 
 import { DownloadGrid } from "../../src/components/layout/Button";
-import Image from '@theme/IdealImage';
-import thumbnail from './installer.png';
-import installation from './installation.webm';
-
-
-
+import Image from "@theme/IdealImage";
+import thumbnail from "./installer.png";
+import installation from "./installation.webm";
 
 ## Before we start
 
@@ -28,31 +25,30 @@ The core strategies of the installation process are:
   will guide you through the installation and install the most common modules of the platform.
 
 - **Docker-Compose**, this strategy includes a docker-compose configuration that sets up the platform
-  exposing you to some decent amount of configuration options. This is the recommended way to install 
+  exposing you to some decent amount of configuration options. This is the recommended way to install
   arkitekt if you want to participate in the development of the platform, or if you want to integrate
   it in a larger infrastructure of your lab or institute that is powered by docker-compose.
 
 - **Helm Charts ** (coming soon), this strategy includes a helm chart that sets up the platform
   exposing you on a kubernetes cluster.
 
-:::note Where to install 
+:::note Where to install
 
-The Arkitekt platform was designed as a multi-user platfrom that gets installed *once* on a **powerful** server and then
+The Arkitekt platform was designed as a multi-user platfrom that gets installed _once_ on a **powerful** server and then
 can be accessed by multiple users and apps, on standard hardware. However it is also possible to install the platform on your own computer and
 use it as a `personal` platform. As long as not all safety features are implemented and audited, we recommend to use the platform
-in the latter way. We'll keep you posted, when we think the platform is safe ready for multi-user installations! 
+in the latter way. We'll keep you posted, when we think the platform is safe ready for multi-user installations!
 
 :::
 
-
-## System Requirements 
+## System Requirements
 
 The arkitekt platform is designed to run on a variety of different hardware and different operating systems.
 However as a quite involved platform that is at the moment not heavily optimized to run on low-end hardware,
 we recommed to not install Arkitekt on a machine with less than **16GB of RAM** and a **decent modern CPU (i7 or i9)** while
-reserving  **at least 50GB of free disk space** on a **SSD drive**.
+reserving **at least 50GB of free disk space** on a **SSD drive**.
 While it is perfectly possible to run the platform on a machine with less resources (indeed it works on a Raspberry Pi 4),
-especially the transfer of large amounts of data will be slow and the platform will be sluggish. 
+especially the transfer of large amounts of data will be slow and the platform will be sluggish.
 
 If you want to use Arkitekt with GPU enabled (deep learning modules), we also recommend to have a **CUDA 11** enabled **Nvidia GPU** with at least
 **8GB of VRAM**. If you want to use the GPU for training, we recommend to have at least **16GB of VRAM**.
@@ -75,44 +71,45 @@ consult the [Troubleshooting section](/docs/troubleshooting/startup) for more in
 Arkitekt is currently build for the x86-64 architecture. This means that it will run in an **emulated mode** on Apple Silicon. This emulated mode
 while functional is not optimized for performance and will be slower than on a native x86-64 machine. We are currently in the midst of transitioning
 our services also to other architectures and will provide native support for Apple Silicon in the future. For now we highly recommend to use a
-Windows or Linux machine to run Arkitekt. 
+Windows or Linux machine to run Arkitekt.
 
 :::
 
-
 ## Graphical installer (recommended)
-
 
 <Image img={thumbnail} />
 
-Arkitekts installer  and admin interface ( once installed) will guide you through the installation process and the deployment of the  platform on your specific hardware.
-Once installed it will serves simple desktop app that  additionaly acts as an updater, as well as and admin interface to the platform and allows you to **start** and **stop** the platform. 
+Arkitekts installer and admin interface ( once installed) will guide you through the installation process and the deployment of the platform on your specific hardware.
+Once installed it will serves simple desktop app that additionaly acts as an updater, as well as and admin interface to the platform and allows you to **start** and **stop** the platform.
 Additionaly it will act as a beacon that advertises the platform on your local network, so that other users can find it.
 
 Go ahead and download our installer for your operating system "Konstruktor" , and follow the instructions:
 
-<DownloadGrid/>
-
-
-
+<DownloadGrid />
 
 Konstruktor necessitates the installation of a container runtime (Docker) on the machine where you want to install arkitekt.
 If you don't have docker installed, you can download it from [here](https://www.docker.com/products/docker-desktop). Docker
-is available for Windows, Mac and Linux and is the sole outside dependency of the arkitekt platform. You do *not* need to create 
-a docker acount in order to use it for Arkitekt. Please check out the FAQ section for more information about the installation of 
+is available for Windows, Mac and Linux and is the sole outside dependency of the arkitekt platform. You do _not_ need to create
+a docker acount in order to use it for Arkitekt. Please check out the FAQ section for more information about the installation of
 docker especially when you are seeking to use GPU support on your machine.
 
-
-<video autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
-  <source src={installation}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={installation} />
 </video>
 
 <div className="text-gray-400 mb-2">
-<small>A quick runthrough the Arkitekt isntallation. Konstruktor needs the docker runtime to be installed beforehand to properly
-function.</small>
+  <small>
+    A quick runthrough the Arkitekt isntallation. Konstruktor needs the docker
+    runtime to be installed beforehand to properly function.
+  </small>
 </div>
-
-
 
 :::note About Channels
 
@@ -137,11 +134,9 @@ downtime. If you encounter any problems with the update, please consult the [Tro
 
 At this early stage of the platform, updating is a crucial part of the platform. We are constantly adding new features and fixing bugs, and
 updating the platform is the only way to get the latest features and bugfixes. The updates in one channel should `always` be backwards compatible
-and your data should be safe. 
+and your data should be safe.
 
 :::
-
-
 
 ## Advertising
 
@@ -152,22 +147,11 @@ that you want to advertise the platform on. When in doubt just click on all of t
 
 :::note About Advertising
 
-Advertising the platform on your local network is a great way to make it discoverable for other users and apps, and we spent *a lot of time*
+Advertising the platform on your local network is a great way to make it discoverable for other users and apps, and we spent _a lot of time_
 to make this work. It is however not a foolproof method and might not work in all cases. If you encounter problems with the advertisement
 of the platform, please consult the [Troubleshooting section](/docs/troubleshooting/startup) for more information.
 
 :::
-
-
-
-
-
-
-
-
-
-
-
 
 ## Other installation strategies
 
@@ -183,7 +167,6 @@ This includes already the configuration for the most common modules of the platf
 (`git clone --recurse-submodules`) will also include the source code of the platform. If you encounter any problems with
 the docker-compose configuration, please open an issue in the repository.
 
-
 ### Helm Charts
 
 We are currently working on a helm chart that will allow you to install arkitekt on a kubernetes cluster. This will be
@@ -192,6 +175,6 @@ docker-compose configuration to set up the platform on a kubernetes cluster usin
 
 ### Custom installation
 
-From here be dragons. You can find some hints in the  developer section of each module and consult each sub
+From here be dragons. You can find some hints in the developer section of each module and consult each sub
 modules documentation for more information about the installation of the platform. At this point however you are on your
 own. If you encounter any problems, please open an issue in the respective repository.

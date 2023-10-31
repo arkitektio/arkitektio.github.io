@@ -1,17 +1,1 @@
-
-
-
-const RepoInstall = ({ repo }: {repo: string}) => {
-
-
-
-
-
-
-
-
-
-
-
-
-}
+const RepoInstall = ({ repo }: { repo: string }) => {};

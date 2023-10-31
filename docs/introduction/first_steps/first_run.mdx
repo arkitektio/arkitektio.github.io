@@ -4,15 +4,15 @@ sidebar_label: 8. Your first Workflow Run
 sidebar_position: 8
 ---
 
-import Image from '@theme/IdealImage';
-import reserveWorkflow from './reserve_workflow.webm';
-import runWorkflow from './run_analysis.webm';
-import replay from './replay.webm';
-import markRoi from './roi_mark.webm';
-import provenance from './provenance.webm';
+import Image from "@theme/IdealImage";
+import reserveWorkflow from "./reserve_workflow.webm";
+import runWorkflow from "./run_analysis.webm";
+import replay from "./replay.webm";
+import markRoi from "./roi_mark.webm";
+import provenance from "./provenance.webm";
 
 We are finally there, we can run our first workflow. In this section we will run our first workflow, that we designed in the previous section.
-Remember it will take an image , max project it, threshold it and then measure the fraction of the image that is below the threshold, to 
+Remember it will take an image , max project it, threshold it and then measure the fraction of the image that is below the threshold, to
 estimate the fraction of the image that is not covered by cells.
 In this section you will learn:
 
@@ -26,8 +26,15 @@ In this section you will learn:
 
 Lets start by reserving our workflow. For this we will navigate to the `Dashboard` tab. Search our Workflow title (which is now a Node) and right-click on the "Reserve" button. This will reserve our workflow for us.
 
-<video  autoPlay muted loop controls className="rounded rounded-md my-3" width={"100%"}>
-  <source src={reserveWorkflow}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md my-3"
+  width={"100%"}
+>
+  <source src={reserveWorkflow} />
 </video>
 
 Pretty straight forward right? Its the same as reserving a normal node, but now we are reserving a workflow. You will notice however that at the end of the reservation
@@ -37,9 +44,7 @@ A workflow includes nodes, and these nodes are the "dependencies" of the workflo
 and ready to be used. When we reserve a workflow, the `Scheduler` will in turn reserve all the nodes that are part of the workflow. And then it will wait until they are
 available. This is what we see in the "Monitor Page". Here we can see the status of all the nodes that are part of the workflow. And we can see if they are ready to be used (green)
 or not (red). If they are not ready to be used we can click on the node and see why they are not ready to be used. Most of the time this means you have to start or restart
-the linked application. 
-
-
+the linked application.
 
 :::info The Monitor Page
 
@@ -50,15 +55,20 @@ the hope at least.
 
 :::
 
-
 ## Run our analysis
 
-And now we can finally run our analysis. Lets start by navigating to the "Data" tab. Lets use the same image as we used in the previous section. 
+And now we can finally run our analysis. Lets start by navigating to the "Data" tab. Lets use the same image as we used in the previous section.
 
-<video  autoPlay muted loop controls className="rounded rounded-md my-3" width={"100%"}>
-  <source src={runWorkflow}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md my-3"
+  width={"100%"}
+>
+  <source src={runWorkflow} />
 </video>
-
 
 1. Navigate to our data in the `Data` tab
 
@@ -69,7 +79,7 @@ on another day you might need to open the "Home", sidebar and step back one day 
 
 This time in our Action menu we will see a new option. "Analysis Run", this is our first `Workflow Action`. Lets drop on it (or click it).
 
-3. You are prompted with a dialog. 
+3. You are prompted with a dialog.
 
 This dialog is our first encounter with an Arkitekt `Assign` dialog. Here Arkitekt will ask us to confirm the assignment.
 
@@ -87,25 +97,38 @@ linked in your run and can be exported (e.g. in your methods section just like h
 
 :::
 
-
-<video  autoPlay muted loop controls className="rounded rounded-md my-3" width={"100%"}>
-  <source src={replay}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md my-3"
+  width={"100%"}
+>
+  <source src={replay} />
 </video>
 
 <div className="text-gray-400 mb-2">
-<small>When double clicking on the node in replay or live mode in a run, you can inspect the data flowing through the graph. Not to helpful here, but very much so
-in the advanced workflows. </small>
+  <small>
+    When double clicking on the node in replay or live mode in a run, you can
+    inspect the data flowing through the graph. Not to helpful here, but very
+    much so in the advanced workflows.{" "}
+  </small>
 </div>
-
-
 
 ## Lets inspect our image
 
 But lets not only look at our workflow. Just like we did in the previous section, we can also inspect our image. Lets start by clicking on the `Data` tab.
 
-
-<video autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
-  <source src={provenance}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={provenance} />
 </video>
 
 While you click on your image, you will now see that there is derived images that are linked to your image. These are the images that are created throughout the workflow.
@@ -116,6 +139,6 @@ Just explore this datagraph. You can click on the images and inspect them.
 Interestingly there is two types of graphs that are linked to your data. The `Data Graph` and the `Provenance Graph`. The `Data Graph` is the graph that is created through
 interlinking of data by the application itself (e.g. a thresholding algorithm can decide to declare that the thresholded image is a derivative of the original image). The
 `Provenance Graph` is however a graph that is created through keeping track which `Node` task created an image. If you click on the `Provenance` icon you will see a reference
-to the `Assignation` (i.e. the Task) that created that image. And that task will in turn have a reference to the `Workflow Assignation` that created it. 
+to the `Assignation` (i.e. the Task) that created that image. And that task will in turn have a reference to the `Workflow Assignation` that created it.
 
 :::

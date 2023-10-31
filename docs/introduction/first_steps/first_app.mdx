@@ -4,12 +4,12 @@ sidebar_label: 5. Visualize in Napari/Fiji
 sidebar_position: 5
 ---
 
-import Image from '@theme/IdealImage';
-import openNapari from './open_napari.webm';
-import napariVisualize from './napari_visualize.webm';
-import connectImageJ from './connect_imagej.webm';
-import visualizeImageJ from './visualize_imagej.webm';
-import thumbnail from './node_explaination.png';
+import Image from "@theme/IdealImage";
+import openNapari from "./open_napari.webm";
+import napariVisualize from "./napari_visualize.webm";
+import connectImageJ from "./connect_imagej.webm";
+import visualizeImageJ from "./visualize_imagej.webm";
+import thumbnail from "./node_explaination.png";
 
 Every analysis starts with the visualization of our data. And we have a great selection of tools in the bioimage world to help us.
 But how do we get our data into these tools? How do we get our data from our server into Napari or Fiji? Well, we could download it, and then open it in the tool.
@@ -21,28 +21,28 @@ In this section you will learn:
 - How to connect both Napari or Fiji to your Arkitekt server.
 - How to visualize your data in Napari or Fiji.
 
-
 ## Team Napari or Team Fiji?
 
 We love Napari and we love Fiji. And we think that both tools have their place in the bioimage analysis world. So we want to make sure that you can use both tools
 with Arkitekt and together in your workflows. So lets try install them both and see how we can connect them to Arkitekt.
 
-:::note Our darling 
+:::note Our darling
 
 We truly love Napari for data visualization. If you have not tried it yet, you should. It is a great tool and we are sure you will love it too. And a few of the
 features that we will show you here are only available in Napari. So if you are not familiar with Napari yet, we recommend you to give it a try.
 
 :::
+
 ### Napari
 
 First lets see how we can get napari to work with Arkitekt. Napari is our go to choice for large data visualization and can take advantage of all of the [lazy loading](docs/features/lazy_loading)
-capabilities of Arkitekt, so that you can easily visualize terabyte sized datasets. To enable Napari to work with Arkitekt we need to install a plugin. 
+capabilities of Arkitekt, so that you can easily visualize terabyte sized datasets. To enable Napari to work with Arkitekt we need to install a plugin.
 
 #### Installation
 
 To install the Napari bridge plugin for Arkitekt you can choose from two options:
 
-- Install it directly from the [napari plugin store](https://napari-hub.org/plugins/mikro-napari) 
+- Install it directly from the [napari plugin store](https://napari-hub.org/plugins/mikro-napari)
 
   This is the easiest way to install the plugin and works also great with napari prebundled binaries.
   Just follow the instructions on the plugin page, and you should be ready to go.
@@ -72,26 +72,33 @@ use the unbundled version of napari (the "pip" install version.) This recommenda
 
 #### Connecting Napari to Arkitekt
 
-Once you have installed the plugin, you can start Napari and you should see a new button in the left hand navigation called `Provide`. Click on it and you should see 
+Once you have installed the plugin, you can start Napari and you should see a new button in the left hand navigation called `Provide`. Click on it and you should see
 the connection process starting.
 
-<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
-  <source src={openNapari}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={openNapari} />
 </video>
 
 A few words about this connection process:
 
 1. **The Magic Bar**:
-    What you see in the bottom left corner is the `Magic Bar`, a widget provided by the mikro-napari plugin, and the core UI element that allows apps to connect to Arkitekt.
-    While developers can choose to implement their own UI elements to connect to Arkitekt, the MagicBar is a common UI element that is provided by the arkitekt package, and
-    you will encounter it in almost all apps that currently conncan connectect to Arkitekt.
+   What you see in the bottom left corner is the `Magic Bar`, a widget provided by the mikro-napari plugin, and the core UI element that allows apps to connect to Arkitekt.
+   While developers can choose to implement their own UI elements to connect to Arkitekt, the MagicBar is a common UI element that is provided by the arkitekt package, and
+   you will encounter it in almost all apps that currently conncan connectect to Arkitekt.
 2. **The Connection screen**:
-    On initial setup you will see a screen that allows you to connect to your Arkitekt server. If you run Arkitekt locally you will see your instance automatically detected.
-    For remote instances, [advertised](/docs/introduction/installation#advertising) Instances will be automatically detected and should be listed in the dropdown menu. If 
-    your instance is not advertised, you can also enter the URL manually.
-3.  **Login in the Browser**:
-    To connect to your Arkitekt instance, you need to login. This is done in the browser, and you will be redirected to the login page of your Arkitekt instance. Please allow
-    requests to the firewall.
+   On initial setup you will see a screen that allows you to connect to your Arkitekt server. If you run Arkitekt locally you will see your instance automatically detected.
+   For remote instances, [advertised](/docs/introduction/installation#advertising) Instances will be automatically detected and should be listed in the dropdown menu. If
+   your instance is not advertised, you can also enter the URL manually.
+3. **Login in the Browser**:
+   To connect to your Arkitekt instance, you need to login. This is done in the browser, and you will be redirected to the login page of your Arkitekt instance. Please allow
+   requests to the firewall.
 
 :::info Seems familiar?
 
@@ -106,33 +113,36 @@ that the connection is active and listening for requests / red means recordings.
 #### Visualizing your data in Napari
 
 To visualize your data in Napari, you can simple search for the `Show on Napari` node, and reserve it in your dashboard. Once you have reserved the node,
-you can run it directly from the image pane where it will appear in the bottom right corner. If you leave the "show roi layer" on, you should even see 
-the ROIs that you have created in the browser. 
+you can run it directly from the image pane where it will appear in the bottom right corner. If you leave the "show roi layer" on, you should even see
+the ROIs that you have created in the browser.
 
-<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
-  <source src={napariVisualize}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={napariVisualize} />
 </video>
-
-
 
 A few words about this process:
 
-1. *Lazy Loading*:
-    When calling the "Show on Napari" node, not the whole image is downloaded, but we can take the advantage of the lazy loading capabilities of both
-    Arkitekt and Napari to only show you the visible parts.
+1. _Lazy Loading_:
+   When calling the "Show on Napari" node, not the whole image is downloaded, but we can take the advantage of the lazy loading capabilities of both
+   Arkitekt and Napari to only show you the visible parts.
 
-2. *ROIs*:
-    If you have created ROIs in the browser, you can also visualize them in Napari. Just make sure that you have the "Show ROI Layer" option enabled, when
-    assigning the node. Importantly you will notice that if you mark rois on the ROI layer they are *live syncing* with your server and the browser, and
-    potentially other napari instances that are connected to the same server. Neat right?
+2. _ROIs_:
+   If you have created ROIs in the browser, you can also visualize them in Napari. Just make sure that you have the "Show ROI Layer" option enabled, when
+   assigning the node. Importantly you will notice that if you mark rois on the ROI layer they are _live syncing_ with your server and the browser, and
+   potentially other napari instances that are connected to the same server. Neat right?
 
-3. *Alterations*:
-    Whatever alterations you make to the image in Napari, will stay in Napari. So if you want to save your alterations back to the server, you need to
-    use the "Upload to Arkitekt" node. More on that later.
+3. _Alterations_:
+   Whatever alterations you make to the image in Napari, will stay in Napari. So if you want to save your alterations back to the server, you need to
+   use the "Upload to Arkitekt" node. More on that later.
 
-
-
-### Fiji 
+### Fiji
 
 Fiji is a great tool for image analysis and has a huge community of developers and users. So we want to make sure that you can use Fiji with Arkitekt as well.
 However Fiji is a Java tool and our core team is not very familiar with Java. So we have not yet developed a Fiji plugin. But because of the great community
@@ -144,22 +154,26 @@ you need to install 🙄 another app on your computer.
 Arkitekt thrives to be a cross-platform solution. However as of now, we cannot provide a Fiji bridge for Mac. This is due to the fact that the PyimageJ package
 does not support Mac. We are working on a solution, but for now, you need to use Napari on Mac. If you are a Java developer and want to help us, please reach out.
 
-
 :::
 
 #### Installation
 
 To connect Fiji to Arkitekt you need to install [MikroJ](https://github.com/jhnnsrs/mikroj), our Fiji wrapping app. MikroJ is a small installable python app, that
-will interface with your Fiji installation and allows us to connect Fiji to Arkitekt. You can find more about the design of MikroJ [here](docs/apps/mikroj). 
+will interface with your Fiji installation and allows us to connect Fiji to Arkitekt. You can find more about the design of MikroJ [here](docs/apps/mikroj).
 
-<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
-  <source src={connectImageJ}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={connectImageJ} />
 </video>
 
-
-
-1.  Just download MikroJ from our [Github page](https://github.com/jhnnsrs/mikroj) and extract it to a folder of your choice. 
-    Then double click on the `MikroJ.exe`file to start the app. Please do **NOT*Ü start your FIJI installation. MikroJ will start Fiji for you.
+1.  Just download MikroJ from our [Github page](https://github.com/jhnnsrs/mikroj) and extract it to a folder of your choice.
+    Then double click on the `MikroJ.exe`file to start the app. Please do \**NOT*Ü start your FIJI installation. MikroJ will start Fiji for you.
     The initial setup can take a few seconds, but once it is done, you should the app screen.
 
 2.  You will see a screen that allows you to both connect to your local Fiji instance and to your Arkitekt instance. Acting as a Bridge.
@@ -176,7 +190,7 @@ will interface with your Fiji installation and allows us to connect Fiji to Arki
 
     :::
 
-4. Optional: Create a shortcut to MikroJ on your desktop. This will allow you to start MikroJ directly from the shortcut.
+4.  Optional: Create a shortcut to MikroJ on your desktop. This will allow you to start MikroJ directly from the shortcut.
 
 If nothing happens after you click on `Initialize ImageJ`, please refer to the [troubleshooting section](/docs/troubleshooting/app).
 
@@ -188,31 +202,29 @@ to the process explained in the Napari section. So we will not go into too much 
 #### Visualizing your data in ImageJ
 
 To visualize your data in ImageJ, you can simple search for the `Load into Imagej` node, and reserve it in your dashboard. Once you have reserved the node,
-you can run it directly from the image pane where it will appear in the bottom right corner. 
+you can run it directly from the image pane where it will appear in the bottom right corner.
 
-<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
-  <source src={visualizeImageJ}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={visualizeImageJ} />
 </video>
-
-
 
 A few words about this process:
 
-1. *Cross Talk*:
-    When calling the `Show on Imagej` node, MikroJ will download the whole image into memory and share this image with Fiji. This means that you can
-    close the browser and the image will still be available in Fiji. 
+1. _Cross Talk_:
+   When calling the `Show on Imagej` node, MikroJ will download the whole image into memory and share this image with Fiji. This means that you can
+   close the browser and the image will still be available in Fiji.
 
-2. *ROIs*:
-    We currently do not support syncing ROIS between Fiji and the Arkitekt Instance automatically. This is defintely on our roadmap, but we have not
-    yet found a good solution. If you have any ideas, please reach out. You can however extract the ROIS on an Image in Fiji through a `Node`.
+2. _ROIs_:
+   We currently do not support syncing ROIS between Fiji and the Arkitekt Instance automatically. This is defintely on our roadmap, but we have not
+   yet found a good solution. If you have any ideas, please reach out. You can however extract the ROIS on an Image in Fiji through a `Node`.
 
-3. *Alterations*:
-    Whatever alterations you make to the image in Fiji, will stay in Fiji. So if you want to save your alterations back to the server, you need to
-    use the `Upload from ImageJ` node. More on that in the advanced tutorial.
-
-
-
-
-
-
-
+3. _Alterations_:
+   Whatever alterations you make to the image in Fiji, will stay in Fiji. So if you want to save your alterations back to the server, you need to
+   use the `Upload from ImageJ` node. More on that in the advanced tutorial.

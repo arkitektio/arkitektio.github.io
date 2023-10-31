@@ -54,7 +54,7 @@ setup:
         # do stuff with arkitekt
    ```
 
-2. Arkitekt relies on the concept of an context manager (that `with` statement). We use 
+2. Arkitekt relies on the concept of an context manager (that `with` statement). We use
    this to manage the lifecycle of the application (e.g setup connections to the backend
    and tear down these connections). With this pattern we can ensure a graceful shutdown
    when it is no longer needed (or when an error occurs)
@@ -133,11 +133,10 @@ setup:
 
     with app:
          # do stuff with arkitekt
-         from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="my-image") 
+         from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="my-image")
 
     from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="my-failed-image")  # will fail
    ```
-
 
 # Lets get started
 
@@ -145,4 +144,4 @@ Now that we have a basic understanding of how Arkitekt works, let's start explor
 We have created a few tutorials to get you started:
 
 - [Storing image data](/docs/developers/python/basics/read-write.md)
-- 
+-

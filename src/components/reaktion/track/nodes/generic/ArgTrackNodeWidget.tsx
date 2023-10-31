@@ -45,5 +45,5 @@ export const ArgTrackNodeWidget: React.FC<ArgNodeProps> = withLayout(
         ))}
       </>
     );
-  }
+  },
 );

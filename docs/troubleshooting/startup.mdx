@@ -10,8 +10,9 @@ import Image from "@theme/IdealImage";
 Puh. We are sorry about that! This is probably the worst case scenario, and one of the hardest to debug. But don't worry, we will get you through this.
 
 ## Before we start
+
 This troubleshooting section will assume you have read the [Getting Started](/docs/introduction) section and have a basic understanding of how Arkitekt works.
-This section will also assume that you are using [Konstruktor](/docs/apps/konstruktor) to start your server. If you are using the docker compose setup, we 
+This section will also assume that you are using [Konstruktor](/docs/apps/konstruktor) to start your server. If you are using the docker compose setup, we
 would kindly ask you to switch to Konstruktor for the time being, and see if you can get it to work there. It will make it easier for us to help you.
 
 :::note Please open an Issue on GitHub
@@ -21,21 +22,23 @@ Every general feedback and improvement notes are always welcome there.
 
 :::
 
-
 Lets start with the basics. Where did you get stuck? We will guide you through a few checkpoints.
 
 Step Zero: The basics
+
 - [I couldn't even install Docker](#docker-installation)
 - [I wasn't able to install `Konstruktor`](#installing-konstruktor)
 - [I started `Konstruktor`, but it crashed immediately](#crashing-konstruktor)
 
 Step One: Konstruktor
+
 - [Konstruktor claimed it couldn't find docker](#konstruktor-couldnt-find-docker)
 - [I coudn't install the "Paper" channel deployment](#couldn't-install-from-paper-channel)
 - [Konstruktor claimed it couldn't find my GPU](#konstruktor-couldnt-find-my-gpu)
 - [Konstruktor showed me an error message](#konstruktor-showed-me-an-error-message)
 
 Step Three: The Deployment
+
 - [I couldn't open the Dashboard of my Deployment](#i-couldnt-open-the-dashboard-of-my-deployment)
 - [I couldn't initialize my Deployment](#i-couldnt-initialize-my-deployment)
 - [I couldn't start my Deployment](#i-couldnt-start-my-deployment)
@@ -45,28 +48,28 @@ Step Three: The Deployment
 - [I couldn't advertise my Deployment](#i-couldnt-advertise-my-deployment)
 
 Step Four: The Access
+
 - [My Deployment is running, but it doesnt appear in Orkestrator](#my-deployment-is-running-but-it-doesnt-appear-in-orkestrator)
 - [I can't access my server from another computer](#i-cant-access-my-server-from-another-computer)
-
 
 ### The basics
 
 #### Docker Installation
 
-Installing Docker has recently become way more straightforward and easy. 
-If you are using Windows or Mac, you can simply download the installer from the [Docker Website](https://www.docker.com/products/docker-desktop). 
-If you are using Linux, you can follow the instructions for your distribution [here](https://docs.docker.com/engine/install/). 
+Installing Docker has recently become way more straightforward and easy.
+If you are using Windows or Mac, you can simply download the installer from the [Docker Website](https://www.docker.com/products/docker-desktop).
+If you are using Linux, you can follow the instructions for your distribution [here](https://docs.docker.com/engine/install/).
 
 ##### Docker on Windows
 
-Installing of Docker on Windows has become way easier recently. But it's still the trickiest of all operation systems. 
+Installing of Docker on Windows has become way easier recently. But it's still the trickiest of all operation systems.
 And it's not always clear what the problem is. So let's try to figure out what's going on. First things first:
 
 - You need to have `Administrator rights` on your computer. If you are using a university computer, you might need to ask your IT department to install Docker for you.
 
 - Docker requires Windows 10 and higher, that means you need to have one of the following Windows versions installed:
-    - Windows 11 64-bit: Home or Pro version 21H2 or higher, or Enterprise or Education version 21H2 or higher.
-    - Windows 10 64-bit: Home or Pro 22H2 (build 19045) or higher, or Enterprise or Education 22H2 (build 19045) or higher.
+  - Windows 11 64-bit: Home or Pro version 21H2 or higher, or Enterprise or Education version 21H2 or higher.
+  - Windows 10 64-bit: Home or Pro 22H2 (build 19045) or higher, or Enterprise or Education 22H2 (build 19045) or higher.
 
 Docker needs to be able to run a `Virtualization` layer on your computer. For this it can use either `Hyper-V` or `Windows Subsystem for Linux 2 (WSL2)`.
 We **strongly recommend** using WSL2, as it is much faster and more stable, and has become the default option for docker.
@@ -79,28 +82,23 @@ wsl --list --verbose
 
 Otherwise you can follow the instructions [here](https://learn.microsoft.com/en-us/windows/wsl/install) to install WSL2.
 
-####  Docker on Mac
+#### Docker on Mac
 
 Installing Docker on Mac is usually pretty straightforward. If you encounter any problems, it's probably because you are using an older Mac,
 or something in your system is blocking the installation. Please open an Issue on our [GitHub](https://github.com/arkitektio/arkitektio.github.io)
 and we will try to help you.
-
 
 ### Konstruktor
 
 #### Installing Konstruktor
 
 Konstruktor is a small application based on the [Tauri](https://tauri.app)-Framework, which is still in active development, however we have not encountered any problems with it so far.
-It should work on all major platforms and we have tested the installation with Windows 10, Mac OS and Ubuntu 20.04. If you encounter any issues 
-in the installation please make sure you have the latest version of Konstruktor installed. You can find the latest version [here](
-    https://github.com/jhnnsrs/konstruktor/releases/latest/
-).
+It should work on all major platforms and we have tested the installation with Windows 10, Mac OS and Ubuntu 20.04. If you encounter any issues
+in the installation please make sure you have the latest version of Konstruktor installed. You can find the latest version [here](https://github.com/jhnnsrs/konstruktor/releases/latest/).
 
 #### Crashing Konstruktor
 
-This is definelty a bug from our side. Please post a screenshot of the crashed application and the error message as an Issue in our Konstruktor [GitHub](
-    https://github.com/jhnnsrs/konstruktor/issues
-). Sorry about that!
+This is definelty a bug from our side. Please post a screenshot of the crashed application and the error message as an Issue in our Konstruktor [GitHub](https://github.com/jhnnsrs/konstruktor/issues). Sorry about that!
 
 #### Konstruktor couldn't find Docker
 
@@ -115,83 +113,68 @@ Try the following steps to debug your docker installation:
 
 2. Check if you have Docker the docker CLI installed and **running**. You can do this by opening a terminal (cmd) and running the following command:
 
-    ```bash
-    docker ps
-    ```
+   ```bash
+   docker ps
+   ```
 
-    If you get an error message, docker is not running. If you get a list of running containers, docker is running.
+   If you get an error message, docker is not running. If you get a list of running containers, docker is running.
 
 3. Check if you can run a docker container. You can do this by running the following command:
 
-    ```bash
-    docker run hello-world
-    ```
+   ```bash
+   docker run hello-world
+   ```
 
-    If you get an error message, docker is not running. If you get a message that the container was started successfully, docker is running.
+   If you get an error message, docker is not running. If you get a message that the container was started successfully, docker is running.
 
-If all of these steps work, but Konstruktor still can't find docker, please open an Issue on our [GitHub](
-    https://github.com/jhnnsrs/konstruktor/issues
-). Sorry about that!
-
+If all of these steps work, but Konstruktor still can't find docker, please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor/issues). Sorry about that!
 
 #### Couldn't install from Paper channel
 
 Channels are Konstruktor ways of creating a new deployment. You can think of them as templates. These templates are stored in a GitHub repository, and
-Konstruktor will try to download them from there. In the default configuration, Konstruktor will try to download the templates from the [konstruktor repository](
-    https://github.com/jhnnsrs/konstruktor
-). So make sure you have an internet connection, and that you can access GitHub. If you are behind a firewall, you might need to allow Konstruktor to access the Internet.
-
+Konstruktor will try to download them from there. In the default configuration, Konstruktor will try to download the templates from the [konstruktor repository](https://github.com/jhnnsrs/konstruktor). So make sure you have an internet connection, and that you can access GitHub. If you are behind a firewall, you might need to allow Konstruktor to access the Internet.
 
 #### Konstruktor couldn't find my GPU
 
-Konstruktor not being able to detect your GPU is not a problem of it one, your Arkitekt instance should still eb able to run, you **might** just 
+Konstruktor not being able to detect your GPU is not a problem of it one, your Arkitekt instance should still eb able to run, you **might** just
 not be able to use GPU accelerated services. This step is just a warning, and you can safely ignore it if you don't need GPU acceleration.
 
 If you are certain however that you have a GPU installed, and you want to use GPU accelerated services, you can try the following steps:
 
-
 1. Make sure you have a GPU installed that supports CUDA. You can find a list of supported GPUs [here](https://developer.nvidia.com/cuda-gpus).
-    Here Nvidia lists the `Computey capability` of each GPU. CUDA 11 supports GPUs with a compute capability of a least 3.5 to 8.x. 
-    So, if you want your GPU to support CUDA 11, it should have at least a compute capability of 3.5. 
-    However, if you're aiming to leverage all features and optimizations provided by CUDA 11, it's preferable to have a newer GPU with a higher compute capability.
-        
+   Here Nvidia lists the `Computey capability` of each GPU. CUDA 11 supports GPUs with a compute capability of a least 3.5 to 8.x.
+   So, if you want your GPU to support CUDA 11, it should have at least a compute capability of 3.5.
+   However, if you're aiming to leverage all features and optimizations provided by CUDA 11, it's preferable to have a newer GPU with a higher compute capability.
 2. Make sure you have the latest NVIDIA drivers installed on your computer. You can find the latest drivers [here](https://www.nvidia.com/Download/index.aspx?lang=en-us).
-    If you are using a laptop, you might need to download the drivers from the website of your laptop manufacturer.
+   If you are using a laptop, you might need to download the drivers from the website of your laptop manufacturer.
 
-3. When checking your GPU, Konstruktor will check if Docker can run a container with the `nvidia/cuda` image. It will *NOT* check your CUDA installation
-   diretly. This means that if you have CUDA installed, but Docker is not running, Konstruktor will still not be able to detect your GPU. The output 
-  of the `nvidia-smi` command inside the docker will be used to detect your GPU. However sometimes this command will fail, even if you have a GPU installed.
-  Just check the LOGS section. If it looks like it detected your GPU correctly, you can safely ignore this warning. But please open an issue on our [GitHub](
-    https://github.com/jhnnsrs/konstruktor/issues) and let us know about it.
+3. When checking your GPU, Konstruktor will check if Docker can run a container with the `nvidia/cuda` image. It will _NOT_ check your CUDA installation
+   diretly. This means that if you have CUDA installed, but Docker is not running, Konstruktor will still not be able to detect your GPU. The output
+   of the `nvidia-smi` command inside the docker will be used to detect your GPU. However sometimes this command will fail, even if you have a GPU installed.
+   Just check the LOGS section. If it looks like it detected your GPU correctly, you can safely ignore this warning. But please open an issue on our [GitHub](https://github.com/jhnnsrs/konstruktor/issues) and let us know about it.
 
-4. Again: You do *NOT* need to install CUDA or CUDNN. Arkitekt Containers utilize the `nvidia/cuda` docker image, which already contains all the necessary libraries.
+4. Again: You do _NOT_ need to install CUDA or CUDNN. Arkitekt Containers utilize the `nvidia/cuda` docker image, which already contains all the necessary libraries.
 
 5. You can also test if your GPU is working correctly by running the following command in a terminal (cmd):
 
-    ```bash
-    docker run --gpus all nvidia/cuda:11.0-base nvidia-smi
-    ```
+   ```bash
+   docker run --gpus all nvidia/cuda:11.0-base nvidia-smi
+   ```
 
-    If you get an error message, you cannot access your GPU. If you get a list of information about your GPU, you can access your GPU :).
+   If you get an error message, you cannot access your GPU. If you get a list of information about your GPU, you can access your GPU :).
 
-6. If Konstruktor claims to have not found your GPU, but you are certain that you have a compatible GPU installed, and you have the latest drivers installed, please open an Issue on our [GitHub](
-    https://github.com/jhnnsrs/konstruktor/issues
-)
+6. If Konstruktor claims to have not found your GPU, but you are certain that you have a compatible GPU installed, and you have the latest drivers installed, please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor/issues)
 
 #### Konstruktor showed me an error message
 
-That sounds like an error on our side. Please open an Issue on our [GitHub](
-    https://github.com/jhnnsrs/konstruktor/issues
-). Sorry about that! You can defintely help us by posting a screenshot of the error message. 
+That sounds like an error on our side. Please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor/issues). Sorry about that! You can defintely help us by posting a screenshot of the error message.
 Sometimes a restart might help!
-
-
 
 ### The Deployment
 
 #### I couldn't open the Dashboard of my Deployment
 
-If you can't open the Dashboard of your Deployment, but it appears on the Dashboard of Konstruktor, its probably because 
+If you can't open the Dashboard of your Deployment, but it appears on the Dashboard of Konstruktor, its probably because
 there is some file permission errors and Konstruktor can't access the files of your Deployment. This can happen if you are using
 Linux and you are running Konstruktor as root. Konstruktor will then create files that are only accessible by root, and you won't be able to access them.
 You can fix this by changing the permissions of the files. You can do this by running the following command in the folder where your Deployment is located.
@@ -214,17 +197,13 @@ However if you are prompted with an error message, please let us know !
 Here are a few things you can try to debug your Deployment:
 
 - If docker complains about occupied ports, you might have another service running on the same port. That blocks the Arkitekt server. If this is
-the case please stop the service and try again. Arkitekt in its default configuration allocates ports 8000, 8010, 8020, 8030, 8040, 8050, 8060, and 8061.
-If one of these ports is blocked the service will not start and you will be prompted with an error message.
+  the case please stop the service and try again. Arkitekt in its default configuration allocates ports 8000, 8010, 8020, 8030, 8040, 8050, 8060, and 8061.
+  If one of these ports is blocked the service will not start and you will be prompted with an error message.
 
 - If docker complains about not being able to pull an image, please check your internet connection. If you are behind a firewall,you might need to allow the
-docker daemon to access the internet. If you are using a proxy, you might need to configure docker to use the proxy. You can find more information about this [here](
-    https://docs.docker.com/network/proxy/
-)
+  docker daemon to access the internet. If you are using a proxy, you might need to configure docker to use the proxy. You can find more information about this [here](https://docs.docker.com/network/proxy/)
 
-- If docker complains about not being able to find an image, please check if you have the latest version of Konstruktor installed. You can find the latest version [here](
-    https://github.com/jhnnsrs/konstruktor
-). If you are using a custom channel, please make sure that the channel is still available. If you are using the default channel, please let us know!
+- If docker complains about not being able to find an image, please check if you have the latest version of Konstruktor installed. You can find the latest version [here](https://github.com/jhnnsrs/konstruktor). If you are using a custom channel, please make sure that the channel is still available. If you are using the default channel, please let us know!
 
 - Konstruktor can also update your deployment to the latest version. Just click on the `Danger` button in the Dashboard. Which allows you to maintain your deployment.
 
@@ -232,8 +211,8 @@ docker daemon to access the internet. If you are using a proxy, you might need t
 
 If you want to inspect why an service might be experiencing errors you can check the logs of the service. You can do this by clicking on the service in the Dashboard.
 This will open a popup window with the logs of the service. If no logs appear, your docker socket might be blocked. On a Windows machine, you might need to check if
-the docker socket is exposed. You can do this by opening the settings of Docker and checking the `Expose daemon on tcp://localhost:2375 without TLS` option. Make sure 
-to restart Docker after you changed the settings. 
+the docker socket is exposed. You can do this by opening the settings of Docker and checking the `Expose daemon on tcp://localhost:2375 without TLS` option. Make sure
+to restart Docker after you changed the settings.
 
 If you still cant see the logs, you can also open the folder of your deployment (by clicking on the deployment name in the dashboard), and run the following command in a terminal (cmd),
 with the current working directory being the folder of your deployment:
@@ -241,8 +220,9 @@ with the current working directory being the folder of your deployment:
 ```bash
 docker compose logs
 ```
-or 
-    
+
+or
+
 ```bash
 docker compose logs $SERVICE_NAME
 ```
@@ -254,14 +234,12 @@ With service name being the logs of the service you want to inspect. You can fin
 That's bad. This can have many reasons. If a service crashes, it will be restarted automatically. If it keeps crashing, it will be restarted a few times, and then
 the deployment will be stopped. You can check the logs of the service to see why it crashed. You can do this by clicking on the service in the Dashboard.
 See if you can find the error message.
-Attach the error message to an Issue on our [GitHub](
-   https://github.com/jhnnsrs/konstruktor
-). We will try to help you!
+Attach the error message to an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor). We will try to help you!
 
 ### I never see all my services turn green
 
-Green services are Arkitekt services, that are running and ready to be used. For this to happen, all services need to be running and ready, and have passed some 
-"health" checks that `Konstruktor` is subjecting it to. If you have a service that is not turning green, it means that it is not ready yet. If you just started 
+Green services are Arkitekt services, that are running and ready to be used. For this to happen, all services need to be running and ready, and have passed some
+"health" checks that `Konstruktor` is subjecting it to. If you have a service that is not turning green, it means that it is not ready yet. If you just started
 your deployment, it might take a few minutes for all services to turn green, as they will perform some initialization steps. If you have a service that is not turning green,
 for a long time (> 40 seconds), it is probably failing. There is however two types of failure:
 
@@ -271,29 +249,24 @@ for a long time (> 40 seconds), it is probably failing. There is however two typ
 
 - Healthcheck failure: If the Container marked (inner card) is safely green, but the top right indicator is not green, it means that the service is failing some
   health checks. This can happen if the service is not ready yet, or any service it depends on is not ready yet. Just click on the `Open Health` and inspect the
-    health of the service. Try restarting that service. This can help sometimes.
+  health of the service. Try restarting that service. This can help sometimes.
 
-Anyhow if you have a service that is not turning green, please open an Issue on our [GitHub](
-    https://github.com/jhnnsrs/konstruktor
-). We will try to help you!
+Anyhow if you have a service that is not turning green, please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor). We will try to help you!
 
 ### I couldn't advertise my Deployment
 
 Advertising your Deployment will set your Konstruktor instance as a "Beacon". It will send out messages inside your network (UDP Broadcast) that will allow other
-all Apps to discover your Deployment. For this to work, you need to have UDP Broadcast enabled in your network (which we will check for), and your network needs 
-to tell us your IP address (which we will also check for). By default Konstruktor will not advertise but wait for you to check the network interfaces you want to 
+all Apps to discover your Deployment. For this to work, you need to have UDP Broadcast enabled in your network (which we will check for), and your network needs
+to tell us your IP address (which we will also check for). By default Konstruktor will not advertise but wait for you to check the network interfaces you want to
 advertise on. For this to work, you need to make sure that your firewall allows these broadcasts.
 
-:::caution On Advertising 
+:::caution On Advertising
 
 Importantly it will also stop when you close Konstruktor. So if you want to advertise your Deployment, you need to keep Konstruktor open.
 :::
 
-
 Advertising your Deployment is not necessary for it to work. It is just a convenience feature that allows you to discover your Deployment from other Apps.
-If apps are not able to discover your Deployment, or you experience any other issue please open an Issue on our [GitHub](
-    https://github.com/jhnnsrs/konstruktor
-). We will try to help you!
+If apps are not able to discover your Deployment, or you experience any other issue please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor). We will try to help you!
 
 ### My Deployment is running, but it doesnt appear in Orkestrator
 
@@ -303,20 +276,20 @@ If your Deployment is running, but it doesn't appear in Orkestrator, it means th
 
 2. Restart Discovery. Depending if your are using the Desktop App or the Webrowser:
 
-    - Desktop App: Restart the whole App.
-    - Webbrowser: Reload the webpage.
+   - Desktop App: Restart the whole App.
+   - Webbrowser: Reload the webpage.
 
 3. Make sure you share the same network as your deployment.
 
 4. For automatic detection: Make sure that:
-    - You are on the same machine as your deployment when using Webbrowser. (e.g you are able to access localhost:8000)
-    - You are on the same network as your deployment when using the Desktop App and you advertise your deployment on the correct network interface.
+
+   - You are on the same machine as your deployment when using Webbrowser. (e.g you are able to access localhost:8000)
+   - You are on the same network as your deployment when using the Desktop App and you advertise your deployment on the correct network interface.
 
 5. For manual connection. If the automatic steps fail, you can always try to manually connect
    your instance by entering in the ipaddr or hostname of your deployment followed by the Lok Service Port (8000) in the `Advanced Connect` tab of Orkestrator.
    Here you should enter
    `hostnameofcomputer:8000` or `ipaddr:8000`
-
 
 ### I can't access my server from another computer
 
@@ -325,5 +298,5 @@ If you can't access your server from another computer, it means that your server
 1. Make sure you share the same network as your deployment.
 2. Make sure you are using the correct IP address. Or if you are using a hostname, make sure that the hostname is resolvable.
 3. Make sure you are using the correct port for the Lok service. By default Arkitekt uses port 8000. If you are using a different port, make sure you are using the correct one.
-4. Make sure your firewall allows incoming connections on the Lok service port. By default Arkitekt uses port 8000. 
-5. Try to advertise your deployment on other network interfaces. 
+4. Make sure your firewall allows incoming connections on the Lok service port. By default Arkitekt uses port 8000.
+5. Try to advertise your deployment on other network interfaces.

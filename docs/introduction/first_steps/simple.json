@@ -1,559 +1,543 @@
 {
-    "__typename": "Flow",
-    "id": "3",
-    "graph": {
-        "__typename": "FlowGraph",
-        "nodes": [
+  "__typename": "Flow",
+  "id": "3",
+  "graph": {
+    "__typename": "FlowGraph",
+    "nodes": [
+      {
+        "__typename": "ArgNode",
+        "id": "1",
+        "position": {
+          "__typename": "Position",
+          "x": 0,
+          "y": 50
+        },
+        "typename": "ArgNode",
+        "parentNode": null,
+        "instream": [[]],
+        "outstream": [
+          [
             {
-                "__typename": "ArgNode",
-                "id": "1",
-                "position": {
-                    "__typename": "Position",
-                    "x": 0,
-                    "y": 50
-                },
-                "typename": "ArgNode",
-                "parentNode": null,
-                "instream": [
-                    []
-                ],
-                "outstream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "rep",
-                            "label": "rep",
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The Image where we should count cells",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "constream": [
-                    []
-                ],
-                "constants": null,
-                "name": "",
-                "description": "No description"
-            },
-            {
-                "__typename": "ReturnNode",
-                "id": "2",
-                "position": {
-                    "__typename": "Position",
-                    "x": 1500,
-                    "y": 50
-                },
-                "typename": "ReturnNode",
-                "parentNode": null,
-                "instream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "return0",
-                            "label": null,
-                            "identifier": "@mikro/metric",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The Back",
-                            "assignWidget": null,
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "outstream": [
-                    []
-                ],
-                "constream": [
-                    []
-                ],
-                "constants": null,
-                "name": "",
-                "description": "No description"
-            },
-            {
-                "__typename": "KwargNode",
-                "id": "3",
-                "position": {
-                    "__typename": "Position",
-                    "x": 750,
-                    "y": 400
-                },
-                "typename": "KwargNode",
-                "parentNode": null,
-                "instream": [
-                    []
-                ],
-                "outstream": [
-                    []
-                ],
-                "constream": [
-                    []
-                ],
-                "constants": null,
-                "name": "",
-                "description": "No description"
-            },
-            {
-                "__typename": "ArkitektNode",
-                "id": "arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8",
-                "position": {
-                    "__typename": "Position",
-                    "x": 681,
-                    "y": 46
-                },
-                "typename": "ArkitektNode",
-                "parentNode": null,
-                "hash": "57d45410523b5fc52e33a89c2ae0174666ef7afefe2028df1e16649a750bf0a4",
-                "kind": "FUNCTION",
-                "defaults": null,
-                "mapStrategy": "MAP",
-                "allowLocal": false,
-                "binds": null,
-                "assignTimeout": 100000,
-                "yieldTimeout": 100000,
-                "reserveTimeout": 100000,
-                "maxRetries": 3,
-                "instream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "rep",
-                            "label": "rep",
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The Image to be thresholded",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "outstream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "return0",
-                            "label": null,
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The thresholded image",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "constream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "gaussian_blur",
-                            "label": "gaussian_blur",
-                            "identifier": null,
-                            "scope": "GLOBAL",
-                            "kind": "BOOL",
-                            "description": "Whether to apply a gaussian blur before thresholding (kernel_size=5)",
-                            "assignWidget": null,
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": true
-                        }
-                    ]
-                ],
-                "constants": null,
-                "name": "Otsu Thresholding",
-                "description": "Binarizes the image based on a threshold, using Otsu's method\nwith option to guassian blur the image before, images are normalized\nfor each x,y slice before thresholding.",
-                "retryDelay": 2000
-            },
-            {
-                "__typename": "ArkitektNode",
-                "id": "arkid-cb5fee92-01e0-4f97-8d81-80bed3757576",
-                "position": {
-                    "__typename": "Position",
-                    "x": 344,
-                    "y": 56
-                },
-                "typename": "ArkitektNode",
-                "parentNode": null,
-                "hash": "3bbc2f84cc1f9c92045a66993b7bca99966d28ae285491905cedcf26fa48510c",
-                "kind": "FUNCTION",
-                "defaults": null,
-                "mapStrategy": "MAP",
-                "allowLocal": false,
-                "binds": null,
-                "assignTimeout": 100000,
-                "yieldTimeout": 100000,
-                "reserveTimeout": 100000,
-                "maxRetries": 3,
-                "instream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "rep",
-                            "label": "rep",
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The Image where we should count cells",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "outstream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "return0",
-                            "label": null,
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The Downscaled image",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "constream": [
-                    []
-                ],
-                "constants": null,
-                "name": "Maximum Intensity Projection",
-                "description": "Projects the image onto the maximum intensity along the z axis",
-                "retryDelay": 2000
-            },
-            {
-                "__typename": "ArkitektNode",
-                "id": "arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887",
-                "position": {
-                    "__typename": "Position",
-                    "x": 1093,
-                    "y": 59
-                },
-                "typename": "ArkitektNode",
-                "parentNode": null,
-                "hash": "a0a7371a828e5104e953d955e69d6d14ceba2d6d58ccd2fd8609f417732f0d8e",
-                "kind": "FUNCTION",
-                "defaults": {
-                    "key": "Background Fraction",
-                    "rep": null,
-                    "value": 0
-                },
-                "mapStrategy": "MAP",
-                "allowLocal": false,
-                "binds": null,
-                "assignTimeout": 100000,
-                "yieldTimeout": 100000,
-                "reserveTimeout": 100000,
-                "maxRetries": 3,
-                "instream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "rep",
-                            "label": "rep",
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The image",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "outstream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "return0",
-                            "label": null,
-                            "identifier": "@mikro/metric",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The Back",
-                            "assignWidget": null,
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "constream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "key",
-                            "label": "key",
-                            "identifier": null,
-                            "scope": "GLOBAL",
-                            "kind": "STRING",
-                            "description": "The key to use for the metric. Defaults to \"max\".",
-                            "assignWidget": null,
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": true
-                        },
-                        {
-                            "__typename": "Port",
-                            "key": "value",
-                            "label": null,
-                            "identifier": null,
-                            "scope": "GLOBAL",
-                            "kind": "INT",
-                            "description": null,
-                            "assignWidget": null,
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": true
-                        }
-                    ]
-                ],
-                "constants": null,
-                "name": "Measure Fraction",
-                "description": "Measures the appearance of this value in the image (0-1)",
-                "retryDelay": 2000
+              "__typename": "Port",
+              "key": "rep",
+              "label": "rep",
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The Image where we should count cells",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
             }
+          ]
         ],
-        "edges": [
+        "constream": [[]],
+        "constants": null,
+        "name": "",
+        "description": "No description"
+      },
+      {
+        "__typename": "ReturnNode",
+        "id": "2",
+        "position": {
+          "__typename": "Position",
+          "x": 1500,
+          "y": 50
+        },
+        "typename": "ReturnNode",
+        "parentNode": null,
+        "instream": [
+          [
             {
-                "__typename": "LabeledEdge",
-                "id": "reactflow__edge-1return_0-arkid-cb5fee92-01e0-4f97-8d81-80bed3757576arg_0",
-                "source": "1",
-                "sourceHandle": "return_0",
-                "target": "arkid-cb5fee92-01e0-4f97-8d81-80bed3757576",
-                "targetHandle": "arg_0",
-                "typename": "LabeledEdge",
-                "stream": [
-                    {
-                        "__typename": "StreamItem",
-                        "key": "rep",
-                        "kind": "STRUCTURE",
-                        "identifier": "@mikro/representation",
-                        "scope": "GLOBAL",
-                        "nullable": false,
-                        "child": null,
-                        "variants": null
-                    }
-                ]
-            },
-            {
-                "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-cb5fee92-01e0-4f97-8d81-80bed3757576return_0-arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8arg_0",
-                "source": "arkid-cb5fee92-01e0-4f97-8d81-80bed3757576",
-                "sourceHandle": "return_0",
-                "target": "arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8",
-                "targetHandle": "arg_0",
-                "typename": "LabeledEdge",
-                "stream": [
-                    {
-                        "__typename": "StreamItem",
-                        "key": "return0",
-                        "kind": "STRUCTURE",
-                        "identifier": "@mikro/representation",
-                        "scope": "GLOBAL",
-                        "nullable": false,
-                        "child": null,
-                        "variants": null
-                    }
-                ]
-            },
-            {
-                "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8return_0-arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887arg_0",
-                "source": "arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8",
-                "sourceHandle": "return_0",
-                "target": "arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887",
-                "targetHandle": "arg_0",
-                "typename": "LabeledEdge",
-                "stream": [
-                    {
-                        "__typename": "StreamItem",
-                        "key": "return0",
-                        "kind": "STRUCTURE",
-                        "identifier": "@mikro/representation",
-                        "scope": "GLOBAL",
-                        "nullable": false,
-                        "child": null,
-                        "variants": null
-                    }
-                ]
-            },
-            {
-                "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887return_0-2arg_0",
-                "source": "arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887",
-                "sourceHandle": "return_0",
-                "target": "2",
-                "targetHandle": "arg_0",
-                "typename": "LabeledEdge",
-                "stream": [
-                    {
-                        "__typename": "StreamItem",
-                        "key": "return0",
-                        "kind": "STRUCTURE",
-                        "identifier": "@mikro/metric",
-                        "scope": "GLOBAL",
-                        "nullable": false,
-                        "child": null,
-                        "variants": null
-                    }
-                ]
+              "__typename": "Port",
+              "key": "return0",
+              "label": null,
+              "identifier": "@mikro/metric",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The Back",
+              "assignWidget": null,
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
             }
+          ]
         ],
-        "globals": [],
-        "args": [
+        "outstream": [[]],
+        "constream": [[]],
+        "constants": null,
+        "name": "",
+        "description": "No description"
+      },
+      {
+        "__typename": "KwargNode",
+        "id": "3",
+        "position": {
+          "__typename": "Position",
+          "x": 750,
+          "y": 400
+        },
+        "typename": "KwargNode",
+        "parentNode": null,
+        "instream": [[]],
+        "outstream": [[]],
+        "constream": [[]],
+        "constants": null,
+        "name": "",
+        "description": "No description"
+      },
+      {
+        "__typename": "ArkitektNode",
+        "id": "arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8",
+        "position": {
+          "__typename": "Position",
+          "x": 681,
+          "y": 46
+        },
+        "typename": "ArkitektNode",
+        "parentNode": null,
+        "hash": "57d45410523b5fc52e33a89c2ae0174666ef7afefe2028df1e16649a750bf0a4",
+        "kind": "FUNCTION",
+        "defaults": null,
+        "mapStrategy": "MAP",
+        "allowLocal": false,
+        "binds": null,
+        "assignTimeout": 100000,
+        "yieldTimeout": 100000,
+        "reserveTimeout": 100000,
+        "maxRetries": 3,
+        "instream": [
+          [
             {
-                "__typename": "Port",
-                "key": "rep",
-                "label": "rep",
-                "identifier": "@mikro/representation",
-                "scope": "GLOBAL",
-                "kind": "STRUCTURE",
-                "description": "The Image where we should count cells",
-                "assignWidget": {
-                    "__typename": "Widget",
-                    "kind": "SearchWidget",
-                    "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                    "hook": null,
-                    "ward": "mikro",
-                    "min": null,
-                    "step": null,
-                    "placeholder": null,
-                    "max": null,
-                    "choices": null,
-                    "asParagraph": null
-                },
-                "returnWidget": null,
-                "child": null,
-                "variants": null,
-                "nullable": false
+              "__typename": "Port",
+              "key": "rep",
+              "label": "rep",
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The Image to be thresholded",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
             }
+          ]
         ],
-        "returns": [
+        "outstream": [
+          [
             {
-                "__typename": "Port",
-                "key": "return0",
-                "label": null,
-                "identifier": "@mikro/metric",
-                "scope": "GLOBAL",
-                "kind": "STRUCTURE",
-                "description": "The Back",
-                "assignWidget": null,
-                "returnWidget": null,
-                "child": null,
-                "variants": null,
-                "nullable": false
+              "__typename": "Port",
+              "key": "return0",
+              "label": null,
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The thresholded image",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
             }
+          ]
+        ],
+        "constream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "gaussian_blur",
+              "label": "gaussian_blur",
+              "identifier": null,
+              "scope": "GLOBAL",
+              "kind": "BOOL",
+              "description": "Whether to apply a gaussian blur before thresholding (kernel_size=5)",
+              "assignWidget": null,
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": true
+            }
+          ]
+        ],
+        "constants": null,
+        "name": "Otsu Thresholding",
+        "description": "Binarizes the image based on a threshold, using Otsu's method\nwith option to guassian blur the image before, images are normalized\nfor each x,y slice before thresholding.",
+        "retryDelay": 2000
+      },
+      {
+        "__typename": "ArkitektNode",
+        "id": "arkid-cb5fee92-01e0-4f97-8d81-80bed3757576",
+        "position": {
+          "__typename": "Position",
+          "x": 344,
+          "y": 56
+        },
+        "typename": "ArkitektNode",
+        "parentNode": null,
+        "hash": "3bbc2f84cc1f9c92045a66993b7bca99966d28ae285491905cedcf26fa48510c",
+        "kind": "FUNCTION",
+        "defaults": null,
+        "mapStrategy": "MAP",
+        "allowLocal": false,
+        "binds": null,
+        "assignTimeout": 100000,
+        "yieldTimeout": 100000,
+        "reserveTimeout": 100000,
+        "maxRetries": 3,
+        "instream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "rep",
+              "label": "rep",
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The Image where we should count cells",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
+            }
+          ]
+        ],
+        "outstream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "return0",
+              "label": null,
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The Downscaled image",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
+            }
+          ]
+        ],
+        "constream": [[]],
+        "constants": null,
+        "name": "Maximum Intensity Projection",
+        "description": "Projects the image onto the maximum intensity along the z axis",
+        "retryDelay": 2000
+      },
+      {
+        "__typename": "ArkitektNode",
+        "id": "arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887",
+        "position": {
+          "__typename": "Position",
+          "x": 1093,
+          "y": 59
+        },
+        "typename": "ArkitektNode",
+        "parentNode": null,
+        "hash": "a0a7371a828e5104e953d955e69d6d14ceba2d6d58ccd2fd8609f417732f0d8e",
+        "kind": "FUNCTION",
+        "defaults": {
+          "key": "Background Fraction",
+          "rep": null,
+          "value": 0
+        },
+        "mapStrategy": "MAP",
+        "allowLocal": false,
+        "binds": null,
+        "assignTimeout": 100000,
+        "yieldTimeout": 100000,
+        "reserveTimeout": 100000,
+        "maxRetries": 3,
+        "instream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "rep",
+              "label": "rep",
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The image",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
+            }
+          ]
+        ],
+        "outstream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "return0",
+              "label": null,
+              "identifier": "@mikro/metric",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The Back",
+              "assignWidget": null,
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
+            }
+          ]
+        ],
+        "constream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "key",
+              "label": "key",
+              "identifier": null,
+              "scope": "GLOBAL",
+              "kind": "STRING",
+              "description": "The key to use for the metric. Defaults to \"max\".",
+              "assignWidget": null,
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": true
+            },
+            {
+              "__typename": "Port",
+              "key": "value",
+              "label": null,
+              "identifier": null,
+              "scope": "GLOBAL",
+              "kind": "INT",
+              "description": null,
+              "assignWidget": null,
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": true
+            }
+          ]
+        ],
+        "constants": null,
+        "name": "Measure Fraction",
+        "description": "Measures the appearance of this value in the image (0-1)",
+        "retryDelay": 2000
+      }
+    ],
+    "edges": [
+      {
+        "__typename": "LabeledEdge",
+        "id": "reactflow__edge-1return_0-arkid-cb5fee92-01e0-4f97-8d81-80bed3757576arg_0",
+        "source": "1",
+        "sourceHandle": "return_0",
+        "target": "arkid-cb5fee92-01e0-4f97-8d81-80bed3757576",
+        "targetHandle": "arg_0",
+        "typename": "LabeledEdge",
+        "stream": [
+          {
+            "__typename": "StreamItem",
+            "key": "rep",
+            "kind": "STRUCTURE",
+            "identifier": "@mikro/representation",
+            "scope": "GLOBAL",
+            "nullable": false,
+            "child": null,
+            "variants": null
+          }
         ]
-    },
-    "restrict": [],
-    "name": "scummy-green-sparrow",
-    "screenshot": null,
-    "createdAt": "2023-10-27T16:42:25.175566+00:00",
-    "workspace": {
-        "__typename": "Workspace",
-        "id": "2"
-    }
+      },
+      {
+        "__typename": "LabeledEdge",
+        "id": "reactflow__edge-arkid-cb5fee92-01e0-4f97-8d81-80bed3757576return_0-arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8arg_0",
+        "source": "arkid-cb5fee92-01e0-4f97-8d81-80bed3757576",
+        "sourceHandle": "return_0",
+        "target": "arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8",
+        "targetHandle": "arg_0",
+        "typename": "LabeledEdge",
+        "stream": [
+          {
+            "__typename": "StreamItem",
+            "key": "return0",
+            "kind": "STRUCTURE",
+            "identifier": "@mikro/representation",
+            "scope": "GLOBAL",
+            "nullable": false,
+            "child": null,
+            "variants": null
+          }
+        ]
+      },
+      {
+        "__typename": "LabeledEdge",
+        "id": "reactflow__edge-arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8return_0-arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887arg_0",
+        "source": "arkid-955c7b0d-2086-40d0-bb49-1273bf6541b8",
+        "sourceHandle": "return_0",
+        "target": "arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887",
+        "targetHandle": "arg_0",
+        "typename": "LabeledEdge",
+        "stream": [
+          {
+            "__typename": "StreamItem",
+            "key": "return0",
+            "kind": "STRUCTURE",
+            "identifier": "@mikro/representation",
+            "scope": "GLOBAL",
+            "nullable": false,
+            "child": null,
+            "variants": null
+          }
+        ]
+      },
+      {
+        "__typename": "LabeledEdge",
+        "id": "reactflow__edge-arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887return_0-2arg_0",
+        "source": "arkid-6deb87ce-fa5d-40c0-af67-dfadb502d887",
+        "sourceHandle": "return_0",
+        "target": "2",
+        "targetHandle": "arg_0",
+        "typename": "LabeledEdge",
+        "stream": [
+          {
+            "__typename": "StreamItem",
+            "key": "return0",
+            "kind": "STRUCTURE",
+            "identifier": "@mikro/metric",
+            "scope": "GLOBAL",
+            "nullable": false,
+            "child": null,
+            "variants": null
+          }
+        ]
+      }
+    ],
+    "globals": [],
+    "args": [
+      {
+        "__typename": "Port",
+        "key": "rep",
+        "label": "rep",
+        "identifier": "@mikro/representation",
+        "scope": "GLOBAL",
+        "kind": "STRUCTURE",
+        "description": "The Image where we should count cells",
+        "assignWidget": {
+          "__typename": "Widget",
+          "kind": "SearchWidget",
+          "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+          "hook": null,
+          "ward": "mikro",
+          "min": null,
+          "step": null,
+          "placeholder": null,
+          "max": null,
+          "choices": null,
+          "asParagraph": null
+        },
+        "returnWidget": null,
+        "child": null,
+        "variants": null,
+        "nullable": false
+      }
+    ],
+    "returns": [
+      {
+        "__typename": "Port",
+        "key": "return0",
+        "label": null,
+        "identifier": "@mikro/metric",
+        "scope": "GLOBAL",
+        "kind": "STRUCTURE",
+        "description": "The Back",
+        "assignWidget": null,
+        "returnWidget": null,
+        "child": null,
+        "variants": null,
+        "nullable": false
+      }
+    ]
+  },
+  "restrict": [],
+  "name": "scummy-green-sparrow",
+  "screenshot": null,
+  "createdAt": "2023-10-27T16:42:25.175566+00:00",
+  "workspace": {
+    "__typename": "Workspace",
+    "id": "2"
+  }
 }

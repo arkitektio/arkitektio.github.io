@@ -66,7 +66,7 @@ export const MikroIQLFieldInner = (props: FieldHookConfig<string>): any => {
 
   const onEditQuery = (
     value: string,
-    documentAst: DocumentNode | undefined
+    documentAst: DocumentNode | undefined,
   ) => {
     form.setValue(value);
   };

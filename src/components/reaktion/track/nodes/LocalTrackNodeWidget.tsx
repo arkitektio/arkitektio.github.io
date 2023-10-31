@@ -74,7 +74,7 @@ export const LocalTrackNodeWidget: React.FC<LocalNodeProps> = withLayout(
               className="text-md font-light"
               onClick={() =>
                 setFrozenEvent(
-                  frozenevent == undefined ? latestEvent : undefined
+                  frozenevent == undefined ? latestEvent : undefined,
                 )
               }
               title="Toggle freeze"
@@ -99,5 +99,5 @@ export const LocalTrackNodeWidget: React.FC<LocalNodeProps> = withLayout(
         )}
       </NodeTrackLayout>
     );
-  }
+  },
 );

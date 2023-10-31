@@ -1,32 +1,31 @@
 .horizontal-slider {
-    width: 100%;
-    height: 20px;
-    margin: auto;
-    margin-bottom: 20px;
-  }
-  .example-thumb {
-    cursor: pointer;
-    position: absolute;
-    display: block;
-    height: 0.5em;
-  }
-  .example-thumb.active {
-    background-color: grey;
-  }
-  .example-track {
-    position: relative;
-  }
-  .example-track.example-track-0 {
-    background: #83a9ff;
-  }
-  
-  .horizontal-slider .example-track {
-    top: 1em;
-    height: 0.5em;
-  }
-  .horizontal-slider .example-thumb {
-    top: 1em;
-    width: 10px;
-    height: 0.5em;
-  }
-  
+  width: 100%;
+  height: 20px;
+  margin: auto;
+  margin-bottom: 20px;
+}
+.example-thumb {
+  cursor: pointer;
+  position: absolute;
+  display: block;
+  height: 0.5em;
+}
+.example-thumb.active {
+  background-color: grey;
+}
+.example-track {
+  position: relative;
+}
+.example-track.example-track-0 {
+  background: #83a9ff;
+}
+
+.horizontal-slider .example-track {
+  top: 1em;
+  height: 0.5em;
+}
+.horizontal-slider .example-thumb {
+  top: 1em;
+  width: 10px;
+  height: 0.5em;
+}

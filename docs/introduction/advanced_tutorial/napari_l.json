@@ -1,413 +1,389 @@
 {
-    "__typename": "Flow",
-    "id": "24",
-    "graph": {
-        "__typename": "FlowGraph",
-        "nodes": [
+  "__typename": "Flow",
+  "id": "24",
+  "graph": {
+    "__typename": "FlowGraph",
+    "nodes": [
+      {
+        "__typename": "ArgNode",
+        "id": "1",
+        "position": {
+          "__typename": "Position",
+          "x": 0,
+          "y": 50
+        },
+        "typename": "ArgNode",
+        "parentNode": null,
+        "instream": [[]],
+        "outstream": [[]],
+        "constream": [[]],
+        "constants": null,
+        "name": "",
+        "description": "No description"
+      },
+      {
+        "__typename": "ReturnNode",
+        "id": "2",
+        "position": {
+          "__typename": "Position",
+          "x": 1500,
+          "y": 50
+        },
+        "typename": "ReturnNode",
+        "parentNode": null,
+        "instream": [[]],
+        "outstream": [[]],
+        "constream": [[]],
+        "constants": null,
+        "name": "",
+        "description": "No description"
+      },
+      {
+        "__typename": "KwargNode",
+        "id": "3",
+        "position": {
+          "__typename": "Position",
+          "x": 750,
+          "y": 400
+        },
+        "typename": "KwargNode",
+        "parentNode": null,
+        "instream": [[]],
+        "outstream": [[]],
+        "constream": [[]],
+        "constants": null,
+        "name": "",
+        "description": "No description"
+      },
+      {
+        "__typename": "ArkitektNode",
+        "id": "arkid-ab03c86e-943c-43ae-b06c-725d9b076e61",
+        "position": {
+          "__typename": "Position",
+          "x": 443,
+          "y": 20
+        },
+        "typename": "ArkitektNode",
+        "parentNode": null,
+        "hash": "f994d581e3dfa751c3ff53b0ae5710813e345c582a9b8b38653a53dce8fbaa48",
+        "kind": "FUNCTION",
+        "defaults": null,
+        "mapStrategy": "MAP",
+        "allowLocal": false,
+        "binds": null,
+        "assignTimeout": 100000,
+        "yieldTimeout": 100000,
+        "reserveTimeout": 100000,
+        "maxRetries": 3,
+        "instream": [[]],
+        "outstream": [
+          [
             {
-                "__typename": "ArgNode",
-                "id": "1",
-                "position": {
-                    "__typename": "Position",
-                    "x": 0,
-                    "y": 50
-                },
-                "typename": "ArgNode",
-                "parentNode": null,
-                "instream": [
-                    []
-                ],
-                "outstream": [
-                    []
-                ],
-                "constream": [
-                    []
-                ],
-                "constants": null,
-                "name": "",
-                "description": "No description"
-            },
-            {
-                "__typename": "ReturnNode",
-                "id": "2",
-                "position": {
-                    "__typename": "Position",
-                    "x": 1500,
-                    "y": 50
-                },
-                "typename": "ReturnNode",
-                "parentNode": null,
-                "instream": [
-                    []
-                ],
-                "outstream": [
-                    []
-                ],
-                "constream": [
-                    []
-                ],
-                "constants": null,
-                "name": "",
-                "description": "No description"
-            },
-            {
-                "__typename": "KwargNode",
-                "id": "3",
-                "position": {
-                    "__typename": "Position",
-                    "x": 750,
-                    "y": 400
-                },
-                "typename": "KwargNode",
-                "parentNode": null,
-                "instream": [
-                    []
-                ],
-                "outstream": [
-                    []
-                ],
-                "constream": [
-                    []
-                ],
-                "constants": null,
-                "name": "",
-                "description": "No description"
-            },
-            {
-                "__typename": "ArkitektNode",
-                "id": "arkid-ab03c86e-943c-43ae-b06c-725d9b076e61",
-                "position": {
-                    "__typename": "Position",
-                    "x": 443,
-                    "y": 20
-                },
-                "typename": "ArkitektNode",
-                "parentNode": null,
-                "hash": "f994d581e3dfa751c3ff53b0ae5710813e345c582a9b8b38653a53dce8fbaa48",
-                "kind": "FUNCTION",
-                "defaults": null,
-                "mapStrategy": "MAP",
-                "allowLocal": false,
-                "binds": null,
-                "assignTimeout": 100000,
-                "yieldTimeout": 100000,
-                "reserveTimeout": 100000,
-                "maxRetries": 3,
-                "instream": [
-                    []
-                ],
-                "outstream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "return0",
-                            "label": null,
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The uploaded image",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "constream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "name",
-                            "label": "name",
-                            "identifier": null,
-                            "scope": "GLOBAL",
-                            "kind": "STRING",
-                            "description": "Overwrite the layer name. Defaults to None.",
-                            "assignWidget": null,
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": true
-                        }
-                    ]
-                ],
-                "constants": null,
-                "name": "Upload Napari Layer",
-                "description": "Upload the current image to the server.",
-                "retryDelay": 2000
-            },
-            {
-                "__typename": "ArkitektNode",
-                "id": "arkid-24a1b3b9-3621-4143-b399-48233c6ff4ab",
-                "position": {
-                    "__typename": "Position",
-                    "x": 834,
-                    "y": 15
-                },
-                "typename": "ArkitektNode",
-                "parentNode": null,
-                "hash": "92b326a80ea7f578543c0b8e334aea6462d5051f123039f0c1712adbd875c83c",
-                "kind": "FUNCTION",
-                "defaults": {
-                    "rep": null
-                },
-                "mapStrategy": "MAP",
-                "allowLocal": false,
-                "binds": null,
-                "assignTimeout": 100000,
-                "yieldTimeout": 100000,
-                "reserveTimeout": 100000,
-                "maxRetries": 3,
-                "instream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "rep",
-                            "label": "rep",
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The Representation.",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "outstream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "return0",
-                            "label": null,
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "A Representation",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "constream": [
-                    []
-                ],
-                "constants": null,
-                "name": "Segment Flou2",
-                "description": "Segments Cells using the stardist flou2 pretrained model",
-                "retryDelay": 2000
-            },
-            {
-                "__typename": "ArkitektNode",
-                "id": "arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0",
-                "position": {
-                    "__typename": "Position",
-                    "x": 1214,
-                    "y": 57
-                },
-                "typename": "ArkitektNode",
-                "parentNode": null,
-                "hash": "277c15f3c78f7f664774dbd41fe1c29b1882a99db5642cb385f47f4b94df6e40",
-                "kind": "FUNCTION",
-                "defaults": {
-                    "rep": null,
-                    "show_roi_layer": true,
-                    "scale_to_physical_size": false
-                },
-                "mapStrategy": "MAP",
-                "allowLocal": false,
-                "binds": null,
-                "assignTimeout": 100000,
-                "yieldTimeout": 100000,
-                "reserveTimeout": 100000,
-                "maxRetries": 3,
-                "instream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "rep",
-                            "label": "rep",
-                            "identifier": "@mikro/representation",
-                            "scope": "GLOBAL",
-                            "kind": "STRUCTURE",
-                            "description": "The Image",
-                            "assignWidget": {
-                                "__typename": "Widget",
-                                "kind": "SearchWidget",
-                                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
-                                "hook": null,
-                                "ward": "mikro",
-                                "min": null,
-                                "step": null,
-                                "placeholder": null,
-                                "max": null,
-                                "choices": null,
-                                "asParagraph": null
-                            },
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": false
-                        }
-                    ]
-                ],
-                "outstream": [
-                    []
-                ],
-                "constream": [
-                    [
-                        {
-                            "__typename": "Port",
-                            "key": "show_roi_layer",
-                            "label": null,
-                            "identifier": null,
-                            "scope": "GLOBAL",
-                            "kind": "BOOL",
-                            "description": null,
-                            "assignWidget": null,
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": true
-                        },
-                        {
-                            "__typename": "Port",
-                            "key": "scale_to_physical_size",
-                            "label": null,
-                            "identifier": null,
-                            "scope": "GLOBAL",
-                            "kind": "BOOL",
-                            "description": null,
-                            "assignWidget": null,
-                            "returnWidget": null,
-                            "child": null,
-                            "variants": null,
-                            "nullable": true
-                        }
-                    ]
-                ],
-                "constants": null,
-                "name": "Show on Napari",
-                "description": "Loads the image into the viewer",
-                "retryDelay": 2000
+              "__typename": "Port",
+              "key": "return0",
+              "label": null,
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The uploaded image",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
             }
+          ]
         ],
-        "edges": [
+        "constream": [
+          [
             {
-                "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-ab03c86e-943c-43ae-b06c-725d9b076e61return_0-arkid-24a1b3b9-3621-4143-b399-48233c6ff4abarg_0",
-                "source": "arkid-ab03c86e-943c-43ae-b06c-725d9b076e61",
-                "sourceHandle": "return_0",
-                "target": "arkid-24a1b3b9-3621-4143-b399-48233c6ff4ab",
-                "targetHandle": "arg_0",
-                "typename": "LabeledEdge",
-                "stream": [
-                    {
-                        "__typename": "StreamItem",
-                        "key": "return0",
-                        "kind": "STRUCTURE",
-                        "identifier": "@mikro/representation",
-                        "scope": "GLOBAL",
-                        "nullable": false,
-                        "child": null,
-                        "variants": null
-                    }
-                ]
-            },
-            {
-                "__typename": "LabeledEdge",
-                "id": "reactflow__edge-1return_0-arkid-ab03c86e-943c-43ae-b06c-725d9b076e61arg_0",
-                "source": "1",
-                "sourceHandle": "return_0",
-                "target": "arkid-ab03c86e-943c-43ae-b06c-725d9b076e61",
-                "targetHandle": "arg_0",
-                "typename": "LabeledEdge",
-                "stream": []
-            },
-            {
-                "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-24a1b3b9-3621-4143-b399-48233c6ff4abreturn_0-arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0arg_0",
-                "source": "arkid-24a1b3b9-3621-4143-b399-48233c6ff4ab",
-                "sourceHandle": "return_0",
-                "target": "arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0",
-                "targetHandle": "arg_0",
-                "typename": "LabeledEdge",
-                "stream": [
-                    {
-                        "__typename": "StreamItem",
-                        "key": "return0",
-                        "kind": "STRUCTURE",
-                        "identifier": "@mikro/representation",
-                        "scope": "GLOBAL",
-                        "nullable": false,
-                        "child": null,
-                        "variants": null
-                    }
-                ]
-            },
-            {
-                "__typename": "LabeledEdge",
-                "id": "reactflow__edge-arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0return_0-2arg_0",
-                "source": "arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0",
-                "sourceHandle": "return_0",
-                "target": "2",
-                "targetHandle": "arg_0",
-                "typename": "LabeledEdge",
-                "stream": []
+              "__typename": "Port",
+              "key": "name",
+              "label": "name",
+              "identifier": null,
+              "scope": "GLOBAL",
+              "kind": "STRING",
+              "description": "Overwrite the layer name. Defaults to None.",
+              "assignWidget": null,
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": true
             }
+          ]
         ],
-        "globals": [],
-        "args": [],
-        "returns": []
-    },
-    "restrict": [],
-    "name": "Napari Deep Learning",
-    "screenshot": null,
-    "createdAt": "2023-10-28T12:56:05.741114+00:00",
-    "workspace": {
-        "__typename": "Workspace",
-        "id": "8"
-    }
+        "constants": null,
+        "name": "Upload Napari Layer",
+        "description": "Upload the current image to the server.",
+        "retryDelay": 2000
+      },
+      {
+        "__typename": "ArkitektNode",
+        "id": "arkid-24a1b3b9-3621-4143-b399-48233c6ff4ab",
+        "position": {
+          "__typename": "Position",
+          "x": 834,
+          "y": 15
+        },
+        "typename": "ArkitektNode",
+        "parentNode": null,
+        "hash": "92b326a80ea7f578543c0b8e334aea6462d5051f123039f0c1712adbd875c83c",
+        "kind": "FUNCTION",
+        "defaults": {
+          "rep": null
+        },
+        "mapStrategy": "MAP",
+        "allowLocal": false,
+        "binds": null,
+        "assignTimeout": 100000,
+        "yieldTimeout": 100000,
+        "reserveTimeout": 100000,
+        "maxRetries": 3,
+        "instream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "rep",
+              "label": "rep",
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The Representation.",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
+            }
+          ]
+        ],
+        "outstream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "return0",
+              "label": null,
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "A Representation",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
+            }
+          ]
+        ],
+        "constream": [[]],
+        "constants": null,
+        "name": "Segment Flou2",
+        "description": "Segments Cells using the stardist flou2 pretrained model",
+        "retryDelay": 2000
+      },
+      {
+        "__typename": "ArkitektNode",
+        "id": "arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0",
+        "position": {
+          "__typename": "Position",
+          "x": 1214,
+          "y": 57
+        },
+        "typename": "ArkitektNode",
+        "parentNode": null,
+        "hash": "277c15f3c78f7f664774dbd41fe1c29b1882a99db5642cb385f47f4b94df6e40",
+        "kind": "FUNCTION",
+        "defaults": {
+          "rep": null,
+          "show_roi_layer": true,
+          "scale_to_physical_size": false
+        },
+        "mapStrategy": "MAP",
+        "allowLocal": false,
+        "binds": null,
+        "assignTimeout": 100000,
+        "yieldTimeout": 100000,
+        "reserveTimeout": 100000,
+        "maxRetries": 3,
+        "instream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "rep",
+              "label": "rep",
+              "identifier": "@mikro/representation",
+              "scope": "GLOBAL",
+              "kind": "STRUCTURE",
+              "description": "The Image",
+              "assignWidget": {
+                "__typename": "Widget",
+                "kind": "SearchWidget",
+                "query": "query search_representation($search: String, $values: [ID]) {\n  options: representations(name: $search, limit: 20, ids: $values) {\n    value: id\n    label: name\n  }\n}",
+                "hook": null,
+                "ward": "mikro",
+                "min": null,
+                "step": null,
+                "placeholder": null,
+                "max": null,
+                "choices": null,
+                "asParagraph": null
+              },
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": false
+            }
+          ]
+        ],
+        "outstream": [[]],
+        "constream": [
+          [
+            {
+              "__typename": "Port",
+              "key": "show_roi_layer",
+              "label": null,
+              "identifier": null,
+              "scope": "GLOBAL",
+              "kind": "BOOL",
+              "description": null,
+              "assignWidget": null,
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": true
+            },
+            {
+              "__typename": "Port",
+              "key": "scale_to_physical_size",
+              "label": null,
+              "identifier": null,
+              "scope": "GLOBAL",
+              "kind": "BOOL",
+              "description": null,
+              "assignWidget": null,
+              "returnWidget": null,
+              "child": null,
+              "variants": null,
+              "nullable": true
+            }
+          ]
+        ],
+        "constants": null,
+        "name": "Show on Napari",
+        "description": "Loads the image into the viewer",
+        "retryDelay": 2000
+      }
+    ],
+    "edges": [
+      {
+        "__typename": "LabeledEdge",
+        "id": "reactflow__edge-arkid-ab03c86e-943c-43ae-b06c-725d9b076e61return_0-arkid-24a1b3b9-3621-4143-b399-48233c6ff4abarg_0",
+        "source": "arkid-ab03c86e-943c-43ae-b06c-725d9b076e61",
+        "sourceHandle": "return_0",
+        "target": "arkid-24a1b3b9-3621-4143-b399-48233c6ff4ab",
+        "targetHandle": "arg_0",
+        "typename": "LabeledEdge",
+        "stream": [
+          {
+            "__typename": "StreamItem",
+            "key": "return0",
+            "kind": "STRUCTURE",
+            "identifier": "@mikro/representation",
+            "scope": "GLOBAL",
+            "nullable": false,
+            "child": null,
+            "variants": null
+          }
+        ]
+      },
+      {
+        "__typename": "LabeledEdge",
+        "id": "reactflow__edge-1return_0-arkid-ab03c86e-943c-43ae-b06c-725d9b076e61arg_0",
+        "source": "1",
+        "sourceHandle": "return_0",
+        "target": "arkid-ab03c86e-943c-43ae-b06c-725d9b076e61",
+        "targetHandle": "arg_0",
+        "typename": "LabeledEdge",
+        "stream": []
+      },
+      {
+        "__typename": "LabeledEdge",
+        "id": "reactflow__edge-arkid-24a1b3b9-3621-4143-b399-48233c6ff4abreturn_0-arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0arg_0",
+        "source": "arkid-24a1b3b9-3621-4143-b399-48233c6ff4ab",
+        "sourceHandle": "return_0",
+        "target": "arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0",
+        "targetHandle": "arg_0",
+        "typename": "LabeledEdge",
+        "stream": [
+          {
+            "__typename": "StreamItem",
+            "key": "return0",
+            "kind": "STRUCTURE",
+            "identifier": "@mikro/representation",
+            "scope": "GLOBAL",
+            "nullable": false,
+            "child": null,
+            "variants": null
+          }
+        ]
+      },
+      {
+        "__typename": "LabeledEdge",
+        "id": "reactflow__edge-arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0return_0-2arg_0",
+        "source": "arkid-71c0f344-e124-4ffb-9297-4e1a14a95be0",
+        "sourceHandle": "return_0",
+        "target": "2",
+        "targetHandle": "arg_0",
+        "typename": "LabeledEdge",
+        "stream": []
+      }
+    ],
+    "globals": [],
+    "args": [],
+    "returns": []
+  },
+  "restrict": [],
+  "name": "Napari Deep Learning",
+  "screenshot": null,
+  "createdAt": "2023-10-28T12:56:05.741114+00:00",
+  "workspace": {
+    "__typename": "Workspace",
+    "id": "8"
+  }
 }

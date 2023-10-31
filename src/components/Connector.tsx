@@ -12,8 +12,6 @@ import { CancelablePromise } from "cancelable-promise";
 import React, { Fragment, useRef, useState } from "react";
 import { VscClose, VscDebugDisconnect } from "react-icons/vsc";
 
-
-
 export const NoHerre = () => {
   const { fakts, setFakts } = useFakts();
   const [future, setFuture] = useState<CancelablePromise<Fakts> | null>(null);
@@ -76,15 +74,23 @@ export const ShowMe = () => {
           <div className="">
             {user && (
               <div className="px-2 py-2">
-                <div className="text-slate-200 ">Hi {user.preferred_username}!</div>
-                <div className="text-slate-600 text-xs">You are logged in with this demo website and you can use it to interact with your locally connected arkitekt instance</div>
+                <div className="text-slate-200 ">
+                  Hi {user.preferred_username}!
+                </div>
+                <div className="text-slate-600 text-xs">
+                  You are logged in with this demo website and you can use it to
+                  interact with your locally connected arkitekt instance
+                </div>
               </div>
             )}
             <div className="flex flex-row w-full gap-2 justify-end p-3">
               {user && (
                 <>
-                  <LogoutButton className="px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md"> Logout </LogoutButton>
-                  <UnconnectButton className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md"/>
+                  <LogoutButton className="px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md">
+                    {" "}
+                    Logout{" "}
+                  </LogoutButton>
+                  <UnconnectButton className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md" />
                 </>
               )}
             </div>
@@ -119,26 +125,36 @@ export const Login = () => {
           className="absolute right-0 mt-2 mr-2 w-56 origin-top-right divide-y divide-gray-100 border border-1 border-gray-400 rounded-md bg-back-800  shadow-lg shadow ring-1 ring-black ring-opacity-5 focus:outline-none"
         >
           <div className="">
-          <div className="">
-            <div className="px-2 py-2">
-              <div className="text-slate-200 ">You are connected!</div>
-              <div className="text-slate-600 text-xs">You are logged in with this demo website with arkitekt. Just authenticate yourself and you are ready to go</div>
-            </div>
-            <div className="flex flex-row w-full gap-2 justify-end p-3">
-              
+            <div className="">
+              <div className="px-2 py-2">
+                <div className="text-slate-200 ">You are connected!</div>
+                <div className="text-slate-600 text-xs">
+                  You are logged in with this demo website with arkitekt. Just
+                  authenticate yourself and you are ready to go
+                </div>
+              </div>
+              <div className="flex flex-row w-full gap-2 justify-end p-3">
                 <>
-                  <LoginButton className={(e) => "px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md " + (e.authenticating ? "animate-pulse" : "")} buildGrant={async (fakts) => {
+                  <LoginButton
+                    className={(e) =>
+                      "px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md " +
+                      (e.authenticating ? "animate-pulse" : "")
+                    }
+                    buildGrant={async (fakts) => {
                       return {
                         clientId: fakts.lok.client_id,
                         clientSecret: fakts.lok.client_secret,
                         scopes: fakts.lok.scopes,
                         redirectUri: window.location.origin + "/callback",
                       };
-                    }}>{(e) => e.authenticating ? "Cancel Login" : "Login" }</LoginButton>
-                  <UnconnectButton className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md"/>
+                    }}
+                  >
+                    {(e) => (e.authenticating ? "Cancel Login" : "Login")}
+                  </LoginButton>
+                  <UnconnectButton className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md" />
                 </>
+              </div>
             </div>
-          </div>
           </div>
         </Popover.Panel>
       </Transition>
@@ -169,16 +185,18 @@ export const Connect = () => {
           static
           className="z-10 absolute right-0 mt-2 mr-2 w-56 origin-top-right divide-y divide-gray-100 border border-1 border-gray-400 rounded-md bg-back-800 shadow-lg shadow ring-1 ring-black ring-opacity-5 focus:outline-none"
         >
-         <div className="px-2 py-2">
-              <div className="text-slate-200 ">Lets get you connected!</div>
-              <div className="text-slate-600 text-xs">You are not currently connected. Here connectable instances will appear (currently restricted to local arkitekt instance)</div>
-            
-          
-              <ConnectButtons
-                containerClassName="flex flex-row w-full gap-2 justify-end p-3"
-                buttonClassName={() => "p-3 cursor-pointer font-light"}
-              />
+          <div className="px-2 py-2">
+            <div className="text-slate-200 ">Lets get you connected!</div>
+            <div className="text-slate-600 text-xs">
+              You are not currently connected. Here connectable instances will
+              appear (currently restricted to local arkitekt instance)
             </div>
+
+            <ConnectButtons
+              containerClassName="flex flex-row w-full gap-2 justify-end p-3"
+              buttonClassName={() => "p-3 cursor-pointer font-light"}
+            />
+          </div>
         </Popover.Panel>
       </Transition>
     </Popover>

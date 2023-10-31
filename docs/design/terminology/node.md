@@ -9,8 +9,6 @@ import Image from "@theme/IdealImage";
 import node_template from "./node-template.png";
 import node_stream from "./node-stream.png";
 
-
-
 ## What is a node?
 
 Nodes are a core conceptual element of the arkitekt platform, that represent the
@@ -27,7 +25,6 @@ takes an image as an input and outputs an image, or more complex as a node that 
 about the images as an input and outputs a table of results.
 
 ## What is a node not?
-
 
 The most important feature to understand about Arkitekt nodes is that they are not bound to an implementation.
 
@@ -58,8 +55,7 @@ decides to change the input and output of the node.
 
 Another important feature to understand about Arkitekt nodes is how they process data. This section will only
 make sense if you have read the Workflow section, but it is important to understand how nodes can establish
-streams of data. 
-
+streams of data.
 
 ## Programming Analogy
 
@@ -76,5 +72,3 @@ analogy in Arkitekt.
 </div>
 
 Nodes are best explained in interplay with explaining it with a Template
-
-

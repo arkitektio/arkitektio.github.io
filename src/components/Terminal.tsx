@@ -33,7 +33,6 @@ export const InnerTerminal = ({
     });
   }, []);
 
-  
   useEffect(() => {
     const currentRef = ref.current;
     console.log(src);

@@ -16,6 +16,6 @@ declare module "asciinema-player" {
       poster?: string;
       fit?: string;
       fontSize?: string;
-    }
+    },
   );
 }

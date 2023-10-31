@@ -4,9 +4,9 @@ title: Everything everywhere, all at once
 sidebar_label: Real-time
 sidebar_position: 4
 ---
+
 import Image from "@theme/IdealImage";
 import client_stack from "./streaming.png";
-
 
 # Everything everywhere, all at once
 
@@ -19,7 +19,7 @@ With Arkitekt we wanted to change this. We wanted to enable users to process the
 
 ## Real-time workflows
 
-Arkitekt is built to enable users to design analysis workflows that can as **easily run post-hoc*** on already generated data, as they can run in **real-time on data** while it is being generated. This requires a bit of a different approach to designing and thinking about bioimage workflows:  Instead of focussing on "batch analysis", Arkitekt fully embraces "streaming analysis" to analyses data as it is being generated, no only cutting down on the time it takes to get results, but because of immediate feedback enabling paradigms like "smart microscopy".
+Arkitekt is built to enable users to design analysis workflows that can as **easily run post-hoc\*** on already generated data, as they can run in **real-time on data** while it is being generated. This requires a bit of a different approach to designing and thinking about bioimage workflows: Instead of focussing on "batch analysis", Arkitekt fully embraces "streaming analysis" to analyses data as it is being generated, no only cutting down on the time it takes to get results, but because of immediate feedback enabling paradigms like "smart microscopy".
 
 <div className="mt-2">
 <Image img={client_stack} />
@@ -29,18 +29,13 @@ Arkitekt is built to enable users to design analysis workflows that can as **eas
 </div>
 </div>
 
-
-
-
 ## Facing bottlenecks
 
-Real-time analysis is a very challenging task, and often unavoidable bottlenecks will arise, rendering your real-time analysis very much week-long. 
+Real-time analysis is a very challenging task, and often unavoidable bottlenecks will arise, rendering your real-time analysis very much week-long.
 These bottlenecks can be caused by the hardware ( an old computer), the software (a long running deep learning algorithm), or the network (very slow network connection / latency).
 When using Arkitekt, we wanted to enable the user to identify and circumvent these bottlenecks and to fix them as they arise.
 
 Arkitekt is therefore designed to provide simple interfaces to debug, monitor and fix these bottlenecks, while the analysis is still running. T
 his enables the user to be able to fix the bottlenecks as they arise, and to be able to continue the analysis in real-time.
-Even though Arkitekt is a server-client application, 
+Even though Arkitekt is a server-client application,
 that in its default configuration enables the user to run the analysis on multiple computers, you can decide to run/schedule workflows latency on one application, enabling even workflows that are sensitive to sub-millisecond latency.
-
-

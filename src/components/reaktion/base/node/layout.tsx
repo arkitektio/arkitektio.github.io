@@ -57,7 +57,7 @@ export const NodeLayoutProvider: React.FC<NodeLayoutProviderProps> = ({
   // On top layout
   const onResize = (
     event: React.SyntheticEvent,
-    { size, handle }: ResizeCallbackData
+    { size, handle }: ResizeCallbackData,
   ) => {
     setState((state) => ({
       ...state,
@@ -103,7 +103,7 @@ export const NodeLayoutProvider: React.FC<NodeLayoutProviderProps> = ({
 
 // a HOC to add the layout state to the node
 export const withLayout = <P extends NodeProps>(
-  Component: React.ComponentType<P>
+  Component: React.ComponentType<P>,
 ) => {
   return (props: P) => {
     return (

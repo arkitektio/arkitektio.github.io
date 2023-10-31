@@ -63,5 +63,5 @@ export const InstallRepoButton = portGuarded(
       </>
     );
   },
-  <div className={className + "bg-back-600"}> 🎱 Connect to install</div>
+  <div className={className + "bg-back-600"}> 🎱 Connect to install</div>,
 );

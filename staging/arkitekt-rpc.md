@@ -5,7 +5,6 @@ sidebar_label: Calling your App
 sidebar_position: 1
 ---
 
-
 # How do we call your app.
 
 Arkitekt is a platform that enables you to connect your favourite tools together. To do this, Arkitekt needs to know how to call your app. Arkitekt uses a simple protocol called Arkitekt RPC to call your app. Arkitekt RPC is a simple but powerful protocol that allows Arkitekt to call your app, and for your app to call Arkitekt. Arkitekt RPC is very much alike other RPC protocols, but extends their concepts to allow for a more client-side oriented approach.
@@ -20,13 +19,9 @@ As the configuration of the specific RPC setup can vary quite dramatically (muti
 
 There are a lot of RPC protocols out there. Some of them are very mature, and have been around for a long time. Some of them are very new, and are still in development. Some of them are very simple, and some of them are very complex. We try to give you a good overview of our journey through the landscape of RPC protocols, and the problems that we encountered when we tried to use them. Arkitekts RPC is not a one-of-a-kind protocol. And parts of it functionality can be found in other protocols. So why did we choose to develop our own RPC protocol? Lets explore some of the reasons why we chose to develop our own RPC protocol, looking at the problems we encountered when we tried to use other RPC protocols.
 
-
-
-
 ### The landscape of RPC protocols
 
 We will first devide them into two categories: 'client-server' RPC and 'message-based'' RPC (explaination of the two categories below). And briefly explain the advantages and disadvantages of each category.
-
 
 # The 'client-server' RPC
 
@@ -71,7 +66,7 @@ When done right, the server can be scaled by just spinning up more servers. The 
 
 ### Not easy to debug
 
-Because computers are not perfect, things can go wrong. When things go wrong, it is very hard to debug the problem. The client does not know what is going on on the server, or even if the server is still running. The server does not know if the client is still running, or if the client is still connected. This makes it very hard to debug problems, especially if we want to enable workflows that are distributed over multiple machines. 
+Because computers are not perfect, things can go wrong. When things go wrong, it is very hard to debug the problem. The client does not know what is going on on the server, or even if the server is still running. The server does not know if the client is still running, or if the client is still connected. This makes it very hard to debug problems, especially if we want to enable workflows that are distributed over multiple machines.
 
 ~ Figure of client-server RPC falling short when an error occurs in one app ~
 
@@ -95,7 +90,7 @@ As the broker is a central server that all the clients connect to, it is very ea
 
 ### Easy to debug
 
-The broker is a central point of authority. It knows what workers are available, and it knows what workers are busy. This makes it very easy to debug problems, as the broker can tell you what is going on. 
+The broker is a central point of authority. It knows what workers are available, and it knows what workers are busy. This makes it very easy to debug problems, as the broker can tell you what is going on.
 
 ### Easy to protect
 
@@ -119,7 +114,6 @@ The broker is a central point of failure. If the broker goes down, all the worke
 
 As all connections have to be routed through the broker, there is a latency penalty. This is not always a big problem, as the latency penalty is very small, but it is still quite a penalty if your application is latency sensitive, and could have connected directly to the worker.
 
-
 ### Hard to advertise functionality
 
 As the broker is just made to route messages, it does not know what functionality is available on the workers. This means that the workers need to advertise their functionality to a central repository of all functionality that is available. This necessates a common protocol often interface definition language (IDL) to be used by all workers.
@@ -127,7 +121,6 @@ As the broker is just made to route messages, it does not know what functionalit
 ### Hard to setup
 
 The initial setup of the broker is not trivial, as you need to be familiar with the technology.
-
 
 # The decision on the architecture
 
@@ -138,11 +131,11 @@ It was not an easy decision to make, but we decided to go with the message-based
 In our design the arkitekt platform (indeed its `rekuest` service) is the central broker, that negotiates between your applications. As discussed previously, we need a central repository for our functionality, that all applications can publish to and read from. With `rekuest` we also provide this and enable apps to simply publish their functionality when connecting to the platform. This functionality is then available to all other apps that are connected to the platform in the form of a Template implementing a Node. See the [Template](terminology/template.md) section for more information on this. The application now when put into
 the provide mode, will connect to the central broker as an agent (worker). This agent is now uniquely identified by the user, and the oauth2 client as well as an instance_id (If you would like to use multiple instances of the same application). The agent now represents a stateful connection to the broker, and we can track the state of all of the agents on the platform.
 
-Importantly the agent does not listen to any requests by itself, but will only do so when receiving a provision. (see figure2). A provision is the act of requesting a specific functionality of an applicaiton through the broker. It represents a contract between the application and the broker. The application can choose to respect this contract, or not (e.g when it can't ensure the requested resources are available). 
+Importantly the agent does not listen to any requests by itself, but will only do so when receiving a provision. (see figure2). A provision is the act of requesting a specific functionality of an applicaiton through the broker. It represents a contract between the application and the broker. The application can choose to respect this contract, or not (e.g when it can't ensure the requested resources are available).
 
-Clients trying to use the functionality of an application, will connect to the broker, and request a reservation. A reservation is a request to the broker to make a specific functionality available for the client. Again its a contract between the broker and this time the client. The broker will then try to find an application that provided the functioniality (already exisiting provision) or provide this functionality (creating a provision) on another app. This provision is then linked to the reservation. 
+Clients trying to use the functionality of an application, will connect to the broker, and request a reservation. A reservation is a request to the broker to make a specific functionality available for the client. Again its a contract between the broker and this time the client. The broker will then try to find an application that provided the functioniality (already exisiting provision) or provide this functionality (creating a provision) on another app. This provision is then linked to the reservation.
 
-When now requesting to use the functionality (doing the RPC call itself), the client will send a request through its connection to the reservation which will in turn map this request to the provision. The provision will then send the request to the agent, which will then execute the request and return the result to the provision, which will then return the result to the reservation, which will then return the result to the client. 
+When now requesting to use the functionality (doing the RPC call itself), the client will send a request through its connection to the reservation which will in turn map this request to the provision. The provision will then send the request to the agent, which will then execute the request and return the result to the provision, which will then return the result to the reservation, which will then return the result to the client.
 
 We establish these contracts as core elements of our design as they allow a clear seperation between the client and the worker. Additionaly these contracts
 allow the client to determine the conditions of validity of its contract to use the functionality (e.g demanding multiple workers to be available, which apps
@@ -150,48 +143,25 @@ are allowed to provide the functionality, etc). This enables easy debugging of t
 
 Internally these contracts mimic closely the concepts of topics and queues in message-based systems. The reservation is the topic, and the provisions are the queues that are subscribed (in a round-robin manner) to the topic. The client send messages to the topic and they get mapped to the queue.
 
-
 ~ Extended image of the broker RPC with arkitekts, reservation and provision ~
 
 Lets look at the image above. We see that the broker is still the central point of authority, and both the application providing functionality and the client are connecting to it, through stateful connections. However we introduce the concept of reservations and provisions
-
-
 
 # Going asynchronous
 
 One of the most important decisions when choosing to use an RPC protocol is choosing how you want to interface with your application. Do you want to use synchronous or asynchronous calls?
 
-Synchronous RPC calls are blocking. The client will wait for the server to return the result before it can continue. Asynchronous RPC calls are non-blocking. The client will not wait for the server to return the result before it can continue. 
+Synchronous RPC calls are blocking. The client will wait for the server to return the result before it can continue. Asynchronous RPC calls are non-blocking. The client will not wait for the server to return the result before it can continue.
 
-:::note 
+:::note
 Notice, that this behaviour is completely orthogonal to the design of the protocol. It possible to use synchronous or asynchronous calls both in a message-based RPC protocol and in a client-server protocol. In a message-based RPC protocol, the client can send a request to the broker, and then wait for the broker to return the result. Or the client can send a request to the broker, and then continue with its work. The broker will then send the result to the client when it is ready.
 :::
 
 Even though we provide you with synchronous interface in our client-libraries, arkitekt is designed to be asynchronous, which allows you to easily design
-concurrent workflows, 
-
-
-
-
-
-
-
-
-
+concurrent workflows,
 
 # The request/response cycle
 
-
-
-
 # The message-based RPC
 
-
-
-
-
-
-
-
 # The 'client-focus' RPC
-

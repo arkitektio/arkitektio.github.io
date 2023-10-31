@@ -4,9 +4,9 @@ sidebar_label: 2. Upload your data
 sidebar_position: 2
 ---
 
-import upload from './upload.webm';
-import createDataset from './create_dataset.webm';
-import dataset_drop from './dataset_drop.webm';
+import upload from "./upload.webm";
+import createDataset from "./create_dataset.webm";
+import dataset_drop from "./dataset_drop.webm";
 
 # Upload your data
 
@@ -20,12 +20,11 @@ Here you will learn how to:
 
 ## Upload data
 
-Uploading data to the platform is easy. You can simple drag and drop your data into the platform. Multiple files can be uploaded at once. 
+Uploading data to the platform is easy. You can simple drag and drop your data into the platform. Multiple files can be uploaded at once.
 The platform will try to auomatically detect the file type and show you the file type in the file list. Currently you can upload any
 datatype to the Arktiekt platform, and Arkitekt should support any filesize.
 
 Lets try this out. Download the following file to your computer: [here](/demos/cells1.TIF).
-
 
 :::info About the data
 
@@ -34,10 +33,15 @@ provided file. It is a 2D image of some cells that we will use in the next secti
 
 :::
 
-
-
-<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
-  <source src={upload}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={upload} />
 </video>
 
 Thats it. Your data is now uploaded to the platform. You can see it in the file list on the left. You can also see that the file type is detected.
@@ -49,46 +53,43 @@ data in a hierarchical way, just like you would organize your files in folders. 
 action bar. Just give it a name and hit enter. A new `Dataset` will be created. You can now drag and drop your data into the
 `Dataset` to organize it. Let's see this in action:
 
-<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
-  <source src={createDataset}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={createDataset} />
 </video>
 
-
 When dragging and dropping your data, Arkitekt will give you contextual help about `Actions` that you can perform on this particular data. For example
-when you drag and drop a file, and you just started your drag-n-drop arkitekt will give you contextually relevant  `Actions` that you can perform on the
-data *itself*. Here, for example you can see a button for delete and a download button (sadly not working currently on the app, but only on the webapp),
-if you hover over the file itself. 
-However these Actions can also be *associative*: If you drag over the `Dataset` with the `File`, you will see that you can move the file to another `Dataset`. 
- 
+when you drag and drop a file, and you just started your drag-n-drop arkitekt will give you contextually relevant `Actions` that you can perform on the
+data _itself_. Here, for example you can see a button for delete and a download button (sadly not working currently on the app, but only on the webapp),
+if you hover over the file itself.
+However these Actions can also be _associative_: If you drag over the `Dataset` with the `File`, you will see that you can move the file to another `Dataset`.
 
 If that doesn't make sense to you, don't worry. We will explain this in more detail in the next few sections. For now, just remember that you can drag and drop
-items over each other, and Arktiekt will give you information about what to do with your data. One more things however: broadly  `Actions` fall into two categories:
+items over each other, and Arktiekt will give you information about what to do with your data. One more things however: broadly `Actions` fall into two categories:
 
 1.  `Manage Actions`: These actions are integrated platform actions that help you manage your data. For example you can delete data, or move it to another
-`Dataset`. `Manage Actions` are however no image processing actions. These actions are always available.
+    `Dataset`. `Manage Actions` are however no image processing actions. These actions are always available.
 
 2.  `Tool Actions`: These actions are provided by your tools that you have installed on the platform. We haven't seen any of these yet, but we will see them
-in the next section. These actions are powered by the nodes that your applications might provide.
-
-
-
-
+    in the next section. These actions are powered by the nodes that your applications might provide.
 
 :::info About Accessibility
 
 As show Drag and Drop plays a crucial role when interfacing with the Orkestrator interface. Most of the time, you will be able to drag and drop
-data to associate with each other, or to organize it. However drag and drop is not the most accessible technology. Therefore Orkestrator provides also a set of functionality that is entirely keyboard accessible (and screen reader friendly). Allmost all commands 
-can be also accessed through the [PowerMenu](/docs/features/powermenu) (Meta-M) or (Ctrl-M) and "non associative actions" can be accessed through a right click on 
+data to associate with each other, or to organize it. However drag and drop is not the most accessible technology. Therefore Orkestrator provides also a set of functionality that is entirely keyboard accessible (and screen reader friendly). Allmost all commands
+can be also accessed through the [PowerMenu](/docs/features/powermenu) (Meta-M) or (Ctrl-M) and "non associative actions" can be accessed through a right click on
 the item.
 
 :::
-
-
 
 ## Just one more file
 
 Before we move on, lets upload one more file. You can download it [here](/demos/cells2.TIF).
 You can upload it the same way as before. However, this time, lets try to upload it directly into the `Dataset` that we created before. You can do this opening
 the `Dataset` and then drag and drop the file into the `Dataset`. Now that we have two files in the `Dataset` lets do something with them.
-
-

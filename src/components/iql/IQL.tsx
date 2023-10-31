@@ -197,7 +197,7 @@ export function IQL(props: GraphiQLInterfaceProps) {
 // Determines if the React child is of the same type of the provided React component
 function isChildComponentType<T extends ComponentType>(
   child: any,
-  component: T
+  component: T,
 ): child is T {
   if (
     child?.type?.displayName &&

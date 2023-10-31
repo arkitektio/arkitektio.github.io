@@ -1,276 +1,304 @@
 @import url("codemirror/lib/codemirror.css");
 /* Colors */
- .graphiql-container, .CodeMirror-info, .CodeMirror-lint-tooltip, reach-portal {
-	--color-primary: rgb(var(--color-primary-300));
-	--color-secondary: rgb(var(--color-primary-500));
-	--color-tertiary: rgb(var(--color-primary-700));
-	--color-info: rgb(var(--color-primary-300));
-	--color-success: rgb(var(--color-primary-300));
-	--color-warning: rgb(var(--color-primary-300));
-	--color-error: rgb(var(--color-primary-300));
-	--color-neutral: rgb(var(--color-slate-200));
-	--color-base: rgb(var(--color-primary-300));
-	--editor-background: rgb(var(--color-back-900));
-	/* Color alpha values */
-	 --alpha-secondary: 0.76;
-	 --alpha-tertiary: 0.5;
-	 --alpha-background-heavy: 0.15;
-	 --alpha-background-medium: 0.1;
-	 --alpha-background-light: 0.07;
-	/* Font */
-	 --font-family: "Roboto", sans-serif;
-	 --font-family-mono: "Fira Code", monospace;
-	 --font-size-hint: calc(12rem / 16);
-	 --font-size-inline-code: calc(13rem / 16);
-	 --font-size-body: calc(15rem / 16);
-	 --font-size-h4: calc(18rem / 16);
-	 --font-size-h3: calc(22rem / 16);
-	 --font-size-h2: calc(29rem / 16);
-	 --font-weight-regular: 400;
-	 --font-weight-medium: 500;
-	 --line-height: 1.5;
-	/* Spacing */
-	 --px-2: 2px;
-	 --px-4: 4px;
-	 --px-6: 6px;
-	 --px-8: 8px;
-	 --px-10: 10px;
-	 --px-12: 12px;
-	 --px-16: 16px;
-	 --px-20: 20px;
-	 --px-24: 24px;
-	/* Border radius */
-	 --border-radius-2: 2px;
-	 --border-radius-4: 4px;
-	 --border-radius-8: 8px;
-	 --border-radius-12: 12px;
-	/* Popover styles (tooltip, dialog, etc) */
-	 --popover-box-shadow: 0px 6px 20px rgba(59, 76, 106, 0.13), 0px 1.34018px 4.46726px rgba(59, 76, 106, 0.0774939), 0px 0.399006px 1.33002px rgba(59, 76, 106, 0.0525061);
-	 --popover-border: none;
-	 --popover-box-background: #000;
-	/* Layout */
-	 --sidebar-width: 44px;
-	 --toolbar-width: 40px;
-	 --session-header-height: 51px;
+.graphiql-container,
+.CodeMirror-info,
+.CodeMirror-lint-tooltip,
+reach-portal {
+  --color-primary: rgb(var(--color-primary-300));
+  --color-secondary: rgb(var(--color-primary-500));
+  --color-tertiary: rgb(var(--color-primary-700));
+  --color-info: rgb(var(--color-primary-300));
+  --color-success: rgb(var(--color-primary-300));
+  --color-warning: rgb(var(--color-primary-300));
+  --color-error: rgb(var(--color-primary-300));
+  --color-neutral: rgb(var(--color-slate-200));
+  --color-base: rgb(var(--color-primary-300));
+  --editor-background: rgb(var(--color-back-900));
+  /* Color alpha values */
+  --alpha-secondary: 0.76;
+  --alpha-tertiary: 0.5;
+  --alpha-background-heavy: 0.15;
+  --alpha-background-medium: 0.1;
+  --alpha-background-light: 0.07;
+  /* Font */
+  --font-family: "Roboto", sans-serif;
+  --font-family-mono: "Fira Code", monospace;
+  --font-size-hint: calc(12rem / 16);
+  --font-size-inline-code: calc(13rem / 16);
+  --font-size-body: calc(15rem / 16);
+  --font-size-h4: calc(18rem / 16);
+  --font-size-h3: calc(22rem / 16);
+  --font-size-h2: calc(29rem / 16);
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --line-height: 1.5;
+  /* Spacing */
+  --px-2: 2px;
+  --px-4: 4px;
+  --px-6: 6px;
+  --px-8: 8px;
+  --px-10: 10px;
+  --px-12: 12px;
+  --px-16: 16px;
+  --px-20: 20px;
+  --px-24: 24px;
+  /* Border radius */
+  --border-radius-2: 2px;
+  --border-radius-4: 4px;
+  --border-radius-8: 8px;
+  --border-radius-12: 12px;
+  /* Popover styles (tooltip, dialog, etc) */
+  --popover-box-shadow: 0px 6px 20px rgba(59, 76, 106, 0.13),
+    0px 1.34018px 4.46726px rgba(59, 76, 106, 0.0774939),
+    0px 0.399006px 1.33002px rgba(59, 76, 106, 0.0525061);
+  --popover-border: none;
+  --popover-box-background: #000;
+  /* Layout */
+  --sidebar-width: 44px;
+  --toolbar-width: 40px;
+  --session-header-height: 51px;
 }
- @media (prefers-color-scheme: dark) {
-	 body:not(.graphiql-light) .graphiql-container, body:not(.graphiql-light) .CodeMirror-info, body:not(.graphiql-light) .CodeMirror-lint-tooltip, body:not(.graphiql-light) reach-portal {
-		 --color-primary: #000;
-		 --color-secondary: #000;
-		 --color-tertiary: #000;
-		 --color-info: #000;
-		 --color-success: #000;
-		 --color-warning: #000;
-		 --color-error: #000;
-		 --color-neutral: #000;
-		 --color-base: #000;
-		 --popover-box-shadow: none;
-		 --popover-box-background: #000;
-		 --popover-border: 1px solid var(--color-neutral);
-	}
+@media (prefers-color-scheme: dark) {
+  body:not(.graphiql-light) .graphiql-container,
+  body:not(.graphiql-light) .CodeMirror-info,
+  body:not(.graphiql-light) .CodeMirror-lint-tooltip,
+  body:not(.graphiql-light) reach-portal {
+    --color-primary: #000;
+    --color-secondary: #000;
+    --color-tertiary: #000;
+    --color-info: #000;
+    --color-success: #000;
+    --color-warning: #000;
+    --color-error: #000;
+    --color-neutral: #000;
+    --color-base: #000;
+    --popover-box-shadow: none;
+    --popover-box-background: #000;
+    --popover-border: 1px solid var(--color-neutral);
+  }
 }
- body.graphiql-dark .graphiql-container, body.graphiql-dark .CodeMirror-info, body.graphiql-dark .CodeMirror-lint-tooltip, body.graphiql-dark reach-portal {
-	 --color-primary: #000;
-	 --color-secondary: #000;
-	 --color-tertiary: #000;
-	 --color-info: #000;
-	 --color-success: #000;
-	 --color-warning: #000;
-	 --color-error: #000;
-	 --color-neutral: #000;
-	 --color-base: #000;
-	 --popover-box-shadow: none;
-	 --popover-box-background: #000;
-	 --popover-border: 1px solid #000;
+body.graphiql-dark .graphiql-container,
+body.graphiql-dark .CodeMirror-info,
+body.graphiql-dark .CodeMirror-lint-tooltip,
+body.graphiql-dark reach-portal {
+  --color-primary: #000;
+  --color-secondary: #000;
+  --color-tertiary: #000;
+  --color-info: #000;
+  --color-success: #000;
+  --color-warning: #000;
+  --color-error: #000;
+  --color-neutral: #000;
+  --color-base: #000;
+  --popover-box-shadow: none;
+  --popover-box-background: #000;
+  --popover-border: 1px solid #000;
 }
- .graphiql-container:is(button), .CodeMirror-info:is(button), .CodeMirror-lint-tooltip:is(button), reach-portal:is(button) {
-	 color: var(--color-neutral);
-	 font-family: var(--font-family);
-	 font-size: var(--font-size-body);
-	 font-weight: var(----font-weight-regular);
-	 line-height: var(--line-height);
+.graphiql-container:is(button),
+.CodeMirror-info:is(button),
+.CodeMirror-lint-tooltip:is(button),
+reach-portal:is(button) {
+  color: var(--color-neutral);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-weight: var(----font-weight-regular);
+  line-height: var(--line-height);
 }
- .graphiql-container input, .CodeMirror-info input, .CodeMirror-lint-tooltip input, reach-portal input {
-	 color: var(--color-neutral);
-	 font-family: var(--font-family);
-	 font-size: var(--font-size-caption);
+.graphiql-container input,
+.CodeMirror-info input,
+.CodeMirror-lint-tooltip input,
+reach-portal input {
+  color: var(--color-neutral);
+  font-family: var(--font-family);
+  font-size: var(--font-size-caption);
 }
- .graphiql-container input::placeholder, .CodeMirror-info input::placeholder, .CodeMirror-lint-tooltip input::placeholder, reach-portal input::placeholder {
-	 color: var(--color-neutral);
+.graphiql-container input::placeholder,
+.CodeMirror-info input::placeholder,
+.CodeMirror-lint-tooltip input::placeholder,
+reach-portal input::placeholder {
+  color: var(--color-neutral);
 }
- .graphiql-container a, .CodeMirror-info a, .CodeMirror-lint-tooltip a, reach-portal a {
-	 color: var(--color-primary);
+.graphiql-container a,
+.CodeMirror-info a,
+.CodeMirror-lint-tooltip a,
+reach-portal a {
+  color: var(--color-primary);
 }
- .graphiql-container a:focus, .CodeMirror-info a:focus, .CodeMirror-lint-tooltip a:focus, reach-portal a:focus {
-	 outline: var(--color-primary) auto 1px;
+.graphiql-container a:focus,
+.CodeMirror-info a:focus,
+.CodeMirror-lint-tooltip a:focus,
+reach-portal a:focus {
+  outline: var(--color-primary) auto 1px;
 }
 /* Make the editors fill up their container and make them scrollable */
- .CodeMirror {
-	 height: 100%;
-	 position: absolute;
-	 width: 100%;
+.CodeMirror {
+  height: 100%;
+  position: absolute;
+  width: 100%;
 }
 /* Override font settings */
- .CodeMirror {
-	 font-family: var(--font-family-mono);
+.CodeMirror {
+  font-family: var(--font-family-mono);
 }
 /* Set default background color */
- .CodeMirror, .CodeMirror-gutters {
-	 background: none;
-	 background-color: var(--editor-background, #000);
+.CodeMirror,
+.CodeMirror-gutters {
+  background: none;
+  background-color: var(--editor-background, #000);
 }
 /* No padding around line number */
- .CodeMirror-linenumber {
-	 padding: 0;
+.CodeMirror-linenumber {
+  padding: 0;
 }
 /* No border between gutter and editor */
- .CodeMirror-gutters {
-	 border: none;
+.CodeMirror-gutters {
+  border: none;
 }
- .CodeMirror-hints {
-	 background: var(--color-back-200);
+.CodeMirror-hints {
+  background: var(--color-back-200);
 }
- .CodeMirror-hint-active {
-	 background: var(--color-back-400) !important;
-	 color: var(--color-primary) !important;
+.CodeMirror-hint-active {
+  background: var(--color-back-400) !important;
+  color: var(--color-primary) !important;
 }
- .CodeMirror-info {
-	 background: var(--color-back-200) !important;
-	 color: var(--color-primary) !important;
-	 border: var(--popover-border);
-	 box-shadow: var(--popover-box-shadow);
-	 font-family: var(--font-family);
-	 font-size: var(--font-size-caption);
-	 font-weight: var(--font-weight-regular);
-	 line-height: var(--line-height);
-	 padding: var(--px-8) var(--px-12);
-	 position: absolute;
-	 z-index: 1;
+.CodeMirror-info {
+  background: var(--color-back-200) !important;
+  color: var(--color-primary) !important;
+  border: var(--popover-border);
+  box-shadow: var(--popover-box-shadow);
+  font-family: var(--font-family);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height);
+  padding: var(--px-8) var(--px-12);
+  position: absolute;
+  z-index: 1;
 }
 /** * Editor theme */
- .cm-s-graphiql {
-	/* Default to punctuation */
-	 color: var(--color-neutral);
-	/* OperationType, `fragment`, `on` */
-	/* Name (OperationDefinition), FragmentName */
-	/* Punctuator (except `$` and `@`) */
-	/* Variable */
-	/* NamedType */
-	/* IntValue, FloatValue */
-	/* StringValue */
-	/* BooleanValue */
-	/* EnumValue */
-	/* Name (ObjectField, Argument) */
-	/* Name (Directive) */
-	/* Name (Alias, Field without Alias) */
-	/* Name (Field with Alias) */
-	/* Comment */
-	/* Whitespace */
-	/* Invalid characters */
-	/* Cursor */
-	/* Color for line numbers and fold-gutters */
+.cm-s-graphiql {
+  /* Default to punctuation */
+  color: var(--color-neutral);
+  /* OperationType, `fragment`, `on` */
+  /* Name (OperationDefinition), FragmentName */
+  /* Punctuator (except `$` and `@`) */
+  /* Variable */
+  /* NamedType */
+  /* IntValue, FloatValue */
+  /* StringValue */
+  /* BooleanValue */
+  /* EnumValue */
+  /* Name (ObjectField, Argument) */
+  /* Name (Directive) */
+  /* Name (Alias, Field without Alias) */
+  /* Name (Field with Alias) */
+  /* Comment */
+  /* Whitespace */
+  /* Invalid characters */
+  /* Cursor */
+  /* Color for line numbers and fold-gutters */
 }
- .cm-s-graphiql .cm-keyword {
-	 color: var(--color-primary);
+.cm-s-graphiql .cm-keyword {
+  color: var(--color-primary);
 }
- .cm-s-graphiql .cm-def {
-	 color: var(--color-tertiary);
+.cm-s-graphiql .cm-def {
+  color: var(--color-tertiary);
 }
- .cm-s-graphiql .cm-punctuation {
-	 color: var(--color-neutral);
+.cm-s-graphiql .cm-punctuation {
+  color: var(--color-neutral);
 }
- .cm-s-graphiql .cm-variable {
-	 color: var(--color-secondary);
+.cm-s-graphiql .cm-variable {
+  color: var(--color-secondary);
 }
- .cm-s-graphiql .cm-atom {
-	 color: var(--color-tertiary);
+.cm-s-graphiql .cm-atom {
+  color: var(--color-tertiary);
 }
- .cm-s-graphiql .cm-number {
-	 color: var(--color-success);
+.cm-s-graphiql .cm-number {
+  color: var(--color-success);
 }
- .cm-s-graphiql .cm-string {
-	 color: var(--color-warning);
+.cm-s-graphiql .cm-string {
+  color: var(--color-warning);
 }
- .cm-s-graphiql .cm-builtin {
-	 color: var(--color-success);
+.cm-s-graphiql .cm-builtin {
+  color: var(--color-success);
 }
- .cm-s-graphiql .cm-string-2 {
-	 color: var(--color-secondary);
+.cm-s-graphiql .cm-string-2 {
+  color: var(--color-secondary);
 }
- .cm-s-graphiql .cm-attribute {
-	 color: var(--color-tertiary);
+.cm-s-graphiql .cm-attribute {
+  color: var(--color-tertiary);
 }
- .cm-s-graphiql .cm-meta {
-	 color: var(--color-tertiary);
+.cm-s-graphiql .cm-meta {
+  color: var(--color-tertiary);
 }
- .cm-s-graphiql .cm-property {
-	 color: var(--color-info);
+.cm-s-graphiql .cm-property {
+  color: var(--color-info);
 }
- .cm-s-graphiql .cm-qualifier {
-	 color: var(--color-secondary);
+.cm-s-graphiql .cm-qualifier {
+  color: var(--color-secondary);
 }
- .cm-s-graphiql .cm-comment {
-	 color: var(--color-neutral);
+.cm-s-graphiql .cm-comment {
+  color: var(--color-neutral);
 }
- .cm-s-graphiql .cm-ws {
-	 color: var(--color-neutral);
+.cm-s-graphiql .cm-ws {
+  color: var(--color-neutral);
 }
- .cm-s-graphiql .cm-invalidchar {
-	 color: #f00;
+.cm-s-graphiql .cm-invalidchar {
+  color: #f00;
 }
- .cm-s-graphiql .CodeMirror-cursor {
-	 border-left: 2px solid var(--color-primary);
+.cm-s-graphiql .CodeMirror-cursor {
+  border-left: 2px solid var(--color-primary);
 }
- .cm-s-graphiql .CodeMirror-linenumber {
-	 color: var(--color-neutral);
+.cm-s-graphiql .CodeMirror-linenumber {
+  color: var(--color-neutral);
 }
 /* Matching bracket colors */
- div.CodeMirror span.CodeMirror-matchingbracket, div.CodeMirror span.CodeMirror-nonmatchingbracket {
-	 color: var(--color-warning);
+div.CodeMirror span.CodeMirror-matchingbracket,
+div.CodeMirror span.CodeMirror-nonmatchingbracket {
+  color: var(--color-warning);
 }
 /* Selected text blocks */
- .CodeMirror-selected, .CodeMirror-focused .CodeMirror-selected {
-	 background: var(--color-primary);
+.CodeMirror-selected,
+.CodeMirror-focused .CodeMirror-selected {
+  background: var(--color-primary);
 }
 /* Position the search dialog */
- .CodeMirror-dialog {
-	 background: inherit;
-	 color: inherit;
-	 left: 0;
-	 right: 0;
-	 overflow: hidden;
-	 padding: var(--px-2) var(--px-6);
-	 position: absolute;
-	 z-index: 6;
+.CodeMirror-dialog {
+  background: inherit;
+  color: inherit;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  padding: var(--px-2) var(--px-6);
+  position: absolute;
+  z-index: 6;
 }
- .CodeMirror-dialog-top {
-	 border-bottom: 1px solid var(--color-neutral);
-	 padding-bottom: var(--px-12);
-	 top: 0;
+.CodeMirror-dialog-top {
+  border-bottom: 1px solid var(--color-neutral);
+  padding-bottom: var(--px-12);
+  top: 0;
 }
- .CodeMirror-dialog-bottom {
-	 border-top: 1px solid var(--color-neutral);
-	 bottom: 0;
-	 padding-top: var(--px-12);
+.CodeMirror-dialog-bottom {
+  border-top: 1px solid var(--color-neutral);
+  bottom: 0;
+  padding-top: var(--px-12);
 }
 /* Hide the search hint */
- .CodeMirror-search-hint {
-	 display: none;
+.CodeMirror-search-hint {
+  display: none;
 }
 /* Style the input field for searching */
- .CodeMirror-dialog input {
-	 border: 1px solid var(--color-neutral);
-	 border-radius: var(--border-radius-4);
-	 padding: var(--px-4);
+.CodeMirror-dialog input {
+  border: 1px solid var(--color-neutral);
+  border-radius: var(--border-radius-4);
+  padding: var(--px-4);
 }
- .CodeMirror-dialog input:focus {
-	 outline: var(--color-primary) solid 2px;
+.CodeMirror-dialog input:focus {
+  outline: var(--color-primary) solid 2px;
 }
 /* Set the highlight color for search results */
- .cm-searching {
-	 background-color: var(--color-warning);
-	/** * When cycling through search results, CodeMirror overlays the current * selection with another element that has the .CodeMirror-selected class * applied. This adds another background color (see above), but this extra * box does not quite match the height of this element. To match them up we * add some extra padding here. (Note that this doesn't affect the line * height of the CodeMirror editor as all line wrappers have a fixed height.) */
-	 padding-bottom: 1.5px;
-	 padding-top: 0.5px;
+.cm-searching {
+  background-color: var(--color-warning);
+  /** * When cycling through search results, CodeMirror overlays the current * selection with another element that has the .CodeMirror-selected class * applied. This adds another background color (see above), but this extra * box does not quite match the height of this element. To match them up we * add some extra padding here. (Note that this doesn't affect the line * height of the CodeMirror editor as all line wrappers have a fixed height.) */
+  padding-bottom: 1.5px;
+  padding-top: 0.5px;
 }
- 

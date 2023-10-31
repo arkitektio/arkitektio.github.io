@@ -4,33 +4,31 @@ sidebar_label: Interactive Workflow
 sidebar_position: 2
 ---
 
-
 import { DownloadGrid } from "../../../src/components/layout/Button";
-import Image from '@theme/IdealImage';
-import interactive from './interactive.png';
-import { ShowWorkflow} from "../../../src/components/reaktion/ShowWorkflow";
-import { DisplayWorkflow} from "../../../src/components/reaktion/DisplayWorkflow";
-import { InstallRepoButton} from "../../../src/components/InstallRepoButton";
-import { UploadModelButton} from "../../../src/components/UploadModelButton";
-import { LatestImage} from "../../../src/components/mikro/LatestImage";
-import { Guard} from "../../../src/components/Guard";
-import interactiveAnalysisFlow from './interactive_analysis.json';
-import model from './test.zip';
+import Image from "@theme/IdealImage";
+import interactive from "./interactive.png";
+import { ShowWorkflow } from "../../../src/components/reaktion/ShowWorkflow";
+import { DisplayWorkflow } from "../../../src/components/reaktion/DisplayWorkflow";
+import { InstallRepoButton } from "../../../src/components/InstallRepoButton";
+import { UploadModelButton } from "../../../src/components/UploadModelButton";
+import { LatestImage } from "../../../src/components/mikro/LatestImage";
+import { Guard } from "../../../src/components/Guard";
+import interactiveAnalysisFlow from "./interactive_analysis.json";
+import model from "./test.zip";
 
 The following workflow and online showcase is an example of how arkitekt enables an interactive workflow, spanning multiple bioimage apps and deep learning enabled
 denoising. With this workflow we would like to demonstrate that by leveraging a tight and timely interaction between the apps, users can get immediate
 feedback on the results of their actions.
 
 Here we set out to use Arkitekt to build a workflow that allows users to interactively denoise and segment cells in regions of interest in a 3D image.
-The workflow is composed of three apps: 
+The workflow is composed of three apps:
 
-- **Napari** a python based 3D volume  viewer that will allow the users to interactively annotate regions of interest in an image, while eeasily exploring
-the 3D volume, as well as the app that will be used to display the results of the workflow.
+- **Napari** a python based 3D volume viewer that will allow the users to interactively annotate regions of interest in an image, while eeasily exploring
+  the 3D volume, as well as the app that will be used to display the results of the workflow.
 
 - **Care Denoising**, a deep learning based denoising app that will be used to denoise the regions of interest selected by the user in Napari.
 
 - **Fiji** (ImageJ), and its "Analyze Particles" plugin, that will be used to segment the denoised regions of interest.
-
 
 <div className="mt-2 p-6">
 <Image img={interactive} />
@@ -44,7 +42,7 @@ the 3D volume, as well as the app that will be used to display the results of th
 
 The main motivation for showcasing this workflow, is the core believe that interactive workflows are a key component of the current and future bioimage analysis
 landscape. We believe that the ability to interactively explore and annotate data, and to get immediate feedback on the results of the analysis, is a key necessity
-for the current analysis where human insight is determing where we look for when analysis our data.  And while automation will continue to grow in importance,
+for the current analysis where human insight is determing where we look for when analysis our data. And while automation will continue to grow in importance,
 we believe that the human in the loop will, continue to play a key component of the analtical process.
 
 ## Prerequisites
@@ -65,48 +63,49 @@ or via the command line with `pip install mikro-napari`
 
 An Arkitekt plugin that allows you to denoise images using deep learning. You can install it through the PluginStore or when connected, by clicking on the button below.
 
-<InstallRepoButton repo={"kare"} user={"jhnnsrs"} branch={"master"}/>
+<InstallRepoButton repo={"kare"} user={"jhnnsrs"} branch={"master"} />
 
 #### [Fiji](https://imagej.net/Fiji)
 
 A ImageJ instance with the "Analyze Particles" plugin installed (comes preinstalled with Fiji)
 
 #### [MikroJ](https://github.com/jhnnsrs/mikroj)
-    
-The Arkitekt enabled FIJI wrapper app that allows your Fiji instance to be connected to Arkitekt. Please install 
+
+The Arkitekt enabled FIJI wrapper app that allows your Fiji instance to be connected to Arkitekt. Please install
 the latest version of MikroJ.
 
 ## Data Preparation
 
-This workflow was designed to work with the [Tribolium](https://publications.mpi-cbg.de/publications-sites/7207/) Dataset. However the examplary data used in this 
+This workflow was designed to work with the [Tribolium](https://publications.mpi-cbg.de/publications-sites/7207/) Dataset. However the examplary data used in this
 workflow is only on noisy stack of the Tribolium dataset, which you can download [here](/demos/noisy_stack.tif).
 
 The Image Data was converted through the `Convert Omero` Node provided by
-<InstallRepoButton repo={"omero"} user={"jhnnsrs"} branch={"master"}/>
 
-## Model Preparation 
+<InstallRepoButton repo={"omero"} user={"jhnnsrs"} branch={"master"} />
+
+## Model Preparation
 
 For this workflow you can either use a pretrained model, or train your own model. If you want to train your own model, you can follow the instructions in the
 Deep Learning Training Tutorial to train your own model. If you want to use a pretrained model, you can upload the pretrained model directly from the link below.
 
-
-<UploadModelButton url={model} name="Tribolium Model" kind="TENSORFLOW"/>
+<UploadModelButton url={model} name="Tribolium Model" kind="TENSORFLOW" />
 
 This model was trained on [this dataset here](/demos/training.zip).
 
-
-## The Workflow 
+## The Workflow
 
 Once you have installed all the apps, you can simply import the workflow by connecting your arkitekt instance and clicking on the button below.
 
-
-<DisplayWorkflow flow={interactiveAnalysisFlow}/>
+<DisplayWorkflow flow={interactiveAnalysisFlow} />
 
 <div className="text-gray-400 mb-2">
-<small>Once connected this pane will also give you an overview over the apps that still need to be installed, nodes in green have been installed, nodes in yellow still lack an implementation. Of course
-feel free to explore this graph more interactively in your orkestrator interface</small>
+  <small>
+    Once connected this pane will also give you an overview over the apps that
+    still need to be installed, nodes in green have been installed, nodes in
+    yellow still lack an implementation. Of course feel free to explore this
+    graph more interactively in your orkestrator interface
+  </small>
 </div>
-
 
 ## Running the Workflow
 
@@ -116,9 +115,8 @@ For the execution of the Workflow you will need to start the following apps:
 - Kare Denoising (through deployment of the kare plugin)
 - Fiji (through MikroJ)
 
-Once you have started all the apps, you can run the workflow directly from an image uploaded to your arkitekt instance. To do so, simply 
+Once you have started all the apps, you can run the workflow directly from an image uploaded to your arkitekt instance. To do so, simply
 start the workflow and select the image the converted you want to run the workflow on.
-
 
 <details>
   <summary>Test Environment</summary>
@@ -139,7 +137,6 @@ start the workflow and select the image the converted you want to run the workfl
         - Arkitekt Paper Channel
         - Segmentor Plugin 0.3.1
         - Stdlib Plugin 0.3.6
-    
-    
+
   </div>
 </details>

@@ -51,5 +51,5 @@ export const KwargTrackNodeWidget: React.FC<KwargNodeProps> = withLayout(
         </NodeTrackLayout>
       </>
     );
-  }
+  },
 );

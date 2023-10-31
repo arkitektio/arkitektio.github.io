@@ -4,19 +4,18 @@ sidebar_label: Deep Learning Bridge
 sidebar_position: 3
 ---
 
-import deepL from './deep_l.json';
-import napariL from './napari_l.json';
-import { DisplayWorkflow} from "../../../src/components/reaktion/DisplayWorkflow";
-import Image from '@theme/IdealImage';
-import thumbnail from './segmentation.png';
-import fijiVideo from './fiji_segmentation.webm';
-import { InstallRepoButton} from "../../../src/components/InstallRepoButton";
+import deepL from "./deep_l.json";
+import napariL from "./napari_l.json";
+import { DisplayWorkflow } from "../../../src/components/reaktion/DisplayWorkflow";
+import Image from "@theme/IdealImage";
+import thumbnail from "./segmentation.png";
+import fijiVideo from "./fiji_segmentation.webm";
+import { InstallRepoButton } from "../../../src/components/InstallRepoButton";
 
 Deep learning is taking over the world of bioimage analysis, and for good reason. However it is not always easy to get started and use
 the deep learning tools that are available.
 In this section of the documentation we will try to show you how to get started with deep learning and how Arkitekt can help you,
 by showing you how to create a simple "deep learning enabled" workflow, that you can use to predict the segmentation of nuclei in a cell culture.
-
 
 ## Prerequisites
 
@@ -25,58 +24,53 @@ To get started with deep learning and Arkitekt you should:
 - Have a basic understanding of deep learning, in the sense of what the words "Training" and "Inference" mean.
 - Have gone through the [basics of Arkitekt](/docs/introduction/first_steps).
 - Have a CUDA capable GPU. If you don't have a GPU, you should still be able to follow along, but the prediction
-will be very slow.
+  will be very slow.
 - Either Mikro-Napari or Fiji with MikroJ installed. If you don't have either of these, you can still follow along, but you won't be able to run the workflow.
 
-# Our task 
+# Our task
 
-We would like to create a workflow that can take an image of nuclei in a cell culture and predict the segmentation of the nuclei. 
+We would like to create a workflow that can take an image of nuclei in a cell culture and predict the segmentation of the nuclei.
 We will be using a deep learning model based on [Stardist](https://github.com/stardist/stardist) to do the prediction.
-We will be using the same dataset that we have used in the [basics of Arkitekt](/docs/introduction/first_steps). 
+We will be using the same dataset that we have used in the [basics of Arkitekt](/docs/introduction/first_steps).
 
-<Image img={thumbnail}/>
+<Image img={thumbnail} />
 
 ## The problems we are trying to solve
 
-In this tutorial we would like to show you how to create a simple deep learning workflow in Arkitekt, and how Arkitekt can solve some common issues, 
-that you might encounter when trying to create your own deep learning workflows. 
+In this tutorial we would like to show you how to create a simple deep learning workflow in Arkitekt, and how Arkitekt can solve some common issues,
+that you might encounter when trying to create your own deep learning workflows.
 
+- How to maintain the **complex software requirements** that is needed for deep learning.
 
--   How to maintain the **complex software requirements** that is needed for deep learning.
+  That's a perfect fit for `PluginApps`. Arkitekt plugins are containerized, so developers can already add in
+  all of the software requirements that are needed for their specific deep learning algorithm. No need to install anything on your computer.
 
-    That's a perfect fit for `PluginApps`. Arkitekt plugins are containerized, so developers can already add in 
-    all of the software requirements that are needed for their specific deep learning algorithm. No need to install anything on your computer.
+- How to **integrate** deep learning into your favourite bioimage analysis app.
 
+  That's what we have **bridging** `Workflows` for. You can create a workflow in Arkitekt, that will take your image from you
+  bioimage analysis app of choice, offload them to the Arkitet server, and just pipe the result back to the bioimage app, so you can continue your analysis
+  in the app you are used to.
 
--   How to **integrate** deep learning into your favourite bioimage analysis app.
+- I **don't have GPUs** available on my computer, how can I still use deep learning?
 
-    That's what we have **bridging** `Workflows` for. You can create a workflow in Arkitekt, that will take your image from you
-    bioimage analysis app of choice, offload them to the Arkitet server, and just pipe the result back to the bioimage app, so you can continue your analysis
-    in the app you are used to.
-
-
--   I **don't have GPUs** available on my computer, how can I still use deep learning?
-
-    Easy. Just use the distributed workflow to offload the prediction to any computer that has a GPU available (here you Arkitekt Server) but potentially 
-    also another computer in your lab / and or the ominous cloud. Oh and if you don't have a GPU available at all, you can still use the CPU version of Stardist.
-
+  Easy. Just use the distributed workflow to offload the prediction to any computer that has a GPU available (here you Arkitekt Server) but potentially
+  also another computer in your lab / and or the ominous cloud. Oh and if you don't have a GPU available at all, you can still use the CPU version of Stardist.
 
 :::note On other solutions
 
 We are not the only ones trying to solve these problems. There are other great solutions out there, that you should definitely check out. One of it is [DeepImageJ](https://deepimagej.github.io).
-Arkitet is not trying to replace these solutions, but rather complement them. We are rather trying to provide a solution that is as generic as possible, so that you can use it with *any* deep learning algorithm
-(that might use a different framework, rely on heavy pre and postprocessing, ...) and *integrate* with any bioimage analysis app.
+Arkitet is not trying to replace these solutions, but rather complement them. We are rather trying to provide a solution that is as generic as possible, so that you can use it with _any_ deep learning algorithm
+(that might use a different framework, rely on heavy pre and postprocessing, ...) and _integrate_ with any bioimage analysis app.
 
 :::
-
 
 ## How to use Deep Learning in Arkitekt
 
 So how do we install Stardist? Well just like any other plugin. You can add the `segmentor` repository to your Arkitekt installation by clicking on the button below.
 
-<InstallRepoButton repo="segmentor" user="jhnnsrs" branch="master"/>
-<br/>
-<br/>
+<InstallRepoButton repo="segmentor" user="jhnnsrs" branch="master" />
+<br />
+<br />
 
 And then you can install the latest version of segmentor by deploying it as an plugin, as you learned in the [basics of Arkitekt](/docs/introduction/first_steps/first_tool#installing-our-first-app).
 For the rest of this tutorial we will assume that you have installed the `segmentor` plugin.
@@ -89,13 +83,16 @@ You can run the prediction on your image by utilizing the `Segment Fluo2` node.
 ## Integrate with ImageJ
 
 Now that we have tested our plugin, we would like to integrate it with our favourite bioimage analysis app. In this case we will be using Fiji through MikroJ, but you can use any other app that is supported by Arkitekt.
-For this we will be using two nodes provided by Fiji, the `Upload Image` node and the `Show Image` node. The `Upload Image` node will take the image from Fiji and upload it to the Arkitekt server, 
+For this we will be using two nodes provided by Fiji, the `Upload Image` node and the `Show Image` node. The `Upload Image` node will take the image from Fiji and upload it to the Arkitekt server,
 where it will be processed by the `Segment Fluo2` node of the `segmentor` plugin. The result will then be piped back to Fiji, where it will be shown using the `Show Image` node.
 
-
-<DisplayWorkflow flow={deepL}/>
+<DisplayWorkflow flow={deepL} />
 <div className="text-gray-400 mb-2">
-    <small> This is the workflow we would like to create. Upload our active image, segment it using a pretrained model, and show the result on ImageJ</small>
+  <small>
+    {" "}
+    This is the workflow we would like to create. Upload our active image, segment
+    it using a pretrained model, and show the result on ImageJ
+  </small>
 </div>
 
 Just import this workflow into your Arkitekt instance, and deploy it on the `reaktor` scheduler just like you did in the [basics of Arkitekt](/docs/introduction/first_workflows#reserving-a-scheduler).
@@ -103,32 +100,40 @@ Feel free to also create that workflow on your own, if you want to get some more
 
 After reserving the workflow, you can run it directly from the `Dashboard` of Orkestrator. Just make sure that you have an image open in Fiji, and then click on the `Run` button of the workflow.
 
-
-<video  autoPlay muted loop controls className="rounded rounded-md" width={"100%"}>
-  <source src={fijiVideo}/>
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={fijiVideo} />
 </video>
 <div className="text-gray-400 mb-2">
-    <small> The workflow in action utilizing MikroJ</small>
+  <small> The workflow in action utilizing MikroJ</small>
 </div>
-
 
 ## Integrate with Napari
 
 Now that we have seen how to integrate with ImageJ, let's try to do the same with Napari. Its quite similar to the ImageJ integration, but this time we will be using the `Upload Layer` node and the `Show on Napari` node provided by Napari.
 
-<DisplayWorkflow flow={napariL}/>
+<DisplayWorkflow flow={napariL} />
 <div className="text-gray-400 mb-2">
-    <small> This is the workflow we would like to create. Upload our active image, segment it using a pretrained model, and show the result on ImageJ</small>
+  <small>
+    {" "}
+    This is the workflow we would like to create. Upload our active image, segment
+    it using a pretrained model, and show the result on ImageJ
+  </small>
 </div>
 
 Import, deploy, reserve and run, just like you did with the ImageJ workflow. Its the same workflow, just with different nodes.
 
-:::info  On universal Workflows 
+:::info On universal Workflows
 
-You might have noticed that the workflow, is similar to the one we created for ImageJ, but not the same. We could have created a universal workflow, that would work for both ImageJ and Napari, by 
+You might have noticed that the workflow, is similar to the one we created for ImageJ, but not the same. We could have created a universal workflow, that would work for both ImageJ and Napari, by
 utilizing the `Upload Image` node and the `Show Image` node, and before deployment let the user choose which app he wants to use. This will be thematized in a later tutorial.
 :::
-
 
 ## Our own model
 
