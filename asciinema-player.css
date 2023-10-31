@@ -120,7 +120,8 @@
   border-style: solid;
   cursor: text;
   border-width: 0.75em;
-  font-family: Consolas, Menlo, 'Bitstream Vera Sans Mono', monospace, 'Powerline Symbols';
+  font-family: Consolas, Menlo, "Bitstream Vera Sans Mono", monospace,
+    "Powerline Symbols";
 }
 .asciinema-terminal .line {
   letter-spacing: normal;
@@ -177,11 +178,26 @@
   height: 32px;
   background: rgba(0, 0, 0, 0.8);
   /* no gradient fallback */
-  background: -moz-linear-gradient(top, rgba(0, 0, 0, 0.5) 0%, #000000 25%, #000000 100%);
+  background: -moz-linear-gradient(
+    top,
+    rgba(0, 0, 0, 0.5) 0%,
+    #000000 25%,
+    #000000 100%
+  );
   /* FF3.6-15 */
-  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.5) 0%, #000000 25%, #000000 100%);
+  background: -webkit-linear-gradient(
+    top,
+    rgba(0, 0, 0, 0.5) 0%,
+    #000000 25%,
+    #000000 100%
+  );
   /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, #000000 25%, #000000 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5) 0%,
+    #000000 25%,
+    #000000 100%
+  );
   /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   color: #bbb;
   box-sizing: content-box;
@@ -296,10 +312,14 @@
 .asciinema-player-wrapper:fullscreen .fullscreen-button svg:last-child {
   display: inline;
 }
-.asciinema-player-wrapper:-webkit-full-screen .fullscreen-button svg:first-child {
+.asciinema-player-wrapper:-webkit-full-screen
+  .fullscreen-button
+  svg:first-child {
   display: none;
 }
-.asciinema-player-wrapper:-webkit-full-screen .fullscreen-button svg:last-child {
+.asciinema-player-wrapper:-webkit-full-screen
+  .fullscreen-button
+  svg:last-child {
   display: inline;
 }
 .asciinema-player-wrapper:-moz-full-screen .fullscreen-button svg:first-child {
@@ -1806,7 +1826,7 @@
   background-color: #121314;
 }
 .asciinema-theme-asciinema .asciinema-terminal {
-  color: #CCCCCC;
+  color: #cccccc;
   background-color: #121314;
   border-color: #121314;
 }
@@ -1814,7 +1834,7 @@
   color: #121314;
 }
 .asciinema-theme-asciinema .bg-fg {
-  background-color: #CCCCCC;
+  background-color: #cccccc;
 }
 .asciinema-theme-asciinema .fg-0 {
   color: hsl(0, 0%, 0%);
@@ -1926,7 +1946,7 @@
   background-color: #121314;
 }
 .asciinema-theme-tango .asciinema-terminal {
-  color: #CCCCCC;
+  color: #cccccc;
   background-color: #121314;
   border-color: #121314;
 }
@@ -1934,7 +1954,7 @@
   color: #121314;
 }
 .asciinema-theme-tango .bg-fg {
-  background-color: #CCCCCC;
+  background-color: #cccccc;
 }
 .asciinema-theme-tango .fg-0 {
   color: #000000;
@@ -1943,46 +1963,46 @@
   background-color: #000000;
 }
 .asciinema-theme-tango .fg-1 {
-  color: #CC0000;
+  color: #cc0000;
 }
 .asciinema-theme-tango .bg-1 {
-  background-color: #CC0000;
+  background-color: #cc0000;
 }
 .asciinema-theme-tango .fg-2 {
-  color: #4E9A06;
+  color: #4e9a06;
 }
 .asciinema-theme-tango .bg-2 {
-  background-color: #4E9A06;
+  background-color: #4e9a06;
 }
 .asciinema-theme-tango .fg-3 {
-  color: #C4A000;
+  color: #c4a000;
 }
 .asciinema-theme-tango .bg-3 {
-  background-color: #C4A000;
+  background-color: #c4a000;
 }
 .asciinema-theme-tango .fg-4 {
-  color: #3465A4;
+  color: #3465a4;
 }
 .asciinema-theme-tango .bg-4 {
-  background-color: #3465A4;
+  background-color: #3465a4;
 }
 .asciinema-theme-tango .fg-5 {
-  color: #75507B;
+  color: #75507b;
 }
 .asciinema-theme-tango .bg-5 {
-  background-color: #75507B;
+  background-color: #75507b;
 }
 .asciinema-theme-tango .fg-6 {
-  color: #06989A;
+  color: #06989a;
 }
 .asciinema-theme-tango .bg-6 {
-  background-color: #06989A;
+  background-color: #06989a;
 }
 .asciinema-theme-tango .fg-7 {
-  color: #D3D7CF;
+  color: #d3d7cf;
 }
 .asciinema-theme-tango .bg-7 {
-  background-color: #D3D7CF;
+  background-color: #d3d7cf;
 }
 .asciinema-theme-tango .fg-8 {
   color: #555753;
@@ -1991,46 +2011,46 @@
   background-color: #555753;
 }
 .asciinema-theme-tango .fg-9 {
-  color: #EF2929;
+  color: #ef2929;
 }
 .asciinema-theme-tango .bg-9 {
-  background-color: #EF2929;
+  background-color: #ef2929;
 }
 .asciinema-theme-tango .fg-10 {
-  color: #8AE234;
+  color: #8ae234;
 }
 .asciinema-theme-tango .bg-10 {
-  background-color: #8AE234;
+  background-color: #8ae234;
 }
 .asciinema-theme-tango .fg-11 {
-  color: #FCE94F;
+  color: #fce94f;
 }
 .asciinema-theme-tango .bg-11 {
-  background-color: #FCE94F;
+  background-color: #fce94f;
 }
 .asciinema-theme-tango .fg-12 {
-  color: #729FCF;
+  color: #729fcf;
 }
 .asciinema-theme-tango .bg-12 {
-  background-color: #729FCF;
+  background-color: #729fcf;
 }
 .asciinema-theme-tango .fg-13 {
-  color: #AD7FA8;
+  color: #ad7fa8;
 }
 .asciinema-theme-tango .bg-13 {
-  background-color: #AD7FA8;
+  background-color: #ad7fa8;
 }
 .asciinema-theme-tango .fg-14 {
-  color: #34E2E2;
+  color: #34e2e2;
 }
 .asciinema-theme-tango .bg-14 {
-  background-color: #34E2E2;
+  background-color: #34e2e2;
 }
 .asciinema-theme-tango .fg-15 {
-  color: #EEEEEC;
+  color: #eeeeec;
 }
 .asciinema-theme-tango .bg-15 {
-  background-color: #EEEEEC;
+  background-color: #eeeeec;
 }
 .asciinema-theme-tango .fg-8,
 .asciinema-theme-tango .fg-9,
@@ -2265,7 +2285,11 @@
 .asciinema-theme-solarized-light .start-prompt .play-button svg .play-btn-fill {
   fill: #dc322f;
 }
-.asciinema-theme-solarized-light .start-prompt .play-button svg .play-btn-stroke {
+.asciinema-theme-solarized-light
+  .start-prompt
+  .play-button
+  svg
+  .play-btn-stroke {
   stroke: #dc322f;
 }
 .asciinema-theme-seti {
@@ -2514,114 +2538,114 @@
   Via: https://github.com/neilotoole/asciinema-theme-nord
  */
 .asciinema-theme-nord {
-  background-color: #2E3440;
+  background-color: #2e3440;
 }
 .asciinema-theme-nord .asciinema-terminal {
-  color: #ECEFF4;
-  background-color: #2E3440;
-  border-color: #2E3440;
+  color: #eceff4;
+  background-color: #2e3440;
+  border-color: #2e3440;
 }
 .asciinema-theme-nord .fg-bg {
-  color: #2E3440;
+  color: #2e3440;
 }
 .asciinema-theme-nord .bg-fg {
-  background-color: #ECEFF4;
+  background-color: #eceff4;
 }
 .asciinema-theme-nord .fg-0 {
-  color: #3B4252;
+  color: #3b4252;
 }
 .asciinema-theme-nord .bg-0 {
-  background-color: #3B4252;
+  background-color: #3b4252;
 }
 .asciinema-theme-nord .fg-1 {
-  color: #BF616A;
+  color: #bf616a;
 }
 .asciinema-theme-nord .bg-1 {
-  background-color: #BF616A;
+  background-color: #bf616a;
 }
 .asciinema-theme-nord .fg-2 {
-  color: #A3BE8C;
+  color: #a3be8c;
 }
 .asciinema-theme-nord .bg-2 {
-  background-color: #A3BE8C;
+  background-color: #a3be8c;
 }
 .asciinema-theme-nord .fg-3 {
-  color: #EBCB8B;
+  color: #ebcb8b;
 }
 .asciinema-theme-nord .bg-3 {
-  background-color: #EBCB8B;
+  background-color: #ebcb8b;
 }
 .asciinema-theme-nord .fg-4 {
-  color: #81A1C1;
+  color: #81a1c1;
 }
 .asciinema-theme-nord .bg-4 {
-  background-color: #81A1C1;
+  background-color: #81a1c1;
 }
 .asciinema-theme-nord .fg-5 {
-  color: #B48EAD;
+  color: #b48ead;
 }
 .asciinema-theme-nord .bg-5 {
-  background-color: #B48EAD;
+  background-color: #b48ead;
 }
 .asciinema-theme-nord .fg-6 {
-  color: #88C0D0;
+  color: #88c0d0;
 }
 .asciinema-theme-nord .bg-6 {
-  background-color: #88C0D0;
+  background-color: #88c0d0;
 }
 .asciinema-theme-nord .fg-7 {
-  color: #ECEFF4;
+  color: #eceff4;
 }
 .asciinema-theme-nord .bg-7 {
-  background-color: #ECEFF4;
+  background-color: #eceff4;
 }
 .asciinema-theme-nord .fg-8 {
-  color: #3B4252;
+  color: #3b4252;
 }
 .asciinema-theme-nord .bg-8 {
-  background-color: #3B4252;
+  background-color: #3b4252;
 }
 .asciinema-theme-nord .fg-9 {
-  color: #BF616A;
+  color: #bf616a;
 }
 .asciinema-theme-nord .bg-9 {
-  background-color: #BF616A;
+  background-color: #bf616a;
 }
 .asciinema-theme-nord .fg-10 {
-  color: #A3BE8C;
+  color: #a3be8c;
 }
 .asciinema-theme-nord .bg-10 {
-  background-color: #A3BE8C;
+  background-color: #a3be8c;
 }
 .asciinema-theme-nord .fg-11 {
-  color: #EBCB8B;
+  color: #ebcb8b;
 }
 .asciinema-theme-nord .bg-11 {
-  background-color: #EBCB8B;
+  background-color: #ebcb8b;
 }
 .asciinema-theme-nord .fg-12 {
-  color: #81A1C1;
+  color: #81a1c1;
 }
 .asciinema-theme-nord .bg-12 {
-  background-color: #81A1C1;
+  background-color: #81a1c1;
 }
 .asciinema-theme-nord .fg-13 {
-  color: #B48EAD;
+  color: #b48ead;
 }
 .asciinema-theme-nord .bg-13 {
-  background-color: #B48EAD;
+  background-color: #b48ead;
 }
 .asciinema-theme-nord .fg-14 {
-  color: #88C0D0;
+  color: #88c0d0;
 }
 .asciinema-theme-nord .bg-14 {
-  background-color: #88C0D0;
+  background-color: #88c0d0;
 }
 .asciinema-theme-nord .fg-15 {
-  color: #ECEFF4;
+  color: #eceff4;
 }
 .asciinema-theme-nord .bg-15 {
-  background-color: #ECEFF4;
+  background-color: #eceff4;
 }
 .asciinema-theme-nord .fg-8,
 .asciinema-theme-nord .fg-9,
