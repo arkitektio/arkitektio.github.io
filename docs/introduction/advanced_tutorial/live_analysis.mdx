@@ -4,12 +4,95 @@ sidebar_label: Live Analysis
 sidebar_position: 4
 ---
 
-import deepL from "./deep_l.json";
+import liveAnalysis from "./live_analysis.json";
 import napariL from "./napari_l.json";
 import { DisplayWorkflow } from "../../../src/components/reaktion/DisplayWorkflow";
 import Image from "@theme/IdealImage";
-import thumbnail from "./segmentation.png";
+import thumbnail from "./node-stream.png";
 import fijiVideo from "./fiji_segmentation.webm";
 import { InstallRepoButton } from "../../../src/components/InstallRepoButton";
 
-# Coming Soon
+# Live (Streaming) Analysis
+
+With Arkitekt we wanted to provide new ways of performing and scheduling our analysis. Today analysis is often done in
+batch mode, where we run scripts and tools are run on a set of images a long time after the initial production. This is such a common approach that 
+most of the tools we use are designed around this workflow. However, this is not the only way to do analysis, and in many
+cases, you might (need to) consider doing analysis in a live mode, where your results are generated as your images are acquired, in
+a continous stream-like fashion.
+
+In this tutorial we will show you how to build a [Streaming Analysis Workflow](/docs/design/real-time) in Arkitekt, and how to run it on live data.
+This tutorial will cover:
+
+- Why streaming analysis?
+- How we model Streaming Analysis in Arkitekt (Generator Nodes)
+- Constructing a streaming analysis workflow
+- Challenges of streaming analysis
+
+
+
+### Why Streaming Analysis?
+
+There are manifold reasons why you might want to consider doing live analysis. Here are some of the most common ones:
+
+- **Real-Time Monitoring**: For live cell imaging where immediate feedback is necessary, such as adjusting experimental conditions based on cell behavior, streaming analysis is crucial.
+- **High-Content Screening**: In high-throughput assays, streaming analysis can quickly identify hits or interesting events, which may be critical in pharmaceutical research.
+- **Adaptive Experiments**: Streaming analysis allows researchers to modify experiments on the fly in response to the data being collected, which can be advantageous for exploratory research or complex biological systems.
+
+### Streaming Analysis in Arkitekt
+
+Arkitekt was conceptualized and specifically build around the idea of [Streaming Analysis](/docs/design/real-time). We wanted to make it easy to build analysis workflows that can 
+be adapted from batch to streaming analysis. To do this, we needed to make sure that the analysis workflows are compatible  and manageable in both modes, and that the platform can handle the multifold challenges of streaming analysis. 
+
+Inherently when you build a workflow in Arkitekt you *always* build a streaming analysis workflow. Just a very simple one, where the real-time functionality does not matter. In a basic workflow
+that just pipes images from one node to the next, the data will still stream through the workflow and the results will be generated as the images are processed.
+However Workflows can be designed to take advantage of the streaming nature of the data, and to do this we need to understand how Arkitekt handles streaming data.
+
+### Stream Nodes
+
+As discussed in the first steps tutorial, Arkitekt is build around the concept of nodes, that define a procedure that can happen on a specific item, and are defined by their input and outputs.
+So far we  got to know `Functional Nodes`, that get their name from programming function that take item(s) and return item(s) *once*. There is however another type of node, that is called a `Stream Node` or `Generator Node`,
+and which is a node that can take an item and returns (yields) item(s) *multiple times* and importantly **over time**
+
+<Image img={thumbnail} />
+<div className="text-gray-400 mb-2">
+  <small> Functional Nodes vs Stream Nodes also with their programming equivalent</small>
+</div>
+
+This means when a stream node is called within a workflow, it will return a stream of items, **each of which** will be processed by the next node in the workflow, at the time they are generated. 
+Imaging a workflow that runs a timeseries on the microscope, and once started will pipe the images directly to the analysis node, which will then generate results for each image as it is acquired.
+
+### Lets not imaging, lets do it!
+
+Well, lets do exactly that. For this tutorial we will use a simple workflow that takes images that are put into a folder  and then pipes them through a small analysis
+pipeline. This pipeline will for now just consist of a simple segmentation and a measurement of the area of the segmented objects. We will use the same deep learning 
+node that we know from our Deep Learning tutorial.
+
+But first things first, how to we get the images into the workflow? And especially how to we get them of the microscope, onto our analysis machine? Well, there is an App
+for that. [**Gucker**](/docs/apps/gucker) is a simple app that watches a folder and then puts any images that are put into that folder into the workflow. So lets install it 
+and get started.
+
+### Other Requirements
+
+If you followed both the [Deep Learning](/docs/introduction/advanced_tutorial/deep-learning) and the [First Steps](/docs/introduction/first_steps/interface) tutorial,
+you should have all the requirements installed. If not, please install the following:
+
+<div className="flex flex-row gap-2">
+  <InstallRepoButton repo={"omero"} user={"jhnnsrs"} branch={"master"} />
+  <InstallRepoButton repo={"reaktor"} user={"jhnnsrs"} branch={"master"} />
+  <InstallRepoButton repo={"segmentor"} user={"jhnnsrs"} branch={"master"} />
+</div>
+
+Of course you can also use any other node that you have installed, but for this tutorial we will construct the following
+workflow:
+
+
+<DisplayWorkflow flow={liveAnalysis} />
+<div className="text-gray-400 mb-2">
+  <small>
+    {" "}
+    This is the workflow we would like to create. Stream our Files, Convert them to Images,
+    Segment them and Measure them.{" "}
+  </small>
+</div>
+
+
