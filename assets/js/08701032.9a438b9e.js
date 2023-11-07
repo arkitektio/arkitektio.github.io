@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[8571],{61637:e=>{e.exports=JSON.parse('{"title":"Others","slug":"/category/others","permalink":"/docs/category/others","navigation":{"previous":{"title":"Intro","permalink":"/docs/showcases/intro"},"next":{"title":"Fiji Automation","permalink":"/docs/showcases/advanced/fiji_workflow"}}}')}}]);
