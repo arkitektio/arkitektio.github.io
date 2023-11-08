@@ -1,8 +1,68 @@
 ---
 id: orkestrator
-title: Orkestrator - your file watcher
+title: Orkestrator
 sidebar_label: Orkestrator
 sidebar_position: 1
 ---
-
+import { OrkestratorGrid } from "../../src/components/layout/Button";
 import { ShowWorkflow } from "../../src/components/reaktion/ShowWorkflow";
+
+Orkestrator is the current primary user-interface for the Arkitekt platform, and is the recommended way to interact with the platform
+to create and manage workflows, inspect and comment on your data, ... etc.
+
+
+## Getting Started
+
+Orkestrator comes in two different flavors, a [desktop application](#desktop-application) and a [web application](#web-application) (that comes deployed
+with the platform). While most of the functionality is shared between the two, there are some differences in the way they are used.
+
+### Desktop Application
+
+The desktop application is the recommended way to use Orkestrator. It is a standalone application that can be downloaded just below, and will install
+itself on your computer. It is available for Windows, MacOS and Linux. The desktop application adds in a few features that are not available in the
+web application, such as:
+
+- **Automatic Network Configuration**: The desktop application is able to automatically find [advertised](/docs/introduction/installation#advertising) Arkitekt
+   instances in your network and connect to them. This means that you don't have to manually enter the address of the Arkitekt instance you want to connect
+   to, and that you can easily switch between different instances.
+
+- **Connect to unsecure instances**: The desktop application is able to connect to Arkitekt instances that are not using HTTPS. This is useful when
+  you are planning to use Arkitekt only in a local network, where certificates are not available. Note that you should not connect to unsecure instances
+  that are exposed to the internet. Please refer to the [security](/docs/design/security/why) section for more information. 
+
+Additionally to these features, the desktop application will gain some additional features in the future, such as:
+
+- **Automatic Updates**: The desktop application will in the future automatically check for updates and install them when available. This means that you will always
+  have the latest version of Orkestrator without having to manually download and install it.
+
+- **Export and Import of Data**: While you can use the Orkestrator app to export and import data manually at this point, we are planning to bridge the [Gucker](./gucker)
+  functionality directly into the desktop application. This will allow you to export and import data directly from the desktop application, without having to use
+  the gucker application.
+
+- **Deep Linking**: The desktop application will in the future support deep linking, which means that you will be able to share links to specific workflows, comments, ... etc.
+  with other users. This will allow you to easily share your work with others, and to link to specific parts of the application from other applications.
+
+You can download the desktop application for your operating system below:
+
+<OrkestratorGrid />
+
+### Web Application
+
+Depending on your Arkitekt installation, you might also have access to the web application directly (it is deployed with the platform in the `paper` channel). The web application
+should be accessible [here](http://localhost:8010), and can be used to interact with the platform, on the same computer. While you can use the web application also from other
+computers in your network, we recommend using the desktop application for that, as it will provide a better experience.
+
+:::info Why these limitations?
+
+One of the biggest limitations in developing modern distributed applications that are browser based are security restrictions. Browsers are very restrictive in what they allow
+web applications to do, and this is especially true when it comes to networking. While a lot of these security concerns are valid, major companies like Google and Microsoft are 
+puhsing more and more for standards that are harmful to the open web. With no alternative in sight, we are forced to use the desktop application to provide the best possible
+experience. If you want to learn more about this, we recommend reading [just the latest articles](https://www.eff.org/search/site/browser) by the EFF.
+
+:::
+
+
+## First steps
+
+If this is your first time using Orkestrator we recommend the [First Steps](/docs/introduction/first_steps/interface) section, which will guide you through the basic of 
+the user interface.
