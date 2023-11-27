@@ -163,16 +163,8 @@ const config = {
             title: "Community",
             items: [
               {
-                label: "Stack Overflow",
-                href: "https://stackoverflow.com/questions/tagged/arkitekt",
-              },
-              {
-                label: "Discord",
-                href: "https://discordapp.com/invite/arkitekt",
-              },
-              {
-                label: "Twitter",
-                href: "https://twitter.com/jhnnsrs",
+                label: "Image.sc",
+                href: "https://forum.image.sc/",
               },
             ],
           },
