@@ -164,7 +164,7 @@ const config = {
             items: [
               {
                 label: "Image.sc",
-                href: "https://forum.image.sc/",
+                href: "https://forum.image.sc/tag/arkitekt",
               },
             ],
           },
