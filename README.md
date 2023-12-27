@@ -1,16 +1,16 @@
-# Arkitekt Documentation Site
+# Arkitekt Documentation 
 
-This is the source code for the Arkitekt documentation site. And is used to generate the static site that is hosted on GitHub Pages.
+This is the software repository for the documentation for the Arkitekt framework.
+It is used to generate the static site that is hosted on GitHub Pages.
+
 You can find the site at [https://arkitekt.live](https://arkitekt.live). 
 
-## Scope of the Documentation
+## Scope of this Repository and Documentation
 
-The documentation is intended to be a reference for the Arkitekt Platform and the basic concepts of Deploying
-the Arkitekt Platform. As the Arkitekt Platform is a collection of tools and services, the documentation of this
-project is focused on providing overarching documentation for integration these tools and services into the
-whole Platform. If you are looking for documentation on a specific tool or service, please refer to the
-documentation for that tool or service. You can find links to the documentation for each tool or service in
-the Projects documentatoni [Arkitekt Platform](https://arkitekt.live/docs/developers/contribute/projects) section of the documentation.
+This respository does **not** contain any platform specific code, but rather is used to
+build the documentation website for the Arkitekt Platform. If you are interested in
+exploring the associated projects of the platform please refer to the 
+[projects section](https://arkitekt.live/docs/developers/contribute/projects)
 
 
 ## Contributing to the Documentation
