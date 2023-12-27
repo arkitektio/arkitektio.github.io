@@ -1,9 +1,13 @@
+
+[![logo](./static/img/favicon.svg)](https://arkitekt.live)
+
 # Arkitekt Documentation 
 
 This is the software repository for the documentation for the Arkitekt framework.
 It is used to generate the static site that is hosted on GitHub Pages.
 
 You can find the site at [https://arkitekt.live](https://arkitekt.live). 
+
 
 ## Scope of this Repository and Documentation
 
