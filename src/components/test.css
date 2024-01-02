@@ -1,0 +1,18 @@
+.graphiql-main {
+    background-color: transparent;
+}
+
+.graphiql-container {
+    background-color: transparent !important
+}
+
+
+.graphiql-sidebar {
+    margin-top: 1rem;
+    margin-left: 0.5rem;
+    background-color: transparent;
+}
+
+.graphiql-session-header {
+    background-color: transparent;
+}

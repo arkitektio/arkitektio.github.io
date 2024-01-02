@@ -8,11 +8,6 @@ export const Guard = (props: { children: React.ReactNode }) => {
 
   return (
     <>
-      {!user && (
-        <div className="bg-primary-300 text-white text-center p-2">
-          Not connected
-        </div>
-      )}
       <EasyGuard
         noAppFallback={<>Not connected</>}
         loginButtonProps={{
