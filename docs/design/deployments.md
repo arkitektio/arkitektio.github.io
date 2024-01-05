@@ -1,7 +1,7 @@
 ---
 id: deployment
-title: Arkitekt and Containers
-sidebar_label: Arkitekt and Containers
+title: Deployment
+sidebar_label: Deployment
 sidebar_position: 2
 ---
 

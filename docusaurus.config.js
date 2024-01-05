@@ -35,6 +35,7 @@ const config = {
   tagline: "streaming analysis for microscopy",
   url: "https://arkitekt.live/",
   baseUrl: "/",
+  
   trailingSlash: false,
   onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
@@ -141,7 +142,7 @@ const config = {
           { to: "/blog", label: "Blog", position: "left" },
           { to: "/explorer", label: "Explorer", position: "left" },
           {
-            href: "https://github.com/arkitektio/arkitektio.github.io",
+            href: "https://github.com/arkitektio",
             label: "GitHub",
             position: "right",
           },
@@ -178,7 +179,7 @@ const config = {
               },
               {
                 label: "GitHub",
-                href: "https://github.com/arkitektio/arkitektio.github.io",
+                href: "https://github.com/arkitektio/",
               },
             ],
           },

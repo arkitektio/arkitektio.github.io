@@ -147,9 +147,9 @@ export const APIDocumentation = () => {
 
     Object.keys(fakts).forEach((e) => {
       console.log(e);
-      const endpoint = fakts[e].endpoint_url;
+      const endpoint = fakts[e].endpoint_url as string;
       const name = e;
-      if (endpoint && name && name != "minio") {
+      if (endpoint && endpoint.includes("graphql")) {
         options.push({ url: endpoint, label: name });
       }
     });
@@ -164,8 +164,6 @@ export const APIDocumentation = () => {
 };
 
 export const Graph = () => {
-  const [state, setState] = React.useState("http://localhost:8888/graphql");
-
   return (
     <BrowserOnly fallback={<div>Hallo</div>}>
       {() => (
