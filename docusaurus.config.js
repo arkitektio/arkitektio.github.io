@@ -2,8 +2,8 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const graphqlMarkdownConfig = require("./graphql-markdown.config");
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
+const lightCodeTheme = require("prism-react-renderer").themes.github;
+const darkCodeTheme = require("prism-react-renderer").themes.dracula;
 
 const mikroConf = {
   schema: "http://localhost:8080/graphql",
@@ -35,6 +35,7 @@ const config = {
   tagline: "streaming analysis for microscopy",
   url: "https://arkitekt.live/",
   baseUrl: "/",
+  
   trailingSlash: false,
   onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
@@ -139,8 +140,9 @@ const config = {
             label: "Documentation",
           },
           { to: "/blog", label: "Blog", position: "left" },
+          { to: "/explorer", label: "Explorer", position: "left" },
           {
-            href: "https://github.com/arkitektio/arkitektio.github.io",
+            href: "https://github.com/arkitektio",
             label: "GitHub",
             position: "right",
           },
@@ -177,7 +179,7 @@ const config = {
               },
               {
                 label: "GitHub",
-                href: "https://github.com/arkitektio/arkitektio.github.io",
+                href: "https://github.com/arkitektio/",
               },
             ],
           },
