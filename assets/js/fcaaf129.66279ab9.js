@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[5028],{33600:e=>{e.exports=JSON.parse('{"title":"Paper","slug":"/category/paper","permalink":"/docs/category/paper","navigation":{"previous":{"title":"Omero Integration","permalink":"/docs/showcases/advanced/omero_sink"},"next":{"title":"Intro","permalink":"/docs/showcases/paper/intro"}}}')}}]);
