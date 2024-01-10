@@ -16,13 +16,12 @@ import prediction from "./train_care.webm";
 import uploadTrainData from "./upload_train_data.webm";
 import { InstallRepoButton } from "../../../src/components/InstallRepoButton";
 
-
 Deep Learning powered methods in Bioimage analysis have changed the way we analysis images, however they are still not widely used in the community.
 This is arguabley due to the lack of easy to use tools and the inability to adapt a published model to a new paradigm, such as a new microscope or a new cell type.
 
 With Arkitekt we aimed to make it easy to both use already trained deep learning models in your analysis pipeline, and to make it easy to adapt a model to your specific needs.
 In this tutorial we will show you how to train your own deep learning model using CARE, a popular method for image restoration, and how to use it in your analysis pipeline.
-We advise you to first read the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7) to understand the methodology of care, as well as following both the 
+We advise you to first read the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7) to understand the methodology of care, as well as following both the
 first steps of the [Arkitekt tutorial](/docs/introduction/first_steps/interface) and the [Deep Learning Bridge tutorial](/docs/introduction/advanced_tutorial/deep_learning).
 
 This tutorial aims to cover the following topics:
@@ -34,12 +33,12 @@ This tutorial aims to cover the following topics:
 ## What we are trying to achieve
 
 In this tutorial we would like to train a deep learning model that can be used to restore images that have been acquired with a confocal microscope. We are using the training
-dataset from the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7), which is a dataset of confocal images of the Tribolium Castaneum embryo, that vary in 
+dataset from the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7), which is a dataset of confocal images of the Tribolium Castaneum embryo, that vary in
 their signal-to-roise ratio. We here will aim to train a model that will help us in a second step to restore images that have been acquired with the same microscope.
 
 :::warning
 
-For the purpose of this tutorial we will only train a model on a subset of the data, and we will use the `same` data for training and validation. This is *NOT AT ALL* how you should train a model,
+For the purpose of this tutorial we will only train a model on a subset of the data, and we will use the `same` data for training and validation. This is _NOT AT ALL_ how you should train a model,
 and we are doing this only for the purpose of this tutorial. Training, Testing, and Validation should always be done on different datasets. This is just a demo.
 
 :::
@@ -48,9 +47,9 @@ and we are doing this only for the purpose of this tutorial. Training, Testing, 
 
 With Arkitekt we wanted to make it easy to train deep learning models, but also to give developers the flexibility to adapt their full training process to their needs. This is why
 we have a very simple conceptional understanding of training, which is that training a deep learning model is simply a `Node` that returns a `Model` that in a second step can be used to
-make predictions (in a `Prediction Node`). This means that training a model is as simple as running a `Node` that returns a `Model`. The developer can then decide how to train the model, and to save it in 
+make predictions (in a `Prediction Node`). This means that training a model is as simple as running a `Node` that returns a `Model`. The developer can then decide how to train the model, and to save it in
 a way that makes sense for their use case. Importantly with Arkitekt we didn't want to limit the developer to speicifc models like image-to-image, or classifications, but to give them the flexibility to
-interact with every datatype and model type. But with great power comes great responsibility, this is why we have developed `Contexts` 
+interact with every datatype and model type. But with great power comes great responsibility, this is why we have developed `Contexts`
 
 ### Training Context
 
@@ -58,13 +57,12 @@ When training a deep learning model, we need data to train on, which often comes
 `Image` and `Image`. This is where `Contexts` come in.
 
 `Context` in Arkitekt are a way to define **arbitrary** relationships between different Data Types inside the platform. This means that in a `Context` you **can** relate a `ROI` with an `Image`, an `Image` with a `Table`
-or a `Table` with a `Metric`,  it all depends on the use case and what type of relationship you want to define. In the case of CARE we want to define a relationship between two `Image` datatypes, which is what we will 
+or a `Table` with a `Metric`, it all depends on the use case and what type of relationship you want to define. In the case of CARE we want to define a relationship between two `Image` datatypes, which is what we will
 do in this tutorial. We just want to note that `Contexts` are not limited to this use case, and can be used in many different ways. Importantly you can have also have multiple `Contexts` that relate the same images in different
 ways (for example a `Context` that relates `Image A ` and `Image B` and a `Context` that relates `Image A` and `Image C` or `Image B` and `Table A`).
 
-
 :::info
-One more thing: Relationships inside a `Context` can be named, so that you can for example have a `Context` that relates `Image A` as `is High SNR` of  `Image B` and a `Context` that relates `Image A` as `is Low SNR` of `Image B`.
+One more thing: Relationships inside a `Context` can be named, so that you can for example have a `Context` that relates `Image A` as `is High SNR` of `Image B` and a `Context` that relates `Image A` as `is Low SNR` of `Image B`.
 Developers can then use these names to define their training process.
 :::
 
@@ -97,7 +95,7 @@ This steps should seem [familiar](/docs/introduction/first_steps/interface), jus
 ### Creating a Context
 
 Now that we have our data, we can create a `Context` that relates the two `Image` datatypes. To do this we could either use the `Create Context` button, or have a `Node` that returns a `Context` datatype, and
-creates this `Context` for us. However we can of course do this also directly on the `Data` tab, using the similar pattern of drag-and-drop. 
+creates this `Context` for us. However we can of course do this also directly on the `Data` tab, using the similar pattern of drag-and-drop.
 
 <video
   autoPlay
@@ -116,7 +114,7 @@ creates this `Context` for us. However we can of course do this also directly on
 A few notes:
 
 - You can always relate items in the `Data` tab by dragging one item on top of the other. This will open a dialog that will ask you to relate the two items by specifying a `Context` and a `Relationship`.
-- You will see a *left* to *right* relationship displayed, and you can give an arbitrary name to the relationship. In this case we are using `gt` for `ground truth` as our high SNR image is our ground truth
+- You will see a _left_ to _right_ relationship displayed, and you can give an arbitrary name to the relationship. In this case we are using `gt` for `ground truth` as our high SNR image is our ground truth
   for the low SNR image. Just read it out loud in your head: `Image A` is `ground truth` of `Image B` inside the context of `Tribolium Denoising`.
 - If the relationship or the Context did not exists before it will be created for you, otherwise you will find existing context in the dropdown.
 - Once submited your images are now related. You can see this by cliking on the newly created `Context` in the `Data` tab, and you will see the two images related by the relationship you specified.
@@ -135,10 +133,9 @@ Make sure to appify and deploy the plugin.
 This app provides only two nodes `Predict CARE` and `Train CARE`, which allow you to train and predict CARE models, with your data. The Train CARE node will take a `Context` as input, and will return a `Model` as output.
 and the `Predict CARE` node will take a `Model` and an `Image` as input and will return a `Predicted Image` as output. Nodes all the way down. Lets see how we can train a CARE model.
 
+:::note
 
-:::note 
-
-Sadly with modern deep learning frameworks there is not yet a *reliable* way see if another process is using the GPU and some deep learning methods like Stardist and CARE sometimes still linger in the GPU memory even after
+Sadly with modern deep learning frameworks there is not yet a _reliable_ way see if another process is using the GPU and some deep learning methods like Stardist and CARE sometimes still linger in the GPU memory even after
 the process has finished. So if you run into the problem that you can't train a CARE model, because the GPU is already in use, simply stop any other deep learning process that might be running. We are working on a more user
 friendly solution for this (also for better multi-gpu support).
 
@@ -160,14 +157,12 @@ friendly solution for this (also for better multi-gpu support).
 
 A few notes:
 
-
 - You know the drill. Search for the `Train CARE` node and `Reserve it` to make it available.
 - Navigate back to the `Data tab` and run it directly from your just created `Context`.
 - You will be prompted by the `Assign Dialog`, which will now ask you training parameters. These are specific to CARE, and you can read more about them in the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7).
-We just leave the default parameters for now, but be aware that you can change them to your needs. The default paramters are not optimal for this dataset, but we are just doing this for the purpose of this tutorial.
+  We just leave the default parameters for now, but be aware that you can change them to your needs. The default paramters are not optimal for this dataset, but we are just doing this for the purpose of this tutorial.
 - Once you submit the dialog, the training will start. You can see the progress in the `Dashboard` tab, and you will see the `Train CARE` node turning green once the training is done.
-    You can also monitor the progress right there. Looking at the progress bar.
-
+  You can also monitor the progress right there. Looking at the progress bar.
 
 ### Inspecting the Model
 
@@ -199,7 +194,7 @@ and you can always just integrate your favorite deep learning framework into Ark
 
 ## Using the Model
 
-Your training is going to take time. But at some point it will end, promise! Once it is done you can use the model to make predictions. 
+Your training is going to take time. But at some point it will end, promise! Once it is done you can use the model to make predictions.
 For this we will now reserve the `Predict CARE` node, which in this case will take a `Model` and an `Image` as input and return an image.
 
 <video
@@ -218,7 +213,6 @@ For this we will now reserve the `Predict CARE` node, which in this case will ta
 
 And thats it, you trained a CARE model and used it to make predictions. You can now use this model in your analysis pipeline, and you can also use it to adapt it to your specific needs.
 Also of course you can download the model and share it with others, just like we did with the models that we are using in our [Showcases](/docs/showcases/intro).
-
 
 ## The developers perspective
 
@@ -282,10 +276,10 @@ def train_care_model(
         LinkableModels.GRUNNLAG_REPRESENTATION, # that are related to each other
         "gt", # trhough the `gt` relationship
         context=context, # inside the given context
-    ) # HERE WE ARE GETTING THE DATA FROM THE CONTEXT, 
+    ) # HERE WE ARE GETTING THE DATA FROM THE CONTEXT,
 
     # we are getting computing data from boths sides of the relationship
-    X = [t.left.data.sel(t=0, c=0).compute() for t in x] 
+    X = [t.left.data.sel(t=0, c=0).compute() for t in x]
     Y = [t.right.data.sel(t=0, c=0).compute() for t in x]
 
 
@@ -365,7 +359,7 @@ def predict(
         restored = care_model.predict(
             image_data, "ZXY"
         )
-        
+
         # We are creating a new representation from the predicted image
         generated = from_xarray(
             restored,

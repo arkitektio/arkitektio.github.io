@@ -5,9 +5,9 @@ import React from "react";
 export default function Root({ children }) {
   return (
     <EasyProvider
-      manifest={{ identifier: "github.io.jhnnsrs.doks", version: "latest" }}
+      manifest={{ identifier: "github.io.jhnnsrs.doks", version: "latest", scopes: ["openid"] }}
     >
-      <AutoConfiguration wellKnownEndpoints={["localhost:8000"]} />
+      <AutoConfiguration wellKnownEndpoints={["localhost:8000", "localhost:8010", "localhost:8030"]} />
       <UnkoverProvider>{children}</UnkoverProvider>
     </EasyProvider>
   );

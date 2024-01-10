@@ -1,0 +1,111 @@
+{
+  "repo": "default",
+  "channels": [
+    {
+      "name": "paper",
+      "title": "Paper",
+      "experimental": false,
+      "logo": "https://raw.githubusercontent.com/jhnnsrs/konstruktor/master/public/paper.png",
+      "long": "The paper deployment to reproduce the paper.",
+      "description": "The original paper deployment. That can be used to generate the conditions of deployment as presented in the paper. It comes with a default set of enabled applications",
+      "features": [
+        {
+          "name": "Easy",
+          "description": "Easy to use",
+          "long": "This deployment is easy to use"
+        }
+      ],
+      "preview": false,
+      "builder": "jhnnsrs/paperbuilder:latest",
+      "forms": ["check_gpu", "admin_user", "users", "groups"],
+      "defaults": {
+        "name": "paper",
+        "adminUsername": "admin",
+        "adminPassword": "admin",
+        "groups": [
+          {
+            "name": "mygroup",
+            "description": "mygroup"
+          }
+        ],
+        "users": [
+          {
+            "username": "demo",
+            "password": "demo",
+            "groups": ["mygroup"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "next",
+      "title": "next",
+      "experimental": true,
+      "logo": "https://raw.githubusercontent.com/jhnnsrs/konstruktor/master/public/next.png",
+      "long": "The next deployment contains breaking changes and is not yet stable. It does however give an impression of the future of Arkitekt",
+      "description": "The next deployment",
+      "features": [
+        {
+          "name": "Easy",
+          "description": "Easy to use",
+          "long": "This deployment is easy to use"
+        }
+      ],
+      "preview": true,
+      "builder": "jhnnsrs/arkitekt_paper_builder",
+      "forms": ["check_gpu", "admin_user", "users", "groups"],
+      "defaults": {
+        "name": "mydeployment",
+        "adminUsername": "admin",
+        "adminPassword": "admin",
+        "groups": [
+          {
+            "name": "mygroup",
+            "description": "mygroup"
+          }
+        ],
+        "users": [
+          {
+            "username": "demo",
+            "password": "demo",
+            "groups": ["mygroup"]
+          }
+        ]
+      },
+      "availableApps": [
+        {
+          "name": "orkestrator",
+          "identifier": "github.io.jhnnsrs.orkestrator",
+          "version": "latest",
+          "description": "The interface",
+          "long": "Orkestrator is the default interface for the platform, enabling you to visualize and control your data and apps",
+          "image": "https://cdn.sstatic.net/Img/teams/teams-illo-free-sidebar-promo.svg?v=47faa659a05e",
+          "requires": ["lok", "rekuest", "mikro"],
+          "scopes": ["read"],
+          "redirect_uris": [
+            "http://localhost:8090",
+            "http://localhost:6789/callback",
+            "http://localhost:6789",
+            "http://localhost:7890",
+            "http://localhost:7890/",
+            "http://localhost:7890/callback"
+          ],
+          "client_kind": "WEBSITE"
+        }
+      ],
+
+      "availableServices": [
+        {
+          "name": "redis",
+          "interface": "redis",
+          "description": "The pubsub",
+          "long": "This allows services to publish and subscribe to events",
+          "image": "redis:latest",
+          "requires": [],
+          "is_backend": true,
+          "extras": {}
+        }
+      ]
+    }
+  ]
+}

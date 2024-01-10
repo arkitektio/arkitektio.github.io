@@ -9,7 +9,6 @@ import { ShowWorkflow } from "../../src/components/reaktion/ShowWorkflow";
 import openNapari from "./open_napari.webm";
 import napariVisualize from "./napari_visualize.webm";
 
-
 Arkitekt aims to provide first-class support for Napari, a popular image viewer for Python.
 This support is provided through the `mikro-napari` plugin/package that enables your local
 Napari installation to communicate with Arkitekt.
@@ -21,16 +20,15 @@ It has gained traction in the expert bioimage space especially because of its ab
 large scale, multi-dimensional images, interactively rendering 3D data with GPU acceleration.
 (“3rd Napari Survey Report” , Napari Developers, 2022)
 
-
 A native Python solution, Napari is often integrated into Python-based analysis scripts, where
 analytical results need to be displayed interactively to inspect. To this end, Napari provides
 different types of layers for different types of data including images, points, lines, shapes. T
 This layered approach to data is useful for overlaying annotations or segmentations on top of
 image data.
 
-### Installation 
+### Installation
 
-Mikro-Napari provides support for Napari 0.4.17 and above. You  can choose from two options:
+Mikro-Napari provides support for Napari 0.4.17 and above. You can choose from two options:
 
 - Install it directly from the [napari plugin store](https://napari-hub.org/plugins/mikro-napari)
 
@@ -90,16 +88,14 @@ A few words about this connection process:
    To connect to your Arkitekt instance, you need to login. This is done in the browser, and you will be redirected to the login page of your Arkitekt instance. Please allow
    requests to the firewall.
 
-Once you are connected, you can start using Arkitekt. The MagicBar will show you the current status of your connection, 
+Once you are connected, you can start using Arkitekt. The MagicBar will show you the current status of your connection,
 and of course you can always disconnect from your Arkitekt instance, and use Napari as you are used to.
 
 ### How to use Napari with Arkitekt
 
 In its current iteration the Mikro Napari Plugin does not provide any functionality to call other apps directly from Napari, this interaction
-is currently only possible through the Orkestrator UI. Which will help you to create workflows that include Napari. (e.g. to use deep learning 
+is currently only possible through the Orkestrator UI. Which will help you to create workflows that include Napari. (e.g. to use deep learning
 models to segment your images, and then visualize the results in Napari, shown [here](/docs/introduction/deep-learning))
-
-
 
 #### Visualizing your data in Napari
 

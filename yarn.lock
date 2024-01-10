@@ -3006,19 +3006,18 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
-"@jhnnsrs/arkitekt@^0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@jhnnsrs/arkitekt/-/arkitekt-0.1.3.tgz#6a94d92ef51f975fa5ea7ba51d90004d3434c860"
-  integrity sha512-oQHyRQRwqAE/oKzqfU6v3Q+3ONlWS+BbPMzXqgVehZdA1eYQpofar5uaxgYc2VZtwkOBwg20i1uzbeKG6BR3qQ==
+"@jhnnsrs/arkitekt@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@jhnnsrs/arkitekt/-/arkitekt-0.1.5.tgz#8e0ad1a8a1ace0a06f98c5ca9437207fd10ec611"
+  integrity sha512-BOPj0lzMWJEUe9YD/fMjwxyGNK6W+L1dxQbaJFjvVidTlHBnl2Ai9cXbM2d440G2re7TRthCCmHtUWbKqFTiKw==
   dependencies:
     "@jhnnsrs/datalayer" "^0.0.8"
-    "@jhnnsrs/fakts" "^0.0.17"
+    "@jhnnsrs/fakts" "^0.0.23"
     "@jhnnsrs/fluss" "^0.0.2"
-    "@jhnnsrs/herre" "^0.0.14"
+    "@jhnnsrs/herre" "^0.0.17"
     "@jhnnsrs/mikro" "^0.0.9"
     "@jhnnsrs/port" "^0.0.4"
     "@jhnnsrs/rekuest" "^0.0.15"
-    cancelable-promise "^4.3.0"
 
 "@jhnnsrs/datalayer@^0.0.4":
   version "0.0.4"
@@ -3034,12 +3033,12 @@
   dependencies:
     cancelable-promise "^4.3.0"
 
-"@jhnnsrs/fakts@^0.0.17":
-  version "0.0.17"
-  resolved "https://registry.yarnpkg.com/@jhnnsrs/fakts/-/fakts-0.0.17.tgz#c41a9e404a1bcab40e9e72132bc06807954f2750"
-  integrity sha512-kAXiMz24Y1ztwV6ixdXtUxdiIs1xfTTLQ9iVtQXSqDtV0hb/tYMYfanzdHb/dKGysA/eUzHRMYtll5o+q6iQKQ==
+"@jhnnsrs/fakts@^0.0.23":
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/@jhnnsrs/fakts/-/fakts-0.0.23.tgz#6cb1202f45cdd468c35b9a746d76142dd510a0c4"
+  integrity sha512-w5o/1mVuli/upmAdjfBGwKMKH6oa0uvMYKgjDSlylVE+ZKxEKkGMqW8qtAQTQ3hppCeRUfJWH/PuK6Aj/ejGKw==
   dependencies:
-    cancelable-promise "^4.3.0"
+    any-signal "^4.1.1"
 
 "@jhnnsrs/fluss@^0.0.2":
   version "0.0.2"
@@ -3050,12 +3049,11 @@
     graphql "16.6.0"
     subscriptions-transport-ws "^0.11.0"
 
-"@jhnnsrs/herre@^0.0.14":
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/@jhnnsrs/herre/-/herre-0.0.14.tgz#a2b617be5a0c92579a6ca056d2a7afdaeb03e144"
-  integrity sha512-OaHn1Kx6EUYV2Lj+fnQhepa+feZ0kkt8eXqdc0rZQFDwnsptBbYJLnM32Xy9YbGMLmP96RSFqCKynXG4xfRyaw==
+"@jhnnsrs/herre@^0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@jhnnsrs/herre/-/herre-0.0.17.tgz#e487e386af0cc1eb98ddaefbd55c3b5bd8ae97ce"
+  integrity sha512-DpC0xusKzuczrHUyYS00ohiOiEv5FM8wUyfaUcb5JGQx8uYh2e6Dc2uVXxjIQX3+PbbvjkpbIcSg1i52YSei8w==
   dependencies:
-    cancelable-promise "^4.3.1"
     crypto-js "^4.1.1"
 
 "@jhnnsrs/kraphql@^0.0.6":
@@ -5153,6 +5151,11 @@ any-promise@^1.0.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/any-promise/-/any-promise-1.3.0.tgz#abc6afeedcea52e809cdc0376aed3ce39635d17f"
   integrity sha512-7UvmKalWRt1wgjL1RrGxoSJW/0QZFIegpeGvZG9kjp8vrRu55XTHbwnqq2GpXm9uLbcuhxm3IqX9OB4MZR1b2A==
+
+any-signal@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/any-signal/-/any-signal-4.1.1.tgz#928416c355c66899e6b2a91cad4488f0324bae03"
+  integrity sha512-iADenERppdC+A2YKbOXXB2WUeABLaM6qnpZ70kZbPZ1cZMMJ7eF+3CaYm+/PhBizgkzlvssC7QuHS30oOiQYWA==
 
 anymatch@~3.1.2:
   version "3.1.3"
@@ -10704,10 +10707,10 @@ prebuild-install@^7.1.1:
     tar-fs "^2.0.0"
     tunnel-agent "^0.6.0"
 
-prettier@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.0.3.tgz#432a51f7ba422d1469096c0fdc28e235db8f9643"
-  integrity sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==
+prettier@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.1.1.tgz#6ba9f23165d690b6cbdaa88cb0807278f7019848"
+  integrity sha512-22UbSzg8luF4UuZtzgiUOfcGM8s4tjBv6dJRT7j275NXsy2jb4aJa4NNveul5x4eqlF1wuhuR2RElK71RvmVaw==
 
 pretty-error@^4.0.0:
   version "4.0.0"

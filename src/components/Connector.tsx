@@ -1,20 +1,12 @@
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
-import { Popover, Transition } from "@headlessui/react";
-import {
-  ConnectButtons,
-  LoginButton,
-  LogoutButton,
-  UnconnectButton,
-} from "@jhnnsrs/arkitekt";
-import { Fakts, FaktsGuard, useFakts } from "@jhnnsrs/fakts";
 import { HerreGuard, useHerre } from "@jhnnsrs/herre";
-import { CancelablePromise } from "cancelable-promise";
 import React, { Fragment, useRef, useState } from "react";
 import { VscClose, VscDebugDisconnect } from "react-icons/vsc";
+import { useArkitektConnect, useArkitektLogin, EasyGuard } from "@jhnnsrs/arkitekt";
+import { Popover, Transition } from "@headlessui/react";
 
 export const NoHerre = () => {
-  const { fakts, setFakts } = useFakts();
-  const [future, setFuture] = useState<CancelablePromise<Fakts> | null>(null);
+  const { fakts, setFakts } = useArkitektConnect();
 
   return (
     <Popover as="div" className="my-auto ">
@@ -48,8 +40,8 @@ export const NoHerre = () => {
 };
 
 export const ShowMe = () => {
-  const { fakts, load, setFakts } = useFakts();
-  const { user, logout } = useHerre();
+  const { fakts, remove } = useArkitektConnect();
+  const { user, logout } = useArkitektLogin();
 
   return (
     <Popover as="div" className="my-auto ">
@@ -86,11 +78,11 @@ export const ShowMe = () => {
             <div className="flex flex-row w-full gap-2 justify-end p-3">
               {user && (
                 <>
-                  <LogoutButton className="px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md">
+                  <button className="px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md" onClick={() => logout()}>
                     {" "}
                     Logout{" "}
-                  </LogoutButton>
-                  <UnconnectButton className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md" />
+                  </button>
+                  <button className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md" onClick={() => remove()}> Unconnect </button>
                 </>
               )}
             </div>
@@ -102,7 +94,8 @@ export const ShowMe = () => {
 };
 
 export const Login = () => {
-  const { fakts, load, setFakts } = useFakts();
+  const { login, loading } = useArkitektLogin();
+  const { fakts, remove } = useArkitektConnect();
 
   return (
     <Popover as="div" className="my-auto ">
@@ -135,23 +128,16 @@ export const Login = () => {
               </div>
               <div className="flex flex-row w-full gap-2 justify-end p-3">
                 <>
-                  <LoginButton
-                    className={(e) =>
+                  <button
+                    className={
                       "px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md " +
-                      (e.authenticating ? "animate-pulse" : "")
+                      (loading ? "animate-pulse" : "")
                     }
-                    buildGrant={async (fakts) => {
-                      return {
-                        clientId: fakts.lok.client_id,
-                        clientSecret: fakts.lok.client_secret,
-                        scopes: fakts.lok.scopes,
-                        redirectUri: window.location.origin + "/callback",
-                      };
-                    }}
+                    onClick={() => login()}
                   >
-                    {(e) => (e.authenticating ? "Cancel Login" : "Login")}
-                  </LoginButton>
-                  <UnconnectButton className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md" />
+                   {loading && <div className="animate-spin">🔄</div>} Login
+                  </button>
+                  <div className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md" onClick={() => remove()}> Unconnect</div>
                 </>
               </div>
             </div>
@@ -163,7 +149,7 @@ export const Login = () => {
 };
 
 export const Connect = () => {
-  const { fakts, load, setFakts } = useFakts();
+  const { registeredEndpoints, load, fakts } = useArkitektConnect();
 
   return (
     <Popover as="div" className="my-auto ">
@@ -192,10 +178,19 @@ export const Connect = () => {
               appear (currently restricted to local arkitekt instance)
             </div>
 
-            <ConnectButtons
-              containerClassName="flex flex-row w-full gap-2 justify-end p-3"
-              buttonClassName={() => "p-3 cursor-pointer font-light"}
-            />
+            {registeredEndpoints.map((e) => (
+              <div className="flex flex-row gap-2 justify-start p-3">
+                <button
+                  className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md"
+                  onClick={() => load({endpoint: e, requestPublic: true})}
+                >
+                  {" "}
+                  {e.name}{" "}
+                </button>
+              </div>
+            ))}
+
+            {JSON.stringify(fakts)}
           </div>
         </Popover.Panel>
       </Transition>
@@ -205,10 +200,8 @@ export const Connect = () => {
 
 export const Connector = (props) => {
   return (
-    <FaktsGuard fallback={<Connect />}>
-      <HerreGuard fallback={<Login />}>
+    <EasyGuard notConnectedFallback={<Connect />} notLoggedInFallback={<Login />}>
         <ShowMe />
-      </HerreGuard>
-    </FaktsGuard>
+    </EasyGuard>
   );
 };
