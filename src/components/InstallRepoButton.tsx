@@ -27,6 +27,8 @@ export const InstallRepoButton = portGuarded(
 
     const tag = `${user}/${repo}:${branch}`;
 
+    const [fetching, setFetching] = React.useState(false);
+
     const { data, refetch } = useQuery(CHECK_REPO_QUERY, {
       client: client,
       variables: { tag },
@@ -35,6 +37,7 @@ export const InstallRepoButton = portGuarded(
 
     const handleClick = async () => {
       try {
+        setFetching(true);
         const { data } = await client.mutate({
           mutation: CREATE_REPO_MUTATION,
           variables: { branch, repo, user },
@@ -43,6 +46,7 @@ export const InstallRepoButton = portGuarded(
         await refetch();
 
         console.log(data);
+        setFetching(false);
       } catch (e) {
         console.log(e);
       }
@@ -55,13 +59,17 @@ export const InstallRepoButton = portGuarded(
         ) : (
           <button
             onClick={handleClick}
-            className={className + "cursor-pointer bg-yellow-200"}
+            className={
+              className +
+              "cursor-pointer bg-yellow-200" +
+              (fetching ? " animate-pulse" : "")
+            }
           >
-            🪄 Install {tag}
+            {fetching ? <> Installing {tag} </> : <>🪄 Install {tag}</>}
           </button>
         )}
       </>
     );
   },
-  <div className={className + "bg-back-600"}> 🎱 Connect to install</div>,
+  <div className={className + "bg-back-600"}> 🎱 Connect to install</div>
 );

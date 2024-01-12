@@ -2,7 +2,11 @@ import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import { HerreGuard, useHerre } from "@jhnnsrs/herre";
 import React, { Fragment, useRef, useState } from "react";
 import { VscClose, VscDebugDisconnect } from "react-icons/vsc";
-import { useArkitektConnect, useArkitektLogin, EasyGuard } from "@jhnnsrs/arkitekt";
+import {
+  useArkitektConnect,
+  useArkitektLogin,
+  EasyGuard,
+} from "@jhnnsrs/arkitekt";
 import { Popover, Transition } from "@headlessui/react";
 
 export const NoHerre = () => {
@@ -78,11 +82,20 @@ export const ShowMe = () => {
             <div className="flex flex-row w-full gap-2 justify-end p-3">
               {user && (
                 <>
-                  <button className="px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md" onClick={() => logout()}>
+                  <button
+                    className="px-2  py-1 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md"
+                    onClick={() => logout()}
+                  >
                     {" "}
                     Logout{" "}
                   </button>
-                  <button className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md" onClick={() => remove()}> Unconnect </button>
+                  <button
+                    className="px-2 py-1 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md"
+                    onClick={() => remove()}
+                  >
+                    {" "}
+                    Unconnect{" "}
+                  </button>
                 </>
               )}
             </div>
@@ -130,14 +143,20 @@ export const Login = () => {
                 <>
                   <button
                     className={
-                      "px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md " +
+                      "px-2  py-1 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md " +
                       (loading ? "animate-pulse" : "")
                     }
                     onClick={() => login()}
                   >
-                   {loading && <div className="animate-spin">🔄</div>} Login
+                    {loading && <div className="animate-spin">🔄</div>} Login
                   </button>
-                  <div className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md" onClick={() => remove()}> Unconnect</div>
+                  <button
+                    className="px-2 py-1 cursor-pointer bg-primary-300 hover:bg-primary-400  rounded rounded-md"
+                    onClick={() => remove()}
+                  >
+                    {" "}
+                    Unconnect
+                  </button>
                 </>
               </div>
             </div>
@@ -182,7 +201,7 @@ export const Connect = () => {
               <div className="flex flex-row gap-2 justify-start p-3">
                 <button
                   className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md"
-                  onClick={() => load({endpoint: e, requestPublic: true})}
+                  onClick={() => load({ endpoint: e, requestPublic: true })}
                 >
                   {" "}
                   {e.name}{" "}
@@ -200,8 +219,11 @@ export const Connect = () => {
 
 export const Connector = (props) => {
   return (
-    <EasyGuard notConnectedFallback={<Connect />} notLoggedInFallback={<Login />}>
-        <ShowMe />
+    <EasyGuard
+      notConnectedFallback={<Connect />}
+      notLoggedInFallback={<Login />}
+    >
+      <ShowMe />
     </EasyGuard>
   );
 };
