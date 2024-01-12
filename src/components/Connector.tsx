@@ -8,6 +8,7 @@ import {
   EasyGuard,
 } from "@jhnnsrs/arkitekt";
 import { Popover, Transition } from "@headlessui/react";
+import BrowserOnly from "@docusaurus/BrowserOnly";
 
 export const NoHerre = () => {
   const { fakts, setFakts } = useArkitektConnect();
@@ -219,11 +220,15 @@ export const Connect = () => {
 
 export const Connector = (props) => {
   return (
-    <EasyGuard
-      notConnectedFallback={<Connect />}
-      notLoggedInFallback={<Login />}
-    >
-      <ShowMe />
-    </EasyGuard>
+    <BrowserOnly>
+      {() => (
+        <EasyGuard
+          notConnectedFallback={<Connect />}
+          notLoggedInFallback={<Login />}
+        >
+          <ShowMe />
+        </EasyGuard>
+      )}
+    </BrowserOnly>
   );
 };
