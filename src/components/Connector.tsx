@@ -210,7 +210,6 @@ export const Connect = () => {
               </div>
             ))}
 
-            {JSON.stringify(fakts)}
           </div>
         </Popover.Panel>
       </Transition>

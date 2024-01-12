@@ -6,6 +6,7 @@ sidebar_position: 1
 
 import Image from "@theme/IdealImage";
 import schema from "./schema.png";
+import storage from "./storage.png";
 
 # Mikro
 
@@ -29,7 +30,7 @@ and connected to an Arkitekt instance.
 
 ## Schema
 
-The Mikro [schema](docs/features/graphql#schema) is the core of the system. It defines the data models and relationships
+The Mikro [schema](/docs/design/graphql#schema) is the core of the system. It defines the data models and relationships
 that are used to store and retrieve data. The schema is defined in [GraphQL](https://graphql.org)
 and provides the only interface to the system. You can inspect a recent [schema.graphql](/schema.graphql)
 Or you can use the [API Explorer](/explorer) to interact with the system directly.
@@ -44,5 +45,41 @@ Or you can use the [API Explorer](/explorer) to interact with the system directl
   </small>
 </div>
 
-<a href="https://downloads.openmicroscopy.org/images/Leica-LIF/imagesc-30856/20191025%20Test%20FRET%20585.%20423,%20426.lif">Download Test Data</a>
+
 </div>
+
+## Storage
+
+Mikro uses a binary storage system for storing the actual image data. This is
+done using a standard S3 object store, which is exposed through the [Minio](https://min.io/) server.
+This allows for a scalable and distributed storage system that can be deployed in various configurations,
+e.g on a single machine, or in a distributed cluster.
+
+
+<div className="mt-2 p-6 w-full">
+<Image img={storage} />
+
+<div className="text-gray-400 mb-2">
+  <small>
+    Different storage configurations are possible, e.g. a single node, or a
+    distributed cluster. The storage is exposed through a standard S3 API, and apps do not need to know
+    about the underlying storage configuration.
+  </small>
+</div>
+
+</div>
+
+When accessing data, a preflight request is made to the Mikro API, which then returns authenticated presigned
+urls or temporary credentials for accessing the data. This allows for a secure and scalable storage system, that
+can be deployed in various configurations.
+
+## Metadata
+
+Mikro uses a relational database for storing metadata about the images. This
+allows for fast querying and filtering of images based on their metadata. The complete metadata
+is exposed through the GraphQL API, and can be used to filter and query images. YOu can however also
+use the [Postgres](https://postgressql.org) database directly to query the metadata. If you are seeking to
+minimize the number of dependencies, you can also use the [SQLite](https://sqlite.org) database which provides
+the same functionality, but is a single file database that does not require a separate database server.
+
+
