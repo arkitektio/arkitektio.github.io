@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[8999],{48264:e=>{e.exports=JSON.parse('{"title":"Features","slug":"/category/features","permalink":"/docs/category/features","navigation":{"previous":{"title":"App Troubles","permalink":"/docs/troubleshooting/app"},"next":{"title":"GraphQL","permalink":"/docs/features/graphql"}}}')}}]);
