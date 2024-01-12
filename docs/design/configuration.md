@@ -38,7 +38,6 @@ Fakts is a simple protocol, that allows Apps to authenticate themselves with the
 The following example shows how an app uses the Fakts protocol to authenticate itself with the platform and to retrieve configuration information.
 Before the app will connect to any service, it will send out a preflight request to the Fakts server, in order to retrieve a token, this token will then be used to authenticate the app with the platform, and to retrieve configuration information.
 
-
 ```yaml
 # Example App Manifest
 name: "Example App"
@@ -46,15 +45,13 @@ version: "0.1.0"
 description: "This is an example app"
 author: "John Doe"
 requirements:
-    - "cuda"
-
+  - "cuda"
 ```
-
 
 When sending out the preflight request, the app will send its [Manifest](#manifest) to the Fakts server, which will then use the information in the manifest to determine the configuration information for the app. Additionally the App can send a list of other parameters like, which type of authenticaiton it would like to use, or which version of the platform it would like to connect to.
 Depending on modifiable strategies installed on the Fakts server, the app might be asked to authenticate itself with the platform, before it can retrieve the token. This is done by sending a code to the user, which the user can then use to authenticate the app with the platform. Once the app has been authenticated, it can retrieve the token, and use it to retrieve the configuration information for the platform.
 
-```mermaid 
+```mermaid
 sequenceDiagram
     App->>Fakts: Here is my Manifest! Can I have a token?
     Fakts-->>App: Okay as the user to validate with this code: ABd345!
@@ -70,7 +67,5 @@ sequenceDiagram
 ```
 
 The configuration, then includes information about all the services running in the deployment, and how to connect to them. The app can then use this information to connect to the platform, and run its tasks.
-
-
 
 Problems of distribtued systems and

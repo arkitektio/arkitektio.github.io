@@ -6,7 +6,7 @@ sidebar_label: Read and Write
 
 # Read and Write
 
-Every analysis starts with data. In this tutorial we will show you how to upload data to Arkitekt. This could be a microscopy image, a segmented image, or any other data that you want to store. We will show you how to upload data to Arkitekt, and how to retrieve it. We will also show you how to work lazily with *big* data on Arkitekt, and how to associate metadata with your data. 
+Every analysis starts with data. In this tutorial we will show you how to upload data to Arkitekt. This could be a microscopy image, a segmented image, or any other data that you want to store. We will show you how to upload data to Arkitekt, and how to retrieve it. We will also show you how to work lazily with _big_ data on Arkitekt, and how to associate metadata with your data.
 
 ## What we will cover
 
@@ -56,7 +56,7 @@ But lets take a closer look at what is happening here.
    :::
 
 2. We create a random numpy array with the shape (100,100,1). This is equivalent to an 100x100 image with one channel.
-3. We create an xarray from the numpy array. As mikros datamodel of images is based on xarray, it is best practice to create an xarray from your data before uploading it to mikro. If you are not familiar with xarray, we recommend that you take a look at the [xarray documentation](http://xarray.pydata.org/en/stable/). You might notice that we are using the `dims` argument to specify the dimensions of the xarray. This labels the axis of the numpy array. In this case we have an image with the dimensions `x`, `y` and `c`. The `c` dimension is the channel dimension, and is used to store multiple channels in one image. 
+3. We create an xarray from the numpy array. As mikros datamodel of images is based on xarray, it is best practice to create an xarray from your data before uploading it to mikro. If you are not familiar with xarray, we recommend that you take a look at the [xarray documentation](http://xarray.pydata.org/en/stable/). You might notice that we are using the `dims` argument to specify the dimensions of the xarray. This labels the axis of the numpy array. In this case we have an image with the dimensions `x`, `y` and `c`. The `c` dimension is the channel dimension, and is used to store multiple channels in one image.
 4. We enter the app context, from now on we are able to call the functionality on the connected arkitekt server.
 
 :::note
@@ -80,7 +80,7 @@ These two lines of code is a bit more complex than the other lines of code in th
 ### Functions are your friend
 
 First lets talk about the function `from_xarray`. As you might notice its imported from the `mikro.api.schema` module, which contains a plethora of methods to interact with the Mikro data server (e.g for creating images, marking rois, commenting, subscribe to image events, ...). These functions
-will provide ways of briding your local data with the data on the server.  The `from_xarray` function is one of these functions. It will take an array-like structure as an argument and create an image on the server, that is then stored in the database and the object store, and return a reference to that back to you.
+will provide ways of briding your local data with the data on the server. The `from_xarray` function is one of these functions. It will take an array-like structure as an argument and create an image on the server, that is then stored in the database and the object store, and return a reference to that back to you.
 
 ### But there are steps in between
 
@@ -93,23 +93,14 @@ You might notice that we don't pass a reference to **where** our server is locat
 :::note Context is everything
 
 While we personally love the flexibility of context managers, some prefer being more explicit about the context. If you are one of those people, you can also pass the underlying `App` mikro api client object to the `from_xarray` function as an argument. This will make the code more explicit, but also more verbose. We will use the context manager in this tutorial, but feel free to use the explicit way if you prefer that.
+
 ```python
 image = from_xarray(image_data, name="Random image", rath=app.mikro.rath) # this uses the mikro service graphql client (rath) directly
 ```
 
 2. Configuration, Authentication, Authentication
-   
-But hey, wasn't Arkitekt a secure and modular platform? How does our app now on which service to store our data? And how do we ensure that not everyone can upload data? This is where the configuration and authentication part comes in. Our app also contains a strategy of how we want to authentication our python script and ourselves against the Arkitekt server. So when we call this function for the first time, the `App` will try to establish a trust relationship with the server. Which strategy we will use greatly depends on how you would like your app to be used, and is highly custimizable. By default and suitable for most usecasses (if you use the `easy`builder ) it will now open a webbrowser for you where you will see the Arkitekt Server, ask you if you trust this app, and if you would like to (temporarilly) grant it access to your data. If you accept, the app will be granted access to the server, and will be send a token that it can use to authenticate itself against the server in the future. Importantly 
 
-
-
-
-
-
-
-
-
-
+But hey, wasn't Arkitekt a secure and modular platform? How does our app now on which service to store our data? And how do we ensure that not everyone can upload data? This is where the configuration and authentication part comes in. Our app also contains a strategy of how we want to authentication our python script and ourselves against the Arkitekt server. So when we call this function for the first time, the `App` will try to establish a trust relationship with the server. Which strategy we will use greatly depends on how you would like your app to be used, and is highly custimizable. By default and suitable for most usecasses (if you use the `easy`builder ) it will now open a webbrowser for you where you will see the Arkitekt Server, ask you if you trust this app, and if you would like to (temporarilly) grant it access to your data. If you accept, the app will be granted access to the server, and will be send a token that it can use to authenticate itself against the server in the future. Importantly
 
 1. We are calling the `from_xarray` function from the `mikro.api.schema` module. This function is a convenience function that will in turn call the apps mikro services api, with the given parameters. Lets inspect these parameters on their way to the server:
 
