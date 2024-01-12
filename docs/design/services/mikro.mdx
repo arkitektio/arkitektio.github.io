@@ -11,20 +11,28 @@ import schema from "./schema.png";
 
 Mikro is the Arkitekt go to solution for all things microscopy. It provides
 the datamodels and services for managing microscopy data, and connects a binary
-storage system around the [Minio](https://min.io/) object store, with a relational
+storage system built around S3 object store (in a standard deploylement powered [Minio](https://min.io/)), with a relational
 database [Postgres](https://postgressql.org) for metadata storage.
 
-As an API first system, Mikro provides a GraphQL API for all of its operations that
+As an API first system, Mikro exposes a GraphQL API for all of its operations that
 can be used by any client. It also provides a web based admin UI for interacting with
 the system through a browser.
+
+:::note API Documentation
+
+The Mikro API is completely interactively documentated using a GraphIQL Playground. You can
+head over to the [API Explorer](/explorer) and select the mikro service, to explore the
+API and try out some queries. In order to use this you will however need to be logged in,
+and connected to an Arkitekt instance.
+
+:::
 
 ## Schema
 
 The Mikro [schema](docs/features/graphql#schema) is the core of the system. It defines the data models and relationships
 that are used to store and retrieve data. The schema is defined in [GraphQL](https://graphql.org)
 and provides the only interface to the system. You can inspect a recent [schema.graphql](/schema.graphql)
-Or you can use the [GraphQL Playground](http://localhost:8020/graphql) to interact with the system
-directly.
+Or you can use the [API Explorer](/explorer) to interact with the system directly.
 
 <div className="mt-2 p-6 w-full">
 <Image img={schema} />

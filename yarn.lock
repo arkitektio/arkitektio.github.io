@@ -3006,18 +3006,19 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
-"@jhnnsrs/arkitekt@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@jhnnsrs/arkitekt/-/arkitekt-0.1.5.tgz#8e0ad1a8a1ace0a06f98c5ca9437207fd10ec611"
-  integrity sha512-BOPj0lzMWJEUe9YD/fMjwxyGNK6W+L1dxQbaJFjvVidTlHBnl2Ai9cXbM2d440G2re7TRthCCmHtUWbKqFTiKw==
+"@jhnnsrs/arkitekt@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@jhnnsrs/arkitekt/-/arkitekt-0.1.11.tgz#e95d5ecffd7106f4b9a2570d0b44f06b4f796e8e"
+  integrity sha512-TXOZxKLs3tJ3qUYHfnWRvpNS5uJJYWFviPx3ld58DIihfxUvIGUizkSMBJpKFIDIFdx1GKQktFtaP6vxrsPnTw==
   dependencies:
     "@jhnnsrs/datalayer" "^0.0.8"
-    "@jhnnsrs/fakts" "^0.0.23"
+    "@jhnnsrs/fakts" "^0.0.24"
     "@jhnnsrs/fluss" "^0.0.2"
-    "@jhnnsrs/herre" "^0.0.17"
+    "@jhnnsrs/herre" "^0.0.19"
     "@jhnnsrs/mikro" "^0.0.9"
     "@jhnnsrs/port" "^0.0.4"
     "@jhnnsrs/rekuest" "^0.0.15"
+    cancelable-promise "^4.3.0"
 
 "@jhnnsrs/datalayer@^0.0.4":
   version "0.0.4"
@@ -3033,10 +3034,10 @@
   dependencies:
     cancelable-promise "^4.3.0"
 
-"@jhnnsrs/fakts@^0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@jhnnsrs/fakts/-/fakts-0.0.23.tgz#6cb1202f45cdd468c35b9a746d76142dd510a0c4"
-  integrity sha512-w5o/1mVuli/upmAdjfBGwKMKH6oa0uvMYKgjDSlylVE+ZKxEKkGMqW8qtAQTQ3hppCeRUfJWH/PuK6Aj/ejGKw==
+"@jhnnsrs/fakts@^0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@jhnnsrs/fakts/-/fakts-0.0.24.tgz#0994ca4448ceb7b33e11868e3cc48dbfeda02841"
+  integrity sha512-lJIdY9iZMhOrn9cxblDG89ZKck6VVviVsXXIJvKTx/7AyJyruREMXWtGiR8yfvUH1+qAS87EUnP7oPwsy2VqVA==
   dependencies:
     any-signal "^4.1.1"
 
@@ -3049,10 +3050,10 @@
     graphql "16.6.0"
     subscriptions-transport-ws "^0.11.0"
 
-"@jhnnsrs/herre@^0.0.17":
-  version "0.0.17"
-  resolved "https://registry.yarnpkg.com/@jhnnsrs/herre/-/herre-0.0.17.tgz#e487e386af0cc1eb98ddaefbd55c3b5bd8ae97ce"
-  integrity sha512-DpC0xusKzuczrHUyYS00ohiOiEv5FM8wUyfaUcb5JGQx8uYh2e6Dc2uVXxjIQX3+PbbvjkpbIcSg1i52YSei8w==
+"@jhnnsrs/herre@^0.0.19":
+  version "0.0.19"
+  resolved "https://registry.yarnpkg.com/@jhnnsrs/herre/-/herre-0.0.19.tgz#be67b8b665458008200aaaf4007443cbb9164662"
+  integrity sha512-Ul+jm4x7Erdv5rQskaDCNDXAsPe2AOZIHEhVbgKVv07UMi6cc8MvBRaeDaP8V/gLRaGbSLJQ6LA+Wcvj5ZZuIA==
   dependencies:
     crypto-js "^4.1.1"
 

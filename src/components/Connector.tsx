@@ -8,6 +8,7 @@ import {
   EasyGuard,
 } from "@jhnnsrs/arkitekt";
 import { Popover, Transition } from "@headlessui/react";
+import BrowserOnly from "@docusaurus/BrowserOnly";
 
 export const NoHerre = () => {
   const { fakts, setFakts } = useArkitektConnect();

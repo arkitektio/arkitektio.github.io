@@ -5,7 +5,7 @@ sidebar_label: Deployment
 sidebar_position: 2
 ---
 
-# Deployment Strategies
+# Deployment
 
 ## Introduction
 
