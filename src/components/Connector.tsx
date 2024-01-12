@@ -220,15 +220,11 @@ export const Connect = () => {
 
 export const Connector = (props) => {
   return (
-    <BrowserOnly>
-      {() => (
-        <EasyGuard
-          notConnectedFallback={<Connect />}
-          notLoggedInFallback={<Login />}
-        >
-          <ShowMe />
-        </EasyGuard>
-      )}
-    </BrowserOnly>
+    <EasyGuard
+      notConnectedFallback={<Connect />}
+      notLoggedInFallback={<Login />}
+    >
+      <ShowMe />
+    </EasyGuard>
   );
 };
