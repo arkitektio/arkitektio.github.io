@@ -29,7 +29,24 @@ As you can see, the manifest contains information about the app, such as its nam
 description. This information will be presented to the user, when they are asked to authenticate
 your app, or they can be used to search for your app in the soon to be released [App Store](/docs/design/appstore).
 
-### Plugin Manifest
+## Extensions to the Manifest
+
+The simple manifest described above is enough to identify your app on the platform, but it a Manifest
+can contain much more information, which can be used by the platform to further enhance the deployment, and
+discoverability of your app. For example, you can specify which hardware and software environments your app requires,
+and inform the user before installation which functionality your apps will provide.
+
+:::warning
+
+This feature describes a feature of Arkitekt that is currently in development, and is not yet
+available in the `paper` and `stable` channels. This feature is currently only available in the
+"beta" channel. It is however already part of the CLI.
+
+:::
+
+## Flavours and Selectors
+
+Flavours and Selectors are a way of describing the different ways an app can be deployed. For example,
 
 When you develop an app for Arkitekt, your manifest will be slightly different, as it will contain
 additional information about your app, such as its prefered hardware and software environments. This

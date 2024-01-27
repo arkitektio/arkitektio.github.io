@@ -11,7 +11,10 @@ import oauth from "./oauth_example.png";
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Arkitekts is built around connecting Apps. Without these Apps arkitekt would be just a (reasonably cool) storage platform with a developer interface. Apps ( in the Arkitekt sense) connect to arkitekt and provide the functionality that makes Arkitekt useful (like applying filters to images) and give you the ability to interact with the data that you store in Arkitekt. As such, the definition of an arkitekt App is a bit broaders, than what you might think of as an App (especially if you are used to the App Store on your phone). This section will introduce you to the concept of an App in Arkitekt, and will give you a few examples of what an App can be.
+Arkitekt is built around connecting Apps with our services. Without these Apps Arkitekt would be just a (reasonably cool) storage platform with a developer interface. 
+Apps ( in the Arkitekt sense) connect to arkitekt and provide the functionality that makes Arkitekt useful and let it does stuff (like applying filters to images) or lets interact with the data that you store in Arkitekt.
+ As such, the definition of an arkitekt App is a bit broaders, than what you might think of as an App (especially if you are used to the App Store on your phone). 
+ This section will introduce you to the concept of an App in Arkitekt, and will give you a few examples of what an App can be.
 
 <div className="mt-2">
 <Image img={app} />
@@ -23,13 +26,20 @@ Arkitekts is built around connecting Apps. Without these Apps arkitekt would be 
 
 How apps fit into the Arkitekt ecoystem is best examplified by the interplay between the Orkestrator _App_ and the Fiji _App_. While Arkitekt only stands as the connection layer it is these two apps that actually manage and do the work. Orkestrator assigns work and Fiji does the actually work. Arkitekt only acts as the Middleman, so that they don't have to interact directly with each other (which would be a lot more complicated than you might think).
 
-Arkitekt without apps is like a car without wheels. It might look cool, but it won't get you anywhere. So let's take a closer look at what an App is, and what it can do.
 
 # The type of Apps
 
-You already saw that Orkestrator and Fiji are apps, but Arkitekts definition of apps is way broader than the usual apps that you might be used to. In fact, almost anything can be an app, as long as it is able to connect to Arkitekt. This means that you can use a website as an app, or your own code, or even your robot or Iot device. What _unifies_ all of these apps is that they all follow some common principles of **authentication** them when connecting with the platform. This is an important feature, because it not only that you are in control of your data, but Arkitekt can use the provided information of the app to _version_ the app. This versioning ensures that if you want to use the functionality of this app in a workflows or just directly in tasks you can be sure that the app will behave the same way every time.
+You already saw that Orkestrator and Fiji are apps, but Arkitekts definition of apps is way broader that an application with a Graphical User Interface.
+ In fact, almost anything can be an app, as long as it is able to connect to Arkitekt. 
+ This means that you can use a website as an app, or your own code, or even your robot or Iot device. 
+ What _unifies_ all of these apps is that they all follow some common principles of **authentication** when connecting with the platform.
+This is an important feature, because it not only that you are in control of your data, but Arkitekt can use the provided information of the app to _version_ the app. 
+This versioning ensures that if you want to use the functionality of this app in a workflows or just directly in tasks you can be sure that the app will behave the same way every time.
 
-This means that the first time a new app decides to connect to Arkitekt, you will be asked to approve the connection and the permissions that the app is asking for.(this is done through Oauth2 Standard, the same principle that is used when you press "login with google", but you don't need to know that to use Arkitekt.). This double authentication process is key to Arkitekts security and some other design principles, and we will go into more detail about it in the [Security](/docs/design/security/why.md) section.
+This means that the first time a new app decides to connect to Arkitekt, you will be asked to approve the connection 
+and the permissions that the app is asking for (this is done through Oauth2 Standard, the same principle that is used when you press "login with google",
+ but you don't need to know that to use Arkitekt.). This double authentication process is key to Arkitekts security and some other design principles,
+  and we will go into more detail about it in the [Security](/docs/design/security/why.md) section.
 
 <div className="mt-2 w-max-xl">
 <Image img={oauth} />
@@ -69,18 +79,6 @@ If you want to know more about how to connect to Arkitekt, you can read more abo
 </TabItem>
 </Tabs>
 
-<details>
-  <summary>How does this work?</summary>
-  <div>
-    <div>
-
-**How does the App know where to connect to?**
-
-As Arkitekt is nothing more than a server in your lab (or in the cloud), and these apps are just programs that run on your computer, they need to know where to connect to. So you might wonder how does the app know which server to use? The answer turns out to be quite difficult and what keeps us up at night. The short answer is that the app needs to know the ip-adress of the Arkitekt server, which depending on your apps location can be autoconfigured through the network through the App Admin Interface. This mean that once you are using the Orkestrator Desktop App, it will automatically discover local servers, and you don't need to worry about the configuration.
-
-</div>
-</div>
-</details>
 
 ### TLDR
 

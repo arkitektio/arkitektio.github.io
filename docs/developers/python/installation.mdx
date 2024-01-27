@@ -35,32 +35,19 @@ pip install arkitekt
 
 :::
 
-## Choose your tutorial
+## Choose your style
 
 The best way to explore what Arkitekt can do is to follow one of the tutorials.
 Here you can find a list of tutorials that will guide you through the process of
 creating your first app. But first let's discuss the two different styles of developing
-apps with Arkitekt.
+apps with Arkitekt. You can pick the one that suits your needs best.
 
-- Classic
+## Classic
 
 This is the most straight-forward way of **interacting** with Arkitekt and its
 services if you want to interact and explore your data, and **use** functionality from other apps.
 The Arkitekt API here sits in the background just like any other python library, and you
 are in full control of the execution of your code.
-
-- Integrated
-
-App that follow the `integrated style` are more integrated into the Arkitekt ecosystem. When developing
-an integrated app, the Arkitekt CLI takes more control over your development process, in order to streamline
-the process of developing and publishing apps that **provide new functionality** (nodes). It also highly
-automates the process of **publishing** your app , so that it can be used by other users.
-
-While you easily switch between the two styles, they differ in the way you interact with the Arkitekt API.
-
-## Classic
-
-Classic apps are the most straight-forward way of interacting with the Arkitekt API. Here is an example:
 
 ```python
 from arkitekt import easy
@@ -85,7 +72,15 @@ creating a new image and uploading it to the mikro service. Once we leave the co
 manager, the app is automatically closed and your script can continue to run as usual.
 Also you run this like any other python script, without any additional steps.
 
+To get started with the classical style, you can follow the [Classic Tutorial](./classical/intro.md)
+
 ## Integrated
+
+App that follow the `integrated style` are more integrated into the Arkitekt ecosystem.
+The Integrated style is your best choice if you want to **provide new functionality** (nodes)
+and develop your own Arkitekt App.  In the integrated style the Arkitekt CLI takes more control over your development process, ands streamline
+the process of developing and your app publishing apps so that it can be used by other users.
+
 
 ```python
 from arkitekt import register
@@ -125,17 +120,23 @@ if __name__ == "__main__":
 
 Here we are creating an app that can be run by the Arkitekt CLI and that
 provides a Node (Add two Numbers) that can be used by other apps. The
-`@register` decorator is used to mark a function as a node. The function
-itself is a normal python function. Importantly when running this script
-normally with `python`, the code in the `if __name__ == "__main__"` block will be executed,
-but none of the code in the function will be executed. Only when you run this
-script with the Arkitekt CLI `arkitekt run` the function will be registered
-as a node through the Arkitekt API.
+`@register` decorator is used to mark a function as a node. 
+
+While you can run this script like any other python script ( executing the
+`if __name__ == "__main__"` block ) in the integrated style you are using
+the Arkitekt CLI to run yout app via:
+
+```bash
+arkitekt run dev
+```
+
+The CLI will then create the App context for your app and register the functions
+that are marked with the `@register` decorator as nodes
 
 :::info Why do we use this?
 
-This pattern might seem strange at first, but it has a few advantages, that we will
-get into later. The main reason is that it allows us to enable a lot of automation,
-and some nice developer experience features like hot-reloading, but most importantly
-it allos us to make the process of developing and publishing apps as easy as possible.
+This pattern might seem strange at first, but it has a few advantages, such as nice developer experience features like hot-reloading,
+ but most importantly and easy portability of your app to other Arkitekt instances. 
 :::
+
+To get started with the integrated style, you can follow the [Integrated Tutorial](./integrated/intro.md)
