@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[4306],{86173:e=>{e.exports=JSON.parse('{"title":"Arkitekt Vs. ...","slug":"/category/arkitekt-vs-","permalink":"/docs/category/arkitekt-vs-","navigation":{"previous":{"title":"Versioning","permalink":"/docs/design/version"},"next":{"title":"...Nextflow.","permalink":"/docs/design/vs/nextflow"}}}')}}]);
