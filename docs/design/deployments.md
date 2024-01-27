@@ -1,11 +1,11 @@
 ---
 id: deployment
-title: Arkitekt and Containers
-sidebar_label: Arkitekt and Containers
+title: Deployment Strategies
+sidebar_label: Deployment 
 sidebar_position: 2
 ---
 
-# Deployment Strategies
+# Deployment
 
 ## Introduction
 
@@ -14,7 +14,6 @@ Arkitekt aims to be highly costumizable in its deployment strategies, ranging fr
 ## Overview
 
 Arkitekt is build around a microservice architecture, which means that it is composed of many small services that seperate concerns of the platform. Contrary to a lot of modern micro-services, Arkitekt containers limits internal (inter-service) communication , which means that the services *are not* coupled. This allows for a lot of flexibility in the deployment strategies, as the services can be deployed on different machines, in different containers, or even in different clouds. On top of that Arkitekt is build on container technology, which means that it can be deployed on any container orchestration platform, such as Kubernetes, Docker Swarm, or even a custom solution.
-
 
 # On Premise
 

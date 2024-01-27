@@ -1,0 +1,82 @@
+---
+id: version
+title: How we version Arkitekt
+sidebar_label: Versioning
+sidebar_position: 2
+---
+
+
+import Image from "@theme/IdealImage";
+import channels from "./channels.png";
+
+
+#### We are talking about the Arkitekt-Server
+
+When we are discussing the versioing of Arkitekt, we are discussing the version of the Arkitekt-Server, and not the versioning of specific Arkitekt Apps.
+Apps follow their **own** versioning scheme, and are not directly affected by the versioning of the Arkitekt-Server, because of the way they are deployed. 
+To read more about this check out the fakts section.
+
+
+### Versioning
+
+First and foremost: Arkitekt is a platform with multiple components, and we version each component separately. Your Arkitekt-Server might then be composed of
+multiple components with different versions, that live alongside each other, and your Arkitekt Server might contain multiple versions of the same component. This
+allows the administrator to let some users use beta versions of some components, while the majority will use the stable versions.
+
+
+<div className="mt-2">
+<Image img={channels} />
+
+<div className="text-gray-400 mb-2 mt-4">
+<small> An example of how you might version an Arkitekt Deployment depending on your needs. Generally you will want most of your apps to connect to stable
+services. The only "conserved" platform api for the platform is the fakts api, which will not be able to differ from app to app that connects to your deployment.
+It is the defining service for each deployment.  </small>
+</div>
+</div>
+
+
+:::tip
+
+While you can even host completely developmental services in your **production** deployment, we **strongly** recommend against this. Most of the time you would
+want a developmental service to be hosted in a **development** Deployment of Arkitekt, and not in your production deployment.
+
+:::
+
+### How we version
+
+We version the Core Arkitekt Services around the concept of Channels. Channels provide an established way to release new features and changes to users, 
+and allow us to group features and changes into different categories, so that users have a working version of Arkitekt at all times. 
+Generally these channels can exist as "live" channels, or as "frozen" channels. Live channels are channels that are constantly updated, and frozen channels
+are channels that will never be updated, and will always contain the same version of the service. To ensure that you receive updates to a service, you need
+to be on a live channel, which is why we recommend to be on a live channel for most of your services.
+
+Arkitekt has three live channels: **Stable**, **Beta** and **Next**. Each channel has a different purpose, and is used for different use cases.
+
+- **Stable**: The stable channel is the channel that is recommended for production environments, and is the channel that is used by default when installing Arkitekt.
+ This channel will only contain services that are considered stable, and breaking changes to your database will be mitigated my migrations. Services in this channel
+ are "guaranteed" to work together with your apps, and stable version of your community apps (and your own apps) should always be compatible with the services in this channel.
+
+- **Beta**: The beta channel is the channel that is recommended for development and testing environments, and contains services that are staging to be released to the stable channel.
+ This channel will contain services that are considered stable, but might still contain breaking changes to a stable database. When appearing in the beta channel the services,
+services are supposed to get ready for the stable channel and only contain bugfixes.
+
+- **Next**: The next channel is considered the "bleeding edge" channel of Arkitekt, and contains services that are still in development. This channel is not recommended for
+production environments, and may contain services of Arkitekt that we are just testing out, and are experimenting on. Services in this channel are *not guarenteed* to work
+with your apps, and may contain breaking changes on every iteration of the service. Some of the services in this channel might never be released to the beta channel, and
+might be removed from the next channel at any time.
+
+
+When we release a new version of Arkitekt, we release a new version of each service in each channel. You can remain on an older version of a service, by choosing a frozen
+"channel", such as the "paper" channel (which is the frozen channel for the original publication of Arkitekt). When we publish a new version to the stable channel, we will
+also publish a "frozen", channel that will contain the same version of the service as the stable channel, but will never be updated. This allows you to stay on a specific
+version of the platform. Hoewver we **strongly** recommend that you stay on the stable channel. (No worries we will keep a transcript of which version of the service you
+were on for provenance reasons).
+
+
+### I developed my own Service, how do I version it?
+
+If you developed your own service, you can version it however you want. We recommend that you follow the same versioning scheme as the Arkitekt Services, but you are
+free to version your services however you want. If you want to establish your service as a "core" Arkitekt service you will however adhere to the channel scheme
+described above (and your first iteration will be put into the next channel). 
+
+Just [contact us](/contact) and we will help you with the process of establishing your service as a core Arkitekt service.
