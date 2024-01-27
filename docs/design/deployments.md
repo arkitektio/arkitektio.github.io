@@ -1,11 +1,9 @@
 ---
 id: deployment
-title: Arkitekt and Containers
-sidebar_label: Arkitekt and Containers
+title: Deployment Strategies
+sidebar_label: Deloyment
 sidebar_position: 2
 ---
-
-# Deployment Strategies
 
 ## Introduction
 
