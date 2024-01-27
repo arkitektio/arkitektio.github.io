@@ -1,0 +1,33 @@
+---
+title: Rekuest
+sidebar_label: Rekuest
+sidebar_position: 1
+---
+
+import Image from "@theme/IdealImage";
+import rekuest from "./rekuest.png";
+
+# Rekuest
+
+Rekuest is one of the core services of Arkitekt. It represents a central repository of
+all the connected apps and their provided functionality, their [Nodes](/docs/terminology/nodes).
+It also provides ways of interacting with the apps, by providing a central access point, that
+apps and users can assign tasks to. Rekuest then takes care of routing the requests to the
+appropriate app, executing the task and returning the result. Similar to all other Arkitekt
+services, Rekuest exposes a GraphQL API, that can be used to interact with it. You can find the
+documentation for the API [here](/docs/api/rekuest).
+
+## Rekuest Design
+
+Rekuest itself is designed as a stateless service (in order to be able to scale horizontally), and
+interfaces with proven open-source technologies, such as [Redis](https://redis.io/) and [RabbitMQ](https://www.rabbitmq.com/).
+to route tasks to the appropriate apps. The following diagram shows the high-level design of Rekuest:
+
+<Image img={rekuest} />
+
+
+:::note
+
+Rekuest is currently being rewritten to support other message brokers, such as [Kafka](https://kafka.apache.org/). This will
+however remain an opt-in feature, and RabbitMQ will remain the default message broker. To learn more about this design decision,
+please refer to the [Why Not?](/docs/design/why-not) section.

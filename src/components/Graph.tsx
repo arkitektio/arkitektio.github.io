@@ -5,10 +5,10 @@ import "graphiql/graphiql.css";
 import "@graphiql/plugin-explorer/dist/style.css";
 import "./test.css";
 import { useHerre } from "@jhnnsrs/herre";
-import { useFakts } from "@jhnnsrs/fakts";
-import { Guard } from "./Guard";
 import BrowserOnly from "@docusaurus/BrowserOnly";
 import { explorerPlugin } from "@graphiql/plugin-explorer";
+import { useArkitektConnect, useArkitektLogin, EasyGuard } from "@jhnnsrs/arkitekt";
+
 
 const explorer = explorerPlugin({} as any);
 
@@ -47,7 +47,7 @@ export const buildStorage = (url: string): Storage => {
 };
 
 const Renderer = ({ url }: { url: string }) => {
-  const { token } = useHerre();
+  const { token } = useArkitektLogin();
 
   const fetcher = createGraphiQLFetcher({
     url: url,
@@ -138,7 +138,7 @@ export const GraphOptions = ({ options }: { options: APIOption[] }) => {
 
 export const APIDocumentation = () => {
   const [options, setOptions] = React.useState<APIOption[]>([]);
-  const { fakts } = useFakts();
+  const { fakts } = useArkitektConnect();
 
   React.useEffect(() => {
     if (!fakts) return;
@@ -147,9 +147,9 @@ export const APIDocumentation = () => {
 
     Object.keys(fakts).forEach((e) => {
       console.log(e);
-      const endpoint = fakts[e].endpoint_url;
+      const endpoint = fakts[e].endpoint_url as string;
       const name = e;
-      if (endpoint && name && name != "minio") {
+      if (endpoint && endpoint.includes("graphql")) {
         options.push({ url: endpoint, label: name });
       }
     });
@@ -163,17 +163,90 @@ export const APIDocumentation = () => {
   );
 };
 
-export const Graph = () => {
-  const [state, setState] = React.useState("http://localhost:8888/graphql");
+export const Login = () => {
+  const { login, loading } = useArkitektLogin();
+  const { fakts, remove } = useArkitektConnect();
 
+  return (
+    <div className="h-full flex flex-col flex-1 items-center justify-center dark:text-white ">
+              <div className="px-2 py-2 flex flex-col items-center justify-center">
+                <div className="text-slate-200 justify-center  items-center align-center">You are connected!</div>
+                <div className="text-slate-600 text-xs">
+                  You are logged in with this demo website with arkitekt. Just
+                  authenticate yourself and you are ready to go
+                </div>
+              </div>
+              <div className="flex flex-row w-full gap-2 justify-center p-3">
+                <>
+                  <button
+                    className={
+                      "px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md " +
+                      (loading ? "animate-pulse" : "")
+                    }
+                    onClick={() => login()}
+                  >
+                   <div className="text-md text-center">Login</div>
+                  </button>
+                  <button className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md text-md" onClick={() => remove()}> Unconnect</button>
+                </>
+              </div>
+          </div>
+  );
+};
+
+export const Connect = () => {
+  const { registeredEndpoints, load, fakts, loading} = useArkitektConnect();
+
+  return (
+   <div className="h-full flex flex-col flex-1 items-center justify-center dark:text-white ">
+            <div className="text-slate-200 justify-center ">Lets get you connected!</div>
+            <div className="text-slate-600 text-xs">
+              You are not currently connected. Here connectable instances will
+              appear (currently restricted to local arkitekt instance)
+            </div>
+            <div className="flex flex-row gap-2 justify-start p-3">
+            {!loading ? registeredEndpoints.map((e) => (
+              
+                <button
+                  className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md flex flex-col"
+                  onClick={() => load({endpoint: e, requestPublic: true})}
+                >
+                  {" "}
+                  <div className="text-2xl text-center">{e.name}</div>
+                  {e.base_url}
+                </button>
+            )): <div className="animate-pulse cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md px-2 py-2 " onClick={() => load()}>Cancel connection</div>}
+            </div>
+
+    </div>
+  );
+};
+
+
+
+export const GraphQuard = (props: { children: React.ReactNode }) => {
+
+  return (
+    <>
+      <EasyGuard
+        noAppFallback={<>Not connected</>}
+        notConnectedFallback={<Connect />} 
+        notLoggedInFallback={<Login />}
+      >
+        {props.children}
+      </EasyGuard>
+    </>
+  );
+};
+
+export const Graph = () => {
   return (
     <BrowserOnly fallback={<div>Hallo</div>}>
       {() => (
-        <div className="h-full">
-          <Guard>
+       
+          <GraphQuard>
             <APIDocumentation />
-          </Guard>
-        </div>
+          </GraphQuard>
       )}
     </BrowserOnly>
   );

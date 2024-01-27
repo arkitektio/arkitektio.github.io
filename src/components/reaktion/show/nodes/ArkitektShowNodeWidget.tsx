@@ -24,11 +24,7 @@ const getGlobalArg = (flow: FlowFragment, id: string, key: string) => {
   );
 };
 
-
-
-const InstalledInfo = (props: {hash: string, name: string}) => {
-
-
+const InstalledInfo = (props: { hash: string; name: string }) => {
   const { data, error, loading } = useRekuestQuery(gql`
     { node(hash: "${props.hash}") {
       name
@@ -36,32 +32,34 @@ const InstalledInfo = (props: {hash: string, name: string}) => {
     }
     `);
 
-  return <>{error ? (
-    <div className="flex flex-row gap-2">
-      <UninstalledNode />
-      <div className="text-yellow-500 my-auto"> {props.name} </div>
-    </div>
-  ) : (
-    <div className="flex flex-row gap-2">
-      <InstalledNode />
-      <div className="text-green-500 my-auto"> {data?.node?.name} </div>
-    </div>
-  )}
-
+  return (
+    <>
+      {error ? (
+        <div className="flex flex-row gap-2">
+          <UninstalledNode />
+          <div className="text-yellow-500 my-auto"> {props.name} </div>
+        </div>
+      ) : (
+        <div className="flex flex-row gap-2">
+          <InstalledNode />
+          <div className="text-green-500 my-auto"> {data?.node?.name} </div>
+        </div>
+      )}
     </>
-
-
-}
+  );
+};
 
 const ShowNodeDetails = (props: ArkitektNodeProps) => {
   const { flow } = useShowRiver();
 
-  
-
   const overwrittenDefaults =
     (props.data.defaults &&
       Object.keys(props.data.defaults).filter(
-        (key) => (props.data.defaults[key] && props.data.defaults[key] != null && props.data.defaults[key] != false) || getGlobalArg(flow, props.id, key),
+        (key) =>
+          (props.data.defaults[key] &&
+            props.data.defaults[key] != null &&
+            props.data.defaults[key] != false) ||
+          getGlobalArg(flow, props.id, key),
       )) ||
     [];
 
@@ -70,7 +68,7 @@ const ShowNodeDetails = (props: ArkitektNodeProps) => {
       <PopoverTrigger className="appearance-none rounded  bg-gray-800 rounded-md cursor-pointer w-full ">
         <RekuestGuard fallback={<> {props.data?.name}</>}>
           <InstalledInfo hash={props.data.hash} name={props.data.name} />
-          </RekuestGuard>
+        </RekuestGuard>
       </PopoverTrigger>
       <PopoverContent className="text-xs bg-back-800 my-auto  ">
         {" "}
@@ -87,7 +85,11 @@ const ShowNodeDetails = (props: ArkitektNodeProps) => {
                     <>
                       <div className=" my-auto"> {key} </div>
                       {global ? (
-                        <div className="text-primary-300"> <div className="font-bold inline">Global </div>{global.port.key} </div>
+                        <div className="text-primary-300">
+                          {" "}
+                          <div className="font-bold inline">Global </div>
+                          {global.port.key}{" "}
+                        </div>
                       ) : (
                         <div className="my-auto">
                           {" "}
@@ -139,7 +141,7 @@ export const ArkitektShowNodewidget: React.FC<ArkitektNodeProps> = withLayout(
           />
         ))}
         <div className="flex flex-row justify-between custom-drag-handle w-full h-full overflow-hidden ">
-            <ShowNodeDetails {...props} />
+          <ShowNodeDetails {...props} />
         </div>
       </NodeShowLayout>
     );

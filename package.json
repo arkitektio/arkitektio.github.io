@@ -30,11 +30,11 @@
     "@graphiql/plugin-explorer": "^1.0.2",
     "@graphql-tools/url-loader": "^7.16.4",
     "@headlessui/react": "^1.7.13",
-    "@jhnnsrs/arkitekt": "^0.1.3",
+    "@jhnnsrs/arkitekt": "^0.1.11",
     "@jhnnsrs/datalayer": "^0.0.8",
-    "@jhnnsrs/fakts": "^0.0.17",
+    "@jhnnsrs/fakts": "^0.0.24",
     "@jhnnsrs/fluss": "^0.0.2",
-    "@jhnnsrs/herre": "^0.0.14",
+    "@jhnnsrs/herre": "^0.0.19",
     "@jhnnsrs/kraphql": "^0.0.6",
     "@jhnnsrs/mikro": "^0.0.9",
     "@jhnnsrs/rekuest": "0.0.15",
@@ -73,7 +73,7 @@
     "@docusaurus/tsconfig": "3.0.0",
     "@tsconfig/docusaurus": "^1.0.5",
     "@types/react": "^18.2.29",
-    "prettier": "^3.0.3",
+    "prettier": "^3.1.1",
     "typescript": "~5.2.2"
   },
   "browserslist": {

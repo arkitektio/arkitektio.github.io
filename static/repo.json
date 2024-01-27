@@ -1,0 +1,202 @@
+{
+  "repo": "default",
+  "channels": 
+      [
+          {
+              "name": "paper",
+              "title": "Paper",
+              "experimental": false,
+              "logo": "https://raw.githubusercontent.com/jhnnsrs/konstruktor/master/public/paper.png",
+              "long": "The paper deployment to reproduce the paper.",
+              "description": "The original paper deployment. That can be used to generate the conditions of deployment as presented in the paper. It comes with a default set of enabled applications",
+              "features": [
+                  {
+                  "name": "Easy",
+                  "description": "Easy to use",
+                  "long": "This deployment is easy to use"
+                  }
+              ],
+              "preview": false,
+              "builder": "jhnnsrs/paperbuilder:latest",
+              "forms": ["check_gpu", "admin_user", "users", "groups" ],
+              "defaults": {
+                  "name": "paper",
+                  "adminUsername": "admin",
+                  "adminPassword": "admin",
+                  "groups": [{
+                      "name": "mygroup",
+                      "description": "mygroup"
+                  }],
+                  "users": [{
+                      "username": "demo",
+                      "password": "demo",
+                      "groups": ["mygroup"]
+                  }]
+              }
+          },
+          {
+            "name": "next",
+            "title": "next",
+            "experimental": true,
+            "logo": "https://raw.githubusercontent.com/jhnnsrs/konstruktor/master/public/next.png",
+            "long": "The next deployment contains breaking changes and is not yet stable. It does however give an impression of the future of Arkitekt",
+            "description": "The next deployment",
+            "features": [
+              {
+                "name": "Easy",
+                "description": "Easy to use",
+                "long": "This deployment is easy to use"
+              }
+            ],
+            "preview": true,
+            "builder": "jhnnsrs/arkitekt_paper_builder",
+            "forms": ["check_gpu", "admin_user", "users", "groups"],
+            "defaults": {
+              "name": "mydeployment",
+              "adminUsername": "admin",
+              "adminPassword": "admin",
+              "groups": [{
+                  "name": "mygroup",
+                  "description": "mygroup"
+              }],
+              "users": [{
+                  "username": "demo",
+                  "password": "demo",
+                  "groups": ["mygroup"]
+              }]
+            }
+          },
+          {
+              "name": "next",
+              "title": "next",
+              "experimental": true,
+              "logo": "https://raw.githubusercontent.com/jhnnsrs/konstruktor/master/public/next.png",
+              "long": "The next deployment contains breaking changes and is not yet stable. It does however give an impression of the future of Arkitekt",
+              "description": "The next deployment",
+              "features": [
+                {
+                  "name": "Easy",
+                  "description": "Easy to use",
+                  "long": "This deployment is easy to use"
+                }
+              ],
+              "preview": true,
+              "builder": "jhnnsrs/arkitekt_paper_builder",
+              "forms": ["check_gpu", "admin_user", "users", "groups"],
+              "defaults": {
+                "name": "mydeployment",
+                "adminUsername": "admin",
+                "adminPassword": "admin",
+                "groups": [{
+                    "name": "mygroup",
+                    "description": "mygroup"
+                }],
+                "users": [{
+                    "username": "demo",
+                    "password": "demo",
+                    "groups": ["mygroup"]
+                }]
+              }
+            },
+              {
+                "name": "beta",
+                "title": "beta",
+                "experimental": true,
+                "logo": "https://raw.githubusercontent.com/jhnnsrs/konstruktor/master/public/next.png",
+                "long": "The beta deployment contains breaking changes and is not yet stable. It does however give an impression of the future of Arkitekt",
+                "description": "The next deployment",
+                "features": [
+                  {
+                    "name": "Beta",
+                    "description": "Expect breaking changes",
+                    "long": "This deployment will change"
+                  }
+                ],
+                "preview": true,
+                "builder": "jhnnsrs/betabuilder:latest",
+                "defaults": {
+                  "name": "mydeployment",
+                  "adminUsername": "admin",
+                  "adminPassword": "admin",
+                  "groups": [{
+                      "name": "mygroup",
+                      "description": "mygroup"
+                  }],
+                  "users": [{
+                      "username": "demo",
+                      "password": "demo",
+                      "groups": ["mygroup"]
+                  }]
+                },
+                "basic_forms": [
+                  {
+                    "welcome_message": "Let's setup your deployment"
+                  },
+                  {
+                    "welcome_message": "Lets talk admin rights now",
+                    "fields": [
+                      {
+                        "key": "adminUsername",
+                        "label": "Admin Username",
+                        "type": "str",
+                        "required": true
+                      },
+                      {
+                        "key": "adminPassword",
+                        "label": "Admin Password",
+                        "type": "str",
+                        "required": true
+                      }
+                    ]
+                  },
+                  {
+                    "welcome_message": "Let's setup your users",
+                    "fields": [
+                      {
+                        "key": "users",
+                        "label": "Users",
+                        "type": "list",
+                        "required": true,
+                        "child": {
+                          "key": "user",
+                          "label": "User",
+                          "fields": [
+                            {
+                              "key": "username",
+                              "label": "Username",
+                              "type": "str",
+                              "required": true,
+                              "default": "demo"
+                            },
+                            {
+                              "key": "password",
+                              "label": "Password",
+                              "type": "str",
+                              "required": true,
+                              "default": "demo"
+                            },
+                            {
+                              "key": "groups",
+                              "label": "Groups",
+                              "type": "list",
+                              "required": true,
+                              "fields": [
+                                {
+                                  "key": "name",
+                                  "label": "Name",
+                                  "type": "str",
+                                  "required": true,
+                                  "default": "mygroup"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              
+              }
+      ] 
+}

@@ -1,0 +1,69 @@
+---
+title: Omero Integration
+sidebar_label: Omero Integration
+sidebar_position: 1
+---
+
+import { DownloadGrid } from "../../../src/components/layout/Button";
+
+import { ShowWorkflow } from "../../../src/components/reaktion/ShowWorkflow";
+
+import Image from "@theme/IdealImage";
+import thumbnail from "./mikroj.png";
+
+## Omero Integration
+
+Arkitekt can be deployed to work with Omero, a popular open source image management platform. Through this integration you
+can easily create workflows that interact with Omero, for example to upload images to Omero or to download images
+from Omero.
+
+:::note
+This integration is currently in beta and provides a limited set of features. We are working on expanding the
+integration to cover more of the Omero API. If you have any feedback or requests, please let us know.
+:::
+
+## Setting up the Omero integration
+
+To use the Omero integration, you need to use a Arkitekt instance that has the Omero integration enabled. Arkitekt
+deployments, that use Konstruktor can enable the Omero integration by choosing an "beta" channel and enabling Omero
+in the setup process. You will be also asked if you want to _include_ a dedicated Omero setup in your deployment, or
+if you want to _connect_ to an existing Omero instance. When enabling the OMERO integration, your Arkitekt deployment
+will include an additional (micro-) service: Omero-Ark, which will act as a proxy between your Arkitekt apps and Omero.
+
+:::warning
+
+In this beta, we _highly_ recommend to use the dedicated Omero setup. The Omero integration is still in beta and
+might not work with all Omero instances. If you want to connect to an existing Omero instance, please make sure that
+you are using a recent version of Omero (>= 5.6.0) and that your Omero instance is accessible from the Arkitekt
+deployment.
+
+:::
+
+## Connecting to an existing Omero instance
+
+If your deployment supports OMERO Orkestrator will automatically create a new pane
+in the sidebar, that allows you to connect to an existing Omero instance.
+
+On first setup, you will need to provide the URL of your Omero instance and your credentials, for your Omero account.
+You can also provide a name for the connection, that will be used to identify the connection in the sidebar. Without
+a name, the connection will be identified by the URL of the Omero instance.
+
+## Using the Omero integration
+
+Once you have connected to an Omero instance, you can use the full featureset of the Arkitekt platfrom with your Omero
+data. You can explore your data, create workflows that interact with your data and interconvert your data between mikro
+and Omero.
+
+:::note
+
+In this current beta, we focused on integrating OMERO as a data source and target for workflows. While we are working on
+integrating more of the OMERO ecoyste, we currently do not plan to establish OMERO as a data `backbone` for Arkitekt, as it is
+not really optimized for high throughput data processing and streaming data. If you are interested in using OMERO as a data backbone for
+your Arkitekt instance, please let us know.
+
+:::
+
+## Uploading data to Omero
+
+OMEROs integration of new image datasets is based on the concept of `projects`. Projects are collections of datasets, that
+can be shared with other users.
