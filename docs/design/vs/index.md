@@ -1,7 +1,7 @@
 ---
-id: intro
+id: index
 title: Introduction to Vs
-sidebar_label: Intro
+sidebar_label: Arkitekt vs..
 sidebar_position: 2
 ---
 

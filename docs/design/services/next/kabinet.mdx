@@ -1,0 +1,118 @@
+---
+title: Kabinet
+sidebar_label: Kabinet
+sidebar_position: 1
+---
+
+import Image from "@theme/IdealImage";
+import kabinet from "./kabinet.png";
+
+# Kabinet
+
+Kabinet is designed to be the new AppStore for the platform. It builds around the concepts of Port, which
+provides the current Plugin system, but
+switches some of its core concepts around, which warrants a new name. This section describes the core concepts
+of the system, and how it is designed to work.
+
+:::note
+
+While Kabinet will eventually replace Port in the standard deployment, you will be still able to use Port if you
+prefer its approach. The two systems will be able to coexist, and you can use both in parallel. However we think
+that Kabinet will provide a better experience for most users.
+
+:::
+
+
+## Core concepts
+
+
+Kabinet will become the new "AppStore" for the platform. It will provide a way to install applications
+from common repositories ("Repos"), as well as to explore and find the correct application to install for a given bioimage tasks.
+It will also provide a way to visualize and query the status plugins and their containers that are running anywhere
+on connected apps.
+
+Here are some core new features of the system:
+
+## Container Backend Apps
+
+As opposed to Port, Kabinet will not be managing Containers directly in side the service, but will instead delegate
+this task to "Container Backend" Apps. Its these Apps that will be responsible for managing their containers and the 
+resources they use. Kabinet only provides a central "State" store for the containers, and a way to query and visualize
+them.
+
+This new approach has several advantages over the "service powered" approach of Port:
+
+- It fully aligns with the "Everything is an App" philosophy of the platform. Container Backends are just another
+  type of App, and can be installed and managed like any other App.
+
+- It allows for a more flexible architecture, where the Container Backend can be deployed anywhere, including resources
+  that do not allow incoming connections, such as for example HPC cluster.
+
+- Developers can easily come up with more personalized Container Backends, that can be tailored to their specific
+  needs. For example, a developer could create a Container Backend that is requiring more specific settings when trying
+  to install a container, or that is using a different container runtime than Docker.
+
+- It allows for a more stable system. If a Container Backend crashes, it will not affect the service, and the containers
+  will continue to run. The Container Backend can then be restarted, and will be able to recover the state of the containers
+  it was managing.
+
+## App Flavours
+
+Kabinet will be build with the new concept of "App Flavours" in mind. An App Flavour is a way to describe a specific
+configuration of an App. For example, a developer could create a "CUDA" App Flavour, that would be configured
+to run on a GPU, but also a "CPU" App Flavour, that would be configured to run on a CPU. The user could then
+choose which App Flavour to install, depending on the resources they have available. Kabinet will further streamline
+this to an automatic process, where the user will not have to choose the App Flavour, but where the system will
+automatically choose the correct App Flavour depending on the environment of the container backend.
+
+
+## Unified Container Visualization
+
+Kabinet will provide a unified way to visualize the containers that are running on any container backend in the system.
+This will allow users to easily see which containers are running, and to query them. This is a big improvement over
+Port, where the containers are only visible in the context of the service they are running on.
+
+## Definition based Container Search
+
+Kabinet will not only provide a way to search for Apps, but also to find the correct container to use for a given
+bioimage task. 
+
+
+<div className="mt-2 p-6 w-full">
+<Image img={kabinet} />
+
+<div className="text-gray-400 mb-2">
+  <small>
+    The new Container Backend App will be responsible for managing the containers, and will be able to run anywhere.
+
+  </small>
+</div>
+</div>
+
+
+
+
+### Challenges
+
+While this new approach has many advantages, it also comes with some challenges:
+
+- Completely detaching the container management from the service means that we will have to face the challenge of
+  synchronizing the state of the containers between the service and the Container Backend. This is not a trivial
+  task, and will require some careful design, to ensure that the state is always consistent between the two. Luckily
+  we can levarge the fact that backends will only be able to modify the state of their own containers.
+
+- Scale is another challenge. If one container backends is managing a massive amount of containers, then
+  it could become the bottleneck of the system (as only one worker queue is used to assign managing tasks to the
+  backends).
+
+- Stability. While the above approach should allow us to have a more stable system, it also means that the
+  system will be more distributed, and that we will have to deal with more moving parts. This will require
+  some careful design to ensure that the system is stable and reliable, especially as Rekuest will be used
+  to communicate between the different parts of the system.
+
+
+
+
+
+
+

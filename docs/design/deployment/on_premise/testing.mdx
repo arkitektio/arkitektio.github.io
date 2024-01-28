@@ -1,0 +1,90 @@
+---
+id: testing
+title: Development
+sidebar_label: Development
+sidebar_position: 2
+---
+
+
+import Image from "@theme/IdealImage";
+import local from "./local.png";
+
+## Development
+
+Facilitating a  smooth development process is one of the main goals of Arkitekt. To achieve this, we have created a
+development environment that allows you to test your App in a real environment and against a real Arkitekt Server,
+all from within your python Code.
+
+:::warning
+
+While the development environment is probably the easiest way to deploy an Arkitket Server for every Python developer,
+we would not recommend it when serving your App. The development environment is not optimized for performance and
+security and should only be used for development purposes.
+
+:::
+
+### Staring a Development Server
+
+To start a development server from within your Python Code, you can use the 'deployment' function from the 'arkitekt'
+package. In its simplest form, the function takes the following arguments:
+
+```python
+from arkitekt import deployment
+
+my_deployment = deployment("my_deployment", channel="stable")
+
+```
+
+The first argument is the name of your deployment. It will be used to create a folder in a ".dokker" folder in your
+working directory. The second argument is the channel you want to use. The channel determines which version of the
+Arkitekt Server will be used. The default channel is "stable", but you can also use "latest" or "next" to use other 
+versions.
+
+The deployment function will return a Deployment object. This object has a number of methods that allow you to interact
+with the deployment. The most important ones are:
+
+- `up()`: Starts the deployment
+- `down()`: Stops the Deployment
+
+Because we want to guarentee that the deployment is stopped when the Python process is terminated, we necessiate using
+the `with` statement when using the deployment:
+
+```python
+
+from arkitekt import deployment
+
+with deployment("my_deployment", channel="stable") as d:
+    # Do something with the deployment
+    d.up(wait_for_health=True)
+
+    print("Deployment is running")
+    pass
+
+```
+
+<div className="mt-2">
+<Image img={local} />
+
+<div className="text-gray-400 mb-2 mt-4">
+<small> An example of how you might version an Arkitekt Deployment depending on your needs. Generally you will want most of your apps to connect to stable
+services. The only "conserved" platform api for the platform is the fakts api, which will not be able to differ from app to app that connects to your deployment.
+It is the defining service for each deployment.  </small>
+</div>
+</div>
+
+
+
+
+
+
+```python
+
+
+
+
+
+
+
+Testing your App is an important part of the development process. It helps to ensure that the code is working as expected 
+and that it is not breaking any existing functionality. While unit-testing your code is far more important, we also wanted
+you to be able to test your App in a real environment and gainst a real Arkitekt Server.

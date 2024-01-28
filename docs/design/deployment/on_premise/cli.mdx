@@ -1,0 +1,78 @@
+---
+id: cli
+title: CLI
+sidebar_label: CLI
+sidebar_position: 2
+---
+
+## CLI
+
+The Arkitekt CLI is a command line tool that helps you to create, build and test your Arkitekt Apps. But you can also use it
+to create new Arkitekt Servers and to manage your Arkitekt Server instances in a local folder.
+
+:::caution
+
+The Arkitekt CLI is currently in beta and we are working hard to improve it. If you find any bugs or have any suggestions
+please let us know. THis is also not the best deployment strategy for beginners. And you are welcome to use the 'Konstruktor'
+to create your Apps.
+
+:::
+
+### Installation
+
+To install the Arkitekt CLI you need to have the python package "arkitekt[cli]" installed. You can do this with the following command:
+
+```bash
+pip install "arkitekt[cli]" # or arkitekt[all] to install all dependencies
+```
+
+### Usage
+
+In order to start an Arkitket Server  you can iniiate a new Arkitekt Server instance with the following command:
+
+```bash
+
+arkitekt server init
+
+```
+
+This will create a new Arkitekt Deployment in a ".dokker" folder in your current working directory.
+
+:::caution 
+
+Before initiating a new Arkitekt Server instance make sure that you are in a folder with fast disk access.
+Otherwise the Arkitekt Server will be very slow to read and write data. Additionaly you should make sure that you have
+enough disk space available. The Arkitekt Server will use a lot of disk space for caching and storing data.
+
+:::
+
+
+### Commands
+
+Once you have initiated a new Arkitekt Server instance you can use the following commands to manage your Arkitekt Server:
+
+```bash
+arkitekt server up
+```
+
+This will start the Arkitekt Server instance in the current working directory.
+
+```bash
+arkitekt server down
+```
+
+This will stop the Arkitekt Server instance in the current working directory.
+
+```bash
+arkitekt server restart
+```
+
+This will restart the Arkitekt Server instance in the current working directory.
+
+```bash
+
+```bash
+arkitekt server open orkestrator
+```
+
+
