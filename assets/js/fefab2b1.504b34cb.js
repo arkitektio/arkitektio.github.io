@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[58],{83308:e=>{e.exports=JSON.parse('{"title":"Security","slug":"/category/security","permalink":"/docs/category/security","navigation":{"previous":{"title":"GraphQL","permalink":"/docs/design/graphql"},"next":{"title":"Why?","permalink":"/docs/design/security/why"}}}')}}]);
