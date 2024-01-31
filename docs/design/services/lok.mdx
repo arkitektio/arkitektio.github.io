@@ -1,0 +1,51 @@
+---
+title: Mikro
+sidebar_label: Mikro
+sidebar_position: 1
+---
+
+import Image from "@theme/IdealImage";
+import schema from "./schema.png";
+import storage from "./storage.png";
+
+# Lok
+
+Lok is a central backend to manage and authorize User and Applications in a distributed
+settings. Loks provides endpoints for apps to configure themselvers (through the Fakts protocol)
+and in a second step to authenticate and authorize users. For the latter it is build on top of [Oauth2](https://oauth.net/2/)
+and [OpenID Connect](https://openid.net/connect/). It then provides a central authentication and authorization
+service for applications to register and authenticate users, and issues JWT token for accessing services.
+
+As JWT are cryptographically signed, they can be verified by any service, and do not require
+a central session store. 
+
+This distributed and scalable authentication and authorization system, was developed as the backbone for the
+Arkitekt platform, but can be used as a standalone service for any application.
+
+## Features
+
+- [x] Application Registration (Authentication of apps based on various Flows)
+- [x] App Configuration (apps can retrieve their configuration from the server)
+- [x] User Authentication and Authorization
+- [x] User and Application Management
+- [x] Distibuted Authentication
+- [x] Social Features (Comments) 
+- [x] User Profiles
+
+All features are exposed through a GraphQL API, which can be used to interact with the system.
+
+
+## Next Features
+
+Lok is currently undergoing a major rewrite, to make it more modular and easier to extend. This rewrite
+will transition the system to a more modular architecture based on modern [Django](https://www.djangoproject.com/) and
+the awesome [Strawberry GraphQL](https://strawberry.rocks/) library.
+
+Additionally to the listed
+features above, the following features are planned:
+
+- [ ] More diverse App Registration Flows (e.g. for Websites)
+- [ ] Social Login (Login with Orcid, Github, Google,... )
+- [ ] User Profiles with social account information
+- [ ] Notificaition Backend (with Mobile Push Notifications)
+- [ ] More Security Features (e.g. 2FA)

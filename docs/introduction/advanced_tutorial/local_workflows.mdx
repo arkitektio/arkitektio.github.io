@@ -1,0 +1,85 @@
+---
+title: Local Workflows
+sidebar_label: Local Workflows
+sidebar_position: 3
+---
+
+import deepL from "./deep_l.json";
+import napariL from "./napari_l.json";
+import { DisplayWorkflow } from "../../../src/components/reaktion/DisplayWorkflow";
+import Image from "@theme/IdealImage";
+import thumbnail from "./local_scheduler.png";
+import localCreation from "./local_workflow_creation.webm";
+import localExecution from "./local_workflow_execution.webm";
+import { InstallRepoButton } from "../../../src/components/InstallRepoButton";
+
+## Local Workflows
+
+While Arkitekt can be a great tool for orchestrating workflows on a multiple computers, spanning multiple programming languages, its modular design
+also makes it a great tool for orchestrating workflows on a single computer and inside a single (python) process. This is due to the nature
+that apps themselves are the schedulers of workflows, and that apps can become their own scheduler.
+
+
+:::note
+While this is a fully functionaly feature at the moment, it is still in its infancy and will be improved upon in the future.
+Not also that you need only two services to run a workflow locally (fluss and rekuest)
+:::
+
+
+
+<div className="mt-2 p-6 w-full">
+    <Image img={thumbnail} />
+
+    <div className="text-gray-400 mb-2">
+    <small>
+        The local scheduler running a workflow. The workflow is running in the same process as the scheduler.
+    </small>
+    </div>
+</div>
+
+### Differences
+
+Everything is in memory, so there is no need to serialize and deserialize data. This means that you can pass around
+large objects without worrying about the performance hit of serialization and deserialization. This also means that
+you can pass around objects that are not serializable, such as open file handles, or objects that are not pickleable.
+
+Additionally everything is hyper fast, as there is no network latency, and no need to wait for other computers to finish
+their work. This means that you can run workflows that are very fast, and that you can run workflows that are very slow
+without worrying about the network latency.
+
+
+### Lets see how to create a local workflow
+
+Creating a local workflow is virtually equivalent to creating a workflow that runs in a distributed fashion. The only difference is that
+when 
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={localCreation} />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Creation of local Workflow</small>
+</div>
+
+And execution is the same as well. Just start the workflow and it will run in the same process.
+
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={localExecution} />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Execution</small>
+</div>
