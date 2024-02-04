@@ -299,7 +299,7 @@ export const AliveDocumentation = (props: AliveDocumentationProps) => {
   const storage = buildStorage(props.storageKey);
 
   return (
-    <div className="h-full">
+    <div className="flex-grow">
       <div className="h-full">
         {fetcher && (
           <GraphiQL
