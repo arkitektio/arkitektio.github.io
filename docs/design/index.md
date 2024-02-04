@@ -1,8 +1,8 @@
 ---
-id: intro
-title: Intro
-sidebar_label: Intro
-sidebar_position: 1
+id: design
+title: Design
+sidebar_label: Design
+sidebar_position: 2
 ---
 
 # Welcome to the Arkitekt Design Docs

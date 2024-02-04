@@ -8,7 +8,9 @@ import { useHerre } from "@jhnnsrs/herre";
 import BrowserOnly from "@docusaurus/BrowserOnly";
 import { explorerPlugin } from "@graphiql/plugin-explorer";
 import { useArkitektConnect, useArkitektLogin, EasyGuard } from "@jhnnsrs/arkitekt";
-
+import mikroIntrospection from "./mikro.introspection.json";
+import { GraphQLError } from "graphql";
+import Link from "@docusaurus/Link";
 
 const explorer = explorerPlugin({} as any);
 
@@ -239,14 +241,233 @@ export const GraphQuard = (props: { children: React.ReactNode }) => {
   );
 };
 
+
+
+
+export const createFallBackFetcher = (props: FallbackDocumentationProps): Fetcher => {
+
+  const fetcher = createGraphiQLFetcher({
+    url: props.faktsKey,
+    headers: {
+    }
+  });
+
+  console.log("Initiated fetcher", fetcher)
+
+  return (graphQLParams, fetcherOpts) => {
+    console.log("Fetcher", graphQLParams, fetcherOpts)
+    if (graphQLParams.operationName === 'IntrospectionQuery') {
+      console.log("IntrospectionQuery", props.schema)
+      return fetch(props.schema).then((response) => {
+        return response.json()
+       
+      }).then(
+        (response) => {
+          console.log("Response", response)
+          return { data: response, errors: [] }
+        }
+      ).catch((e) => {
+        console.error(e)
+        return {data: {}, errors: [new GraphQLError("Could not fetch schema from " + props.schema)]};
+    });
+
+    }
+    return Promise.resolve({ data: {}, errors: [{ message: "Live features only availabe if your connect your Arkitekt Instance" }]});
+  }
+
+
+}
+
+
+export type AliveDocumentationProps = {
+  faktsKey: string;
+  storageKey: string;
+}
+
+export const AliveDocumentation = (props: AliveDocumentationProps) => {
+
+  const { token } = useArkitektLogin();
+  const { fakts } = useArkitektConnect();
+
+  const fetcher = createGraphiQLFetcher({
+    url: fakts[props.faktsKey]?.endpoint_url as string,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const storage = buildStorage(props.storageKey);
+
+  return (
+    <div className="h-full">
+      <div className="h-full">
+        {fetcher && (
+          <GraphiQL
+            fetcher={fetcher}
+            defaultQuery=""
+            plugins={[explorer]}
+            storage={storage}
+          />
+        )}
+      </div>
+    </div>
+  );
+
+
+
+}
+
+
+export type FallbackDocumentationProps = {
+  faktsKey: string;
+  storageKey: string;
+  schema?: string;
+}
+
+
+
+
+export const FallbackDocumentation = (props: FallbackDocumentationProps) => {
+      
+    const fetcher = createFallBackFetcher(props);
+
+    const storage = buildStorage(props.storageKey);
+  
+    return (
+      <div className="flex-grow">
+        <div className="h-full">
+          {fetcher && (
+            <GraphiQL
+              fetcher={fetcher}
+              defaultQuery=""
+              plugins={[explorer]}
+              storage={storage}
+            />
+          )}
+        </div>
+      </div>
+    );
+  };
+
+
+export type DynamicDocumentationProps = {
+  faktsKey: string;
+  schema: string;
+  description: string;
+}
+
+
+
+export const DynamicDocumentation = (props: DynamicDocumentationProps) => {
+
+
+  return (
+    <>
+  
+    <div className="flex flex-grow h-full flex-col">
+    <div className="flex-grow flex overflow-y-auto">
+        <EasyGuard
+          noAppFallback={<>Not connected</>}
+          notConnectedFallback={<FallbackDocumentation faktsKey={props.faktsKey} storageKey={props.faktsKey} schema={props.schema} />} 
+          notLoggedInFallback={<FallbackDocumentation faktsKey={props.faktsKey} storageKey={props.faktsKey} schema={props.schema} />}
+        >
+          <AliveDocumentation faktsKey={props.faktsKey} storageKey={props.faktsKey}/>
+        </EasyGuard>
+    </div>
+    </div>
+    </>
+  );
+  };
+
+
+
+
+
+
+
+
+  export type ServiceOption = {
+    label: string;
+    schema: any;
+    faktsKey: string;
+    description: string;
+  };
+  
+  export const ServiceSelector = ({
+    onChange,
+    value,
+    options,
+  }: {
+    onChange: (value: ServiceOption) => void;
+    value: ServiceOption;
+    options: ServiceOption[];
+  }) => {
+    return (
+      <div className="flex-initial flex flex-row pl-20 gap-2 h-10 mt-2 pr-10">
+        <div className="py-2 px-2 h-10 my-auto text-slate-600"> Choose Service</div>
+            {options.map((e) => (
+              <>
+                <button
+                  onClick={() => onChange(e)}
+                  disabled={e.faktsKey == value.faktsKey}
+                  className={
+                    "appearance-none bg-slate-700 hover:bg-slate-400 text-slate-200 font-light py-2 px-2 rounded inline-flex items-center cursor-pointer disabled:opacity-100 opacity-30 transition duration-500 ease-in-out"
+                  }
+                >
+                  {e.label}
+                </button>
+              </>
+            ))}
+            <div className="flex-grow"></div>
+      <div className="flex-initial px-3  text-slate-600 my-auto max-w-50">{value.description}</div>
+      <Link to={"docs/design/api"} className="flex-initial my-auto">What am I Seeing?</Link>
+      </div>
+    );
+  };
+
+
+
+
+export const DocumentationPage = ({ options }: { options: ServiceOption[] }) => {
+    const [state, setState] = React.useState(options.at(0));
+  
+    return (
+      <div className="flex flex-col h-[95%] w-full overflow-y-auto">
+        <DynamicDocumentation {...state} />
+        <ServiceSelector value={state} onChange={(e) => setState(e)} options={options} />
+      </div>
+    );
+  };
+
+
+export const APIS: ServiceOption[] = [
+  {faktsKey: "mikro", label: "Mikro", schema: "/introspections/mikro.introspection.json", description: "Mikro handles all things microscopy"},
+  {faktsKey: "port", label: "Port", schema: "/introspections/port.introspection.json", description: "Port manages containers and apps"},
+  {faktsKey: "kabinet", label: "Kabinet", schema: "/introspections/kabinet.introspection.json", description: "Kabinet will manage all things apps in the future"},
+  {faktsKey: "kluster", label: "Kluster", schema: "/introspections/kluster.introspection.json", description: "Kluster spawns and manages dask clusters on demand"},
+  {faktsKey: "konviktion", label: "Konviktion", schema: "/introspections/konviktion.introspection.json", description: "Connects your data to notion and back"},
+  {faktsKey: "mikro_next", label: "Mikro (Next)", schema: "/introspections/mikro_next.introspection.json", description: "Mikro handles all things microscopy"},
+  {faktsKey: "omero_ark", label: "OmeroArk (Next)", schema: "/introspections/omero_ark.introspection.json", description: "Your Omero server gateway"},
+  {faktsKey: "rekuest", label: "Rekuest", schema: "/introspections/rekuest.introspection.json", description: "Rekuest manages Nodes and Tasks"},
+  {faktsKey: "unlok", label: "Lok", schema: "/introspections/unlok.introspection.json", description: "User management and authentication"},
+  {faktsKey: "fluss", label: "Fluss", schema: "/introspections/fluss.introspection.json", description: "Workflow management and execution log"},
+]
+
+
+
+
 export const Graph = () => {
+
+
+
+
+
   return (
     <BrowserOnly fallback={<div>Hallo</div>}>
       {() => (
        
-          <GraphQuard>
-            <APIDocumentation />
-          </GraphQuard>
+
+       <DocumentationPage options={APIS} />
       )}
     </BrowserOnly>
   );

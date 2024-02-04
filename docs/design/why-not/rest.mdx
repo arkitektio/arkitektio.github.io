@@ -1,0 +1,73 @@
+---
+title: Why not Kafka?
+sidebar_label: Kafka?
+sidebar_position: 1
+---
+
+import Image from "@theme/IdealImage";
+
+
+## Why not Rest?
+
+When deciding on the API for Arkitekt, we considered using REST, but ultimately decided on GraphQL. Here are some reasons why we chose GraphQL over REST:
+
+
+## Why we like GraphQL
+
+1. **Flexibility**: With GraphQL, clients can specify exactly what data they need, reducing over-fetching or under-fetching of data.
+   For bioimage analysis, where datasets can be large and complex, this ensures efficient data retrieval.
+
+2. **Strongly Typed**: GraphQL is strongly typed. This means that the shape and type of the response are known in advance,
+   which can be particularly useful in bioimage analysis where ensuring data integrity and consistency is crucial. Also it allows you
+   to use the full power of your IDE to explore the API.
+
+3. **Evolution of your Schema**: As bioimage analysis techniques and tools evolve, the data structure and requirements might change.
+   GraphQL allows for the addition of new fields and types without impacting existing queries, ensuring backward compatibility.
+
+4. **Aggregated Data**: Often in bioimage analysis, data from multiple sources or related entities need to be fetched.
+   GraphQL allows for fetching data from multiple sources in a single query, simplifying client-side data aggregation. With
+   **soon to be implemened** federation, you can even fetch data from different Arkitekt services in a single query.
+
+5. **Real-time Updates**: With subscriptions in GraphQL, clients can be notified in real-time when certain data changes.
+   This can be invaluable in bioimage analysis when monitoring the progress or outcomes of certain analyses (e.g in streaminganalysis)
+
+6. **Self-documenting**: GraphQL APIs come with introspection capabilities, making it easier for developers to understand the available data, types, queries, and mutations, t
+   hereby fostering faster and more accurate development. Just check the GraphIQL interface of your Arkitekt server.
+
+7. **Ecosystem & Tooling**: The growing popularity of GraphQL has led to a rich ecosystem of tools, libraries, and client-side frameworks.
+   This can speed up development and offer advanced features for bioimage analysis data servers out of the box. Indeed a lot of the Arkitektl
+   client libraries are build around this ecosystem (e.g. [graphql-codegen](https://the-guild.dev/graphql/codegen) and [turms](https://github.com/jhnnsrs/turms))
+
+
+:::note Developing with GraphQL
+
+Developing a Python or Typescript client that interfaces with our GraphQL API is easy and fun. We have outlined the steps in the [Developing with GraphQL](/docs/developer/helpers/developing-with-graphql) section,
+which utilizes some of the tools and libraries mentioned above.
+
+:::
+
+
+## Challenges of using GraphQL
+
+While we believe that GraphQL is a great fit for bioimage analysis, it is not without its challenges. Here are some of the challenges we have encountered:
+
+1. **Learning Curve**: GraphQL has a steeper learning curve compared to REST, especially for developers who are new to it. However, we believe that the benefits of GraphQL outweigh the initial learning curve,
+and our tooling should help to make the transition easier.
+
+2. **Caching**: Caching in GraphQL can be more complex than in REST, especially when dealing with complex queries and mutations. While we employ a number of strategies to mitigate this, it is still an area that requires careful consideration.
+
+3. **N + 1 Problem**: The N + 1 problem occurs when a query results in multiple requests to the server to fetch related data, and can lead to performance issues.In REST, the N + 1 problem can be mitigated by using endpoints that return the exact data needed. In GraphQL, this problem can be exacerbated by the flexibility of the API. 
+However, we have implemented a number of strategies to mitigate this problem, such as dataloader and federation and especially our new strawberrry based implementation, comes with a lot of performance improvements.
+
+4. **Security**: While GraphQL provides a lot of flexibility, it also introduces new security challenges. For example, clients can craft complex queries that can lead to performance issues or even denial of service attacks. Our new APIs
+have implemented a number of strategies to mitigate these risks, such as query complexity analysis and rate limiting.
+
+
+
+
+:::note Work in progress
+
+This section is still work in progress.
+
+:::
+

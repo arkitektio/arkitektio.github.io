@@ -1,52 +1,36 @@
 ---
-id: graphql
-title: GraphQL
-sidebar_label: GraphQL
+id: api
+title: API First
+sidebar_label: API
 sidebar_position: 2
 ---
 
 import Image from "@theme/IdealImage";
 import thumbnail from "./graphql.png";
 
-# GraphQL
+# API First
 
 Arkitekt was designed to be open and expandable. Building on the middleman approach, it
 was an early design decision to establish Arkitekt as a framework, rather than a tool. This
-entailed for Arkitekt to adapt a developer first or API first approach. In developing this
-API, it was paramount to adopt open standards that are widely used and that fit well for the
+entailed for Arkitekt to adapt a developer first or **API first** approach. In developing this
+API, it was paramount to adopt open standards that are **widely used** and that fit well for the
 Arkitekt paradigm of lab-wide task assignment and scientific data exploration.
+
+## GraphQL
 
 Arkitekt therefore exposes all its functionality through a set of [GraphQL](https://graphql.org/) APIs. [GraphQL](https://graphql.org/) is an
 API protocol developed by Facebook to facilitate a one-stop-shop and developer-friendly
 retrieval and manipulation of data with a high level of relationships, such as their friendship
-graph. It was designed to overcome issues in other API protocols such as REST, where when trying to explore highly relational data,
-dedicated and separately orchestrated requests to the backend needed to be performed.
+graph. 
 
-## Why we like GraphQL
+:::note Why not Rest?
 
-1. **Flexibility**: With GraphQL, clients can specify exactly what data they need, reducing over-fetching or under-fetching of data.
-   For bioimage analysis, where datasets can be large and complex, this ensures efficient data retrieval.
+While REST is a widely used and well understood protocol, it has some limitations when it comes to
+bioimage analysis. If you want to read more about this. Head over to the [Why Not Rest](/docs/design/why-not/rest) section.
+:::
 
-2. **Strongly Typed**: GraphQL is strongly typed. This means that the shape and type of the response are known in advance,
-   which can be particularly useful in bioimage analysis where ensuring data integrity and consistency is crucial. Also it allows you
-   to use the full power of your IDE to explore the API.
 
-3. **Evolution of your Schema**: As bioimage analysis techniques and tools evolve, the data structure and requirements might change.
-   GraphQL allows for the addition of new fields and types without impacting existing queries, ensuring backward compatibility.
 
-4. **Aggregated Data**: Often in bioimage analysis, data from multiple sources or related entities need to be fetched.
-   GraphQL allows for fetching data from multiple sources in a single query, simplifying client-side data aggregation. With
-   **soon to be implemened** federation, you can even fetch data from different Arkitekt services in a single query.
-
-5. **Real-time Updates**: With subscriptions in GraphQL, clients can be notified in real-time when certain data changes.
-   This can be invaluable in bioimage analysis when monitoring the progress or outcomes of certain analyses (e.g in streaminganalysis)
-
-6. **Self-documenting**: GraphQL APIs come with introspection capabilities, making it easier for developers to understand the available data, types, queries, and mutations, t
-   hereby fostering faster and more accurate development. Just check the GraphIQL interface of your Arkitekt server.
-
-7. **Ecosystem & Tooling**: The growing popularity of GraphQL has led to a rich ecosystem of tools, libraries, and client-side frameworks.
-   This can speed up development and offer advanced features for bioimage analysis data servers out of the box. Indeed a lot of the Arkitektl
-   client libraries are build around this ecosystem (e.g. [graphql-codegen](https://the-guild.dev/graphql/codegen) and [turms](https://github.com/jhnnsrs/turms))
 
 # What does this boil down to?
 
