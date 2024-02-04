@@ -391,6 +391,7 @@ export const DynamicDocumentation = (props: DynamicDocumentationProps) => {
     schema: any;
     faktsKey: string;
     description: string;
+    core?: boolean;
   };
   
   export const ServiceSelector = ({
@@ -404,8 +405,22 @@ export const DynamicDocumentation = (props: DynamicDocumentationProps) => {
   }) => {
     return (
       <div className="flex-initial flex flex-row pl-20 gap-2 h-10 mt-2 pr-10">
-        <div className="py-2 px-2 h-10 my-auto text-slate-600"> Choose Service</div>
-            {options.map((e) => (
+        <div className="py-2 px-2 h-10 my-auto text-slate-600"> Core Services</div>
+            {options.filter(e => e.core).map((e) => (
+              <>
+                <button
+                  onClick={() => onChange(e)}
+                  disabled={e.faktsKey == value.faktsKey}
+                  className={
+                    "appearance-none bg-slate-700 hover:bg-slate-400 text-slate-200 font-light py-2 px-2 rounded inline-flex items-center cursor-pointer disabled:opacity-100 opacity-30 transition duration-500 ease-in-out"
+                  }
+                >
+                  {e.label}
+                </button>
+              </>
+            ))}
+          <div className="py-2 px-2 h-10 my-auto text-slate-600"> Optional Services</div>
+          {options.filter(e => !e.core).map((e) => (
               <>
                 <button
                   onClick={() => onChange(e)}
@@ -441,16 +456,16 @@ export const DocumentationPage = ({ options }: { options: ServiceOption[] }) => 
 
 
 export const APIS: ServiceOption[] = [
-  {faktsKey: "mikro", label: "Mikro", schema: "/introspections/mikro.introspection.json", description: "Mikro handles all things microscopy"},
-  {faktsKey: "port", label: "Port", schema: "/introspections/port.introspection.json", description: "Port manages containers and apps"},
+  {faktsKey: "mikro", label: "Mikro", schema: "/introspections/mikro.introspection.json", description: "Mikro handles all things microscopy", core: true},
+  {faktsKey: "rekuest", label: "Rekuest", schema: "/introspections/rekuest.introspection.json", description: "Rekuest manages Nodes and Tasks", core: true},
+  {faktsKey: "port", label: "Port", schema: "/introspections/port.introspection.json", description: "Port manages containers and apps", core: true},
+  {faktsKey: "unlok", label: "Lok", schema: "/introspections/unlok.introspection.json", description: "User management and authentication", core: true},
+  {faktsKey: "fluss", label: "Fluss", schema: "/introspections/fluss.introspection.json", description: "Workflow management and execution log", core: true},
   {faktsKey: "kabinet", label: "Kabinet", schema: "/introspections/kabinet.introspection.json", description: "Kabinet will manage all things apps in the future"},
   {faktsKey: "kluster", label: "Kluster", schema: "/introspections/kluster.introspection.json", description: "Kluster spawns and manages dask clusters on demand"},
   {faktsKey: "konviktion", label: "Konviktion", schema: "/introspections/konviktion.introspection.json", description: "Connects your data to notion and back"},
   {faktsKey: "mikro_next", label: "Mikro (Next)", schema: "/introspections/mikro_next.introspection.json", description: "Mikro handles all things microscopy"},
   {faktsKey: "omero_ark", label: "OmeroArk (Next)", schema: "/introspections/omero_ark.introspection.json", description: "Your Omero server gateway"},
-  {faktsKey: "rekuest", label: "Rekuest", schema: "/introspections/rekuest.introspection.json", description: "Rekuest manages Nodes and Tasks"},
-  {faktsKey: "unlok", label: "Lok", schema: "/introspections/unlok.introspection.json", description: "User management and authentication"},
-  {faktsKey: "fluss", label: "Fluss", schema: "/introspections/fluss.introspection.json", description: "Workflow management and execution log"},
 ]
 
 
