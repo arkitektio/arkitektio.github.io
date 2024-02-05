@@ -1,11 +1,11 @@
 ---
-title: Mikro
-sidebar_label: Mikro
+title: Lok
+sidebar_label: Lok
 sidebar_position: 1
 ---
 
 import Image from "@theme/IdealImage";
-import schema from "./schema.png";
+import lok from "./lok.png";
 import storage from "./storage.png";
 
 # Lok
@@ -21,6 +21,28 @@ a central session store.
 
 This distributed and scalable authentication and authorization system, was developed as the backbone for the
 Arkitekt platform, but can be used as a standalone service for any application.
+
+## Design
+
+Lok employs patterns for distributed authentication and authorization, through the use of JWT tokens. These tokens
+represent cryptographically signed claims about the user and the application issued by the Lok server. They can be
+verified by any service, and do not require a central session store.
+
+<div className="mt-2 p-6 w-full">
+<Image img={lok} />
+
+<div className="text-gray-400 mb-2">
+  <small>
+    An excerpt of the Arkitekt Schema with some Metadata models that are
+    attached to the images.
+  </small>
+</div>
+</div>
+
+
+
+
+
 
 ## Features
 
