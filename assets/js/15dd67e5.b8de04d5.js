@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[5673],{24571:e=>{e.exports=JSON.parse('{"title":"Next","slug":"/category/next","permalink":"/docs/category/next","navigation":{"previous":{"title":"Rekuest","permalink":"/docs/design/services/rekuest"},"next":{"title":"Kabinet","permalink":"/docs/design/services/next/kabinet"}}}')}}]);
