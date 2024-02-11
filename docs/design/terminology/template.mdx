@@ -1,0 +1,51 @@
+---
+id: template
+title: What is a Template?
+sidebar_label: Template
+sidebar_position: 1
+---
+
+
+import Image from "@theme/IdealImage";
+import template from "./node-template.png";
+
+# What is a Template?
+
+Templates can be best understood in comparison with nodes. A node in Arkitekt is an abstract description of an analysis tasks, which defines
+the inputs, outputs, but **not** the actual code that is run. A template is a concrete implementation of a node, and maps the abstract
+notion of the task to a real world implementation.
+
+Apps therefore do not expose nodes, but templates. So when trying to run an analysis and instructing Arktiekt to run a task, Arkitekt internally
+looks up the template that is associated with the node, and sends the request to the app that is associated with the template.
+
+## Example
+
+Let's say you have want to do a bioimage task that is called "Project Maximum Intensity". This tasks has exactly on input, such as an image, and a single output, the segmented image Thats the abstract description of the task, and is represented by a node in Arkitekt. 
+Now this tasks could run on a variety of different applications, such as on ImageJ, Stardist or Napari. 
+Each of these applications would have a different way of running the task, but the abstract idea including the inputs and outputs would be the same.
+ These different ways of running the task are represented by templates in Arkitekt.
+
+
+<div className="mt-2">
+<Image img={app} />
+
+<div className="text-gray-400 mb-2">
+<small>Nodes and Templates</small>
+</div>
+</div>
+
+Nodes are never attached to an application, templates always are. 
+
+:::info 
+
+Importantly templates are not created only on the app level, but for each user that runs the app. This allows us to find the best fitting
+template for each bioimage task.
+
+:::
+
+## Developer Side 
+
+When developing an app, you will never really interact with nodes and templates, as they are abstract concepts that are abstracted away by our SDKs. 
+Once you register a python function, that function will be automatically inspected to infer inputs and outputs and the documentaiton of the function.
+This information is now send to the Arkitekt server, and if no node with the parameters of the function exists, a new node is automatically created and
+associated with the app.

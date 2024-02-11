@@ -1,0 +1,60 @@
+---
+title: Fluss
+sidebar_label: Fluss
+sidebar_position: 1
+---
+
+import Image from "@theme/IdealImage";
+import fluss from "./fluss.png";
+import storage from "./storage.png";
+
+# Fluss
+
+Fluss is the Arkitekt service for managing the design of workflows and their runs. It provides the storage
+backend for importing and exporting workflows, and acts as the log service for workflow runs.
+
+:::info
+
+Fluss is not a workflow engine. It does not execute workflows, but rather manages their data for design and runs.
+Workflow execution in an Arkitekt system is handled by `Apps` not `Services`. To read more about Scheduling
+Apps and their execution, see the [Workflow](/docs/workflow) documentation.
+
+:::
+
+<div className="mt-2 p-6 w-full">
+<Image img={fluss} />
+
+<div className="text-gray-400 mb-2">
+  <small>
+    An Architectural Overview of the Fluss Service. And its relationship with the
+    execution of workflows by an Arkitekt App.
+  </small>
+</div>
+</div>
+
+
+## The Workflow Format
+
+A Workflow that is designed by a user (in an App like Orkestrator) is stored in Fluss in a plain JSON format.
+This JSON format contains the definition of the worklflow by defining the nodes and their connections. While
+you can manipulate this JSON directly, the JSON format is not primarily designed for human readability. Instead,
+please use the Orkestrator App to design and manage workflows.
+
+We also provide webcomponents that allow you to render the workflow in a visual format. This is useful for
+displaying the workflow in a user interface (just like here in the documentation).
+
+
+## Workflow Runs
+
+When a workflow is executed by an App, the App will create a new `Run` in Fluss. This run will contain the log
+of all the events that occur during the execution of the workflow. This log is stored in Fluss and can be queried
+by any app. While these logs provide a detailed view of the logical execution of the workflow, they do not contain
+all the details for provenance reasons. For example (quite obviously) the logs do not contain the actual data that was processed
+by the workflow. Instead, the logs contain references to the data, and the data is stored in the storage service. However
+they do contain the details of the processing steps that were applied to the data.
+
+Because a normal workflow can be quite complex, the logs can be quite large. Fluss lets you filter the logs by time,
+by node, by status, and by other criteria, and with Orkestrator you can view the logs in a visual format.
+
+
+

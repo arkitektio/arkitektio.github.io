@@ -1,0 +1,36 @@
+---
+title: Port
+sidebar_label: Port
+sidebar_position: 1
+---
+
+import Image from "@theme/IdealImage";
+import port from "./port.png";
+import storage from "./storage.png";
+
+# Port
+
+Port is Arkitekts "App Store" for all the apps that can run as Plugins on the Platform, so called
+PluginApps. It allows you to install
+and manage these as containerized applications on the Platform and to execute them directly on the
+Platform server.
+
+
+
+<div className="mt-2 p-6 w-full">
+<Image img={port} />
+
+<div className="text-gray-400 mb-2">
+  <small>
+    An Architectural Overview of the Port Service
+  </small>
+</div>
+</div>
+
+:::note
+
+While the Port service is a core part of the Platform, we are currently rethinking the way we want
+to handle the execution of PluginApps. In the future we think that the "Kabinet" service will be
+responsible for the execution of PluginApps. YOu can read more about Kabinet [here](/docs/services/next/kabinet).
+
+:::
