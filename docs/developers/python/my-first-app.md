@@ -23,7 +23,7 @@ local arkitekt instance for the first time.
 
 # Usage
 
-Lets's create an Arkitekt App, as it is the connection layer between your code and the arkitet server. If you don't know what we mean by an app, check out the [App](/docs/design/terminology/app.md) section of the terminology page.
+Lets's create an Arkitekt App, as it is the connection layer between your code and the arkitet server. If you don't know what we mean by an app, check out the [App](/docs/design/terminology/app.mdx) section of the terminology page.
 
 ```python
 from arkitekt import easy
