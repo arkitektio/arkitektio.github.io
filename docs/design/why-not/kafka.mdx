@@ -14,13 +14,38 @@ and why Arkitekt chose RabbitMQ.
 
 ### Kafka
 
-Kafka is a distributed streaming platform, that is used for building real-time data pipelines and streaming apps. It is a distributed, partitioned, replicated commit log service. It provides the functionality of a messaging system, but with a unique design.
+Kafka is a distributed streaming platform, that is used for building real-time data pipelines and streaming apps. It is a distributed, partitioned, replicated commit log service. 
+It provides the functionality of a messaging system, but can keep the data for a longer time, and is optimized for high throughput. It is often used for building real-time data pipelines and streaming apps.
 
-....
+#### Sounds great, why not use it, why RabbitMQ?
 
-:::note Work in progress
+Kafka is a great tool, but it is not the best fit for every use case. It is optimized for high throughput in distributed settings and is powering the real-time data pipelines of many gigantous companies.
+So why did Arkitekt choose RabbitMQ?
 
-This section is still work in progress.
+
+#### Complexity
+
+Kafka is a complex system to setup and maintain. It comes only configurable as a distributed system, and requires multiple instances of the broker to be running. 
+This makes it hard to setup and maintain for small projects, especially if you are just trying to set it up on your local machine. RabbitMQ is much easier to setup and maintain, and is a better fit for small projects.
+
+
+#### Performance
+
+Kafka is optimized for high **throughput**, but this comes at a cost. If you are looking for low **latency**, RabbitMQ can achieve lower latencies than Kafka.
+You can find more about this [here](https://double.cloud/blog/posts/2023/03/apache-kafka-vs-rabbitmq/). We wanted to provide very low message latencies, as in
+biology the time between the stimulus and the response is very short. This is why we chose RabbitMQ.
+
+:::note On Message Size
+
+RabbitMQ is also better suited for small message sizes, as it has a lower overhead than Kafka. This is important for Arkitekt, as the messages are often very small because
+we pass only message IDs and not the whole message. This is because the messages are stored in a database, and we only need to pass the ID of the message to the next service.
 
 :::
 
+
+
+### Outlook
+
+It is important to note that Arkitekt is still in development, and we are always looking for ways to improve the platform. We are looking into adding support for Kafka in the future, 
+as it is a great tool for real-time data processing in larger scale projects. We are currently reworking [rekuest](/docs/design/services/rekuest) to add support for other message 
+brokers, and Kafka is on our list. If you are interested in this, please let us know in the [Discord](https://discord.gg/arkitekt)!

@@ -1,0 +1,48 @@
+---
+id: apps-vs-services
+title: Apps vs Services
+sidebar_label: Apps vs Services
+sidebar_position: 4
+---
+
+# Apps vs Services
+
+The Arkitekt platform revolves around the Concepts of Apps and Services. These two concepts are the building blocks of the platform and are used to define the architecture of the system.
+In this section, we will discuss the differences between Apps and Services and how they are used in the platform.
+
+## Services
+
+Services are the building blocks of the Arkitekt **Server** and are making up the backbone of your analysis. They are web-based applications that are running on the server and are used to provide
+common functionality and ways of retrieving and updating data. As opposed to Apps, Services are not user-facing and are not meant to be used directly by a user.
+Instead, they are used by Apps to provide the necessary functionality to the user. 
+
+Services in the Arkitekt sense never really do anything on their own in the analysis sense, they rather provide a way for Apps to do things. 
+For example, a Service might provide a way to retrieve (query) data from a database, or to send a notification to a user. This means that for the most
+part Services are stateless.
+
+## Apps
+
+Apps are the true stars of the Arkitekt platform and your analysis. While Services provide only primitives to store and retrieve data, Apps will actually do something with that data.
+Depending on what type of analysis you are doing, Apps can be anything from a simple web application that visualizes your data (such as Orkestrator) to a complex machine learning model that
+runs in a docker container on the servers (a Plugin). Importantly Apps can choose to expose part of their functionality to the users, which can then remotely instruct the App to do something.
+This functionality then also becomes available to other Apps, and in Workflows, so that you can create a net of functionality in your lab.
+
+:::note
+
+While Apps **can** chose to expose functionality, they are not required to do so. For example you could design an Arkitekt App that just connects to the server in order to visualize some data.
+
+:::
+
+Apps come in two big flavours, Standalone Apps and Plugins. To read more about these, see the [Apps](/docs/apps) section.
+
+## Interplay between Apps and Services
+
+Apps and Services are designed to work together in order to provide the necessary functionality to the user. Services provide the necessary primitives to store and retrieve data, while Apps
+provide the functionality to do something with that data. This means that Services are used by Apps to provide the necessary functionality to the user.
+
+:::note
+
+As Apps **depend** on Services to provide the necessary functionality, you can only run Apps with your Arkitekt Server that has the necessary Services installed. No worries, the Arkitekt platform
+will automatically check for this and let you know if you are missing any Services. And of course you can always install the necessary Services yourself.
+
+:::

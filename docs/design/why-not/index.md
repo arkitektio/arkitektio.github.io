@@ -1,7 +1,7 @@
 ---
 id: index
 title: Introduction to Why Not?
-sidebar_label: Why Not?
+sidebar_label: Why Not ..
 sidebar_position: 2
 ---
 

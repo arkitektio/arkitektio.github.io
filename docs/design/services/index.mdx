@@ -6,6 +6,7 @@ sidebar_position: 1
 ---
 
 import Image from "@theme/IdealImage";
+import thumbnail from "./techstack.png";
 
 # Services
 
@@ -13,6 +14,10 @@ Arkitekt is designed to be a flexible and modular platform that can stand as a c
 This modularity and composability of the platform is ensured by the use of a (micro)-service architecture, where each service is designed to be a standalone 
 component that can be used independently or in combination with other services. A service in the Arkitekt platform is a containerized web-server that can be
 provides API endpoints for its functionality.
+
+
+
+
 
 ## Services in Arkitekt
 
@@ -30,6 +35,16 @@ Other services can be added to the platform as needed. Some additional services 
 - [Kluster](kluster.mdx): Dask-Cluster management
 
 
+<div className="mt-2 p-6">
+<Image img={thumbnail} />
+
+<div className="text-gray-400 mb-2">
+<small>Arkitekts core design of a cental webserver middleman </small>
+</div>
+</div>
+
+
+
 ## Technical Design of the Services
 
 #### Design Principles
@@ -44,7 +59,7 @@ While the Services in Arkitekt can be designed in a variety of ways, the followi
 communicate with each other (as opposed to some micro-service architectures where services communicate with each other). This is to ensure that the services
 can develop and evolve independently and can be used in a variety of combinations.
 
-- ** JWT Authentication and Authorization**: Each service can be configured to use a variety of authentication and authorization mechanisms. However, In order to ensure a consistent and distibributed authentication 
+- **JWT Authentication and Authorization**: Each service can be configured to use a variety of authentication and authorization mechanisms. However, In order to ensure a consistent and distibributed authentication 
 each service accepts JWT tokens that are used to authenticate.
 
 - **Database**: Each service can be configured to use a variety of databases. However, the default database used in the Arkitekt platform is a PostgreSQL database.

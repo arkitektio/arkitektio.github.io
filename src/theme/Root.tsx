@@ -7,7 +7,7 @@ export default function Root({ children }) {
     <EasyProvider
       manifest={{ identifier: "github.io.jhnnsrs.doks", version: "latest", scopes: ["openid"] }}
     >
-      <AutoConfiguration wellKnownEndpoints={["localhost:8000", "localhost:8010", "localhost:8030"]} />
+      <AutoConfiguration wellKnownEndpoints={["localhost:8000", "localhost:8010", "localhost:8030", "localhost:11000"]} />
       <UnkoverProvider>{children}</UnkoverProvider>
     </EasyProvider>
   );

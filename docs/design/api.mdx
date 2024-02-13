@@ -1,0 +1,126 @@
+---
+id: api
+title: API First
+sidebar_label: API First
+sidebar_position: 2
+---
+
+import Image from "@theme/IdealImage";
+import thumbnail from "./graphql.png";
+
+# API First
+
+Arkitekt was designed to be open and expandable. Building on the middleman approach, it
+was an early design decision to establish Arkitekt as a framework, rather than a tool. This
+entailed for Arkitekt to adapt a developer first or **API first** approach. In developing this
+API, it was paramount to adopt open standards that are **widely used** and that fit well for the
+Arkitekt paradigm of lab-wide task assignment and scientific data exploration.
+
+## GraphQL
+
+Arkitekt therefore exposes all its functionality through a set of [GraphQL](https://graphql.org/) APIs. [GraphQL](https://graphql.org/) is an
+API protocol developed by Facebook to facilitate a one-stop-shop and developer-friendly
+retrieval and manipulation of data with a high level of relationships, such as their friendship
+graph. 
+
+:::note Why not Rest?
+
+While REST is a widely used and well understood protocol, it has some limitations when it comes to
+bioimage analysis. If you want to read more about this. Head over to the [Why Not Rest](/docs/design/why-not/rest) section.
+:::
+
+
+
+
+# What does this boil down to?
+
+Well GraphQL allows you to declaritively specify what data you want to fetch from the server, and the server will return exactly that data, exploring
+all the relationships between the data. This is best explained with an example. Lets look at the
+below query. This query fetches the name of the image, the name of the ROIs, and the shape of the image.
+
+<div className="mt-2 w-20">
+<Image img={thumbnail} />
+
+<div className="text-gray-400 mb-2">
+<small>The GraphQL request, resolve, response  </small>
+</div>
+</div>
+
+## React developer? Try it out Here
+
+We can talk ages about the ease of use of graphql. But you can try it out yourself. Here is a simple example of a React component that uses graphql to fetch data from yur local Arkitekt server.
+You can just change the query to fetch any data you want.
+
+```jsx live
+function Display(props) {
+  const { data } = useMikroQuery(gql`
+    query {
+      representations(limit: 3) {
+        id
+        name
+      }
+    }
+  `);
+
+  return (
+    <div className="flex flex-col gap-2">
+      {data &&
+        data.representations.map((image) => (
+          <div className="bg-back-800 px-2">{image.name} </div>
+        ))}
+    </div>
+  );
+}
+```
+
+By changing the query, you can fetch any data you want. For example, here we fetch the name and shape of the image, as well as the labels of the ROIs.
+
+```jsx live
+function Display(props) {
+  const { data } = useMikroQuery(gql`
+    query {
+      representations(limit: 3) {
+        id
+        name
+        rois {
+          id
+          label
+        }
+        store
+        shape
+      }
+    }
+  `);
+
+  return (
+    <div className="flex flex-col gap-2">
+      {data &&
+        data.representations.map((image) => (
+          <>
+            <div className="bg-back-800 px-2 rounded rounded-md">
+              {image.name}{" "}
+            </div>
+            <div className="bg-green-200">
+              {image.rois.map((roi) => (
+                <div className="bg-back-800 px-2">{roi.label} </div>
+              ))}
+            </div>
+            <div>
+              {image.shape.map((i) => (
+                <i>{i} </i>
+              ))}
+            </div>
+          </>
+        ))}
+    </div>
+  );
+}
+```
+
+## Python developer? Look here
+
+While we can't provide you with an interactive playground to explore GraphQL just, yet
+just have a look at the source code of our client apps. The ominious `api` folder that you
+find in all our client apps is actually entirely generated from the GraphQL schema, that you
+find in the `schema` folder. This means you can generate your own typed queries and mutations
+from the schema.
