@@ -154,6 +154,7 @@ const config = {
   
         // Public API key: it is safe to commit it
         apiKey: '3d1912be9aa61b26779d736dcade0043',
+        indexName: "arkitekt"
 
   
   
