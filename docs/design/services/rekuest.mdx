@@ -45,3 +45,17 @@ please refer to the [Why Not?](/docs/design/why-not) section.
 
 :::
 
+
+
+### Challenges as a Distributed System
+
+Rekuest is our backbone service for the distributed task execution in Arkitekt. As such it has to be highly available and
+fault-tolerant. This is a huge undertaking and we are still in the process of refining the design and implementation of Rekuest.
+
+But luckily we are not alone in this. We are standing on the shoulders of giants, and we are using proven open-source technologies
+to build Rekuest. This allows us to focus on the business logic and the integration with other Arkitekt services, and not have to worry
+about the low-level details of distributed systems.
+
+We tried to achieved this by using a message broker (RabbitMQ) to queue and distribute tasks to the appropriate apps,
+and only thinly wrapping it in a websocket-based API. The sole purpose of this API is to provide a safe and interoperable way
+to interact with Rekuest, and to provide a way to monitor the state of the system.
