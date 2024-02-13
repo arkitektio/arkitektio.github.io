@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[5836],{69284:e=>{e.exports=JSON.parse('{"title":"For Developers","slug":"/category/for-developers","permalink":"/docs/category/for-developers","navigation":{"previous":{"title":"Gucker","permalink":"/docs/apps/standalones/gucker"},"next":{"title":"Intro","permalink":"/docs/developers/intro"}}}')}}]);
