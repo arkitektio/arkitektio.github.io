@@ -41,7 +41,7 @@ your functions is very important. It will help you and others to understand what
 in the UI.
 
 But how do we tell Arkitekt that we are no longer working with strings but need "Images"? This is done through updating the type hint of our function. We will change it from `str` to `Representation`,
-an import for the `mikro` python package. When  register a function the SDK will automatically detect the type hint and will create the correct input and output [Port](docs/terminology/port), for you.
+an import for the `mikro` python package. When  register a function the SDK will automatically detect the type hint and will create the correct input and output [Port](/docs/design/terminology/port), for you.
 This means you have to (almost) always use type hints to indicate the type of your input and output. But hey you should do that anyway.
 
 
@@ -70,7 +70,7 @@ And that is it.
 
 :::note
 
-The `Representation` type from the `mikro` is our first [Structure](docs/design/terminology/structure). Structures represent more complex data types, then
+The `Representation` type from the `mikro` is our first [Structure](/docs/design/terminology/structure). Structures represent more complex data types, then
 simple types like `String` or `Int`. While most of the time you will find yourself working with sharable global structures (that live on a connected
 service), you can also create your own structures (even non serializable), that are only available to your app. We will cover this in a later tutorial.
 

@@ -1,5 +1,5 @@
 ---
-id: Structure
+id: structure
 title: How do these elements relate?
 sidebar_label: Structure
 sidebar_position: 1

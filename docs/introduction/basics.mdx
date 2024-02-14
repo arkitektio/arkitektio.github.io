@@ -1,0 +1,43 @@
+---
+title: Basics
+sidebar_label: Basics
+sidebar_position: 1
+---
+
+import Image from "@theme/IdealImage";
+import thumbnail from "./stateless.png";
+import techstack from "./techstack.png";
+
+
+## Basics
+
+Arkitekt is software platform for image analysis. As explained in the [philosophy](/docs/design/why) section, Arkitekt wants to act as
+a middleman and datahub that stands between the user and the image analysis tools. As such, Arkitekt is an installable app that runs on a computer in your
+lab (or just yours if you don't want to share). In more technical terms this app is in actually server platform, that provides a graphical webinterface for the user to interact with, and also some
+programming endpoints for the tools to interact with. We acknowledge that even the word server can be a bit daunting, and comes with a lot of connotations of some tedious explainations
+from the IT department for some of you. But don't worry, we have tried to make it as easy as possible to get started and its perfectly fine to just think of it as an app.
+
+Anyway, when you install Arkitekt, you are installing that server app. It will now run on your computer, in the background, and potentially advertise itself on your local network, so that
+Apps can easily find and connect to it. We will talk more about Apps later on, but for now just think of them as the image analysis tools that you want to use.
+You on the other hand, will interact with Arkitekt through a webbrowser or a graphical desktop app (Orkestrator). These graphical interfaces, that we mentioned earlier, will allow you to remotely interact with the
+Arkitekt server diretly and through that, with all of the connected Apps. Importantly this means that you can use Arkitekt from any computer on your local network or even remotely over the internet (if you chose to connect it).
+
+For most users, this is all you need to know about the software design of Arkitekt. You install it, and then you can use it to run image analysis tools. The rest of this section is intended for more technically
+inclined users who want to know more about the inner workings of Arkitekt. If you are not interested in that, you can safely skip to the next section, please make sure to read a little bit in the design
+section or go through our tutorial to get a better understanding of how to use Arkitekt.
+
+:::note
+
+While Arkitekt comes with a graphical interface, it is not a requirement to use it. Arkitekt can be used entirely through its programming interface, and you can even build your own graphical interface if you want to.
+Indeed there is nothing special about the prebuilt Arkitekt interface, for all intents and purposes it is just another App that connects to the Arkitekt server.
+
+:::
+
+<div className="mt-2 p-6">
+<Image img={thumbnail} />
+
+<div className="text-gray-400 mb-2">
+<small>Arkitekts core design of a cental webserver middleman </small>
+</div>
+</div>
+

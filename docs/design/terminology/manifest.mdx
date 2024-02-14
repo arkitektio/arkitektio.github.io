@@ -11,7 +11,7 @@ A manifest is the Arkitekt way of identifying an application. It contains inform
 such as its name, version, and which access rights [scopes](#scopes) it requires. When you develop
 an app for Arkitekt, you will need to create a manifest for your app, which will be used to uniquely
 identify your app on the platform. No worries, this is a simple process, and if you are using the
-[Arkitekt CLI](/docs/developers/python/intro.md), it will be done automatically for you.
+[Arkitekt CLI](/docs/developers/python/plugin), it will be done automatically for you.
 
 In its simplest form, a manifest is a YAML file, that contains the following information:
 
@@ -27,7 +27,7 @@ scopes:
 
 As you can see, the manifest contains information about the app, such as its name, version, and
 description. This information will be presented to the user, when they are asked to authenticate
-your app, or they can be used to search for your app in the soon to be released [App Store](/docs/design/appstore).
+your app, or they can be used to search for your app in the soon to be released App Store.
 
 ## Extensions to the Manifest
 
@@ -100,6 +100,23 @@ available in the `alpha` channel.
 :::
 
 
+# Scopes
+
+Scopes are a way of describing the access rights that your app requires. When a user authenticates
+your app, they will be asked to grant your app access to certain resources, such as their image data
+, or their worfklows. These resources are called scopes, and they are defined in your app's
+manifest. For example, if your app requires read access to a user's image data, you would add the
+`read` scope to your app's manifest.
+
+:::note
+
+The scope based access control is currently not enforced by the platform, as it would hinder the development
+of new apps. We will gradually introduce scope based access control, and we will provide a migration path
+for existing apps.
+
+:::
+
+```yaml
 
 
 

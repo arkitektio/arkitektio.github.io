@@ -41,7 +41,7 @@ This versioning ensures that if you want to use the functionality of this app in
 This means that the first time a new app decides to connect to Arkitekt, you will be asked to approve the connection 
 and the permissions that the app is asking for (this is done through Oauth2 Standard, the same principle that is used when you press "login with google",
  but you don't need to know that to use Arkitekt.). This double authentication process is key to Arkitekts security and some other design principles,
-  and we will go into more detail about it in the [Security](/docs/design/security/why.md) section.
+  and we will go into more detail about it in the [Security](/docs/design/security) section.
 
 <div className="mt-2 w-max-xl">
 <Image img={oauth} />
@@ -52,7 +52,7 @@ and the permissions that the app is asking for (this is done through Oauth2 Stan
 
 ## Apps can provide functionality
 
-Depending on the App, you can use it to do a lot of different things. For example, you can use an App to just download images from Arkitekt, or you can use some interesting python code to display a graph of your data. One important aspect is that an app can also choose to expose some of its functionality as [Templates](template.md). This means that you can use the functionality of the App in other Apps, or in the Orkestrator. This is a very powerful feature, and we will go into more detail about it in the [Nodes and Templates](node.md) section.
+Depending on the App, you can use it to do a lot of different things. For example, you can use an App to just download images from Arkitekt, or you can use some interesting python code to display a graph of your data. One important aspect is that an app can also choose to expose some of its functionality as [Templates](./template). This means that you can use the functionality of the App in other Apps, or in the Orkestrator. This is a very powerful feature, and we will go into more detail about it in the [Nodes and Templates](./node) section.
 
 ## Examples of Apps
 
@@ -62,7 +62,7 @@ As we are a firm believer in the power of the example, here are a few examples o
   <TabItem value="apple" label="Computer" default>
     An App on your computer is the obvious example, and yes, if that app is able to connect to Arkitekt (because the developer decided to make it an Arkitekt App), then it is an Arkitekt App. Easy. Two examples of this are the Orkestrator Desktop App, and MikroJ an app that is used to enable ImageJ on the platform. Both apps will as you to approve the connection to Arkitekt, and both apps will ask you for permissions.
 
-Importantly though the Orkestrator apps asks you for a lot more permissions than the MikroJ app, because the Orkestrator app is able to do a lot more things with your data. If you want to know more about the permissions that an App can ask for, you can read more about it in the [Security](/docs/design/security/why.md) section. Always remember that you are in control of your data, and you decide what Apps are allowed to do with it, so check the permissions before you approve an App.
+Importantly though the Orkestrator apps asks you for a lot more permissions than the MikroJ app, because the Orkestrator app is able to do a lot more things with your data. If you want to know more about the permissions that an App can ask for, you can read more about it in the [Security](/docs/design/security) section. Always remember that you are in control of your data, and you decide what Apps are allowed to do with it, so check the permissions before you approve an App.
 </TabItem>
 <TabItem value="orange" label="Website">
 
@@ -71,13 +71,13 @@ Also a website can be an an arkitekt app. Indeed this website is an arkitekt app
   </TabItem>
   <TabItem value="banana" label="Robot">
     
-Now this is where it gets interesting. Your robot or Iot device can also become an arkitekt app. Most of the time, these machines do not need access to your data, but can provide functionality like taking pictures, or measuring temperature. In this case you can use the [Orkestrator](/docs/intro.mdx) to connect to your robot or Iot device, and call the functionality that it provides. This is a very powerful feature, and we will go into more detail about it in the [Nodes and Templates](node.md) section.
+Now this is where it gets interesting. Your robot or Iot device can also become an arkitekt app. Most of the time, these machines do not need access to your data, but can provide functionality like taking pictures, or measuring temperature. In this case you can use the [Orkestrator](/docs/intro.mdx) to connect to your robot or Iot device, and call the functionality that it provides. This is a very powerful feature, and we will go into more detail about it in the [Nodes and Templates](./node) section.
   </TabItem>
   <TabItem value="code" label="Code">
 
 Your code can also become an Arkitekt app. In fact, if you want your code to connect to an arkitekt server, it needs to become an app, because it needs rights to access your data. If you are using python you can use the arkitekt python library to connect to Arkitekt. If you are using javascript you can use the arkitekt javascript/typescript library. If you are using another language, you can use the Arkitekt API directly.
 
-If you want to know more about how to connect to Arkitekt, you can read more about it in the [Developer](/docs/developers/intro.mdx) section. We made sure to be compatible with standard webstandards (Oauth2, websockets), so you can use almost any language that is able to connect to a webserver.
+If you want to know more about how to connect to Arkitekt, you can read more about it in the [Developer](/docs/developers) section. We made sure to be compatible with standard webstandards (Oauth2, websockets), so you can use almost any language that is able to connect to a webserver.
 </TabItem>
 </Tabs>
 

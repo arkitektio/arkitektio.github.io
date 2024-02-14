@@ -1,0 +1,135 @@
+---
+id: graphql
+title: Developing with GraphQL
+sidebar_label: Developing with GraphQL
+sidebar_position: 7
+---
+
+# Developing with GraphQL
+
+As stated in the [API](/docs/design/api) section, the GraphQL API is the primary way to interact with the platform. This section will guide you through the process of developing with the GraphQL API
+form the comfort of your python environment.
+
+:::note
+
+This guide is an emerging documentation for now check out [turms](htps://github.com/jhnnsrs/turms) for more information.
+
+:::
+
+
+## Introduction
+
+While developing Arkitekt applications, you will often need to interact with the GraphQL API. To retrieve and manipulate data, you will need to write queries and mutations.
+Of course you can do this manually by writing the queries and mutations in plain python string and then sending them to the server using a library like `requests`. However, this can be error-prone and time-consuming,
+especially because we will only receive plain JSON responses from the server. Wouldn't it be nice if we could have a more pythonic way of interacting with the GraphQL API?
+And get typed responses from the server? This is where code generation comes in.
+
+In this guide, we will show you how to use the `turms` library which is as build-in integration with the Arkitekt CLI to generate python code for interacting with the GraphQL API,
+and how to use the generated code in your application.
+
+
+## Prerequisites
+For this guide, you will need to have the following installed:
+
+- Python 3.6 or higher
+- Arkitekt CLI
+
+:::note
+You need to have installed the Arkitekt CLI together with our code generating library `turms` to follow this guide. If you didn't install it (or you are not sure), you can do so by running the following command:
+
+
+```bash
+pip install turms>=0.5.0 black
+```
+
+:::
+
+## Getting Started
+
+To get started, you will need to create a new project using the Arkitekt CLI. You can do this by running the following command:
+
+```bash
+
+arkitekt init
+
+```
+
+This will create a new project in the current directory. You can then navigate to the project directory and run the following command to initialize the code generation
+for the GraphQL API:
+
+
+We can now generate a configuration file for our code generation for our project by running the following command:
+
+```bash
+arkitekt gen init mikro
+```
+
+It will ask you where you want to generate the module for your generated code. Leave it as the default and press enter.
+
+This will generate a `graphql.config.yaml` file in the root of your project. This file contains the configuration for the code generation. You can open the file and modify the configuration to suit your needs.
+But for now, we will use the default configuration. You can read more about the configuration options in the documentation for the `turms` library.
+
+When running the command you should now also have a new folder called `graphql` in your project directory. This folder contains all of your documents and schemas that are necessary for the code generation.
+You will also find an empty `mikro` folder in this directory. This is where we will place our documents that we want to generate code for.
+
+:::note Why the nested `mikro` folder?
+
+The graphql folder cannot only hold documents for one of the many arkitekt services. Therefore, we use to the convention of a nested folder to specify which service we want to generate code for.
+As this will be the source of truth for the code generation, we think its best to be tidy and organized. (Of course you can choose your own path in the configuration file)
+
+:::
+
+## Generating Code
+
+Lets generate some code for our project. We will start by creating a new document in the `mikro` folder. Just add a new file called `first_query.graphql` and add the following content:
+
+```graphql
+
+query FirstQuery {
+  datasets {
+    id
+    name
+  }
+}
+
+```
+
+This is a simple query that retrieves all datasets from the server. After saving we can generate the code for this query by running the following command in the base directory of your project:
+
+```bash
+
+arkitekt gen compile mikro
+
+```
+
+This should now create a directory named `api` in the same directory, that contains the generated code for the query in the "mikro.py" file. You can now use this code in your application to interact with the GraphQL API.
+
+## Using the Generated Code
+
+To use the generated code, you will need to import the generated query and use it to interact with the GraphQL API. You can do this by running the following code:
+
+```python
+from arkitekt import easy
+from api.mikro import first_query
+
+# Create a new app
+app = easy("my_test_app")
+
+# Run the query
+with app:
+    datasets = first_query()
+    print(datasets)
+
+```
+
+Thats its you have now successfully generated and used code for interacting with the GraphQL API. You can now use this code in your application to interact with the API, and always
+be sure that you are getting the correct data types from the server.
+
+### Why we love this
+
+- **Type Safety**: The generated code is fully typed, so you can be sure that you are getting the correct data types from the server.
+- **Easy to use**: The generated code is easy to use, so you can quickly get started with interacting with the GraphQL API.
+- **Completely Documentend**: The generated code is fully documented directly from our API documentation. Just inspect some fields.
+- **Traitfull**: Turms has the neat concepts of adding traits to the graphql types. Imagine traits like mixins, that allow you to add speciic logig to the return types (e.g. getting the numpy array for a zarr store field)
+
+

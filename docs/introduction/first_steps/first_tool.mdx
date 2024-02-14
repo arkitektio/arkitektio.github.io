@@ -53,7 +53,7 @@ Well wouldn't it be nice if we had that convert node right now? Well, let's inst
 
 Before we will use some functionality from an outside app (and another installation), lets start simple and let us install an Arkitekt `PluginApp`. `PluginApps`
 are _just_ `Apps` that are installed and running inside the Arkitekt server. They are not different from any other app, except that they are easily installed
-through the Arkitekt interface, and can run completely veritualized seperate from your operating system (More about that in ["Arkitekt and Containers"](/docs/design/containers)).
+through the Arkitekt interface, and can run completely veritualized seperate from your operating system (More about that in ["Arkitekt and Containers"](/docs/design/various/containers).
 Installation of Plugin Apps is a prettry straightforward process and can be done in a few steps:
 
 <video
@@ -78,7 +78,7 @@ This will prompt you for a repository URL. A repository is a collection of (vers
 These repositories represent git repositories, that contain some Arkitekt specific configurations provided by the app
 developer. You don't need to worry about this, just copy the following values into the prompt:
 
-User: `jhnnsrs`
+User: `arkitektio-apps`
 Repository: `omero`
 Branch: `master`
 
@@ -90,7 +90,7 @@ This will add the repository to the list of available repositories. It should ha
 
 When clicking on the repository you should see a list of apps that are available in this repository.
 It is important to note that each app (or plugin) has a version number. This version number is an important element of the
-Arkitekt ecosystem. More about this in [Why we version](/docs/design/why_we_version).
+Arkitekt ecosystem. More about this in [Why we version](/docs/design/version).
 
 5. Right click on the latest (highest version number) app and click on "Appify".
 
@@ -107,7 +107,7 @@ we feel like we can build a platform that is truly open and collaborative, and p
 
 Last and final step, Deployment. Only when hitting deploy will Arkitekt actually download your app, and install it on the server.
 This procedure might take quite a while (depending on your internet connection), as it will download the app, and all its dependencies
-and run in inside a container on the server. Arkitekt will also ask you about an [instance](docs/design/multiinstance) name. Just leave main as it is, and click on
+and run in inside a container on the server. Arkitekt will also ask you about an instance name. Just leave `main` as it is, and click on
 "Deploy". This will start the installation process.
 
 But don't worry, you can continue working while this is happening in the background, and
@@ -119,7 +119,7 @@ The plugin system is still in its early stages. We are working on making this pr
 default repositories that you can install from. But for now, this is the way to install apps on the Arkitekt server. Also note that the
 "progress" indicator is (even though) functional not really accurate. It will show you the progress of the download, and
 unzipping. But it will not show you the progress of the actual installation. This is something that we will improve in the future. If it
-seems like its freezing or not doing anything, just wait a little bit longer. It will eventually finish. (Sometime a [refresh](/docs/troubleshooting/general_help) of the page
+seems like its freezing or not doing anything, just wait a little bit longer. It will eventually finish. (Sometime a [refresh](/docs/troubleshooting) of the page
 can also help).
 :::
 
@@ -133,7 +133,7 @@ You might ask yourself, why do we need to have repositories and containers and w
   rely on the latest and greatest version of your app. Arkitekt will periodically check for updates of your apps, and will notify you if there are updates
   available.
 - **Versioning**: We want to make sure that you can always rely on the same version of an app. This is important for reproducibility, and to make sure
-  that you can always rely on the same functionality. If you want to learn more about this, read [Why we version](/docs/design/why_we_version).
+  that you can always rely on the same functionality. If you want to learn more about this, read [Why we version](/docs/design/version).
 - **Portability** : Do you know that the App which we just installed had some very specific version requirements for the Java Virtual Machine? Well, you don't
   have to worry about this. As plugin can package all of that, you can be sure that the app is running in the correct environment, and you don't have to worry about
   any dependencies.
@@ -155,7 +155,7 @@ our desired nodes.
 Reservations are a core concept of the Arkitekt platform. They represent a contract of use between you and the Arkitekt platform, which will try to provide
 you the reserved `Node`, and inform you if its currently not available, (Maybe because the connected application is not started yet).
 Reservations are always bound to a specific `User` and a specific `Node`, and connect the `Node` to one or multiple real-world implementation(s) (e.g. our plugin app).
-To learn more about reservations, read [Reservations](/docs/design/reservations).
+To learn more about reservations, read [Reservations](/docs/design/terminology/reservation).
 
 :::
 

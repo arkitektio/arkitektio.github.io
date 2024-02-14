@@ -23,7 +23,7 @@ database.
 **Plugins are sandboxed** - Plugins run in a sandboxed environment, which means that they can't access the data of other plugins or your filesystem. This means that you can install plugins without worrying about them accessing your data or potentially damaging your system. They only
 can interact with our protected APIs.
 
-**Transport Layer Security (TLS)** - When hosting your own Arkitekt instance, you can enable TLS to encrypt the data that is sent between the client and the server. This means that even if someone intercepts the data, they won't be able to read it. You can find more information on how to enable TLS in the [deployment guide](/docs/deployment).
+**Transport Layer Security (TLS)** - When hosting your own Arkitekt instance, you can enable TLS to encrypt the data that is sent between the client and the server. This means that even if someone intercepts the data, they won't be able to read it. You can find more information on how to enable TLS in the [deployment guide](/docs/design/deployment).
 
 **Multi-user support** - Arkitekt supports multiple users, and each user has their own data and roles. This means that you can share your Arkitekt instance with other people without worrying about them accessing your data. Teams can be created and users can be assigned to teams, and each team can have different permissions.
 

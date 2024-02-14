@@ -1,5 +1,5 @@
 ---
-id: my-first-app
+id: read-write
 title: Read and Write
 sidebar_label: Read and Write
 ---
@@ -21,7 +21,7 @@ In this tutorial we will cover the following topics:
 
 ## Understanding Mikro
 
-Mikro is Arkitekts storage system, and one of the core components of Arkitekt. You can use it to store, explore and organize your bioimage data. Backed by a relational database and a s3 compatible object store, Mikro is designed for you to manage datasets of any size. If you are familiar with omero you can think of Mikro as the Arkitekt version of omero. For more information on Mikro, see the [Mikro documentation](/docs/services/mikro.md). When interacting with Mikro through python, we can use the mikro client, that is a module of the arkitekt client, and provides some additional convenience methods to make the python ecosystem of pandas, numpy and xarray work well with Mikro.
+Mikro is Arkitekts storage system, and one of the core components of Arkitekt. You can use it to store, explore and organize your bioimage data. Backed by a relational database and a s3 compatible object store, Mikro is designed for you to manage datasets of any size. If you are familiar with omero you can think of Mikro as the Arkitekt version of omero. For more information on Mikro, see the [Mikro documentation](/docs/design/services/mikro). When interacting with Mikro through python, we can use the mikro client, that is a module of the arkitekt client, and provides some additional convenience methods to make the python ecosystem of pandas, numpy and xarray work well with Mikro.
 
 ## Upload some data
 
@@ -45,11 +45,11 @@ with app:
    print(image.data)
 ```
 
-You can make this code run by copying it into a python file and running it. You will need to install the arkitekt client first. You can find instructions on how to do this in the [installation](/docs/developers/python/installation.md) tutorial.
+You can make this code run by copying it into a python file and running it. You will need to install the arkitekt client first. You can find instructions on how to do this in the [installation](/docs/developers/python/installation) tutorial.
 
 But lets take a closer look at what is happening here.
 
-1. First we create an `App` through the easy (builder) function. The `App` is the main way for you to interact with the Arkitekt API, it holds the connection to the server, and provides you with a context to interact with the server. You can read more about the `App` in the [App](/docs/developers/python/app.md) tutorial.
+1. First we create an `App` through the easy (builder) function. The `App` is the main way for you to interact with the Arkitekt API, it holds the connection to the server, and provides you with a context to interact with the server. 
 
    :::note
    We would advise you to use the `easy` function to create an app. This function will automatically create a new app (uniquely belong to you) if it does not exist yet. If the app already exists, it will return the existing app. This is useful if you want to use the same app in multiple scripts.

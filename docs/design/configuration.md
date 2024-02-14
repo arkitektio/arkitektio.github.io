@@ -48,7 +48,7 @@ requirements:
   - "cuda"
 ```
 
-When sending out the preflight request, the app will send its [Manifest](#manifest) to the Fakts server, which will then use the information in the manifest to determine the configuration information for the app. Additionally the App can send a list of other parameters like, which type of authenticaiton it would like to use, or which version of the platform it would like to connect to.
+When sending out the preflight request, the app will send its [Manifest](/docs/design/terminology/manifest) to the Fakts server, which will then use the information in the manifest to determine the configuration information for the app. Additionally the App can send a list of other parameters like, which type of authenticaiton it would like to use, or which version of the platform it would like to connect to.
 Depending on modifiable strategies installed on the Fakts server, the app might be asked to authenticate itself with the platform, before it can retrieve the token. This is done by sending a code to the user, which the user can then use to authenticate the app with the platform. Once the app has been authenticated, it can retrieve the token, and use it to retrieve the configuration information for the platform.
 
 ```mermaid

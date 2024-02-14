@@ -82,7 +82,7 @@ This is probably the most basic workflow you can create, but it will teach you a
   pass it on to the next node. Nodes will not wait for all data to be processed, but will process it autonomously as it comes in. This means that you can process data ridicously fast,
   and importantly you can process data that is still being generated. This is a core feature of Arkitekt, and we will get to it later. You will also
   note that the edges are labeled with `@mikro/representatoin` and `@mikro/metric`. These labels correspond to the data types that are passed between the nodes. The `@` symbol
-  indicates that these are [mikro](/docs/service/mikro) data types and the `representation` and `metric` indicate the type of data.
+  indicates that these are [mikro](/docs/design/services/mikro) data types and the `representation` and `metric` indicate the type of data.
   The first two nodes will manipulate an image to an image (images are represented as `representation`), and the last node will return a `metric` (metrics are scalar values attached
   to an image (here the fraction)). This `metric` will also be the output of our node.
 
@@ -120,8 +120,8 @@ Also if you refresh this page the nodes in the workflow should now appear green.
 You saw these button in the last section:
 
 <div className="flex flex-row gap-2">
-  <InstallRepoButton repo={"stdlib"} user={"jhnnsrs"} branch={"master"} />
-  <InstallRepoButton repo={"reaktor"} user={"jhnnsrs"} branch={"master"} />
+  <InstallRepoButton repo={"stdlib"} user={"arkitektio-apps"} branch={"master"} />
+  <InstallRepoButton repo={"reaktor"} user={"arkitektio-apps"} branch={"master"} />
 </div>
 
 Now follow [previously outlined](./first_tool#installing-our-first-app) steps to `Appify` the latest `stdlib` and `reaktor` version, and deploy them to your server.
@@ -149,7 +149,7 @@ In the Arkitekt ecosystem `Schedulers` play a vital role and we actually have in
   Wouldn't it be great if they could just call their own nodes directly? Well they can.
   `partially distributed` or `ìn-app` Schedulers are Schedulers that will call their own nodes directly, _without_ the need to call Arkitekt. This means that they can schedule tasks much faster, as they don't have to call Arkitekt for each step.
   This type of Scheduler is great for workflows where nodes are contained mostly within a single app, and where performance is key. They are also immensly useful for workflow that work `completely` local with **in memory data** in one app.
-  You can see an example of that in our experimental [MikroJ in memory workflow](/docs/showcases/advanced). The downside is that they are more fault-prone, as they are not running on the Arkitekt server
+  You can see an example of that in our experimental [MikroJ in memory workflow](/docs/showcases). The downside is that they are more fault-prone, as they are not running on the Arkitekt server
   and if the Scheduling app goes down, the workflow will fail.
 
 The TLDR of which workflow scheduling to choose is: In 99% of cases you will want to use the `fully distributed` Schedulers, as they are more fault tolerant to network errors.
@@ -158,7 +158,7 @@ The TLDR of which workflow scheduling to choose is: In 99% of cases you will wan
 
 Schedulers are a core concept in Arkitekt. They are the conductor of your workflow, and they will make sure that your workflow is executed correctly. They are however also a quite advanced
 concept, and you need to probably understand the Arkitekt design a bit better to fully understand their nuances. So don't worry if you don't understand them fully yet. We will try to give you some guidance
-in other parts of the [documentation](/docs/design/scheduler).
+in other parts of the [documentation](/docs/design/terminology/scheduler).
 :::
 
 But lets to just that and prepare a `Scheduler` for our workflow. For this we will use the `Reaktor` app, which we installed in the previous step. `Reaktor` is a distributed `Scheduler` app,

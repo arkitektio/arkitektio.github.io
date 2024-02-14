@@ -11,8 +11,8 @@ Puh. We are sorry about that! This is probably the worst case scenario, and one 
 
 ## Before we start
 
-This troubleshooting section will assume you have read the [Getting Started](/docs/introduction) section and have a basic understanding of how Arkitekt works.
-This section will also assume that you are using [Konstruktor](/docs/apps/konstruktor) to start your server. If you are using the docker compose setup, we
+This troubleshooting section will assume you have read the [Getting Started](/docs/introduction/first_steps) section and have a basic understanding of how Arkitekt works.
+This section will also assume that you are using [Konstruktor](/docs/apps/standalones/konstruktor) to start your server. If you are using the docker compose setup, we
 would kindly ask you to switch to Konstruktor for the time being, and see if you can get it to work there. It will make it easier for us to help you.
 
 :::note Please open an Issue on GitHub
@@ -94,11 +94,11 @@ and we will try to help you.
 
 Konstruktor is a small application based on the [Tauri](https://tauri.app)-Framework, which is still in active development, however we have not encountered any problems with it so far.
 It should work on all major platforms and we have tested the installation with Windows 10, Mac OS and Ubuntu 20.04. If you encounter any issues
-in the installation please make sure you have the latest version of Konstruktor installed. You can find the latest version [here](https://github.com/jhnnsrs/konstruktor/releases/latest/).
+in the installation please make sure you have the latest version of Konstruktor installed. You can find the latest version [here](https://github.com/arkitektio/konstruktor/releases/latest/).
 
 #### Crashing Konstruktor
 
-This is definelty a bug from our side. Please post a screenshot of the crashed application and the error message as an Issue in our Konstruktor [GitHub](https://github.com/jhnnsrs/konstruktor/issues). Sorry about that!
+This is definelty a bug from our side. Please post a screenshot of the crashed application and the error message as an Issue in our Konstruktor [GitHub](https://github.com/arkitektio/konstruktor/issues). Sorry about that!
 
 #### Konstruktor couldn't find Docker
 
@@ -127,12 +127,12 @@ Try the following steps to debug your docker installation:
 
    If you get an error message, docker is not running. If you get a message that the container was started successfully, docker is running.
 
-If all of these steps work, but Konstruktor still can't find docker, please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor/issues). Sorry about that!
+If all of these steps work, but Konstruktor still can't find docker, please open an Issue on our [GitHub](https://github.com/arkitektio/konstruktor/issues). Sorry about that!
 
 #### Couldn't install from Paper channel
 
 Channels are Konstruktor ways of creating a new deployment. You can think of them as templates. These templates are stored in a GitHub repository, and
-Konstruktor will try to download them from there. In the default configuration, Konstruktor will try to download the templates from the [konstruktor repository](https://github.com/jhnnsrs/konstruktor). So make sure you have an internet connection, and that you can access GitHub. If you are behind a firewall, you might need to allow Konstruktor to access the Internet.
+Konstruktor will try to download them from there. In the default configuration, Konstruktor will try to download the templates from the [konstruktor repository](https://github.com/arkitektio/konstruktor). So make sure you have an internet connection, and that you can access GitHub. If you are behind a firewall, you might need to allow Konstruktor to access the Internet.
 
 #### Konstruktor couldn't find my GPU
 
@@ -151,7 +151,7 @@ If you are certain however that you have a GPU installed, and you want to use GP
 3. When checking your GPU, Konstruktor will check if Docker can run a container with the `nvidia/cuda` image. It will _NOT_ check your CUDA installation
    diretly. This means that if you have CUDA installed, but Docker is not running, Konstruktor will still not be able to detect your GPU. The output
    of the `nvidia-smi` command inside the docker will be used to detect your GPU. However sometimes this command will fail, even if you have a GPU installed.
-   Just check the LOGS section. If it looks like it detected your GPU correctly, you can safely ignore this warning. But please open an issue on our [GitHub](https://github.com/jhnnsrs/konstruktor/issues) and let us know about it.
+   Just check the LOGS section. If it looks like it detected your GPU correctly, you can safely ignore this warning. But please open an issue on our [GitHub](https://github.com/arkitektio/konstruktor/issues) and let us know about it.
 
 4. Again: You do _NOT_ need to install CUDA or CUDNN. Arkitekt Containers utilize the `nvidia/cuda` docker image, which already contains all the necessary libraries.
 
@@ -163,11 +163,11 @@ If you are certain however that you have a GPU installed, and you want to use GP
 
    If you get an error message, you cannot access your GPU. If you get a list of information about your GPU, you can access your GPU :).
 
-6. If Konstruktor claims to have not found your GPU, but you are certain that you have a compatible GPU installed, and you have the latest drivers installed, please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor/issues)
+6. If Konstruktor claims to have not found your GPU, but you are certain that you have a compatible GPU installed, and you have the latest drivers installed, please open an Issue on our [GitHub](https://github.com/jhnnsrs/arkitektio/issues)
 
 #### Konstruktor showed me an error message
 
-That sounds like an error on our side. Please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor/issues). Sorry about that! You can defintely help us by posting a screenshot of the error message.
+That sounds like an error on our side. Please open an Issue on our [GitHub](https://github.com/arkitektio/konstruktor/issues). Sorry about that! You can defintely help us by posting a screenshot of the error message.
 Sometimes a restart might help!
 
 ### The Deployment
@@ -203,7 +203,7 @@ Here are a few things you can try to debug your Deployment:
 - If docker complains about not being able to pull an image, please check your internet connection. If you are behind a firewall,you might need to allow the
   docker daemon to access the internet. If you are using a proxy, you might need to configure docker to use the proxy. You can find more information about this [here](https://docs.docker.com/network/proxy/)
 
-- If docker complains about not being able to find an image, please check if you have the latest version of Konstruktor installed. You can find the latest version [here](https://github.com/jhnnsrs/konstruktor). If you are using a custom channel, please make sure that the channel is still available. If you are using the default channel, please let us know!
+- If docker complains about not being able to find an image, please check if you have the latest version of Konstruktor installed. You can find the latest version [here](https://github.com/arkitektio/konstruktor). If you are using a custom channel, please make sure that the channel is still available. If you are using the default channel, please let us know!
 
 - Konstruktor can also update your deployment to the latest version. Just click on the `Danger` button in the Dashboard. Which allows you to maintain your deployment.
 
@@ -234,7 +234,7 @@ With service name being the logs of the service you want to inspect. You can fin
 That's bad. This can have many reasons. If a service crashes, it will be restarted automatically. If it keeps crashing, it will be restarted a few times, and then
 the deployment will be stopped. You can check the logs of the service to see why it crashed. You can do this by clicking on the service in the Dashboard.
 See if you can find the error message.
-Attach the error message to an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor). We will try to help you!
+Attach the error message to an Issue on our [GitHub](https://github.com/arkitektio/konstruktor). We will try to help you!
 
 ### I never see all my services turn green
 
@@ -251,7 +251,7 @@ for a long time (> 40 seconds), it is probably failing. There is however two typ
   health checks. This can happen if the service is not ready yet, or any service it depends on is not ready yet. Just click on the `Open Health` and inspect the
   health of the service. Try restarting that service. This can help sometimes.
 
-Anyhow if you have a service that is not turning green, please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor). We will try to help you!
+Anyhow if you have a service that is not turning green, please open an Issue on our [GitHub](https://github.com/arkitektio/konstruktor). We will try to help you!
 
 ### I couldn't advertise my Deployment
 
@@ -266,7 +266,7 @@ Importantly it will also stop when you close Konstruktor. So if you want to adve
 :::
 
 Advertising your Deployment is not necessary for it to work. It is just a convenience feature that allows you to discover your Deployment from other Apps.
-If apps are not able to discover your Deployment, or you experience any other issue please open an Issue on our [GitHub](https://github.com/jhnnsrs/konstruktor). We will try to help you!
+If apps are not able to discover your Deployment, or you experience any other issue please open an Issue on our [GitHub](https://github.com/arkitektio/konstruktor). We will try to help you!
 
 ### My Deployment is running, but it doesnt appear in Orkestrator
 

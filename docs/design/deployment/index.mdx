@@ -36,7 +36,7 @@ One concern when deploying an Arkitekt is how you want to manage storage. While 
 of diskspace. The Mikro service will require a lot of diskspace, as it stores all the microscopy data that is streamed through Arkitekt. 
 Therefore you should consider how you want to manage storage, and how you want to backup your data. By relying on the S3 API, Arkitekt
 should give you the flexibility of a lot of different storage providers, and you can even use multiple storage providers at the same time.
-Please refer to the [Mikro documentation](/docs/mikro/storage) for more information on how to configure storage for the Mikro service.
+Please refer to the [Mikro documentation](/docs/design/services/mikro#storage) for more information on how to configure storage for the Mikro service.
 
 
 ### Networking
@@ -54,7 +54,7 @@ some guides on how to deploy Arkitekt in different environments, but you should 
 
 On premise deployment refers to the deployment of Arkitekt on your own hardware, such as your own computer, or a server in your local network.
 This is the simplest way of deploying Arkitekt, as it does not require any additional infrastructure,
-and is the default deployment strategy when using the [first steps guide](/docs/introduction/installation).
+and is the default deployment strategy when using the [first steps guide](/docs/introduction/first_steps).
 We believe that on premise deployments will be the most common deployment strategy for Arkitekt, 
 as you will have full control over the deployment, and enjoy the fastest possible (network) speeds.
 
@@ -63,7 +63,7 @@ as you will have full control over the deployment, and enjoy the fastest possibl
 
 ## Single Machine
 
-The simplest deployment strategy is to deploy Arkitekt on a single machine. This is the default deployment strategy when using the [first steps guide](/docs/introduction/installation.mdx). This strategy is ideal for development and testing purposes, as it is easy to setup and does not require any additional infrastructure. This setup works great for small teams , or when developing proof-of-concepts. Installign Arkitket on a single machine only requires a basic installation of docker (preferably with Docker Desktop).
+The simplest deployment strategy is to deploy Arkitekt on a single machine. This is the default deployment strategy when using the [first steps guide](/docs/introduction/first_steps). This strategy is ideal for development and testing purposes, as it is easy to setup and does not require any additional infrastructure. This setup works great for small teams , or when developing proof-of-concepts. Installign Arkitket on a single machine only requires a basic installation of docker (preferably with Docker Desktop).
 
 However, this strategy is not recommended for production environments, multiple users, or large teams, as it does not provide any redundancy or scalability. This type of deployment comes in multiple flavours, that further define the deployment strategy.
 
@@ -71,7 +71,7 @@ However, this strategy is not recommended for production environments, multiple 
 
 Konstruktor is our preferred way of deploying Arkitekt on a single machine, as it abstracts a lof of the configuration away, while maintaining full
 customizability. Konstruktor does this by only giving you a more user-friendly interface to the configuration files and docker-compose which it uses
-under the hood. You can find more information about Konstruktor in the [Konstruktor documentation](https://arkitekt.live/docs/introduction/installation#konstruktor).
+under the hood. You can find more information about Konstruktor in the [Konstruktor documentation](/docs/introduction/installation).
 
 ### Single Machine - Docker Compose Setup
 

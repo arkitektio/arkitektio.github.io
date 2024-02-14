@@ -69,18 +69,18 @@ pipeline. This pipeline will for now just consist of a simple segmentation and a
 node that we know from our Deep Learning tutorial.
 
 But first things first, how to we get the images into the workflow? And especially how to we get them of the microscope, onto our analysis machine? Well, there is an App
-for that. [**Gucker**](/docs/apps/gucker) is a simple app that watches a folder and then puts any images that are put into that folder into the workflow. So lets install it
+for that. [**Gucker**](/docs/apps/standalones/gucker) is a simple app that watches a folder and then puts any images that are put into that folder into the workflow. So lets install it
 and get started.
 
 ### Other Requirements
 
-If you followed both the [Deep Learning](/docs/introduction/advanced_tutorial/deep-learning) and the [First Steps](/docs/introduction/first_steps/interface) tutorial,
+If you followed both the [Deep Learning](/docs/introduction/advanced/deep_learning) and the [First Steps](/docs/introduction/first_steps/interface) tutorial,
 you should have all the requirements installed. If not, please install the following:
 
 <div className="flex flex-row gap-2">
-  <InstallRepoButton repo={"omero"} user={"jhnnsrs"} branch={"master"} />
-  <InstallRepoButton repo={"reaktor"} user={"jhnnsrs"} branch={"master"} />
-  <InstallRepoButton repo={"segmentor"} user={"jhnnsrs"} branch={"master"} />
+  <InstallRepoButton repo={"omero"} user={"arkitektio-apps"} branch={"master"} />
+  <InstallRepoButton repo={"reaktor"} user={"arkitektio-apps"} branch={"master"} />
+  <InstallRepoButton repo={"segmentor"} user={"arkitektio-apps"} branch={"master"} />
 </div>
 
 Of course you can also use any other node that you have installed, but for this tutorial we will construct the following

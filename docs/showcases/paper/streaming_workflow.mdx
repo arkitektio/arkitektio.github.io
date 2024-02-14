@@ -33,7 +33,7 @@ As the deep learning-based segmentation steps can be highly time-consuming, seve
 
 We **strongly** suggest to go through the [Getting Started](/docs/introduction/first_steps) guide before attempting to run this workflow.
 It will guide you through the installation of the Arkitekt platform and the setup of your first workflow, as well as how to install plugins
-and apps. Additionally, we suggest to go through the [Live Analysis Basics](/docs/advanced_tutorial/live) guide to get familiar with the Streaming
+and apps. Additionally, we suggest to go through the [Live Analysis Basics](/docs/introduction/advanced/live) guide to get familiar with the Streaming
 capabilities of Arkitekt.
 :::
 
@@ -54,15 +54,15 @@ that will be used to run the parallel processes. These computers will need to be
 Your microscope Software of choice (tested with [Metamorph](https://www.moleculardevices.com/), that is able to stream images to a directory on the microscope computer, in an
 OME compliant format.
 
-#### [Gucker](https://github.com/jhnnsrs/gucker)
+#### [Gucker](https://github.com/arkitektio-apps/gucker)
 
-This workflow uses the Gucker App to watch a directory for new files opn the Acquisition Computer. To install Gucker, download the latest release from the [Gucker Releases](https://github.com/jhnnsrs/gucker/releases/latest).
-You can also choose to install Gucker from source by following the instructions on the [Gucker Github](https://github.com/jhnnsrs/gucker).
+This workflow uses the Gucker App to watch a directory for new files opn the Acquisition Computer. To install Gucker, download the latest release from the [Gucker Releases](https://github.com/jhnnsrs/arkitektio-apps/releases/latest).
+You can also choose to install Gucker from source by following the instructions on the [Gucker Github](https://github.com/arkitektio-apps/gucker).
 
-#### [Mikro-Napari](https://github.com/jhnnsrs/mikro-napari) and [Napari](https://napari.org/)
+#### [Mikro-Napari](https://github.com/arkitektio-apps/mikro-napari) and [Napari](https://napari.org/)
 
 For visualization of the 3D data, we use the Napari App. To install Napari, follow the instructions on the [Napari Website](https://napari.org/), as well as install
-the mikro-napari plugin by following the instructions [here](/docs/introduction/first_steps/first_app) or [here](/docs/apps/mikro-napari).
+the mikro-napari plugin by following the instructions [here](/docs/introduction/first_steps/first_app) or [here](/docs/apps/standalones/mikro-napari).
 
 #### PluginApps
 
@@ -70,12 +70,12 @@ This workflow uses the following `PluginApps` installed through the Arkitekt Plu
 or connect this website to your Arkitekt instance and click on the button below:
 
 <div className="flex flex-row gap-2">
-  <InstallRepoButton repo="stdlib" user="jhnnsrs" branch="master" />
-  <InstallRepoButton repo="omero" user="jhnnsrs" branch="master" />
-  <InstallRepoButton repo="segmentor" user="jhnnsrs" branch="master" />
+  <InstallRepoButton repo="stdlib" user="arkitektio-apps" branch="master" />
+  <InstallRepoButton repo="omero" user="arkitektio-apps" branch="master" />
+  <InstallRepoButton repo="segmentor" user="arkitektio-apps" branch="master" />
 </div>
 
-#### _[Optional]: Parallization_
+
 
 To enable the parallelization of the Stardist segmentation, you will need to have access to a Docker enabled computer (Ubuntu 22.04 or Windows 10) with a CUDA 11 enabled GPU.
 Arkitekt does not need to be installed on this computer, but we will run the Segmentor Plugin on this computer through a `docker run` command.
@@ -86,7 +86,7 @@ Arkitekt does not need to be installed on this computer, but we will run the Seg
 
 1. Install Arkitekt on your analysis computer following the instructions [here](/docs/introduction/installation).
 
-2. Depending if you want to reproduce the results illustrated in the Paper, you can either install the Stardist Model which we used for the demo data, via the button below or train your own model by following the instructions [here](/docs/advanced_tutorial/training).
+2. Depending if you want to reproduce the results illustrated in the Paper, you can either install the Stardist Model which we used for the demo data, via the button below or train your own model by following the instructions [here](/docs/introduction/advanced/training).
 
 <UploadModelButton
   url={organoidModel}
@@ -148,7 +148,7 @@ A few notes on this workflow:
 
 1. Creating the Workflow follows the same patterns as illustrated in the Tutorials.
 
-1. Connect the nodes by dragging the output ports of one node to the input ports of another node. As illustrated in the [Live Analysis](/docs/introduction/advanced_tutorial/live), the
+1. Connect the nodes by dragging the output ports of one node to the input ports of another node. As illustrated in the [Live Analysis](/docs/introduction/advanced/live), the
    `Convert Omero` node is returning a list of Images (as some OME formats can contain multiple series), which is why we need to `Chunk` the list of images into single images, before we can
    run the rest of the workflow on each image individually.
 
@@ -167,7 +167,7 @@ A few notes on this workflow:
 
 :::note On Parallization in Arkitekt
 
-As you can see Arkitekt supports various parellization patterns, each coming with their own advantages and disadvantages. For more information on the different parellization patterns, please refer to the [Advanced Tutorial](/docs/advanced_tutorial/parallelization).
+As you can see Arkitekt supports various parellization patterns, each coming with their own advantages and disadvantages. 
 
 :::
 

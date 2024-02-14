@@ -1,29 +1,13 @@
 ---
-id: my-first-app
-title: My first App
-sidebar_label: The basics
+id: index
+title: Classical Style
+sidebar_label: Classic Style
 ---
 
-# Quickstart
 
-The easiest way to install the library is to use poetry or pip:
+# Classical Usage
 
-```python
-pip install arkitekt
-```
-
-As Arkitekt comes with a CLI, you can then use it to create a new project:
-
-```python
-arkitekt init
-```
-
-This will setup arkitekt in the local directory and guide you through connecting to your
-local arkitekt instance for the first time.
-
-# Usage
-
-Lets's create an Arkitekt App, as it is the connection layer between your code and the arkitet server. If you don't know what we mean by an app, check out the [App](/docs/design/terminology/app.mdx) section of the terminology page.
+Lets's create an Arkitekt App, as it is the connection layer between your code and the arkitet server. If you don't know what we mean by an App, check out the [App](/docs/design/terminology/app) section of the terminology page.
 
 ```python
 from arkitekt import easy
@@ -45,11 +29,11 @@ setup:
 
    ```python
     from arkitekt import easy
-    from fakts.grants.remote import RemoteDeviceGrant
+    from fakts.grants.remote import AnyOtherGrantType
 
     app = easy("my-app-name")
 
-    app.fakts.grant = RemoteDeviceGrant("my-device-id", "my-device-secret") # Will try to connect claiming to be a preconfigured client
+    app.fakts.grant = AnyOtherGrantType()
     with app:
         # do stuff with arkitekt
    ```
@@ -61,7 +45,7 @@ setup:
 
 3. Within this context, you can use the `app` object to access the various services that
    Arkitekt provides. These services are available as attributes on the `app` object.
-   For example, to access the `Mikro` service (responsible for storing your microscopy data
+   For example, to access the `Mikro` client (responsible for storing your microscopy data
    ), you can use `app.mikro`.
 
 4. The context manager also sets some context specific variables (contextvars).
@@ -99,7 +83,7 @@ setup:
 6. Apps work both in async and synchronous contexts. This means that you can use the `app`
    object in both async and sync code. The `app` object will automatically detect the context
    and use the correct backend (check the documentation of koil for this). This means that you can use the same code in both async and
-   sync code.
+   sync code
 
    ```python
     from arkitekt import Arkitekt
@@ -143,5 +127,5 @@ setup:
 Now that we have a basic understanding of how Arkitekt works, let's start exploring the various things you can do with it.
 We have created a few tutorials to get you started:
 
-- [Storing image data](/docs/developers/python/basics/read-write.md)
--
+- [Storing image data](/docs/developers/python/classical/read-write)
+

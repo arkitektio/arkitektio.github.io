@@ -1,0 +1,52 @@
+---
+id: usage
+title: Usage
+sidebar_label: Usage
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+
+## Usage
+
+Arkitekts functionaly is within the Arkitekt Provider that itself sets up providers for
+the related services.
+
+````jsx
+import { ArkitektProvider } from "@jhnnsrs/arkitekt";
+import { useMikroQuery, MikroGuard } from "@jhnnsrs/mikro";
+
+export const InnerApp = () => {
+  const [data] = useMikroQuery(
+    gql```
+    query {
+      myrepresentations {
+        id
+        name
+      }
+    }
+  ```
+  ); // Once configured this will return the data from the query
+
+  return <>{JSON.stringify(data)}</>
+};
+
+export const App = () => {
+  return (
+    <ArkitektProvider>
+        <MikroGuard fallback={<div>Mikro is not connected</div>}> {/* // This will only render the children if mikro is connected */}
+           <InnerApp>
+      </MikroGuard>
+    </ArkitektProvider>
+  );
+};
+````
+
+:::info
+This app will not work as is. You need to use both `fakts` and `herre` to first
+configure the connected and then authenticate with them.
+:::
+
+This documentation provides examples to be used with "react-router" and authenticating
+your web app as a public app (an app that users can login in with and authorize).

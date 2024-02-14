@@ -22,7 +22,7 @@ This is arguabley due to the lack of easy to use tools and the inability to adap
 With Arkitekt we aimed to make it easy to both use already trained deep learning models in your analysis pipeline, and to make it easy to adapt a model to your specific needs.
 In this tutorial we will show you how to train your own deep learning model using CARE, a popular method for image restoration, and how to use it in your analysis pipeline.
 We advise you to first read the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7) to understand the methodology of care, as well as following both the
-first steps of the [Arkitekt tutorial](/docs/introduction/first_steps/interface) and the [Deep Learning Bridge tutorial](/docs/introduction/advanced_tutorial/deep_learning).
+first steps of the [Arkitekt tutorial](/docs/introduction/first_steps/interface) and the [Deep Learning Bridge tutorial](/docs/introduction/advanced/deep_learning).
 
 This tutorial aims to cover the following topics:
 
@@ -70,7 +70,7 @@ Developers can then use these names to define their training process.
 
 Lets see how we can train a CARE model using Arkitekt. Of course we will need `CARE` for that, but lets wait for a moment and first see how we can define a `Context` that relates two `Image` datatypes.
 Indeed this relationship has nothing to do with CARE, and we can use it for many different things. But lets start with the `Data` that we will use for training. We will use the same data as in the CARE pape,
-which you can download [here](/static/nGFP_high_snr.tif) and [here](/static/nGFP_low_snr.tif). We will use the `same` data for training and validation, but as we said before, this is just for the purpose of this tutorial.
+which you can download [here](/demos/nGFP_high_snr.tif) and [here](/demos/nGFP_low_snr.tif). We will use the `same` data for training and validation, but as we said before, this is just for the purpose of this tutorial.
 
 <video
   autoPlay
@@ -124,7 +124,7 @@ A few notes:
 And thats it, you created a training dataset for CARE. You can of course relate more items in the same context, but for now lets leave it at that. Now we can train a CARE model (on the GPU if you have one).
 For this we will need the `KARE` app, which is just `CARE` but enabled as an Arkitekt app (this freaking K is for Arkitekt, get it?). You can install it by clicking on the `Install Repo` button below.
 
-<InstallRepoButton repo="kare" user="jhnnsrs" branch="master" />
+<InstallRepoButton repo="kare" user="arkitektio-apps" branch="master" />
 <br />
 <br />
 
@@ -212,11 +212,11 @@ For this we will now reserve the `Predict CARE` node, which in this case will ta
 </div>
 
 And thats it, you trained a CARE model and used it to make predictions. You can now use this model in your analysis pipeline, and you can also use it to adapt it to your specific needs.
-Also of course you can download the model and share it with others, just like we did with the models that we are using in our [Showcases](/docs/showcases/intro).
+Also of course you can download the model and share it with others, just like we did with the models that we are using in our [Showcases](/docs/showcases).
 
 ## The developers perspective
 
-If you are a developer and you want to know how to integrate your own deep learning app into Arkitekt, you can read our Developer Tutorial on how to do this [here](/docs/developers/python/basics/deep_learning).
+If you are a developer and you want to know how to integrate your own deep learning app into Arkitekt, you can read our Developer Tutorial on how to do this [here](/docs/developers/python).
 But also please just find here **ALL** the code for the `Train CARE` and `Predict CARE` nodes, which are just a few lines of code, and should be easy to understand.
 
 ```python

@@ -55,7 +55,7 @@ should have appeared in the `Data` tab. If you click on it you should see the im
 
 We just performed our first conversion. We took a file from our Server and converted it to the internal Arkitekt format based on Zarr, again storing
 it on our server. In practicallity this meant that our "Omero" PluginApp streamed the file from the server, converted it and then uploaded the
-converted zarr dataset again to the server. More on that in [How Assignment Works](/docs/design/assignation). You will notice that
+converted zarr dataset again to the server. More on that in [How Assignment Works](/docs/design/terminology/assignation). You will notice that
 first conversion takes a bit longer. This is because we only start the Java process that performs the conversion when we need it.
 On subsequent conversions this process will already be running and the conversion should be much faster.
 :::
@@ -91,8 +91,7 @@ We would love to integrate [Viv](https://github.com/hms-dbmi/vizarr) into Orkest
 :::note On Mikro next
 
 After some lessons learned about metadata handling in Arkitekt we are currently working on a new version of "Mikro" (the storage service) that will be able to handle
-metadata in a more flexible way. This will also allow us to provide more advanced visualization options in the future. If you want to read more about this you can
-read more about it in the [Mikro Next](/docs/services/next/mikro_next) section.
+metadata in a more flexible way. This will also allow us to provide more advanced visualization options in the future..
 
 :::
 

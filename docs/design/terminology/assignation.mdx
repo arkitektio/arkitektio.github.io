@@ -1,0 +1,55 @@
+---
+id: assignation
+title: Assignation
+sidebar_label: Assignation
+sidebar_position: 8
+---
+
+### Whats is a port?
+
+A port is concept tightligly related to Nodes and their input and outputs.
+Each nodes has multiple input and output ports.
+
+Ports are defined by a mandatory `key` and a `type` and an optional `label`.
+
+```javascript
+{
+  key: 'input',
+  type: 'number',
+  label: 'Input'
+}
+```
+
+### Port Types
+
+Each port has a type, that defines the type of data that can be passed through it.
+The following basic types are supported:
+
+- `int`
+- `float`
+- `string`
+- `boolean`
+- `structure`
+
+Additionality there are some special types:
+
+- `List` - A list of values of the same type
+- `Dict` - A key-value pair of values of the same type
+- `Union` - A value that can be one of multiple types
+
+Importantly Ports always specifie if they expect nullable values or not.
+
+:::note
+
+Structure Ports are a bit special. They are used to define non
+serializable data structures, that need to be shrank down to a serializable
+format, and expanded back to the original format, when passing from
+one app to another app.
+
+:::
+
+##
+
+
+
+
