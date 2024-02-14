@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[2261],{58130:e=>{e.exports=JSON.parse('{"title":"Integrated","slug":"/category/integrated","permalink":"/docs/category/integrated","navigation":{"previous":{"title":"Usage","permalink":"/docs/developers/python/classical/Usage"},"next":{"title":"Intro","permalink":"/docs/developers/python/plugin/"}}}')}}]);
