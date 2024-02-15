@@ -12,11 +12,8 @@ import template from "./node-template.png";
 # What is a Template?
 
 Templates can be best understood in comparison with nodes. A node in Arkitekt is an abstract description of an analysis tasks, which defines
-the inputs, outputs, but **not** the actual code that is run. A template is a concrete implementation of a node, and maps the abstract
-notion of the task to a real world implementation.
-
-Apps therefore do not expose nodes, but templates. So when trying to run an analysis and instructing Arktiekt to run a task, Arkitekt internally
-looks up the template that is associated with the node, and sends the request to the app that is associated with the template.
+the inputs, outputs, but **not** the actual code that is run. A template is a concrete implementation of a node, and implements the abstract
+notion of the task in a specific application.
 
 ## Example
 
@@ -39,7 +36,7 @@ Nodes are never attached to an application, templates always are.
 :::info 
 
 Importantly templates are not created only on the app level, but for each user that runs the app. This allows us to find the best fitting
-template for each bioimage task.
+template for each bioimage task based on the user's preferences and the available resources.
 
 :::
 

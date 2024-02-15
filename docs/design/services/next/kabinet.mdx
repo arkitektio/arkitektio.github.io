@@ -12,12 +12,12 @@ import { GithubRepo} from "/src/components/GithubRepo";
 
 Kabinet is designed to be the new AppStore for the platform. It builds around the concepts of Port, which
 provides the current Plugin system, but
-switches some of its core concepts around, which warrants a new name. This section describes the core concepts
+switches some of its core concepts around, which warrants a new service. This section describes the core concepts
 of the system, and how it is designed to work.
 
 :::note
 
-While Kabinet will eventually replace Port in the standard deployment, you will be still able to use Port if you
+While Kabinet will probably replace Port in the standard deployment, you will be still able to use Port if you
 prefer its approach. The two systems will be able to coexist, and you can use both in parallel. However we think
 that Kabinet will provide a better experience for most users.
 
@@ -37,7 +37,7 @@ Here are some core new features of the system:
 
 ## Container Backend Apps
 
-As opposed to Port, Kabinet will not be managing Containers directly in side the service, but will instead delegate
+As opposed to Port, Kabinet will not be managing Containers directly inside its service, but will instead delegate
 this task to "Container Backend" Apps. Its these Apps that will be responsible for managing their containers and the 
 resources they use. Kabinet only provides a central "State" store for the containers, and a way to query and visualize
 them.
