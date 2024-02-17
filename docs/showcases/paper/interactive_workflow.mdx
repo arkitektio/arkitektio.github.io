@@ -59,17 +59,17 @@ install the apps that are missing. In this case you will need to install the fol
 With the mikro-napari plugin, which you can install easily via the napari plugin manager.
 or via the command line with `pip install mikro-napari`
 
-#### [Kare Denoising](https://github.com/jhnnsrs/kare)
+#### [Kare Denoising](https://github.com/arkitektio-apps/kare)
 
 An Arkitekt plugin that allows you to denoise images using deep learning. You can install it through the PluginStore or when connected, by clicking on the button below.
 
-<InstallRepoButton repo={"kare"} user={"jhnnsrs"} branch={"master"} />
+<InstallRepoButton repo={"kare"} user={"arkitektio-apps"} branch={"master"} />
 
 #### [Fiji](https://imagej.net/Fiji)
 
 A ImageJ instance with the "Analyze Particles" plugin installed (comes preinstalled with Fiji)
 
-#### [MikroJ](https://github.com/jhnnsrs/mikroj)
+#### [MikroJ](https://github.com/arkitektio-apps/mikroj)
 
 The Arkitekt enabled FIJI wrapper app that allows your Fiji instance to be connected to Arkitekt. Please install
 the latest version of MikroJ.
@@ -81,7 +81,7 @@ workflow is only on noisy stack of the Tribolium dataset, which you can download
 
 The Image Data was converted through the `Convert Omero` Node provided by
 
-<InstallRepoButton repo={"omero"} user={"jhnnsrs"} branch={"master"} />
+<InstallRepoButton repo={"omero"} user={"arkitektio-apps"} branch={"master"} />
 
 ## Model Preparation
 
@@ -91,6 +91,13 @@ Deep Learning Training Tutorial to train your own model. If you want to use a pr
 <UploadModelButton url={model} name="Tribolium Model" kind="TENSORFLOW" />
 
 This model was trained on [this dataset here](/demos/training.zip).
+
+:::note
+
+If you press the button once, it will be uploaded to your arkitekt instance, if you press it again, it will be again created. Just
+check your Arkitekt instance to see if the model was uploaded correctly. Sorry for this inconvenience, we are working on a fix.
+
+:::
 
 ## The Workflow
 
