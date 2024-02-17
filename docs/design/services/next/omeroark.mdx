@@ -6,6 +6,7 @@ sidebar_position: 1
 
 import Image from "@theme/IdealImage";
 import { GithubRepo} from "/src/components/GithubRepo";
+import design from "./omeroark-design.png";
 
 # OmeroArk
 
@@ -13,3 +14,38 @@ OmeroArk is a tool for managing and archiving data from OMERO. It is designed to
 and provides a familiar GraphQL API for querying and managing data on the Omero server.
 
 <GithubRepo url="https://github.com/arkitektio/omero-ark-server" title="OmeroArk"/>
+
+# Design
+
+OmeroArk is designed to be a stateless gateway that wraps the Blitz based Omero-Server in a more documentated GraphQL API inline with the Arkitekt design principles.
+
+<div className="mt-2 p-6 w-full">
+<Image img={design} />
+
+<div className="text-gray-400 mb-2">
+  <small>
+     The design of the OmeroArk Service. OmeroArk is a stateless gateway that wraps the Blitz based Omero-Server in a 
+     more documentated GraphQL API inline with the Arkitekt design principles.
+  </small>
+</div>
+</div>
+
+:::info
+
+While we are exploring to make this GraphQL API more powerful and to facilitate the download of
+raw data from the OMERO server, because of limitations in the Blitz Gateway, the Graphql API is currently not allowing the upload of data to the OMERO server.
+(Similar to the OMERO web client, where also upload is not possible). 
+
+:::
+
+# Features
+
+- **GraphQL API**: OmeroArk provides a familiar (http based) GraphQL API for querying and managing data on the Omero server.
+- **Stateless Gateway**: OmeroArk is designed to be a stateless gateway and does not need to sync data with the OMERO server. What you see is what you
+    get from the OMERO server.
+
+- **Authentication** OmeroArk uses the same SSO authentication like the rest of the Arktiekt Platform. Once you have associated your omero account with your Arkitekt account.
+
+
+
+

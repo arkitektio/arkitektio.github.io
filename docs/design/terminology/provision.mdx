@@ -5,10 +5,45 @@ sidebar_label: Provision
 sidebar_position: 8
 ---
 
+
+import Image from "@theme/IdealImage";
+import provision from "./provisions.png";
+
 ### What is a Provision
 
-A provision is a request from Arkitekt to an app to provide an Implementation of a 
-previously defined Node.
+A provision is a request from Arkitekt to an app to provide an Actors for a previously
+registered Template by this App. Just like a [Reservation](/docs/design/terminology/reservation), is an implicit
+contract between a User or a Scheduling App and Arkitekt  for a Functionality, a Provision implicit contract between Arkitekt 
+and the App for that Functionality.
+
+### Why do we need Provisions
+
+Provisions provide a way for Arkitekt to track which Apps are currently active, accessible to other users, and which are not.
+If an App disconnects, or a User revokes access to this particular functionality of the App for Arkitekt, Arkitekt will mark
+this provision as inactive and will no longer send requests to this App for this functionality. 
+
+This becomes especially important when the App is being used in a workflow and we would like to understand if our workflow is
+still runnable. So how do we track this information? We use Provisions and their ability to be linked to a Reservation.
 
 
+<div className="mt-2">
+<Image img={provision} />
+
+<div className="text-gray-400 mb-2">
+<small>The interplay between reservations and provisions</small>
+</div>
+</div>
+
+When an Workflow is reserved in Arkitekt, the scheduling app will received a provision request for this workflow,
+and will be expected to provide an Actor for this workflow. During its own provisioning process, the scheduling app
+can then "reserves" the resources it needs to run the workflow. Which will then cause provisions to be sent to the
+Apps that provide the resources. If now one of the Apps is not available, the signal is able to be propagated back to
+workflow, and the workflow can be marked as not runnable.
+
+:::note
+
+WHen building a workflow, you can also decide for nodes to be optional, esentially telling arkitekt that there is
+no need to propagate this offline signal further, as the workflow can still be run without this node.
+
+:::
 

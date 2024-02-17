@@ -6,10 +6,52 @@ sidebar_position: 1
 
 import Image from "@theme/IdealImage";
 import { GithubRepo} from "/src/components/GithubRepo";
+import design from "./kluster-design.png";
 
-# Kluseter
+# Kluster
 
-OmeroArk is a tool for managing and archiving data from OMERO. It is designed to be used in conjunction with the OMERO server, 
-and provides a familiar GraphQL API for querying and managing data on the Omero server.
+Kluster is a DASK Cluster Manager Gateway that interfaces with Dask-Gateway to provide on demand
+scalable Dask Clusters on a variety of underlying distributed computing platforms (SLURM, PBS,
+Kubernetes, Hadooop).
+
 
 <GithubRepo url="https://github.com/arkitektio/kluster-server" title="Kluster"/>
+
+## Design
+
+Kluster is designed to be a stateless gateway that interfaces with the [Dask-Gateway](https://gateway.dask.org/en/latest/) 
+and only provide a more documentated GraphQL API inline with the Arkitekt design principles. Additionally to the main 
+Kluster Server we also provide a modified Dask-Gateway [Kluster-Gateway] that comes with a JWT Authentication plugin
+so that Arkitekts Authentication paradigm can be used to authenticate users to the Dask-Gateway, when not using the
+Kluster Server.
+
+
+<div className="mt-2 p-6 w-full">
+<Image img={design} />
+
+<div className="text-gray-400 mb-2">
+  <small>
+     The design of the Kluster. Kluster is a stateless gateway that wraps the Dask-Gateway API and provides a
+     GraphQL API that can be easily consumed by Apps and Visualization Clients.
+  </small>
+</div>
+</div>
+
+:::info
+
+Currently Kluster is in the early stages of development and has not been tested with all Cluster Backends,
+that Dask-Gateway can provide for. It works great with Local Clusters and SLURM Clusters (albeit SlURM requires
+some additional configuration).If you have been using Dask-Gateway and have a use case for Kluster, please
+reach out to us and we can help you get started.
+
+:::
+
+## Features
+
+- **GraphQL API**: Kluster provides a GraphQL API that can be used to manage Dask Clusters.
+- **Stateless**: Kluster is designed to be stateless and can be easily scaled horizontally.
+- **Dask-Gateway**: Kluster wraps the Dask-Gateway API and provides a more standardized API for Dask Clusters.
+- **JWT Authentication**: Kluster provides a JWT Authentication plugin for Dask-Gateway that can be used to authenticate
+  users to the Dask-Gateway.
+
+

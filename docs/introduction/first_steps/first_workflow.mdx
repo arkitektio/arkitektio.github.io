@@ -95,29 +95,11 @@ The other plugin will be used to actually run the workflow in the background. So
 ## New plugins
 
 First we need to install the apps that provide the functionality for the nodes in this workflow.
+We will need two new plugins for this workflow, so lets install them. One plugin will provide all of our functionality need to run this workflow in.
 
-<HerreGuard fallback={<div>
+Make sure to install the `stdlib` and `reaktor` apps. You can do that by clicking on the `Install` button below, or 
+the classic way by adding these Repositories to your plugin store.
 
-If appears you are not logged in. Its easier to login to install the plugins.
-But don't you worry, we will guide you through it.
-
-First lets install the Standard Libary plugin [`Stdlib`](https://github.com/jhnnsrs/stdlib) plugin, which provides a battery of basic
-image processing nodes. You can install it by clicking on the "Plugin Store", and adding the "Stdlib" repository.
-Users: `jhnnsrs`, Repository: `stdlib`, Branch: `master`. You then follow the [previously outlined](./first_tool#installing-our-first-app) steps to `Appify` the latest stdlib version, and deploy it
-to your server.
-
-Then we will need the [`Reaktor`](https://github.com/jhnnsrs/reaktor) plugin, which will acts a `scheduler` for our workflow. Don't worry
-you will understand what that means in a second. You can install it by clicking on the "Plugin Store", and adding the "Reaktor" repository.
-Users: `jhnnsrs`, Repository: `reaktor`, Branch: `main`. Again followig the [previously outlined](./first_tool#installing-our-first-app) steps to `Appify` the latest reaktor version, and deploy it
-
-If you now search for `Deploy Flow` and `Crop Image` in the search bar, you should find the two nodes we just installed.
-If you don't, make sure you have the correct repository selected in the search bar, and your installation was successful.
-Also if you refresh this page the nodes in the workflow should now appear green.
-
-</div>
-}>
-
-You saw these button in the last section:
 
 <div className="flex flex-row gap-2">
   <InstallRepoButton repo={"stdlib"} user={"arkitektio-apps"} branch={"master"} />
@@ -127,7 +109,6 @@ You saw these button in the last section:
 Now follow [previously outlined](./first_tool#installing-our-first-app) steps to `Appify` the latest `stdlib` and `reaktor` version, and deploy them to your server.
 You should now be able to search for `Deploy Flow` and `Otsu Threshold` in the dashboard search bar, and find the two nodes we just installed.
 
-</HerreGuard>
 
 ## Reserving a Scheduler
 

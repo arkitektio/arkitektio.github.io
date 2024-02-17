@@ -17,6 +17,51 @@ of the files in a workflow.
 
 ## Installation
 
+Gucker comes as a bundled application installable from its Github Releases [page](https://github.com/arkitektio-apps/gucker/releases/latest).
+Additionally you can install it via `pip`:
+
+```bash
+pip install gucker
+```
+
+## Usage
+
+Currently gucker is only available as a GUI while we are working on also enabling
+it as a command line tool. To start the GUI simply run the binary in the extracted folder or run the following command, 
+if you installed it via pip:
+
+```bash
+gucker
+```
 
 
+## Configuration
 
+Gucker requires you to set two directories, the "Import" directory and the "Export" directory.
+The "Import" directory is the directory that will be watched for changes 
+while the "Target" directory is the directory where the files will be copied to when you explicitly export them.
+
+## Usage in Arkitekt Workflows
+
+Guckers main purpose is to establish a "Streaming Node" in Arkitekt workflows, and allows
+you to directly stream files to the Arkitekt Server and start the processing of the files in a workflow.
+For this just add the `Stream Files` node to your workflow and configure it to use the Gucker instance,
+that points to the Folder you want to watch.
+
+Additionally you can also specify some filters to only stream files that match a certain file pattern
+in regexp. Here are some common patterns:
+
+- `.*` - matches all files
+- `.*.tif` - matches all tif files
+- `.*.czi` - matches all czi files
+- `.*.nd2` - matches all nd2 files
+- `.*[.tif|.tiff]` - matches all jpg and png files
+
+
+:::note
+
+Regular expressions are a powerful tool to match file patterns, but can also be quite complex.
+We are recommending to use a tool like [regex101](https://regex101.com/) to test your regular expressions. 
+Against the files you want to match, if it gets too complex.
+
+:::
