@@ -10,6 +10,9 @@ import { ShowWorkflow } from "../../../src/components/reaktion/ShowWorkflow";
 
 import Image from "@theme/IdealImage";
 import thumbnail from "./mikroj.png";
+import omero_explore_before from "./omero_explore_before.webm";
+import omero_explore_after from "./omero_explore_after.webm";
+import omero_run_workflow from "./omero_run_workflow.webm";
 
 ## Omero Integration
 
@@ -63,7 +66,62 @@ your Arkitekt instance, please let us know.
 
 :::
 
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={omero_explore_before} />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Uploading an converting the data</small>
+</div>
+
 ## Uploading data to Omero
 
 OMEROs integration of new image datasets is based on the concept of `projects`. Projects are collections of datasets, that
 can be shared with other users.
+
+
+
+## Runing a workflow with Omero data
+
+You can use Omero data as input for your workflows. You can use the `Omero` input type in your workflow definition to
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={omero_run_workflow} />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Uploading an converting the data</small>
+</div>
+
+
+# Exploring Data after
+
+Of course as soon as the data is uploaded, you can explore it in the Omero web interface and in
+the Arkitekt isntance. We use the underlying infrastructure of Omero so everything is always
+in sync.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={omero_explore_after} />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Uploading an converting the data</small>
+</div>
