@@ -28,43 +28,46 @@ integration to cover more of the Omero API. If you have any feedback or requests
 ## Setting up the Omero integration
 
 To use the Omero integration, you need to use a Arkitekt instance that has the Omero integration enabled. Arkitekt
-deployments, that use Konstruktor can enable the Omero integration by choosing an "beta" channel and enabling Omero
-in the setup process. You will be also asked if you want to _include_ a dedicated Omero setup in your deployment, or
-if you want to _connect_ to an existing Omero instance. When enabling the OMERO integration, your Arkitekt deployment
-will include an additional (micro-) service: Omero-Ark, which will act as a proxy between your Arkitekt apps and Omero.
+deployments, that use Konstruktor can enable the Omero integration by choosing the `full` channel which includes the
+Omero integration. 
 
 :::warning
 
-In this beta, we _highly_ recommend to use the dedicated Omero setup. The Omero integration is still in beta and
+In this beta, we _highly_ recommend to use the dedicated Omero setup, and the `full` deployment, also includes an OMERO
+instance. This is the easiest way to get started with the Omero integration and as Omero integration is still in beta and
 might not work with all Omero instances. If you want to connect to an existing Omero instance, please make sure that
 you are using a recent version of Omero (>= 5.6.0) and that your Omero instance is accessible from the Arkitekt
 deployment.
 
 :::
 
-## Connecting to an existing Omero instance
+To understand more about the design of our OMERO integration visit our [design documentation](/docs/design/services/next/omeroark)
 
-If your deployment supports OMERO Orkestrator will automatically create a new pane
-in the sidebar, that allows you to connect to an existing Omero instance.
+## Connecting to Omero
 
-On first setup, you will need to provide the URL of your Omero instance and your credentials, for your Omero account.
-You can also provide a name for the connection, that will be used to identify the connection in the sidebar. Without
-a name, the connection will be identified by the URL of the Omero instance.
+Utilizing the OMERO integration is straightforward: you can still use the full featureset of your OMERO deployment
+(like the OMERO.web interface) but also use the Arkitekt platform to interact with your OMERO data.
 
-## Using the Omero integration
+One such integration is included in Orkestrator, which , If your deployment supports OMERO, will automatically create a new pane
+in the sidebar, that allows you to connect to an existing OMERO instance.
+
+On first setup, you will need to provide your  username and password, to connect to your OMERO instance. By default
+username `root` and password `omero` are already setup, but of course you can and should use your user credentials.
+Afterwards your Arkitekt account is associated with your OMERO account and all your data is accessible from Arkitekt.
+
+:::info On Integrating a Remote Server
+
+If you are seeking to use a remote OMERO instance, you can change the OMERO server when you are setting up the connection
+in the `Advanced` tab. Please be aware that the port and host need to be accessible from the Arkitekt deployment, not from
+your local machine.
+
+:::
 
 Once you have connected to an Omero instance, you can use the full featureset of the Arkitekt platfrom with your Omero
 data. You can explore your data, create workflows that interact with your data and interconvert your data between mikro
 and Omero.
 
-:::note
 
-In this current beta, we focused on integrating OMERO as a data source and target for workflows. While we are working on
-integrating more of the OMERO ecoyste, we currently do not plan to establish OMERO as a data `backbone` for Arkitekt, as it is
-not really optimized for high throughput data processing and streaming data. If you are interested in using OMERO as a data backbone for
-your Arkitekt instance, please let us know.
-
-:::
 
 <video
   autoPlay
@@ -77,19 +80,22 @@ your Arkitekt instance, please let us know.
   <source src={omero_explore_before} />
 </video>
 <div className="text-gray-400 mb-2">
-  <small> Uploading an converting the data</small>
+  <small> Interfacing with OMERO Server through the Orkestrator Webinterface. Data is linked between the two services. </small>
 </div>
 
-## Uploading data to Omero
+:::info On Uploading data to Omero
 
-OMEROs integration of new image datasets is based on the concept of `projects`. Projects are collections of datasets, that
-can be shared with other users.
+While we are working on supporting direct uploads to the OMERO instance through orkestrator, the underlying API of OMERO is hard
+to wrap reliably, so we are currently working on a workaround to upload data to OMERO. Just like OMERO.web, you have to use OMERO importer to
+upload data to OMERO and then you can use Arkitekt to interact with the data
 
-
+:::
 
 ## Runing a workflow with Omero data
 
-You can use Omero data as input for your workflows. You can use the `Omero` input type in your workflow definition to
+Fully integrated within the Arkitekt Platform, you can now run workflows that interact with your Omero data. This
+includes workflows that download data from Omero, process it and upload it back to Omero. Creating workflows
+that interact with Omero is as easy as creating workflows that interact with any other data source. 
 
 <video
   autoPlay
@@ -102,8 +108,19 @@ You can use Omero data as input for your workflows. You can use the `Omero` inpu
   <source src={omero_run_workflow} />
 </video>
 <div className="text-gray-400 mb-2">
-  <small> Uploading an converting the data</small>
+  <small> An example batch workflow run through Orkestrator with direct display of OMERO data in the Run View</small>
 </div>
+
+
+:::info
+
+In this current beta, we focused on integrating OMERO as a data source and target for workflows. While we are working on
+integrating more of the OMERO ecoyste, we currently do not plan to establish OMERO as a data `backbone` for Arkitekt, as it is
+not really optimized for high throughput data processing and streaming data. If you are interested in using OMERO as a data backbone for
+your Arkitekt instance, please let us know.
+
+:::
+
 
 
 # Exploring Data after
@@ -123,5 +140,5 @@ in sync.
   <source src={omero_explore_after} />
 </video>
 <div className="text-gray-400 mb-2">
-  <small> Uploading an converting the data</small>
+  <small> Exploring the generated Data just like Before</small>
 </div>
