@@ -61,7 +61,7 @@ export const OrkestratorGrid = ({ children }) => {
     <div className="grid grid-cols-3 md:grid-cols-3 gap-4 mb-3 ">
       <a
         href={
-          "https://github.com/jhnnsrs/orkestrator/releases/download/orkestrator-v0.0.6/orkestrator_0.0.6_amd64.deb"
+          "https://github.com/arkitektio/orkestrator/releases/download/v0.0.7/orkestrator_0.0.7_amd64.deb"
         }
         target="_blank"
         className="p-2 bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto "
@@ -73,7 +73,7 @@ export const OrkestratorGrid = ({ children }) => {
       </a>
       <a
         href={
-          "https://github.com/jhnnsrs/orkestrator/releases/download/orkestrator-v0.0.6/orkestrator_0.0.6_x64_en-US.msi"
+          "https://github.com/arkitektio/orkestrator/releases/download/v0.0.7/orkestrator_0.0.7_x64-setup.exe"
         }
         target="_blank"
         className="bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto"
@@ -85,7 +85,7 @@ export const OrkestratorGrid = ({ children }) => {
       </a>
       <a
         href={
-          "https://github.com/jhnnsrs/orkestrator/releases/download/orkestrator-v0.0.6/orkestrator_0.0.6_x64.dmg"
+          "https://github.com/arkitektio/orkestrator/releases/download/v0.0.7/orkestrator_0.0.7_x64.dmg"
         }
         target="_blank"
         className="bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto"
