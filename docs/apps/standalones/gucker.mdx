@@ -5,6 +5,10 @@ sidebar_label: Gucker
 sidebar_position: 5
 ---
 
+import streamFiles from './stream_files.webm';
+import connectGucker from './connect_gucker.webm';
+import { GuckerGrid } from "/src/components/layout/GuckerGrid";
+
 # Gucker
 
 Gucker (from German: "gucken" / to watch) is a file watcher that can be used to watch files and directories for changes and can stream the new files to the
@@ -18,11 +22,18 @@ of the files in a workflow.
 ## Installation
 
 Gucker comes as a bundled application installable from its Github Releases [page](https://github.com/arkitektio-apps/gucker/releases/latest).
+
+<GuckerGrid/>
 Additionally you can install it via `pip`:
 
 ```bash
 pip install gucker
 ```
+
+:::info On Mac support
+
+Currently we provide no build for the Mac platform, but you can install it via pip on your Mac. We will add a Mac build in the future.
+:::
 
 ## Usage
 
@@ -33,6 +44,18 @@ if you installed it via pip:
 ```bash
 gucker
 ```
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={connectGucker} />
+</video>
+
 
 
 ## Configuration
@@ -56,6 +79,18 @@ in regexp. Here are some common patterns:
 - `.*.czi` - matches all czi files
 - `.*.nd2` - matches all nd2 files
 - `.*[.tif|.tiff]` - matches all jpg and png files
+
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={streamFiles} />
+</video>
 
 
 :::note
