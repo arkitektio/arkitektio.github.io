@@ -1,0 +1,160 @@
+---
+id: build
+title: Building your Plugin
+sidebar_label: On Building your Plugin
+---
+
+
+# Building your Plugin
+
+## Introduction
+
+In this section, we will learn how to build an Arkitekt plugin from your python code. 
+We will also learn how to package and distribute your plugin so that it can be discovered and
+user by others.
+
+## Prerequisites
+
+Before we start, make sure you have created your plugin and have it working in your local environment.
+Also check if that plugin is working with your local Arkitekt instance.
+
+## Packaging your Plugin
+
+To package your plugin, you will need to create a software container around your python app, that will include
+all the dependencies and the code. In a default configuration, Arkitekt uses Docker to build and run plugins.
+
+### Start Building
+
+To start building your plugin, you will have to initialize a `Builder` for your project. You can do this by running the following command:
+
+```bash
+arkitekt port init
+```
+
+This will ask you a few questions about your project and will create a new builder in your project ".arkitekt" directory. The content of
+this directory will look something like this:
+
+```bash
+.arkitekt
+├── builders
+│   ├── default
+│   │   ├── Dockerfile
+│   │   ├── config.yaml
+```
+
+This is your first builder. A builder is a way of bundling your code and dependencies into a container. The `Dockerfile` is the file that
+will be used to build the container. The `config.yaml` file is the configuration file for the builder, and help the Arkitekt Server and
+connected tools to understand if the build container fits the underlying hardware of the server.
+
+:::note On builders
+
+You can have multiple builders in your project. Each builder can be used to build a different version of your plugin.
+For example, you can have a builder that allows you to bundle your dockercontainer to support CUDA and another one that
+supports only CPU. By specifiying the right `selectors` in your `config.yaml` file, you can make sure that the right builder
+is used for the right hardware of the server that is running your plugin.
+:::
+
+### The Dockerfile
+
+The `Dockerfile` is the file that will be used to build the container. It is a simple text file that contains a list of commands that
+the Docker daemon will execute to build the container. Arkitekt has no specific requirements for the `Dockerfile`, besides that you need
+to include the app.py and the .arkitekt folder in the container and that on execution it should be in the current working directory.
+
+A simple `Dockerfile` for a python plugin could look like this:
+
+```Dockerfile
+FROM python:3.8-slim
+
+RUN mkdir /app
+WORKDIR /app
+COPY . /app
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+````
+
+This `Dockerfile` will create a container based on the `python:3.8-slim` image, and will install the requirements from the `requirements.txt` file
+that is in the root of your project. It will also copy the rest of the files in the root of your project to the `/app` directory in the container.
+
+:::note On Paths
+
+The paths in the `Dockerfile` are relative to the root of your project. This means that you need to have a `requirements.txt` file in the root of your project,
+not in the `.arkitekt` directory.
+
+:::
+
+### The config.yaml
+
+The `config.yaml` file is the configuration file for the builder. It contains a list of selectors that will be used to determine if the builder
+is compatible with the server that is running the plugin. The `config.yaml` file will look something like this:
+
+```yaml
+selectors:
+```
+
+This file is empty by default. You can add selectors to the file to make sure that the builder is only used on servers that have the right hardware
+to run the container. For example, if you have a builder that supports CUDA, you can add a selector that checks if the server has a GPU:
+
+```yaml
+selectors:
+  - type: cuda 
+    minimun_compute_capability: 3.5
+```
+
+This will make sure that the builder is only used on servers that have a GPU with a compute capability of 3.5 or higher.
+We are still working on the documentation for the selectors, so for now, you can check the source code of the Arkitekt Server to see what selectors are available.
+
+### Building the container
+
+To build the container and your plugins, you can run the following command:
+
+```bash
+arkitekt port build
+```
+
+This will build the container with your local docker daemon and add a new build in your local directory.
+Importantly this build is not yet published and uploaded and can only be used on your local machine.
+
+### Staging a build
+
+Staging a Build allows you to test out your just build plugin against your local Arkitekt instance. To stage a build, you can run the following command:
+
+```bash
+arkitekt port stage
+```
+
+This will run the container locally and will instruct it to connect to your local Arkitekt instance. 
+This will allow you to test your plugin in a real environment, as it would happen when you would publish your plugin.
+This is a great way to test your plugin before you publish it.
+
+### Publishing a build
+
+To publish a build, you can run the following command:
+
+```bash
+arkitekt port publish
+```
+
+This is the final step in the process of building your plugin. This will upload your container to a registry, and will create
+a new "deployment" of your plugin in the local directory. If you push your directory to a git repository, you can now point any
+Arkitekt instance to this repository and it will be able to discover and use your plugin.
+
+:::warning On Versioning
+
+While you can have multiple builds for the same version of your plugin, you can only have one deployment for a version of your plugin.
+So if you want to publish a new version of your plugin, you will have to change the version in your `manifest` by runnning
+`arkitekt manifest version patch` or `arkitekt manifest version minor` or `arkitekt manifest version major` and then build and publish your plugin again.
+:::
+
+:::note On Registries
+
+The current publishing process only supports the Docker Hub as a registry and as we do not have a central repository for plugins yet, relies on
+github to host the metadata of the plugin. You can host this anywhere you want, as long as it is accessible by the Arkitekt Server, but hopefully
+we will have a central repository for plugins in the future.
+
+:::
+
+### Conclusion
+
+And thats it for building your plugin. Of course, this is a very basic example, and there are many more things you can do with the builder, but this should
+get you started. If you have any questions, feel free to ask in the community forums.
