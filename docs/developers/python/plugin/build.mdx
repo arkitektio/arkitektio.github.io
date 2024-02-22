@@ -25,32 +25,32 @@ all the dependencies and the code. In a default configuration, Arkitekt uses Doc
 
 ### Start Building
 
-To start building your plugin, you will have to initialize a `Builder` for your project. You can do this by running the following command:
+To start building your plugin, you will have to initialize a `Flavour` for your project. You can do this by running the following command:
 
 ```bash
 arkitekt port init
 ```
 
-This will ask you a few questions about your project and will create a new builder in your project ".arkitekt" directory. The content of
+This will ask you a few questions about your project and will create a new flavour in your project ".arkitekt" directory. The content of
 this directory will look something like this:
 
 ```bash
 .arkitekt
-├── builders
+├── flavours
 │   ├── default
 │   │   ├── Dockerfile
 │   │   ├── config.yaml
 ```
 
-This is your first builder. A builder is a way of bundling your code and dependencies into a container. The `Dockerfile` is the file that
-will be used to build the container. The `config.yaml` file is the configuration file for the builder, and help the Arkitekt Server and
-connected tools to understand if the build container fits the underlying hardware of the server.
+This is your first flavour. A flavour is a way of bundling your code and dependencies into a container. The `Dockerfile` is the file that
+will be used to build the container. The `config.yaml` file is the configuration file for the flavour, and help the Arkitekt Server and
+connected tools to understand if the build flavour fits the underlying hardware of the server.
 
-:::note On builders
+:::note On Flavours
 
-You can have multiple builders in your project. Each builder can be used to build a different version of your plugin.
-For example, you can have a builder that allows you to bundle your dockercontainer to support CUDA and another one that
-supports only CPU. By specifiying the right `selectors` in your `config.yaml` file, you can make sure that the right builder
+You can have multiple flavours in your project. Each flavour can be used to build a different version of your plugin.
+For example, you can have a flavour that allows you to bundle your dockercontainer to support CUDA and another one that
+supports only CPU. By specifiying the right `selectors` in your `config.yaml` file, you can make sure that the right Flavours
 is used for the right hardware of the server that is running your plugin.
 :::
 
@@ -85,23 +85,27 @@ not in the `.arkitekt` directory.
 
 ### The config.yaml
 
-The `config.yaml` file is the configuration file for the builder. It contains a list of selectors that will be used to determine if the builder
+The `config.yaml` file is the configuration file for the flavour. It contains a list of selectors that will be used to determine if the flavour
 is compatible with the server that is running the plugin. The `config.yaml` file will look something like this:
 
 ```yaml
-selectors:
+description: This is a vanilla flavour
+dockerfile: Dockerfile
+selectors: []
 ```
 
-This file is empty by default. You can add selectors to the file to make sure that the builder is only used on servers that have the right hardware
-to run the container. For example, if you have a builder that supports CUDA, you can add a selector that checks if the server has a GPU:
+This file is empty by default. You can add selectors to the file to make sure that the flavour is only used on servers that have the right hardware
+to run the container. For example, if you have a flavour that supports CUDA, you can add a selector that checks if the server has a GPU:
 
 ```yaml
+description: This is a cuda flavour
+dockerfile: Dockerfile
 selectors:
-  - type: cuda 
-    minimun_compute_capability: 3.5
+  - type: cuda
+    min_compute_capability: 3.5
 ```
 
-This will make sure that the builder is only used on servers that have a GPU with a compute capability of 3.5 or higher.
+This will make sure that the flavour is only used on servers that have a GPU with a compute capability of 3.5 or higher.
 We are still working on the documentation for the selectors, so for now, you can check the source code of the Arkitekt Server to see what selectors are available.
 
 ### Building the container
@@ -156,5 +160,5 @@ we will have a central repository for plugins in the future.
 
 ### Conclusion
 
-And thats it for building your plugin. Of course, this is a very basic example, and there are many more things you can do with the builder, but this should
+And thats it for building your plugin. Of course, this is a very basic example, and there are many more things you can do with the flavour, but this should
 get you started. If you have any questions, feel free to ask in the community forums.
