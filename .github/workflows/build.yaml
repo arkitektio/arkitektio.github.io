@@ -6,7 +6,7 @@ permissions:
   contents: write
 
 jobs:
-  deploy:
+  build:
     name: Build for GitHub Pages
     runs-on: ubuntu-latest
     steps:
