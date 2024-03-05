@@ -37,8 +37,8 @@ const config = {
   baseUrl: "/", 
 
   trailingSlash: false,
-  onBrokenLinks: "warn",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "throw",
   favicon: "img/favicon.svg",
   markdown: {
     mermaid: true,
