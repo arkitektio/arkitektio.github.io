@@ -1,52 +1,60 @@
 ---
 id: index
-title: Roadmap
-sidebar_label: Roadmap
+title: Next
+sidebar_label: Next
 sidebar_position: 9
 ---
 
 import workflow from "./workflow.mp4";
 
-# Arkitekt Next
 
-Developing the Arkitekt Platform is an ongoing process. We are constantly working on improving the platform and adding new features.
-Based on our versioning [Schema](/docs/design/version), most of our new features and improvements are currently part of `Arkitekt Next`.
+Developing the Arkitekt Platform is an ongoing process. While we are happy with the current version of Arkitekt, we are always looking for ways to
+improve the platform and make it more user-friendly, stable, and reliable. After having adapted the platform to a set of applications, we have now 
+learned a lot more about the needs of our users and are working on a new version of Arkitekt that will address the most dire pitfalls of the current version.
+of Arkitekt.
 
 :::note Important Note
 
-We are working tirelessly to bring the next version of Arkitekt to you. Rest assured, we are also maintaining the current version of Arkitekt
-and will continue to provide support and updates for it until we are ready to release the next version.
-All changes and improvements are being made in a way that SHOULD be backward compatible with the current version of Arkitekt.
+We are working tirelessly to bring the next version of Arkitekt to you. Currently we are stepping into a pre-alpha phase and are looking for early adopters
+that want to help us test the new version of Arkitekt. If you are interested in testing the new version of Arkitekt, please go ahead and check out
+the installation instructions for the `next` version of Arkitekt. Rest assured that the "paper version", will remain available and rest frozen in time
+to ensure reproducability of the paper.
 
 :::
 
-#### What is coming next?
+# The shape of things to come
 
 Arkitekt Next is our way of addressing the **lessons we have learned** from the current version of Arkitekt and **feedback from our users**.
 The Paper version of Arkitekt will remain available and rest frozen in time (to ensure reproducability of the paper), 
 while we continue to develop the Next version.
 
-#### Main New Features and Improvements
+# Main New Features and Improvements
 
-Arkitekt Next focusses primarily on stability and usability improvements. It does not aim to bring a whole new battery of
-features but rather should be seen as **refinement** of the existing platform, and its underlying technologies. 
-
-# Improved User Experience
+## Improved User Experience
 
 We are working on improving the user experience of Arkitekt. While Orkestrator is a powerful tool, we are realizing that it can be overwhelming for new users. 
 Our next version will have a more intuitive and user-friendly interface. Here we are focusing on the following areas:
 
 ### Improved Design and Layout
 
-We are working on a new design and layout for "Orkestrator" and are streamlining
-the process of "reserving" Nodes and "deploying" applications. The new design will be more intuitive and user-friendly.
-Our goal is to not only make the platform more user-friendly but also to make it more visually appealing.
-For this we have adopted a new design language that is more modern and visually appealing based on shadcn-ui.
+The design and layout of "Orkestrator" boasts a lot of features and functionality, but it is not very user-friendly.
+With the new interface we are working on, we are aiming to make the platform more user-friendly and intuitive, streamlining
+the UI and UX.
 
+
+### No more Reservations
+
+While Johannes was desperately trying to make reservations work, we realized that the concept of "reserving" a node was not very
+intuitive and was causing a lot of confusion (additionally it was a source of many bugs). So we got rid of it ! The new version of Arkitekt
+will allow you to assign tasks to nodes directly without having to reserve them first. But hey don't worry they are not gone entirely
+and reservations will still be used to predefine the parameters for batch-tasks to make them both more easy to start and more efficient.
+You just don't have to think about them to much:
+
+Look how easy it is to start a task:
 
 ### Improved Workflow Design  
 
-Visual Workflow Design in Orkestrator is currently a bit complex and not very intuitive. We are working on improving the workflow design and making it more intuitive.
+Visual Workflow Design in Orkestrator is currently a bit complex and not very intuitive. We have reworked and are continuing to iterate on the workflow design and making it more intuitive.
 The new prototype alreadly includes features such as auto node suggestion, auto-repair of broken workflows, and more and uses design patterns
 that users are already familiar with from other workflow design tools like Blender or Unreal Engine. Here is a sneak peak of the new design:
 
@@ -61,10 +69,33 @@ that users are already familiar with from other workflow design tools like Blend
   <source src={workflow} />
 </video>
 
+## Improved Data management
+
+### Introducing the Knowledge Graph
+
+A vision of Arkitekt was to capture the reality of biological systems in a database that allows users to create arbitraty measurements
+and interactively link them to each other. But the current version of Arkitekt does not fully allow to capture the intricacies of biological
+interactions intuitevely. The next version of Arkitekt will introduce the "Knowledge Graph" a new feature that will allow users to assign 
+meaning to their analyzed data (e.g. this ROI delineates an Axon) and link them to other data (e.g. this Axon is connected to this Dendrite).
+For this Arkitekt will now feature a Graph Database (based on the amazing Apache AGE project) that will allow users to interactively create
+and explore the relationships between their data using their own vocabulary.
 
 
+##### Insert video of the Knowledge Graph here
 
+### Introducing Views
+Metadata management is a major pain point in the bioimage community. To often does the metadata get lost or is not properly documented, and
+often because the metadata system is to rigid to accomodate the needs of the users. The next version of Arkitekt will introduce the concept of
+"Views". Views are ways to describe the metadata of your data in a flexible way. Your first channel of the image is supposed to be displayed
+in a certain color? Just add a RGBView to that channel. You want to describe the acquisition parameters of your image? Just add a AcquisitionView
+to the image. You want to indicate that this images pixel values represent labels (in a segmentation Map), just add a PixelView to the image, and
+map the labels to your Knowledge Entities. While your image-data might never change, the way you describe it can be as flexible as you need it to be.
 
+### Introduction of Protocols
+
+Protocols are a way to describe the steps of sample preparation, image acquisition, and image analysis in a structured way, and to link specific protocol-steps
+to your image data. Imaging you want to filter  all your images based on which  a specific antibody was used in the primary staining? If you added the antibody to the
+protocol, you can now filter your images (attached via ProtocolViews) based on that information. 
 
 # Stability
 

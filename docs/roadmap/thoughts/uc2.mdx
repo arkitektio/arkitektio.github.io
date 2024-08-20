@@ -1,0 +1,43 @@
+---
+id: uc2
+title: UC2
+sidebar_label: UC2
+sidebar_position: 1
+---
+
+# UC2
+
+UC2 is amazing ❤️. Open-source hardware along side open-source software, count us in. Here are a few thoughths on projects 
+that will be using UC2 hardware and integration strategies with the Arkitekt platform.
+
+## What is UC2?
+
+Because a video is worth a thousand words, here is a video that explains what UC2 is:
+
+https://www.youtube.com/watch?v=Jp5TOqvf7Nc
+
+
+## How can we integrate UC2 with Arkitekt?
+
+Integrating embedded devices like microscopes but also robotic devices into bioimage workflows is one of the primary use cases 
+for a distributed platform like Arkitekt. So how can we integrate UC2 with Arkitekt? Here are a few ideas:
+
+### Using UC2 just as a device controlled by an Microscope App
+
+This is the simplest way of integrating UC2 with Arkitekt. We would just create an Arkitekt App that would control the Imswitch
+instance that in turn controls the UC2 device. This would allow us to control the device from the Arkitekt platform, but currently we would not be able
+to stream live data from the device to the Arkitekt platform. This would be a good first step to get the device integrated with Arkitekt.
+
+### Streaming Live Data from UC2 to Arkitekt
+
+This would be the next step in integrating UC2 with Arkitekt. We would need to create a way to stream live data from the UC2 device to the Arkitekt platform.
+utilzing the new Livekit/WebRTC features of Arkitekt. This would allow us to stream live data from the device to the Arkitekt platform, and then display
+it alongside other data in the Arkitekt platform. This would be a great way to integrate UC2 with Arkitekt, while still using the Imswitch instance to control the device.
+the microscope.
+
+### Establish Arkitekt as the UC2 Control Center
+
+Another option is to establish Arkitekt as a full blown remote control center of the UC2 microscope without the need for a seperate GUI application like
+Imswitch (but building on top of its backend functionality) This would mean that the Arkitekt platform could be used as the complete GUI for microscopy contorl and remotley send requests to the (potentially completed
+in the microscopy enclosed) UC2 contorl device. While this would be a more complex integration, it would allow for a more seamless integration of UC2 with Arkitekt.
+, however it also could really consitute a mission creep for the Arkitekt platform.
