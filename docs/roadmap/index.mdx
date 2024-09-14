@@ -6,7 +6,12 @@ sidebar_position: 9
 ---
 
 import workflow from "./workflow.mp4";
+import ui from "./ui.mp4";
 import knowledge from "./knowledge.mp4";
+import assignment from "./assignment.mp4";
+import graph from "./graph.mp4";
+import graphd from "./graph_database.png";
+import Image from "@theme/IdealImage";
 
 # Arkitekt Next
 
@@ -40,6 +45,22 @@ The design and layout of "Orkestrator" boasts a lot of features and functionalit
 With the new interface we are working on, we are aiming to make the platform more user-friendly and intuitive, streamlining
 the UI and UX.
 
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={ui} />
+</video>
+
+:::note Note
+The new design of Orkestrator has still no feature parity with the old version. We are working on adding all the features of the old version
+to the new version, but we are also taking the opportunity to rework some of the features that are not as intuitive as we would like them to be.
+:::
+
 
 ### No more Reservations
 
@@ -50,6 +71,23 @@ and reservations will still be used to predefine the parameters for batch-tasks 
 You just don't have to think about them to much:
 
 Look how easy it is to start a task:
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={assignment} />
+</video>
+
+The menu you are seeing here is subject to change, but the general idea is that you can start a task with a single click. Additionally 
+take note of the new "Installable Actions" section. This is a new feature that will allow you to install actions that are not part of your
+instance but might be useful for your workflow. (i.e. you might want to install a "Segmentation" action that is not part of your instance yet)
+But thats (not so distant) "future music" and we are still working on the details of this feature.
+
 
 ### Improved Workflow Design  
 
@@ -68,6 +106,9 @@ that users are already familiar with from other workflow design tools like Blend
   <source src={workflow} />
 </video>
 
+We really hope that this new design will make it easier for users to create and manage their workflows in Orkestrator. However if you have any feedback
+on the new design, please feel free to reach out to us on [GitHub](https://github.com/arkitektio)
+
 ## Improved Data management
 
 ### Introducing the Knowledge Graph
@@ -78,7 +119,6 @@ interactions intuitevely. The next version of Arkitekt will introduce the "Knowl
 meaning to their analyzed data (e.g. this ROI delineates an Axon) and link them to other data (e.g. this Axon is connected to this Dendrite).
 For this Arkitekt will now feature a Graph Database (based on the amazing Apache AGE project) that will allow users to interactively create
 and explore the relationships between their data using their own vocabulary.
-
 
 <video
   autoPlay
@@ -96,22 +136,65 @@ This is a prelimnary version of the Knowledge Graph and we are working on improv
 We would like to tightly integrate the Knowledge Graph with the Views and Protocols features of the next version of Arkitekt.
 :::
 
+Of course this changes the way you interact with your data. Instead of just having a list of images, you now have a graph of knowledge entities
+that are linked to each other. This is a powerful feature that allows you to capture the intricacies of your data in a more intuitive way. You might
+have noticed in the previous video that ROIs can have these entities attached to them. Like this you can describe your data in a more flexible way
 
-##### Insert video of the Knowledge Graph here
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={graph} />
+</video>
+
+Of course you can also attach various metrics to your data. Want to attach a "length" metric to your AIS? Just create a new metric expression
+and attach it to your AIS through for example a ROI Length Measurement? (We will describe that better in the upcoming documentation)
+
+<div className="mt-2 p-6">
+<Image img={graphd} />
+
+<div className="text-gray-400 mb-2">
+<small>
+The new data and metadata model now includes the knowledge graph which brings features from graph-databases to the platform.
+Here you can see the new model applied to the old "paper" example of an interactive workflow. Once Arkitet Next is released we will
+reimaging this workllow in the new system.
+(Its still postgres under the hood)
+</small>
+</div>
+</div>
 
 ### Introducing Views
 Metadata management is a major pain point in the bioimage community. To often does the metadata get lost or is not properly documented, and
 often because the metadata system is to rigid to accomodate the needs of the users. The next version of Arkitekt will introduce the concept of
-"Views". Views are ways to describe the metadata of your data in a flexible way. Your first channel of the image is supposed to be displayed
-in a certain color? Just add a RGBView to that channel. You want to describe the acquisition parameters of your image? Just add a AcquisitionView
-to the image. You want to indicate that this images pixel values represent labels (in a segmentation Map), just add a PixelView to the image, and
+"Views". Views are ways to describe the metadata of your data in a flexible way emphasizing the multi-dimensionality of images.
+
+Your first channel of the image is supposed to be displayed in a certain color? Just add a `RGBView` to only that channel. 
+You want to describe the acquisition parameters of your entire image? Add a `AcquisitionView` to the whole image
+You want to indicate that this images pixel values represent labels (in a segmentation Map), just add a `PixelView` to the image, and
 map the labels to your Knowledge Entities. While your image-data might never change, the way you describe it can be as flexible as you need it to be.
+
+:::note Note
+
+A better of this feature is comming soon. We are working on improving the user experience and the features of the Views feature.
+
+:::
 
 ### Introduction of Protocols
 
 Protocols are a way to describe the steps of sample preparation, image acquisition, and image analysis in a structured way, and to link specific protocol-steps
 to your image data. Imaging you want to filter  all your images based on which  a specific antibody was used in the primary staining? If you added the antibody to the
-protocol, you can now filter your images (attached via ProtocolViews) based on that information. 
+protocol, and you can now filter your images (attached via ProtocolViews) based on that information. 
+
+:::note note
+
+The usability of this feature is still in development. We are working on improving the user experience and the features of the Protocols feature.
+As we don't want you to write a protocol for every image, we are working on optimizing the procedure to attach protocols to your data.
+
+:::
 
 # Stability
 
@@ -274,4 +357,13 @@ based on the `GraphQL` best practices.
 #### Improved Security
 
 We are working on improving the security of Arkitekt. While currently Arkitekt is `secure by design`, most security features are not `enforced`. 
-The next version of Arkitekt will have more security features that are `enforced` by default.
+The next version of Arkitekt will have more security features that are `enforced` by default.import knowledge from "./knowledge.mp4";
+
+import Image from "@theme/IdealImage";
+import assignment from "./assignment.mp4";
+import graph from "./graph.mp4";
+import graphd from "./graph_database.png";
+import knowledge from "./knowledge.mp4";
+import ui from "./ui.mp4";
+import workflow from "./workflow.mp4";
+
