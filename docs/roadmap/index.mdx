@@ -33,7 +33,7 @@ to ensure reproducability of the paper.
 :::
 
 
-# The shape of things to come
+## The shape of things to come
 
 While we could dicusss hours about the new features of the next version of Arkitekt, we have decided to focus on the most important ones here and give you
 already a sneak peak of what is to come, this is by no means a comprehensive list of all the features that we are working on, but it should give you a good
@@ -145,6 +145,22 @@ to install apps from your own repositories. Here is a sneak peak of the new App 
   <source src={appstore} />
 </video>
 
+:::info On Engines
+
+`Kabinet` the new App-Store backend service, follows are complety different design on deploying apps. While the old Plugin-System deployed containers directly
+on the server, the new App-Store provides the backbone for different "Engines" (again, just Arkitekt Apps), that can connect to the server and deploy apps
+on any infrastructure. Want to deploy apps on your own cluster? Just create an Engine App for that cluster, install it on the cluster and connect it to the Arkitekt
+Instance. 
+
+:::
+
+
+:::note For Developers
+
+With this approach, we can rely more heavily on the ingenuity of software packages like `Helm` and `Kubernetes` to deploy apps, and can focus on the
+development of the platform itself. If you want to see what happens an earily prototy is [here](https://github.com/jhnnsrs/deployer)
+
+:::
 
 
 
@@ -259,9 +275,9 @@ but to provide a way to interlink your analysis steps with your data and metadat
 :::
 
 
-## Improved Collaboration
+## Other stuff 
 
-
+While the above features are the most important ones that we have been working on, we are also working on other features that will improve the platform. 
 
 
 ### Introduction of Rooms
@@ -284,7 +300,7 @@ Here is a sneak peak of the new rooms feature
   <source src={rooms} />
 </video>
 
-:::note Note 
+:::info Agents are Apps 
 
 As Agents are just Arkitekt Apps, you can just download differently enabled apps from the app-store and can (potentially if you allow) have access to your whole
 arkitekt functionailty. This highly experimental agent here can browser all of your lab functionality and start analysis tasks (like the simulated acquistion task lasting 5 seconds) in your name.
@@ -300,13 +316,93 @@ While nobody stops you form creating an Arkitekt App that uses your OpenAI API k
 :::
 
 
-# Stability
+### Arkitekt For Real Time Streams
+
+When talking about Streams most people think about video streams, but in the context of Arkitekt as a streaming analysis platform, we talk about streaming
+analytical data. These to concepts ironically could not be more different, so much so that Arkitekt didn't even have support for streaming videos in the first place.
+Well that is about to change. The next version of Arkitekt will introduce the concept of "Streams" a way to have stream real-time (video) data to the platform and
+other connected apps.  Want to stream data from your microscope to your Orkestraor instance? 
+Well thats what we are working on. Here is a sneak peak of the new streaming feature
+
+
+VIDEO HERE
+
+:::info On Streams
+Streams are a highly experimental feature and are not yet fully implemented. We are working on integrating the Streams more tightly in a collaboration with OpenUC2,
+so stay tuned. 
+:::
+
+
+:::note Livekit 
+
+The new streaming feature is based on the amazing [Livekit](https://livekit.io/) project, that allows for real-time video streaming through WebRTC and will allow
+for a performant and reliable streaming experience utilizing **losless** compression. The setup is a bit more complex than the rest of the platform, but we are working
+on making it as easy as possible to set up.
+
+:::
+
+
+### Stateful Apps
+
+Your microscope has a phisical position of the stage that you want to display to the user before he moves it and break the objective? Not possible in the old version of Arkitekt.
+Going to be possible in the next version of Arkitekt. We are working on introducing the concept of "Stateful Apps" that can publish their state to arkitekt for users to remotely 
+inspect. This is a highly experimental feature and we are working on making it as easy as possible to implement. Heres a sneak peak of the new feature api 
+
+
+```python
+
+from arkitekt_next import register, state, background
+from my_custom_api import listen_to_stage_position, move_stage
+
+
+@state
+class MyState:
+    position_x: float = 0.0
+    active_objective: str = "40x"
+
+
+@register
+def change_x_position(state: MyState, x: int) -> int:
+    state.position_x = position_x
+    time.sleep(5) # Simulating move
+    return state.position_x
+
+
+
+@register
+def change_objective(state: MyState, objective: str) -> str:
+    state.active_objective = objective
+    time.sleep(5) # Simulating move
+    return state.active_objective
+
+
+@background
+def listen_to_stage_change(state: MyState):
+    # constantly runs in the background checks some external API for changes
+    # of course this could also be a callback
+    for state_change_event = listen_to_stage_position():
+        state.position_x = state_change_event.position_x
+
+```
+
+:::note On the Danger of State 
+
+Stateful Apps are a highly experimental feature and can lead to a lot of confusion and bugs, because state is just aweful.
+We are working on making the state management as easy as possible and clarifiyng the purpose of state: to provide ui feedback to the user, and not to store data.
+We will only release the state feature once we have established some programmatic guardrails to prevent misuse (e.g. if your app tries to update
+its state in the millisecond interval and crashes the server, we will have to intervene).
+
+:::
+
+
+
+## Stability Upgrades
 
 Stability is a major focus of the development on Arkitekt Next. As the platform grew organically out of our research needs,
 some parts of the platform are not as stable as we would like them to be. We are working on improving the stability of the platform
 and making sure that it is robust and reliable. Here we are focusing on the following areas:
 
-### Adressing Dependency Hell
+### Adressing Failure Hell
 
 One of the arguabily biggest features of the Arkitekt platform is its ability to have applications run code that depend on other
 applications. May it be that you schedule a workflow on one app, that calls a plugin on another app. Or when when you have written
@@ -315,68 +411,14 @@ a plugin that internally calls another plugin.
 This is a powerful feature, but our current implementation is not as stable as we would like it to be. Especially when apps fail, and
 we have to cascade the failure to other apps that depend on the failed app. Currently propagating this change to the next app needs is
 handled on the client side, and is therefore not as reliable as we would like it to be. The next version of Arkitekt will adress this
-feature and make sure that the platform is more robust by introducing the "Dependency Graph".
+feature and make sure that the platform is more robust by introducing an automatic way to handle the cascading failure of tasks on the server side.
 
-#### Dependency Graph
 
-The Dependency Graph is a new feature that represents a major overhaul of the rekuest service, and will require application developers
-to define the dependencies of their applications in a more explicit way. Through this the rekuest service will be able to construct a
-graph of dependencies between applications and will be able to handle cascading failures in a more reliable way.
-
-```python title="The old way"
-from arkitekt import register
-from arkitekt import find
-
-@register
-def my_function_that_needs_another_function():
-    # This is how you would call another function in the current version of Arkitekt
-    # This is not very reliable as the client has to handle the failure of the other function
-    # and propagate the failure to the next function
-    try:
-        dependend_function = find("other_function")
-    except:
-        raise Exception("The function is not registered with the platform. This error is annoying for users")
-    
-    dependend_function()
-
-```
-
-```python title="The new way"
-from arkitekt import register, declare
-
-dependend_function = declare("other_function")
-
-@register(dependencies=[dependend_function])
-def my_function_that_needs_another_function():
-    # This is how you would call another function in the next version of Arkitekt
-    # This is more reliabe as the rekuest service will not allow assignments to this
-    # function if the other function is not available
-    dependend_function()
-
-```
-
-:::note Note
-
-The `declare` function will always allow for users to declare dependencies on `Nodes` *not* on `Implementations`. You can
-however `narrow` the dependency to a specific implementation by providing additional parameters to the `declare` function.
-i.e `dependend_function = declare("other_function", strategy="TEST")` will return all currently available implementations of the
-Node `other_function` and make them available for testing.
-
-:::
-
-:::note `declare` vs `reserve`
-
-Declaration and reserving are tigthly linked concepts but are not the same. Declarions of dependencies are done on the `Implementation`
-level and will only result in the reservation of that specific node once this `Implementation` is provisioned. The narrowing parameter
-are therefore similar to the reserve patterns.
-
-:::
-
-### Adressing the fragility of Client-Server relationships
+### Adressing Apps without Servers 
 
 Arkitekt is buld around the concept of apps that want to connect to the platform. But this platform is
 by design modular as we wanted to make it easy for sys admins to only choose the modules they need. Do not
-care about `mikro`? Just don't install it. `Kluster` is exactly what you want because you have a cluster? Just
+care about `mikro`? Just don't install it. `Kluster` is exactly what you want because you have a  dask-cluster? Just
 add it in your `docker-compose` file.
 
 So how do we make sure that the apps can find services that they need to connect to? The Arkitekt answer to this 
@@ -384,24 +426,14 @@ is "Fakts", a small protocol that we developed for the service discovery inside 
 for its intended purpose. However while transitioning from the `Paper` version to the `Next` version we realized that
 apps do not really have a way of declaring specific version requirements and communicate them before they are 
 installed. This is a major issue as it can lead to the installation of apps that are not compatible with your
-underlying services.
-
-#### Extension to Fakts and Manifest
-
-The next version of Arkitekt will introduce elaborate on the concept of the `Manifest` and Fakts will more tigthly
-integrate and inspect the manifest of an app before it is installed. This will allow for the platform to make sure
-that the app is compatible with the services that are available on the platform.
-
-While before the manifest was a simple yaml file that was used to describe the app, the next version of Arkitekt will
-require the manifest to be more explicit about the dependencies of the app. This will allow the platform to make sure
-that the app is compatible with the services that are available on the platform.
-
+underlying services. Fakts next will adress this issue and make sure that the platform is more robust and reliable
+by introductin dependencies to the Fakts protocol, which are declared in the app manifest and can stop you 
+from installing an app that is not compatible with your services.
 
 ```yaml title="The old manifest"
 name: "My App"
 version: "1.0.0"
 ```
-
 
 ```yaml title="The new way"
 name: "My App"
@@ -412,53 +444,39 @@ dependencies:
     - rekuest: "live.arkitekt.rekuest@next"
 ```
 
-Here the app declares that it needs the `kluster` and `mikro` services in the `paper` version and the `rekuest` service in the `next` version.
-When the app is installed, the platform will check if the services are available and if they are compatible with the app. If not, the installation
-will fail preemptively.
+:::note Breaking changes 
 
-:::note Note
-
-The `dependencies` field in the manifest can be a list of services that the app needs to connect to. However it can also be used to get access to 
-specific configuration values that are configurable by the user. i.e 
-
-```yaml
-name: "My App"
-version: "1.0.0"
-dependencies:
-    - kluster: "live.arkitekt.kluster@paper"
-    - should_use_gpu: "config.gpu_enabled"
-
-```
-
-Would allow the app to get access to the `gpu_enabled` configuration value that can be set by an admin in the platform configuration, and
-tight to that specific app. This is a powerful feature that allows for a more fine grained control of the app configuration.
+This is probably the biggest breaking change in arkitekt and will hinder old apps from connecting to the platform. We will
+update the existing apps to the new manifest format, but you might have to update your apps to the new manifest format as wll.
 
 :::
 
-This is a powerful feature but also a source of many bugs. We are working on improving the way dependencies are handled
-
-#### Improved Documentation
+### Improved Documentation
 
 We are working on improving the documentation of Arkitekt. While the current documentation is comprehensive, it can be overwhelming for new users. 
-While we will keep the expert section we will also add a new section for beginners and intermediate users.
+While we will keep the expert section we will also add a new section for beginners and intermediate users, that will guide them through the platform
+step by step. We are also working on improving the search functionality of the documentation, so that users can easily find the information they are looking for.
+All of which has not yet happend.
 
-#### Improved Backend Stack 
+### Improved Backend Stack 
 
 We are working on improving the backend stack of Arkitekt. Currently Arkitekt is built on top of a stack of Graphene, Django, and Postgres. While We are happy with the two latter, `Graphene` has some limitations
-and we are going to replace `Strawberry` which is a new GraphQL library that provides a more type safe and intuitive API. This stack is already powering newer services such as `Kabinet` and `Mikro Next` 
-and we are happy with the results.
+and we are going to replace `Strawberry` which is a new GraphQL library that provides a more type safe and intuitive API. This stack is is already powering everything that you are seing here, and we are
+working on making it more stable and reliable.
 
-#### Performance Updates
+
+### Performance Updates
 
 A major focus of the development on Rekuest will be on improving the performance of the platform, when assigning tasks. While the current version of Arkitekt is not slow by any means, we are working
-of scqueezing out every bit of performance from the platform, when it comes to distributed task assignment.
+of scqueezing out every bit of performance from the platform, when it comes to distributed task assignment. One such tasks is going to be the introduction of "ephemeral" tasks that will not have
+to be stored in the database and can be assigned directly to the worker. This feature does not yet exist, but we are working on it.
 
-#### Improved API Design
+### Improved API Design
 
 We are working on improving the API design of Arkitekt. While the current API is powerful, it does not follow all the best practices. THe next version of Arkitekt will have a more consistent and intuitive API
 based on the `GraphQL` best practices.
 
-#### Improved Security
+### Improved Security
 
 We are working on improving the security of Arkitekt. While currently Arkitekt is `secure by design`, most security features are not `enforced`. 
-The next version of Arkitekt will have more security features that are `enforced` by default.
+The next version of Arkitekt will have more security features and we hope to  `enforce` them  by default.

@@ -28,9 +28,8 @@ The Arkitekt-Next project again depends on the same prerequisites as the Arkitek
 Arkitekt-Next comes with a new developmental project creator build around "blok". To install the Arkitket-Server you can therefore use the Arktiekt-Next CLI.
 
 ```bash
-pip install `arkitekt-next[blok,all]>=0.7.56`
+pip install `arkitekt-next[blok,all]>=$INSERT_LATEST_PYPI_VERSION`
 ``` 
-
 This will install the Arkitekt-Next CLI and all the necessary client dependencies, as well as `blok`, the build to.  To now create the
 server environemnt (a docker-compose project with multiple file mounts and configuration files) you can run the following command:
     
@@ -46,7 +45,7 @@ This will clone the git repository of each subproject and mount it into the dock
 blok build arkitekt $PATH_TO_PROJECT --fluss-dev=True --rekuest-dev=True --lok-dev=True --mikro-dev=True --orkestrator-dev=True --kabinet-dev=True --postgres-dev=True
 ````
 
-:::note Note
+:::info ARM64 Support
 Because of the way we build Apache AGE at the moment the ARM64 builds are not available. This means that the database service will have to run
 emulated on ARM64 systems. Performance is abyssmal but it works for testing purposes.
 :::
@@ -92,3 +91,10 @@ arkitekt-next run dev
 
 This will start the client and run the function on the server. You can now access the function on the 
 Orkestrator UI that should run within electron.
+
+## Next Steps
+
+Please join our Discord server to get help with the installation and to stay up to date with the latest developments.
+
+[Join the Discord](https://discord.gg/pT8kggfFBk)
+

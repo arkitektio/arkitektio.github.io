@@ -181,6 +181,10 @@ const config = {
                 label: "Image.sc",
                 href: "https://forum.image.sc/tag/arkitekt",
               },
+              {
+                label: "Discord",
+                href: "https://discord.gg/pT8kggfFBk",
+              },
             ],
           },
           {
