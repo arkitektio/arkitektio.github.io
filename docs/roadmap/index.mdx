@@ -5,17 +5,25 @@ sidebar_label: Next
 sidebar_position: 9
 ---
 
+import ui from "./ui.mp4";
+import assignment from "./assignment.mp4";
 import workflow from "./workflow.mp4";
+import graph from "./graph.mp4";
+import rooms from "./rooms.mp4";
 import knowledge from "./knowledge.mp4";
+import mikro_graph from "./mikro_graph.png";
+import protocols from "./protocols.mp4";
+import appstore from "./appstore.mp4";
+import Image from "@theme/IdealImage";
+
 
 # Arkitekt Next
 
-Developing the Arkitekt Platform is an ongoing process. While we are happy with the current version of Arkitekt, we are always looking for ways to
+Developing the Arkitekt Platform is an ongoing process. While we are *happy* with the released version of Arkitekt, we are always looking for ways to
 improve the platform and make it more user-friendly, stable, and reliable. After having adapted the platform to a set of applications, we have now 
 learned a lot more about the needs of users and are working on a lessons-learned-version of Arkitekt that will address the most dire pitfalls of the current version.
-of Arkitekt.
 
-:::note Important Note
+:::info From here be dragons
 
 We are working tirelessly to bring the next version of Arkitekt to you. Currently we are stepping into a pre-alpha phase and are looking for early adopters
 that want to help us test the new version of Arkitekt. If you are interested in testing the new version of Arkitekt, please go ahead and check out
@@ -25,35 +33,82 @@ to ensure reproducability of the paper.
 :::
 
 
-# Main New Features and Improvements
+# The shape of things to come
 
-Here are some of the main new features and improvements that we are working on for the next version of Arkitekt:
+While we could dicusss hours about the new features of the next version of Arkitekt, we have decided to focus on the most important ones here and give you
+already a sneak peak of what is to come, this is by no means a comprehensive list of all the features that we are working on, but it should give you a good
+idea of what to expect.
+
 
 ## Improved User Experience
 
-We are working on improving the user experience of Arkitekt. While Orkestrator is a powerful tool, we are realizing that it can be overwhelming for new users. 
-Our next version will have a more intuitive and user-friendly interface. Here we are focusing on the following areas:
+Users, Users, Users! While we want Arkitekt to be a powerful tool for bioimage analysis, we also want it to be easy to use. Let's face it, if you followed 
+the tutorial and got your first workflow running you saw all of the hurdles. This is why we are working hardcore on improving the user experience of Arkitekt.
+starting with `Orkestrator` our desktop control app. Here we are focusing on the following areas:
 
 ### Improved Design and Layout
 
 The design and layout of "Orkestrator" boasts a lot of features and functionality, but it is not very user-friendly.
 With the new interface we are working on, we are aiming to make the platform more user-friendly and intuitive, streamlining
-the UI and UX.
+the UI and UX. Here is a sneak peak of the new design:
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={ui} />
+</video>
+
+The new design will hopefuly feature a more intuitive layout, with a focus on the most important features of the platform. You'll be able to 
+easily navigate between different sections of the platform, and access the most important features with just a few clicks. Also interlinking
+between the different parts of the platform will be more intuitive and easier to understand. Images will become front-and-center in the new design
+and exploring ROIs and measurements should be more intuitive.
+
+:::note For Developers
+
+Orkestrators new design is based on the [`shadcn/ui`](https://ui.shadcn.com/framework) and follows a more stricter design system. For you as a developer this should also
+make it easier to create your own apps that follow the same design pattern.
+
+:::
 
 
 ### No more Reservations
 
 While Johannes was desperately trying to make reservations work, we realized that the concept of "reserving" a node was not very
 intuitive and was causing a lot of confusion (additionally it was a source of many bugs). So we got rid of it ! The new version of Arkitekt
-will allow you to assign tasks to nodes directly without having to reserve them first. But hey don't worry they are not gone entirely
-and reservations will still be used to predefine the parameters for batch-tasks to make them both more easy to start and more efficient.
-You just don't have to think about them to much:
+will allow you to assign tasks to nodes directly without having to reserve them first. B
 
 Look how easy it is to start a task:
 
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={assignment} />
+</video>
+
+
+Two clicks and you are done. No more reservations, no more waiting for the node to be available. Just start your task and let Arkitekt do the rest.
+The context menu is still a work in progress and we are working on improving the user experience of the context menu. You might have notced that
+"Available to install" section. This is a new feature that integrates closely with the new App Store that we are working on. More on that later.
+
+
+:::info Don't you worry 
+Reservations are not entirely gone, but their purpose has shifted: they can now be used to predefine the parameters for batch-tasks to make them both more easy to start and more efficient.
+You just don't have to think about them to much anymore 
+:::
+
 ### Improved Workflow Design  
 
-Visual Workflow Design in Orkestrator is currently a bit complex and not very intuitive. We have reworked and are continuing to iterate on the workflow design and making it more intuitive.
+Designin visual workflows should be a breeze and honestly in Orkestrator is currently a bit complex and not very intuitive. We have reworked and are continuing to iterate on the workflow design and making it more intuitive.
 The new prototype alreadly includes features such as auto node suggestion, auto-repair of broken workflows, and more and uses design patterns
 that users are already familiar with from other workflow design tools like Blender or Unreal Engine. Here is a sneak peak of the new design:
 
@@ -68,17 +123,46 @@ that users are already familiar with from other workflow design tools like Blend
   <source src={workflow} />
 </video>
 
+:::note Note
+It's still not perfect, so please please suggest improvements and let us know what you think.
+:::
+
+
+### The App Store
+
+Feel like installing a new app? In Arkitekt-Next this should be no problem. We are working on a new App Store that will allow you to easily install new apps
+and plugins to extend the functionality of the platform. We will have some commnuity repositories enabled by default, but you can still use the old mechanism
+to install apps from your own repositories. Here is a sneak peak of the new App Store:
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={appstore} />
+</video>
+
+
+
+
 ## Improved Data management
 
-### Introducing the Knowledge Graph
+Data management is a major pain point in the bioimage community and we are hoping to address some outstanding issues with next version of Arkitekt. 
+Here we are focusing on the following areas:
+
+
+
+### Introducing the Knowledge Graph and Ontologies
 
 A vision of Arkitekt was to capture the reality of biological systems in a database that allows users to create arbitraty measurements
 and interactively link them to each other. But the current version of Arkitekt does not fully allow to capture the intricacies of biological
-interactions intuitevely. The next version of Arkitekt will introduce the "Knowledge Graph" a new feature that will allow users to assign 
-meaning to their analyzed data (e.g. this ROI delineates an Axon) and link them to other data (e.g. this Axon is connected to this Dendrite).
+interactions intuitevely. The next version of Arkitekt will introduce the `Knowledge Graph` a new feature that will allow users to assign 
+meaning to their analyzed data following a more natural language based approach (e.g. this ROI delineates an Axon) and link them to other data (e.g. this Axon is connected to this Dendrite).
 For this Arkitekt will now feature a Graph Database (based on the amazing Apache AGE project) that will allow users to interactively create
 and explore the relationships between their data using their own vocabulary.
-
 
 <video
   autoPlay
@@ -91,27 +175,130 @@ and explore the relationships between their data using their own vocabulary.
   <source src={knowledge} />
 </video>
 
+This short video illustrates a very manual approach of labeling and assigning meaning to ROIS in an image. Of course the process shoud be
+ideally automated, but maybe it can give you an idea of what we are aiming for.
+
+:::info On Ontologies
+
+Ontologies and Knowledge Graphs are a *huge* topic and are sadly not coverable in this short introduction. We will of course provide more information
+on how to create and use ontologies in the next version of Arkitekt in the documentation, and explain you how they might just help to make your data
+and your knowledge more sharable.
+
+:::
+
+
+
+<Image img={mikro_graph} />
+
+What we are aiming for it to interlink your Knowledge Graph with your data and metadata, and to allow you to interactively explore the relationships between your data and metadata.
+We want Programmers and Database savy people to use standard graph query languages to interact with the Knowledge Graph,
+and non-programmers to use a more intuitive interface to explore the relationships between their data and metadata.
+
+
+
+
 :::note 
 This is a prelimnary version of the Knowledge Graph and we are working on improving the user experience and the features of the Knowledge Graph.
 We would like to tightly integrate the Knowledge Graph with the Views and Protocols features of the next version of Arkitekt.
 :::
 
 
-##### Insert video of the Knowledge Graph here
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={graph} />
+</video>
+
 
 ### Introducing Views
-Metadata management is a major pain point in the bioimage community. To often does the metadata get lost or is not properly documented, and
+
+
+Metadata management is hard. To often does the metadata get lost or is not properly documented, and
 often because the metadata system is to rigid to accomodate the needs of the users. The next version of Arkitekt will introduce the concept of
-"Views". Views are ways to describe the metadata of your data in a flexible way. Your first channel of the image is supposed to be displayed
-in a certain color? Just add a RGBView to that channel. You want to describe the acquisition parameters of your image? Just add a AcquisitionView
-to the image. You want to indicate that this images pixel values represent labels (in a segmentation Map), just add a PixelView to the image, and
-map the labels to your Knowledge Entities. While your image-data might never change, the way you describe it can be as flexible as you need it to be.
+"Views". Views are ways to describe the metadata of your data in a flexible way respecting the multi-dimensionality of your data.
+
+
+- Your first channel of the image is supposed to be displayed in a certain color? Just add a RGBView to that channel.
+- You want to describe the acquisition parameters of your image? Just add a AcquisitionView
+to the image. 
+- One of your Lab reagents was used to stain an image? StainViews to your rescue.
+- You want to indicate that this images pixel values represent labels (in a segmentation Map), just add a PixelView to the image, and
+map the labels to your Knowledge Entities. 
+
+While your image-data might never change, the way you describe it can be as flexible as you need it to be, and we hope it can
+evolve in the same way your data does.
 
 ### Introduction of Protocols
 
-Protocols are a way to describe the steps of sample preparation, image acquisition, and image analysis in a structured way, and to link specific protocol-steps
-to your image data. Imaging you want to filter  all your images based on which  a specific antibody was used in the primary staining? If you added the antibody to the
-protocol, you can now filter your images (attached via ProtocolViews) based on that information. 
+Where Metadata is a way to describe your imaging data, some metadata is more structured than others. For all the none structured information
+we have worked on "Protocols", that allow you to describe the steps of your image analysis using natural language and rich text editing. 
+They can still interlink data and metadata, but are more focused on the analysis steps that you have taken to arrive at your image.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={protocols} />
+</video>
+
+:::note On Protocols future 
+
+Protocols are one of these features that are highly experimental and might not make it into the final version of Arkitekt. They are currently to
+broad in scope and might just live in an outside software that can be integrated with Arkitekt. Our goal is not to reinvent word processing software
+but to provide a way to interlink your analysis steps with your data and metadata. So if you have suggestions ! Right away! 
+
+:::
+
+
+## Improved Collaboration
+
+
+
+
+### Introduction of Rooms
+
+LLMs are everywhere. While their ability to facilitate image analysis with scientific scrutiny is debatable, they are a great way to interact and discuss with your
+data. The next version of Arkitekt will introduce the concept of "Rooms". Rooms are a way to create a virtual space where you can interact with your data, and discuss
+with your colleagues but also with "AI Agents", that can help you with your analysis. In full Arkitekt style these agents are just pluggable apps that can be added to
+your room and can help you with your analysis.
+
+
+Here is a sneak peak of the new rooms feature
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded rounded-md"
+  width={"100%"}
+>
+  <source src={rooms} />
+</video>
+
+:::note Note 
+
+As Agents are just Arkitekt Apps, you can just download differently enabled apps from the app-store and can (potentially if you allow) have access to your whole
+arkitekt functionailty. This highly experimental agent here can browser all of your lab functionality and start analysis tasks (like the simulated acquistion task lasting 5 seconds) in your name.
+But you can imaging purely analytical agents that have access to your data and can help you with your analysis.
+
+:::
+
+:::note On Open-source LLMs
+
+While nobody stops you form creating an Arkitekt App that uses your OpenAI API key to interact with an LLM, in full Arkitekt Style you can bundle your arkitekt server with
+[Ollama](https://ollama.com/) a LLM backend that all agents can hook into and use, without sending data to the cloud.
+
+:::
+
 
 # Stability
 
