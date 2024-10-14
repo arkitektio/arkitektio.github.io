@@ -9,7 +9,7 @@ sidebar_position: 1
 
 While developing Arkitekt, we have found ourselves in the position of having to explain the same concepts over and over again. And while we are happy to do that, we also want to make sure that we are not wasting your time. So we decided to create a list of terms that we use in Arkitekt, and explain them in a way that we hope is easy to understand. If you are new to Arkitekt, we recommend that you take a look at this list before you start reading the rest of the documentation, as they will help you understand the rest of the documentation better, and guide you in the right direction.
 
-If you feel like we have missed something, or if you have a suggestion for a better explanation, please let us know by creating an issue on our [Github repository](https://github.com/arkitekt/arkitektio.github.io/doks) (or just edit the file and create a pull request).
+If you feel like we have missed something, or if you have a suggestion for a better explanation, please let us know by creating an issue on our [Github repository](https://github.com/arkitektio/arkitektio.github.io) (or just edit the file and create a pull request).
 
 ## Before we start
 
