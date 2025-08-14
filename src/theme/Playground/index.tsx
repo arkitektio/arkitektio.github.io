@@ -93,14 +93,7 @@ function ThemedLiveEditor() {
 function EditorWithHeader() {
   return (
     <>
-      <Header>
-        <Translate
-          id="theme.Playground.liveEditor"
-          description="The live editor label of the live codeblocks"
-        >
-          Live Editor
-        </Translate>
-      </Header>
+      <Header></Header>
       <ThemedLiveEditor />
     </>
   );
@@ -123,7 +116,6 @@ export default function Playground({
 
   return (
     <div className={styles.playgroundContainer}>
-      {/* @ts-expect-error: type incompatibility with refs */}
       <LiveProvider
         code={children.replace(/\n$/, "")}
         noInline={noInline}

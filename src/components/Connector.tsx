@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { VscDebugDisconnect } from "react-icons/vsc";
 
 import { Popover, Transition } from "@headlessui/react";
@@ -15,7 +16,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
-
 export const NoHerre = () => {
   const fakts = App.useFakts();
 

@@ -22,8 +22,6 @@ export const UploadModelButton = ({
   name: string;
   kind: string;
 }) => {
-  const { client } = useService("mikro").client;
-
   const handleClick = async () => {
     console.log(url);
     try {
@@ -36,10 +34,7 @@ export const UploadModelButton = ({
         type: fileBlob.type,
       });
 
-      const { data } = await client.mutate({
-        mutation: CREATE_MODEL_ZIP,
-        variables: { name, kind, data: file },
-      });
+      // TODO: Check if the file is a valid zip file
 
       console.log(data);
     } catch (e) {

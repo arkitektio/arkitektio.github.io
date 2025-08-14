@@ -221,13 +221,14 @@ export const createFallBackFetcher = (
 };
 
 export type AliveDocumentationProps = {
-  serviceKey: string;
+  serviceKey: "mikro" | "kabinet" | "lok";
   storageKey: string;
 };
 
 export const AliveDocumentation = (props: AliveDocumentationProps) => {
   const token = App.useToken();
-  const alias = App.useService(props.serviceKey).alias;
+  const service = App.useService(props.serviceKey);
+  const alias = service?.alias;
 
   if (!alias) {
     return <div className="flex flex-col h-full w-full">No service found</div>;
@@ -296,7 +297,7 @@ export const DynamicDocumentation = (props: DynamicDocumentationProps) => {
         <div className="flex-grow flex overflow-y-auto">
           <App.Guard notConnectedFallback={<> No Documentation</>}>
             <AliveDocumentation
-              serviceKey={props.service.key}
+              serviceKey={props.service.key as "mikro" | "kabinet" | "lok"}
               storageKey={props.service.key}
             />
           </App.Guard>

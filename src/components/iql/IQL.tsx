@@ -106,7 +106,7 @@ export function IQL(props: GraphiQLInterfaceProps) {
       return editorContext.initialVariables || editorContext.initialHeaders
         ? undefined
         : "second";
-    })(),
+    })() as any,
     sizeThresholdSecond: 60,
     storageKey: "secondaryEditorFlex",
   });

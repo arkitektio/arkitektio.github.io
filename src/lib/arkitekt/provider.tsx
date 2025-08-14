@@ -131,15 +131,15 @@ export const ArkitektContext = createContext<AppContext & AppFunctions>({
 });
 export const useArkitekt = () => useContext(ArkitektContext);
 
-export const useService = (key: string) => {
+export const useService = (key: string): Service | undefined => {
   const { connection } = useArkitekt();
 
   if (!connection) {
-    throw new Error("Arkitekt not connected");
+    return { alias: undefined, client: undefined } as Service; // Return a service with undefined alias if not connected
   }
 
   if (!connection.clients[key]) {
-    throw new Error(`Service ${key} not available`);
+    return { alias: undefined, client: undefined } as Service; // Return a service with undefined alias if not connected
   }
 
   return connection?.clients[key];

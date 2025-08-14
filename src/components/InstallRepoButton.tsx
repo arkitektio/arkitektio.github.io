@@ -36,22 +36,11 @@ export const InstallRepoButton = ({
   repo: string;
   user: string;
 }) => {
-  const { client } = useService("kabinet");
-  if (!client)
-    return (
-      <div
-        className={className + "bg-back-800 text-white bg-opacity-1 my-2"}
-        onDoubleClick={() =>
-          alert("You need to be logged in to install repos.")
-        }
-      >
-        {" "}
-        {user}/{repo}:{branch}
-      </div>
-    );
-  else {
-    return <InstallRepoButtonInneer branch={branch} repo={repo} user={user} />;
-  }
+  return (
+    <Guard.Kabinet fallback={<>This server does not support kabinet</>}>
+      <InstallRepoButtonInneer branch={branch} repo={repo} user={user} />
+    </Guard.Kabinet>
+  );
 };
 
 const InstallRepoButtonInneer = ({
