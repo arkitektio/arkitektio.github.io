@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[7472],{55513:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Arkitekt","permalink":"/blog/first-blog-post","unlisted":false,"date":"2022-10-11T00:00:00.000Z"}]}')}}]);

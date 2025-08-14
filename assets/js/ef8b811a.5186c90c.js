@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdoks=self.webpackChunkdoks||[]).push([[8947],{56600:s=>{s.exports=JSON.parse('{"authors":[{"name":"Johannes Roos","title":"PhD Student @ IINS Bordeaux","url":"https://github.com/jhnnsrs","imageURL":"https://github.com/jhnnsrs.png","key":"jhnnsrs","page":null,"count":1}]}')}}]);
