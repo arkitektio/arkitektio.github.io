@@ -1,0 +1,11 @@
+mutation RequestUpload($key: String!, $datalayer: String!) {
+  requestUpload(input: { key: $key, datalayer: $datalayer }) {
+    ...Credentials
+  }
+}
+
+mutation RequestAccess($store: ID!, $duration: Int) {
+  requestAccess(input: { store: $store, duration: $duration }) {
+    ...AccessCredentials
+  }
+}

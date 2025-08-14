@@ -1,0 +1,40 @@
+fragment Binds on Binds {
+  implementations
+}
+
+fragment PostmanReservation on Reservation {
+  title
+  id
+  reference
+  action {
+    ...Ports
+    name
+    description
+    hash
+  }
+  binds {
+    ...Binds
+  }
+  viable
+  happy
+}
+
+fragment ListReservation on Reservation {
+  id
+  title
+  reference
+  action {
+    name
+    description
+    hash
+  }
+}
+
+fragment DetailReservation on Reservation {
+  ...PostmanReservation
+  action {
+    name
+    description
+    ...Ports
+  }
+}

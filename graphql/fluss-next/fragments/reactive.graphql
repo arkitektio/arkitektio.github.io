@@ -1,0 +1,22 @@
+fragment ReactiveTemplate on ReactiveTemplate {
+  id
+  ins {
+    ...FlussPort
+  }
+  outs {
+    ...FlussPort
+  }
+  constants {
+    ...FlussPort
+  }
+  implementation
+  title
+  description
+}
+
+fragment ListReactiveTemplates on ReactiveTemplate {
+  id
+  title
+  description
+  implementation
+}

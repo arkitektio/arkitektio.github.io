@@ -54,9 +54,9 @@ You can just change the query to fetch any data you want.
 
 ```jsx live
 function Display(props) {
-  const { data } = useMikroQuery(gql`
+  const { data, error } = useMikroQuery(gql`
     query {
-      representations(limit: 3) {
+      images(pagination: {limit: 3}) {
         id
         name
       }
@@ -66,9 +66,11 @@ function Display(props) {
   return (
     <div className="flex flex-col gap-2">
       {data &&
-        data.representations.map((image) => (
+        data.images.map((image) => (
           <div className="bg-back-800 px-2">{image.name} </div>
         ))}
+
+      {error && <div className="text-red-500">Error: {error.message}</div>}
     </div>
   );
 }
@@ -78,17 +80,17 @@ By changing the query, you can fetch any data you want. For example, here we fet
 
 ```jsx live
 function Display(props) {
-  const { data } = useMikroQuery(gql`
+  const { data, error } = useMikroQuery(gql`
     query {
-      representations(limit: 3) {
+      images(pagination: {limit: 3}) {
         id
         name
         rois {
           id
-          label
         }
-        store
-        shape
+        store {
+          shape
+          }
       }
     }
   `);
@@ -96,23 +98,25 @@ function Display(props) {
   return (
     <div className="flex flex-col gap-2">
       {data &&
-        data.representations.map((image) => (
+        data.images.map((image) => (
           <>
             <div className="bg-back-800 px-2 rounded rounded-md">
               {image.name}{" "}
             </div>
             <div className="bg-green-200">
               {image.rois.map((roi) => (
-                <div className="bg-back-800 px-2">{roi.label} </div>
+                <div className="bg-back-800 px-2">{roi.id} </div>
               ))}
             </div>
             <div>
-              {image.shape.map((i) => (
+              {image.store?.shape.map((i) => (
                 <i>{i} </i>
               ))}
             </div>
           </>
         ))}
+
+      {error && <div className="text-red-500">Error: {error.message}</div>}
     </div>
   );
 }

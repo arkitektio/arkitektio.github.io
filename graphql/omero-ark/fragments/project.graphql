@@ -1,0 +1,15 @@
+fragment ListProject on Project {
+  id
+  name
+  description
+}
+
+fragment Project on Project {
+  id
+  name
+  description
+  datasets {
+    ...ListDataset
+  }
+  tags
+}

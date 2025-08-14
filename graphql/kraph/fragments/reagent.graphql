@@ -1,0 +1,32 @@
+fragment Reagent on Reagent {
+  id
+  label
+  category {
+    id
+    label
+  }
+  externalId
+  usableIn {
+    id
+    label
+  }
+  createableFrom {
+    id
+    label
+  }
+}
+
+fragment PathReagent on Reagent {
+  ...ListReagent
+  category {
+    label
+    store {
+      presignedUrl
+    }
+  }
+}
+
+fragment ListReagent on Reagent {
+  id
+  label
+}

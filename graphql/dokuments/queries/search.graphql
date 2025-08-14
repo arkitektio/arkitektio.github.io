@@ -1,0 +1,5 @@
+query GlobalSearch($search: String) {
+  pages: pages(filters: { search: $search }) {
+    ...ListPage
+  }
+}

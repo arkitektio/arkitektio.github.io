@@ -1,0 +1,5 @@
+mutation SendMessage($input: SendMessageInput!) {
+  send(input: $input) {
+    ...Message
+  }
+}

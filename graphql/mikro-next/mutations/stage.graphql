@@ -1,0 +1,12 @@
+mutation CreateStage($name: String!) {
+  createStage(input: { name: $name }) {
+    id
+    name
+  }
+}
+
+mutation PinStage($id: ID!, $pin: Boolean!) {
+  pinStage(input: { id: $id, pin: $pin }) {
+    ...Stage
+  }
+}

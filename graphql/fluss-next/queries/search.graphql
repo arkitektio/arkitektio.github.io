@@ -1,0 +1,8 @@
+query GlobalSearch($search: String, $pagination: OffsetPaginationInput) {
+  workspaces: workspaces(
+    filters: { search: $search }
+    pagination: $pagination
+  ) {
+    ...ListWorkspace
+  }
+}

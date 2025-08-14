@@ -5,23 +5,22 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from "react";
-import clsx from "clsx";
-import useIsBrowser from "@docusaurus/useIsBrowser";
-import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
+import BrowserOnly from "@docusaurus/BrowserOnly";
+import ErrorBoundary from "@docusaurus/ErrorBoundary";
+import { usePrismTheme } from "@docusaurus/theme-common";
 import Translate from "@docusaurus/Translate";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
-import BrowserOnly from "@docusaurus/BrowserOnly";
-import { usePrismTheme } from "@docusaurus/theme-common";
-import ErrorBoundary from "@docusaurus/ErrorBoundary";
+import useIsBrowser from "@docusaurus/useIsBrowser";
+import clsx from "clsx";
+import React from "react";
+import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live";
 
-import type { Props } from "@theme/Playground";
-import type { Props as ErrorProps } from "@theme/Error";
 import type { ThemeConfig } from "@docusaurus/theme-live-codeblock";
+import type { Props as ErrorProps } from "@theme/Error";
+import type { Props } from "@theme/Playground";
 
+import { App } from "@site/src/lib/app/App";
 import styles from "./styles.module.css";
-import { AllGuarded } from "@site/src/fallbacks/guarded";
-import { KraphQLPlayground } from "@site/src/components/iql/Playground";
 
 function Header({ children }: { children: React.ReactNode }) {
   return <div className={clsx(styles.playgroundHeader)}>{children}</div>;
@@ -71,9 +70,9 @@ function ResultWithHeader() {
       </Header>
       {/* https://github.com/facebook/docusaurus/issues/5747 */}
       <div className={styles.playgroundPreview}>
-        <AllGuarded>
+        <App.Guard>
           <Preview />
-        </AllGuarded>
+        </App.Guard>
       </div>
     </>
   );
@@ -119,20 +118,6 @@ export default function Playground({
     liveCodeBlock: { playgroundPosition },
   } = themeConfig as ThemeConfig;
   const prismTheme = usePrismTheme();
-
-  console.log(props);
-  if (props.className === "language-kraphql") {
-    return (
-      <BrowserOnly>
-        {() => (
-          <KraphQLPlayground
-            code={children}
-            playgroundPosition={playgroundPosition}
-          />
-        )}
-      </BrowserOnly>
-    );
-  }
 
   const noInline = props.metastring?.includes("noInline") ?? false;
 

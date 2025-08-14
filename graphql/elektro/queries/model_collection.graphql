@@ -1,0 +1,11 @@
+query DetailModelCollection($id: ID!) {
+  modelCollection(id: $id) {
+    ...ModelCollection
+  }
+}
+
+query ListModelCollections($pagination: OffsetPaginationInput, $filters: ModelCollectionFilter) {
+  modelCollections(pagination: $pagination, filters: $filters) {
+    ...ListModelCollection
+  }
+}

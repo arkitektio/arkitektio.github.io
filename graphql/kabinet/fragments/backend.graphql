@@ -1,0 +1,32 @@
+fragment ListBackend on Backend {
+  id
+  user {
+    sub
+  }
+  client {
+    clientId
+  }
+
+  name
+  kind
+}
+
+fragment Backend on Backend {
+  id
+  user {
+    sub
+  }
+  client {
+    clientId
+  }
+  clientId
+  instanceId
+  name
+  kind
+  pods {
+    ...ListPod
+  }
+  resources {
+    ...ListResource
+  }
+}

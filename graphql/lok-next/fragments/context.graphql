@@ -1,0 +1,13 @@
+fragment Context on Context {
+  organization {
+    id
+    name
+    slug
+  }
+  user {
+    id
+    username
+  }
+  roles
+  scope
+}

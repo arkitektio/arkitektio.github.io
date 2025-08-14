@@ -1,7 +1,12 @@
 import { useQuery } from "@apollo/client";
-import { usePort, PortGuard, portGuarded, usePortQuery } from "@jhnnsrs/port";
 import gql from "graphql-tag";
 import React from "react";
+import { useService } from "../lib/arkitekt/provider";
+import { App, Guard } from "../lib/app/App";
+import {
+  useCreateGithubRepoMutation,
+  useListGithubReposQuery,
+} from "../lib/kabinet/api/graphql";
 
 const CREATE_REPO_MUTATION = gql`
   mutation ($branch: String!, $repo: String!, $user: String!) {
@@ -31,7 +36,7 @@ export const InstallRepoButton = ({
   repo: string;
   user: string;
 }) => {
-  const { client } = usePort();
+  const { client } = useService("kabinet");
   if (!client)
     return (
       <div
@@ -58,24 +63,29 @@ const InstallRepoButtonInneer = ({
   repo: string;
   user: string;
 }) => {
-  const { client } = usePort();
+  const [createRepo] = useCreateGithubRepoMutation();
 
   const tag = `${user}/${repo}:${branch}`;
 
   const [fetching, setFetching] = React.useState(false);
 
-  const { data, refetch } = useQuery(CHECK_REPO_QUERY, {
-    client: client,
-    variables: { tag },
-    pollInterval: 3000,
+  const { data, refetch, error } = useListGithubReposQuery({
+    variables: {
+      filters: {
+        repo: repo,
+        user: user,
+        branch: branch,
+      },
+    },
   });
 
   const handleClick = async () => {
     try {
       setFetching(true);
-      const { data } = await client.mutate({
-        mutation: CREATE_REPO_MUTATION,
-        variables: { branch, repo, user },
+      createRepo({
+        variables: {
+          identifier: tag,
+        },
       });
 
       await refetch();
@@ -87,9 +97,14 @@ const InstallRepoButtonInneer = ({
     }
   };
 
+  const installedRepo = data?.githubRepos.at(0);
+
   return (
-    <>
-      {data?.githubRepo ? (
+    <Guard.Kabinet fallback={<>This server does not support kabinet</>}>
+      {error && (
+        <div className={className + "bg-red-300"}>Error: {error.message}</div>
+      )}
+      {installedRepo ? (
         <button className={className + "bg-green-300"}> ✅ {tag}</button>
       ) : (
         <button
@@ -103,6 +118,6 @@ const InstallRepoButtonInneer = ({
           {fetching ? <> Installing {tag} </> : <>🪄 Install {tag}</>}
         </button>
       )}
-    </>
+    </Guard.Kabinet>
   );
 };

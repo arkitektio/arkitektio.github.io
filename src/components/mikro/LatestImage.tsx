@@ -1,21 +1,13 @@
-import { useMikroQuery } from "@jhnnsrs/mikro";
-import gql from "graphql-tag";
+import { useImagesQuery } from "@site/src/lib/mikro/api/graphql";
 import React from "react";
 
 export const LatestImage = () => {
-  const { data } = useMikroQuery(gql`
-    {
-      representations(limit: 1) {
-        store
-        name
-      }
-    }
-  `);
+  const { data } = useImagesQuery({});
 
   return (
     <div className="">
       Nothing
-      {data?.representations?.map((rep) => <> {rep.name} </>)}
+      {data?.images?.map((rep) => <> {rep.__typename} </>)}
     </div>
   );
 };

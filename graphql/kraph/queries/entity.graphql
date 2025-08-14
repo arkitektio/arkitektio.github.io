@@ -1,0 +1,41 @@
+query GetEntity($id: ID!) {
+  entity(id: $id) {
+    ...Entity
+  }
+}
+
+query SearchEntities($search: String, $values: [ID!]) {
+  options: entities(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}
+
+query ListEntities($filters: EntityFilter, $pagination: GraphPaginationInput) {
+  entities(filters: $filters, pagination: $pagination) {
+    ...ListEntity
+  }
+}
+
+query SearchEntitiesForRole(
+  $search: String
+  $values: [ID!]
+  $tags: [String!]
+  $categories: [ID!]
+) {
+  options: entities(
+    filters: {
+      search: $search
+      ids: $values
+      tags: $tags
+      categories: $categories
+    }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}

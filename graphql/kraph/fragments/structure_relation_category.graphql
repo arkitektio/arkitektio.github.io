@@ -1,0 +1,49 @@
+fragment StructureRelationCategory on StructureRelationCategory {
+  ...BaseEdgeCategory
+  ...BaseCategory
+  sourceDefinition {
+    tagFilters
+    categoryFilters
+    identifierFilters
+  }
+  targetDefinition {
+    tagFilters
+    categoryFilters
+    identifierFilters
+  }
+  ageName
+  label
+  description
+  store {
+    presignedUrl
+  }
+  bestQuery {
+    ...GraphQuery
+  }
+  pinned
+}
+
+fragment ListStructureRelationCategory on StructureRelationCategory {
+  ...BaseListCategory
+  ...BaseListEdgeCategory
+  sourceDefinition {
+    tagFilters
+    categoryFilters
+    identifierFilters
+  }
+  targetDefinition {
+    tagFilters
+    categoryFilters
+    identifierFilters
+  }
+  label
+}
+
+fragment ListStructureRelationCategoryWithGraph on StructureRelationCategory {
+  ...ListStructureRelationCategory
+  graph {
+    id
+    name
+    description
+  }
+}

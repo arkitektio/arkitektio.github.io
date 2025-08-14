@@ -1,0 +1,31 @@
+fragment Dataset on Dataset {
+  id
+  name
+  description
+  provenanceEntries {
+    ...ProvenanceEntry
+  }
+  images {
+    ...ListImage
+  }
+  files {
+    ...ListFile
+  }
+  children {
+    ...ListDataset
+  }
+  isDefault
+  pinned
+  createdAt
+  creator {
+    sub
+  }
+  tags
+}
+
+fragment ListDataset on Dataset {
+  id
+  name
+  description
+  isDefault
+}

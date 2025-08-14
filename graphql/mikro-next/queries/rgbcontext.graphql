@@ -1,0 +1,24 @@
+query GetRGBContext($id: ID!) {
+  rgbcontext(id: $id) {
+    ...RGBContext
+  }
+}
+
+query GetRGBContexts(
+  $filters: RGBContextFilter
+  $pagination: OffsetPaginationInput
+) {
+  rgbcontexts(filters: $filters, pagination: $pagination) {
+    ...ListRGBContext
+  }
+}
+
+query RGBContextOptions($search: String, $values: [ID!]) {
+  options: rgbcontexts(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}

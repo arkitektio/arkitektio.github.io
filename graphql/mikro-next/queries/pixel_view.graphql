@@ -1,0 +1,5 @@
+query GetMaskedPixelInfo($id: ID!) {
+  maskedPixelInfo(id: $id) {
+    label
+  }
+}

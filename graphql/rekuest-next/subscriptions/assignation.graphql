@@ -1,0 +1,11 @@
+subscription WatchAssignationEvents($instanceId: InstanceId!) {
+  assignationEvents(instanceId: $instanceId) {
+    ...AssignationEvent
+  }
+}
+
+subscription WatchAssignations($instanceId: InstanceId!) {
+  assignations(instanceId: $instanceId) {
+    ...AssignationChangeEvent
+  }
+}

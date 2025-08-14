@@ -1,0 +1,9 @@
+query Clients(
+  $pagination: OffsetPaginationInput
+  $filters: ClientFilter
+  $order: ClientOrder
+) {
+  clients(order: $order, pagination: $pagination, filters: $filters) {
+    ...ListClient
+  }
+}

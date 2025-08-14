@@ -1,0 +1,30 @@
+fragment MetricCategory on MetricCategory {
+  ...BaseCategory
+  ...BaseNodeCategory
+  ageName
+  label
+  metricKind
+  description
+  store {
+    presignedUrl
+  }
+  bestQuery {
+    ...GraphQuery
+  }
+  tags {
+    id
+    value
+  }
+  pinned
+}
+
+fragment ListMetricCategory on MetricCategory {
+  ...BaseListCategory
+  ...BaseNodeCategory
+  label
+  metricKind
+  structureDefinition {
+    tagFilters
+    categoryFilters
+  }
+}

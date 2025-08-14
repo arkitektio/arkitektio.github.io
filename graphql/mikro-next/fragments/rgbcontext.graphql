@@ -1,0 +1,64 @@
+fragment RGBContext on RGBContext {
+  id
+  views {
+    ...RGBView
+  }
+  image {
+    id
+    store {
+      ...ZarrStore
+    }
+    derivedScaleViews {
+      id
+      image {
+        id
+        store {
+          ...ZarrStore
+        }
+      }
+      scaleX
+      scaleY
+      scaleZ
+      scaleT
+      scaleC
+    }
+  }
+  pinned
+  name
+  z
+  t
+  c
+  blending
+}
+
+fragment ListRGBContext on RGBContext {
+  image {
+    id
+    store {
+      ...ZarrStore
+    }
+    derivedScaleViews {
+      id
+      image {
+        id
+        store {
+          ...ZarrStore
+        }
+      }
+      scaleX
+      scaleY
+      scaleZ
+      scaleT
+      scaleC
+    }
+  }
+  id
+  name
+  views {
+    ...RGBView
+  }
+  blending
+  t
+  z
+  c
+}

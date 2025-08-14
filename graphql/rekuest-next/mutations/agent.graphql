@@ -1,0 +1,9 @@
+mutation PinAgent($input: PinInput!) {
+  pinAgent(input: $input) {
+    ...Agent
+  }
+}
+
+mutation DeleteAgent($id: ID!) {
+  deleteAgent(input: { id: $id })
+}

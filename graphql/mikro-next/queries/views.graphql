@@ -1,0 +1,15 @@
+query GetRGBView($id: ID!) {
+  rgbView(id: $id) {
+    ...RGBView
+  }
+}
+
+query SearchRGBViews($search: String, $values: [ID!]) {
+  options: rgbViews(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}

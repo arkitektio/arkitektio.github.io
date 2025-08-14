@@ -1,0 +1,12 @@
+fragment ListImage on Image {
+  id
+  name
+  description
+}
+
+fragment Image on Image {
+  id
+  name
+  acquisitionDate
+  tags
+}

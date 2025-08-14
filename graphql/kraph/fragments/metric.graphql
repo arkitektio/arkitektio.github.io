@@ -1,0 +1,26 @@
+fragment Metric on Metric {
+  id
+  category {
+    id
+    label
+  }
+  value
+}
+
+fragment ListMetric on Metric {
+  id
+  value
+  label
+}
+
+fragment PathMetric on Metric {
+  ...ListMetric
+  category {
+    id
+    label
+    store {
+      presignedUrl
+    }
+  }
+  value
+}

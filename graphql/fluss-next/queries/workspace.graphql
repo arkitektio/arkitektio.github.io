@@ -1,0 +1,21 @@
+query Workspace($id: ID!) {
+  workspace(id: $id) {
+    ...Workspace
+  }
+}
+
+query Workspaces($pagination: OffsetPaginationInput) {
+  workspaces(pagination: $pagination) {
+    ...ListWorkspace
+  }
+}
+
+query WorkspaceCarousel(
+  $pagination: OffsetPaginationInput
+  $filters: WorkspaceFilter
+  $order: WorkspaceOrder
+) {
+  workspaces(pagination: $pagination, filters: $filters, order: $order) {
+    ...CarouselWorkspace
+  }
+}

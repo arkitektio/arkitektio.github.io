@@ -1,0 +1,17 @@
+mutation assign($input: AssignInput!) {
+  assign(input: $input) {
+    ...PostmanAssignation
+  }
+}
+
+mutation cancel($input: CancelInput!) {
+  cancel(input: $input) {
+    ...PostmanAssignation
+  }
+}
+
+mutation interrupt($input: InterruptInput!) {
+  interrupt(input: $input) {
+    ...PostmanAssignation
+  }
+}

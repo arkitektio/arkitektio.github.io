@@ -1,0 +1,24 @@
+fragment DetailDependency on Dependency {
+  id
+  reference
+  initialHash
+  action {
+    id
+    name
+    hash
+  }
+  reference
+  resolvable
+}
+
+fragment ListDependency on Dependency {
+  id
+  initialHash
+  action {
+    id
+    name
+    hash
+  }
+  reference
+  resolvable
+}

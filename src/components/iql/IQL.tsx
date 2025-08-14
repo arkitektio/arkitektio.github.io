@@ -18,9 +18,9 @@ import {
 } from "@graphiql/react";
 import { GraphiQLToolbarConfig } from "graphiql/dist/components/GraphiQL";
 import "graphiql/graphiql.css";
-import "./iql.css";
-import "./editor.css";
 import React, { ComponentType, ReactNode, useState } from "react";
+import "./editor.css";
+import "./iql.css";
 
 type AddSuffix<Obj extends Record<string, any>, Suffix extends string> = {
   [Key in keyof Obj as `${string & Key}${Suffix}`]: Obj[Key];
@@ -197,7 +197,7 @@ export function IQL(props: GraphiQLInterfaceProps) {
 // Determines if the React child is of the same type of the provided React component
 function isChildComponentType<T extends ComponentType>(
   child: any,
-  component: T,
+  component: T
 ): child is T {
   if (
     child?.type?.displayName &&

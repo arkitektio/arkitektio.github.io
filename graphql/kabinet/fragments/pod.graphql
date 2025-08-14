@@ -1,0 +1,60 @@
+fragment ListPod on Pod {
+  id
+  podId
+  backend {
+    user {
+      sub
+    }
+    client {
+      clientId
+    }
+    name
+  }
+  deployment {
+    id
+    flavour {
+      release {
+        id
+        version
+        app {
+          identifier
+        }
+      }
+    }
+  }
+  clientId
+  resource {
+    id
+    name
+  }
+  status
+}
+
+fragment Pod on Pod {
+  id
+  podId
+  backend {
+    ...Backend
+  }
+  status
+  latestLogDump {
+    logs
+    createdAt
+  }
+  clientId
+  resource {
+    ...ListResource
+  }
+  deployment {
+    id
+    flavour {
+      release {
+        id
+        version
+        app {
+          identifier
+        }
+      }
+    }
+  }
+}

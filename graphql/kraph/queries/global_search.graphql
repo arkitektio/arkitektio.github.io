@@ -1,0 +1,17 @@
+query GlobalSearch($search: String!) {
+  entityCategories(filters: { search: $search }, pagination: { limit: 10 }) {
+    ...ListEntityCategory
+  }
+  relationCategories(filters: { search: $search }, pagination: { limit: 10 }) {
+    ...ListRelationCategory
+  }
+  measurementCategories(
+    filters: { search: $search }
+    pagination: { limit: 10 }
+  ) {
+    ...ListMeasurementCategory
+  }
+  structureCategories(filters: { search: $search }, pagination: { limit: 10 }) {
+    ...ListStructureCategory
+  }
+}

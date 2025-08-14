@@ -1,0 +1,10 @@
+fragment Document on Document {
+  id
+  content
+  metadata
+  distance
+  structure {
+    identifier
+    object
+  }
+}

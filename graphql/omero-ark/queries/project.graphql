@@ -1,0 +1,11 @@
+query ListProjects {
+  projects {
+    ...ListProject
+  }
+}
+
+query GetProject($id: ID!) {
+  project(id: $id) {
+    ...Project
+  }
+}

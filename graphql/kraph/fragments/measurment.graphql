@@ -1,0 +1,10 @@
+fragment PathMeasurement on Measurement {
+  validFrom
+  validTo
+  category {
+    id
+    label
+  }
+  leftId
+  rightId
+}

@@ -1,0 +1,11 @@
+fragment Toolbox on Toolbox {
+  id
+  name
+  description
+}
+
+fragment ListToolbox on Toolbox {
+  id
+  name
+  description
+}

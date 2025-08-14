@@ -1,0 +1,12 @@
+fragment DetailTrace on Trace {
+  id
+  name
+  store {
+    ...ZarrStore
+  }
+}
+
+fragment ListTrace on Trace {
+  id
+  name
+}

@@ -1,0 +1,9 @@
+fragment OCRPageResult on OCRPageResult {
+  lines {
+    text
+    score
+    angle
+    bbox
+  }
+  angle
+}

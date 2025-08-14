@@ -1,0 +1,32 @@
+fragment Stimulus on Stimulus {
+    id
+    label
+    cell
+    location
+    position
+    trace {
+        id
+        name
+        store {
+            ...ZarrStore
+        }
+    }
+}
+
+fragment DetailStimulus on Stimulus {
+    id
+    label
+    simulation {
+        ...DetailSimulation
+    }
+}
+
+
+fragment ListStimulus on Stimulus {
+    id
+    label
+    cell
+    simulation {
+        id
+    }
+}

@@ -1,0 +1,14 @@
+fragment Room on Room {
+  id
+  title
+  description
+  messages {
+    ...ListMessage
+  }
+}
+
+fragment ListRoom on Room {
+  id
+  title
+  description
+}

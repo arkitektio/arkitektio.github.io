@@ -1,0 +1,11 @@
+fragment NodeQueryView on NodeQueryView {
+  nodeId
+  query {
+    ...NodeQuery
+  }
+  render {
+    ...Table
+    ...Pairs
+    ...Path
+  }
+}

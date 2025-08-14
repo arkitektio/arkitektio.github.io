@@ -1,0 +1,28 @@
+fragment File on File {
+  origins {
+    id
+  }
+  id
+  name
+  store {
+    ...BigFileStore
+  }
+  views {
+    id
+    seriesIdentifier
+    image {
+      ...ListImage
+    }
+  }
+  provenanceEntries {
+    ...ProvenanceEntry
+  }
+  organization {
+    slug
+  }
+}
+
+fragment ListFile on File {
+  id
+  name
+}

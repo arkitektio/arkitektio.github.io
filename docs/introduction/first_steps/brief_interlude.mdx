@@ -6,9 +6,8 @@ sidebar_position: 6
 
 import Image from "@theme/IdealImage";
 import upAndDownURL from "./upload_video.webm";
+import { App } from "@site/src/lib/app/App";
 import thumbnail from "./node_explaination.png";
-import { HerreGuard } from "@jhnnsrs/herre";
-import { FaktsGuard } from "@jhnnsrs/fakts";
 import { InstallRepoButton } from "../../../src/components/InstallRepoButton";
 import Admonition from "@theme/Admonition";
 
@@ -47,7 +46,7 @@ you will see a familiar connect screen that will prompt you to connect to your A
 
 So just connect. We will wait here.
 
-<FaktsGuard fallback={
+<App.Guard fallback={
 <>
 <div className="bg-back-800 p-3 text-center rounded rounded-md mb-2">
  😊 Just one connection away... 
@@ -64,7 +63,6 @@ to much interactive help about it.
  
  
  }> 
-<HerreGuard fallback={<div className="bg-back-800 p-3 text-center rounded rounded-md  mb-2 "> 🥹 Almost there... Just login! </div>}>
 
 <div className="bg-green-300 text-center text-black p-3 rounded rounded-md ">
   You did it 🥰! We are connected
@@ -82,7 +80,7 @@ to analyze your data. They are not as fancy as the ones we have seen so far, but
 
 Look at this button. It will install the Standard Library to your Arkitekt instance. Just click it.
 
-<InstallRepoButton repo={"stdlib"} user={"arkitektio-apps"} branch={"master"} />
+<InstallRepoButton repo={"std"} user={"arkitektio-apps"} branch={"main"} />
 
 Turned green? Great! You now have the Standard Library Repository installed. We will do that in the next chapter.
 
@@ -93,7 +91,7 @@ The second plugin we will install is called Reaktor. This is a weird one, becaus
 
 Same procedure as before, just click the button.
 
-<InstallRepoButton repo={"reaktor"} user={"arkitektio-apps"} branch={"master"} />
+<InstallRepoButton repo={"scheduler"} user={"arkitektio-apps"} branch={"main"} />
 
 Turned green? Great! You now have the Reaktor Repository installed. Next chapter.
 
@@ -105,5 +103,4 @@ this documentatoin. Its not that complicated.
 
 :::
 
-</HerreGuard>
-</FaktsGuard>
+</App.Guard>

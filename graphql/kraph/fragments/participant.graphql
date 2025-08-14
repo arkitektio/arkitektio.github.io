@@ -1,0 +1,5 @@
+fragment PathParticipant on Participant {
+  role
+  leftId
+  rightId
+}

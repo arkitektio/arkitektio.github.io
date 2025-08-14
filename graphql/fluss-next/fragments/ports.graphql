@@ -1,0 +1,179 @@
+fragment FlussStringAssignWidget on StringAssignWidget {
+  __typename
+  kind
+  placeholder
+  asParagraph
+}
+
+fragment FlussSliderAssignWidget on SliderAssignWidget {
+  __typename
+  kind
+  min
+  max
+}
+
+fragment FlussSearchAssignWidget on SearchAssignWidget {
+  __typename
+  kind
+  query
+  ward
+}
+
+fragment FlussCustomAssignWidget on CustomAssignWidget {
+  __typename
+  ward
+  hook
+}
+
+fragment FlussChoiceAssignWidget on ChoiceAssignWidget {
+  __typename
+  kind
+  choices {
+    value
+    label
+    description
+  }
+}
+
+fragment FlussAssignWidget on AssignWidget {
+  __typename
+  kind
+  ...FlussStringAssignWidget
+  ...FlussSearchAssignWidget
+  ...FlussSliderAssignWidget
+  ...FlussChoiceAssignWidget
+  ...FlussCustomAssignWidget
+}
+
+fragment FlussChildPortNested on Port {
+  __typename
+  key
+  kind
+  identifier
+  children {
+    key
+    kind
+    identifier
+    assignWidget {
+      ...FlussAssignWidget
+    }
+    returnWidget {
+      ...FlussReturnWidget
+    }
+  }
+  assignWidget {
+    ...FlussAssignWidget
+  }
+  returnWidget {
+    ...FlussReturnWidget
+  }
+  nullable
+}
+
+fragment FlussChildPort on Port {
+  __typename
+  kind
+  identifier
+  key
+  children {
+    ...FlussChildPortNested
+  }
+  assignWidget {
+    ...FlussAssignWidget
+  }
+  returnWidget {
+    ...FlussReturnWidget
+  }
+  nullable
+}
+
+fragment FlussCustomEffect on CustomEffect {
+  __typename
+  kind
+  hook
+  ward
+}
+
+fragment FlussMessageEffect on MessageEffect {
+  __typename
+  kind
+  message
+}
+
+fragment FlussPortEffect on Effect {
+  __typename
+  kind
+  dependencies
+  ...FlussCustomEffect
+  ...FlussMessageEffect
+}
+
+fragment FlussAssignWidget on AssignWidget {
+  __typename
+  kind
+  ...FlussStringAssignWidget
+  ...FlussSearchAssignWidget
+  ...FlussSliderAssignWidget
+  ...FlussChoiceAssignWidget
+  ...FlussCustomAssignWidget
+}
+
+fragment Validator on Validator {
+  function
+  dependencies
+}
+
+fragment FlussPort on Port {
+  __typename
+  key
+  label
+  nullable
+  description
+  effects {
+    ...FlussPortEffect
+  }
+  assignWidget {
+    ...FlussAssignWidget
+  }
+  returnWidget {
+    ...FlussReturnWidget
+  }
+  choices {
+    label
+    value
+    description
+  }
+  kind
+  identifier
+  children {
+    ...FlussChildPort
+  }
+  default
+  nullable
+  validators {
+    ...Validator
+  }
+}
+
+fragment FlussCustomReturnWidget on CustomReturnWidget {
+  __typename
+  kind
+  hook
+  ward
+}
+
+fragment FlussChoiceReturnWidget on ChoiceReturnWidget {
+  __typename
+  choices {
+    label
+    value
+    description
+  }
+}
+
+fragment FlussReturnWidget on ReturnWidget {
+  __typename
+  kind
+  ...FlussCustomReturnWidget
+  ...FlussChoiceReturnWidget
+}

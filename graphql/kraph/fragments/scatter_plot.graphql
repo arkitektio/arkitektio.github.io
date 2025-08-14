@@ -1,0 +1,14 @@
+fragment ScatterPlot on ScatterPlot {
+  id
+  name
+  description
+  xColumn
+  yColumn
+}
+
+fragment ListScatterPlot on ScatterPlot {
+  id
+  name
+  xColumn
+  yColumn
+}

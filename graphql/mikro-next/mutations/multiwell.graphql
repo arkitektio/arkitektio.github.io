@@ -1,0 +1,12 @@
+mutation CreateMultiWellPlate($input: MultiWellPlateInput!) {
+  createMultiWellPlate(input: $input) {
+    ...MultiWellPlate
+  }
+}
+
+mutation AutoCreateMultiWellPlate($input: String!) {
+  result: createMultiWellPlate(input: { name: $input }) {
+    label: name
+    value: id
+  }
+}

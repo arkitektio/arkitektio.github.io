@@ -1,0 +1,11 @@
+mutation CreateNodeQuery($input: NodeQueryInput!) {
+  createNodeQuery(input: $input) {
+    ...NodeQuery
+  }
+}
+
+mutation PinNodeQuery($input: PinNodeQueryInput!) {
+  pinNodeQuery(input: $input) {
+    ...NodeQuery
+  }
+}

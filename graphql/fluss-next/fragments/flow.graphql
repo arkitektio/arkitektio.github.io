@@ -1,0 +1,198 @@
+
+
+fragment BaseGraphNode on GraphNode {
+  __typename
+  ins {
+    ...FlussPort
+  }
+  outs {
+    ...FlussPort
+  }
+  constants {
+    ...FlussPort
+  }
+  voids {
+    ...FlussPort
+  }
+  globalsMap
+  constantsMap
+  title
+  description
+  kind
+}
+
+fragment FlussBinds on Binds {
+  implementations
+}
+
+fragment RetriableNode on RetriableNode {
+  retries
+  retryDelay
+}
+
+fragment AssignableNode on AssignableNode {
+  nextTimeout
+}
+
+fragment RekuestActionNode on RekuestActionNode {
+  hash
+  mapStrategy
+  allowLocalExecution
+  binds {
+    ...FlussBinds
+  }
+  actionKind
+}
+
+fragment RekuestMapActionNode on RekuestMapActionNode {
+  ...BaseGraphNode
+  ...RetriableNode
+  ...AssignableNode
+  ...RekuestActionNode
+  __typename
+  hello
+}
+
+fragment RekuestFilterActionNode on RekuestFilterActionNode {
+  ...BaseGraphNode
+  ...RetriableNode
+  ...AssignableNode
+  ...RekuestActionNode
+  __typename
+  path
+}
+
+fragment ReactiveNode on ReactiveNode {
+  ...BaseGraphNode
+  __typename
+  implementation
+}
+
+fragment ArgNode on ArgNode {
+  ...BaseGraphNode
+  __typename
+}
+
+fragment ReturnNode on ReturnNode {
+  ...BaseGraphNode
+  __typename
+}
+
+fragment GraphNode on GraphNode {
+  __typename
+  id
+  position {
+    x
+    y
+  }
+  parentNode
+  ...RekuestFilterActionNode
+  ...RekuestMapActionNode
+  ...ReactiveNode
+  ...ArgNode
+  ...ReturnNode
+}
+
+fragment BaseGraphEdge on GraphEdge {
+  __typename
+  id
+  source
+  sourceHandle
+  target
+  targetHandle
+  kind
+  stream {
+    ...StreamItem
+  }
+}
+
+fragment LoggingEdge on LoggingEdge {
+  ...BaseGraphEdge
+  level
+}
+
+fragment VanillaEdge on VanillaEdge {
+  ...BaseGraphEdge
+  __typename
+}
+
+fragment GraphEdge on GraphEdge {
+  ...LoggingEdge
+  ...VanillaEdge
+}
+
+fragment StreamItem on StreamItem {
+  kind
+  label
+}
+
+fragment GlobalArg on GlobalArg {
+  key
+  port {
+    ...FlussPort
+  }
+}
+
+fragment Graph on Graph {
+  nodes {
+    ...GraphNode
+  }
+  edges {
+    ...GraphEdge
+  }
+  globals {
+    ...GlobalArg
+  }
+}
+
+fragment Flow on Flow {
+  __typename
+  id
+  graph {
+    ...Graph
+  }
+  title
+  description
+  createdAt
+  workspace {
+    id
+  }
+}
+
+fragment ListFlow on Flow {
+  id
+  title
+  createdAt
+  workspace {
+    id
+  }
+}
+
+fragment ListWorkspace on Workspace {
+  id
+  title
+  description
+  latestFlow {
+    ...ListFlow
+  }
+}
+
+fragment Workspace on Workspace {
+  id
+  title
+  latestFlow {
+    ...Flow
+  }
+  flows {
+    ...ListFlow
+  }
+}
+
+fragment CarouselWorkspace on Workspace {
+  id
+  title
+  description
+  latestFlow {
+    ...Flow
+  }
+}

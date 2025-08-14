@@ -1,0 +1,25 @@
+subscription WatchTransformationViews($stage: ID!) {
+  affineTransformationViews(stage: $stage) {
+    create {
+      ...AffineTransformationView
+      image {
+        id
+        store {
+          shape
+        }
+        name
+      }
+    }
+    delete
+    update {
+      ...AffineTransformationView
+      image {
+        id
+        store {
+          shape
+        }
+        name
+      }
+    }
+  }
+}

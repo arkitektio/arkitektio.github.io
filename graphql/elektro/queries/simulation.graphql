@@ -1,0 +1,11 @@
+query DetailSimulation($id: ID!) {
+  simulation(id: $id) {
+    ...DetailSimulation
+  }
+}
+
+query ListSimulations {
+  simulations(pagination: { limit: 10 }) {
+    ...ListSimulation
+  }
+}

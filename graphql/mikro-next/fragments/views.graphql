@@ -1,0 +1,198 @@
+fragment View on View {
+  xMin
+  xMax
+  yMin
+  yMax
+  tMin
+  tMax
+  cMin
+  cMax
+  zMin
+  zMax
+}
+
+fragment ChannelView on ChannelView {
+  ...View
+  id
+  channelName: name
+  excitationWavelength
+  emissionWavelength
+  acquisitionMode
+}
+
+fragment DerivedView on DerivedView {
+  ...View
+  id
+  originImage {
+    id
+    name
+  }
+  operation
+}
+
+fragment ROIView on ROIView {
+  ...View
+  id
+  roi {
+    id
+    name
+  }
+}
+
+fragment FileView on FileView {
+  ...View
+  id
+  seriesIdentifier
+  file {
+    id
+    name
+  }
+}
+
+fragment AffineTransformationView on AffineTransformationView {
+  ...View
+  id
+  affineMatrix
+  stage {
+    id
+    name
+  }
+}
+
+fragment RGBView on RGBView {
+  ...View
+  id
+  contexts {
+    id
+    name
+  }
+  name
+  image {
+    id
+    store {
+      ...ZarrStore
+    }
+    derivedScaleViews {
+      id
+      image {
+        id
+        store {
+          ...ZarrStore
+        }
+      }
+      scaleX
+      scaleY
+      scaleZ
+      scaleT
+      scaleC
+    }
+  }
+  congruentViews(types: [HISTOGRAM]) {
+    ...HistogramView
+  }
+
+  colorMap
+  contrastLimitMin
+  contrastLimitMax
+  gamma
+  active
+  fullColour
+  baseColor
+}
+
+fragment TimepointView on TimepointView {
+  ...View
+  id
+  msSinceStart
+  indexSinceStart
+  era {
+    ...Era
+  }
+}
+
+fragment OpticsView on OpticsView {
+  ...View
+  id
+  objective {
+    id
+    name
+    serialNumber
+  }
+  camera {
+    id
+    name
+    serialNumber
+  }
+  instrument {
+    id
+    name
+    serialNumber
+  }
+}
+
+fragment MaskView on MaskView {
+  ...View
+  id
+  referenceView {
+    id
+    image {
+      id
+      name
+    }
+  }
+}
+
+fragment ReferenceView on ReferenceView {
+  ...View
+  id
+}
+
+fragment InstanceMaskView on InstanceMaskView {
+  ...View
+  id
+  referenceView {
+    id
+    image {
+      id
+      name
+    }
+  }
+}
+
+fragment AcquisitionView on AcquisitionView {
+  ...View
+  id
+  description
+  acquiredAt
+  operator {
+    sub
+  }
+}
+
+fragment WellPositionView on WellPositionView {
+  ...View
+  id
+  column
+  row
+  well {
+    id
+    rows
+    columns
+    name
+  }
+}
+
+fragment ContinousScanView on ContinousScanView {
+  ...View
+  id
+  direction
+}
+
+fragment HistogramView on HistogramView {
+  ...View
+  id
+  bins
+  min
+  max
+  histogram
+}

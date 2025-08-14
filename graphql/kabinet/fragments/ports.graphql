@@ -1,0 +1,195 @@
+fragment StringAssignWidget on StringAssignWidget {
+  __typename
+  kind
+  placeholder
+  asParagraph
+}
+
+fragment SliderAssignWidget on SliderAssignWidget {
+  __typename
+  kind
+  min
+  max
+}
+
+fragment StateChoiceAssignWidget on StateChoiceAssignWidget {
+  __typename
+  kind
+  followValue
+  stateChoices
+}
+
+fragment FilterPort on Port {
+  __typename
+  kind
+  key
+  identifier
+  assignWidget {
+    ... on SearchAssignWidget {
+      query
+    }
+  }
+  returnWidget {
+    ...ReturnWidget
+  }
+  description
+  nullable
+}
+
+fragment SearchAssignWidget on SearchAssignWidget {
+  __typename
+  kind
+  query
+  ward
+  filters {
+    ...FilterPort
+  }
+}
+
+fragment CustomAssignWidget on CustomAssignWidget {
+  __typename
+  ward
+  hook
+}
+
+fragment ChoiceAssignWidget on ChoiceAssignWidget {
+  __typename
+  kind
+  choices {
+    value
+    label
+    description
+  }
+}
+
+fragment ChildPortNested on Port {
+  __typename
+  kind
+  key
+  identifier
+  children {
+    kind
+    identifier
+    assignWidget {
+      ...AssignWidget
+    }
+    returnWidget {
+      ...ReturnWidget
+    }
+  }
+  assignWidget {
+    ...AssignWidget
+  }
+  returnWidget {
+    ...ReturnWidget
+  }
+  description
+  nullable
+}
+
+fragment ChildPort on Port {
+  __typename
+  kind
+  key
+  identifier
+  children {
+    ...ChildPortNested
+  }
+  assignWidget {
+    ...AssignWidget
+  }
+  returnWidget {
+    ...ReturnWidget
+  }
+  nullable
+  description
+}
+
+fragment CustomEffect on CustomEffect {
+  __typename
+  kind
+  hook
+  ward
+}
+
+fragment MessageEffect on MessageEffect {
+  __typename
+  kind
+  message
+}
+
+fragment PortEffect on Effect {
+  __typename
+  kind
+  dependencies
+  ...CustomEffect
+  ...MessageEffect
+}
+
+fragment AssignWidget on AssignWidget {
+  __typename
+  kind
+  ...StringAssignWidget
+  ...SearchAssignWidget
+  ...SliderAssignWidget
+  ...ChoiceAssignWidget
+  ...CustomAssignWidget
+  ...StateChoiceAssignWidget
+}
+
+fragment Validator on Validator {
+  function
+  dependencies
+  label
+  errorMessage
+}
+
+fragment Port on Port {
+  __typename
+  key
+  label
+  nullable
+  description
+  effects {
+    ...PortEffect
+  }
+  assignWidget {
+    ...AssignWidget
+  }
+  returnWidget {
+    ...ReturnWidget
+  }
+  kind
+  identifier
+  children {
+    ...ChildPort
+  }
+  default
+  nullable
+  validators {
+    ...Validator
+  }
+}
+
+fragment CustomReturnWidget on CustomReturnWidget {
+  __typename
+  kind
+  hook
+  ward
+}
+
+fragment ChoiceReturnWidget on ChoiceReturnWidget {
+  __typename
+  choices {
+    label
+    value
+    description
+  }
+}
+
+fragment ReturnWidget on ReturnWidget {
+  __typename
+  kind
+  ...CustomReturnWidget
+  ...ChoiceReturnWidget
+}

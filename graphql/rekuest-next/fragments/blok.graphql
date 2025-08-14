@@ -1,0 +1,78 @@
+fragment PortMatch on PortMatch {
+  at
+  key
+  kind
+  identifier
+  nullable
+  children {
+    at
+    key
+    kind
+    identifier
+    nullable
+  }
+}
+
+fragment Blok on Blok {
+  id
+  name
+  actionDemands {
+    key
+    argMatches {
+      ...PortMatch
+    }
+    returnMatches {
+      ...PortMatch
+    }
+  }
+  stateDemands {
+    key
+    matches {
+      ...PortMatch
+    }
+  }
+  materializedBloks {
+    ...MaterializedBlok
+  }
+  possibleAgents {
+    ...ListAgent
+  }
+}
+
+fragment MaterializedBlok on MaterializedBlok {
+  id
+  agent {
+    id
+  }
+  blok {
+    id
+    name
+    url
+  }
+  dashboard {
+    id
+  }
+  actionMappings {
+    key
+    implementation {
+      id
+    }
+  }
+  stateMappings {
+    key
+    state {
+      id
+    }
+  }
+}
+
+fragment ListBlok on Blok {
+  id
+  name
+  actionDemands {
+    key
+  }
+  stateDemands {
+    key
+  }
+}

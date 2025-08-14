@@ -1,0 +1,11 @@
+query GetTable($id: ID!) {
+  table(id: $id) {
+    ...Table
+  }
+}
+
+query GetTables($filters: TableFilter, $pagination: OffsetPaginationInput) {
+  tables(filters: $filters, pagination: $pagination) {
+    ...ListTable
+  }
+}

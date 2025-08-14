@@ -1,0 +1,27 @@
+fragment ListROI on ROI {
+  id
+  image {
+    id
+    name
+  }
+  kind
+  vectors
+}
+
+fragment ROI on ROI {
+  id
+  pinned
+  image {
+    id
+    ...RGBImage
+  }
+  createdAt
+  creator {
+    sub
+  }
+  provenanceEntries {
+    ...ProvenanceEntry
+  }
+  kind
+  vectors
+}

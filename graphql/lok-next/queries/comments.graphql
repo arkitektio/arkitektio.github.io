@@ -1,0 +1,17 @@
+query CommentsFor($object: ID!, $identifier: Identifier!) {
+  commentsFor(identifier: $identifier, object: $object) {
+    ...ListComment
+  }
+}
+
+query MyMentions {
+  myMentions {
+    ...MentionComment
+  }
+}
+
+query DetailComment($id: ID!) {
+  comment(id: $id) {
+    ...DetailComment
+  }
+}

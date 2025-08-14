@@ -1,0 +1,11 @@
+mutation CreateGraphQuery($input: GraphQueryInput!) {
+  createGraphQuery(input: $input) {
+    ...GraphQuery
+  }
+}
+
+mutation PinGraphQuery($input: PinGraphQueryInput!) {
+  pinGraphQuery(input: $input) {
+    ...GraphQuery
+  }
+}

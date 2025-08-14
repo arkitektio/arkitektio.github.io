@@ -1,0 +1,14 @@
+query ListServiceInstances(
+  $pagination: OffsetPaginationInput
+  $filters: ServiceInstanceFilter
+) {
+  serviceInstances(pagination: $pagination, filters: $filters) {
+    ...ListServiceInstance
+  }
+}
+
+query GetServiceInstance($id: ID!) {
+  serviceInstance(id: $id) {
+    ...ServiceInstance
+  }
+}

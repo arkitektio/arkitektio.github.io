@@ -1,0 +1,11 @@
+subscription WatchRois($image: ID!) {
+  rois(image: $image) {
+    create {
+      ...ListROI
+    }
+    delete
+    update {
+      ...ListROI
+    }
+  }
+}

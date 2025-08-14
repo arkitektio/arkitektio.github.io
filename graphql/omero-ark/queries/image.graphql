@@ -1,0 +1,11 @@
+query ListImages {
+  images {
+    ...ListImage
+  }
+}
+
+query GetImage($id: ID!) {
+  image(id: $id) {
+    ...Image
+  }
+}

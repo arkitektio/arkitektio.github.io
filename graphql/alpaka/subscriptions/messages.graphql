@@ -1,0 +1,7 @@
+subscription WatchMessages($room: ID!, $agentId: ID!) {
+  room(room: $room, agentId: $agentId, filterOwn: false) {
+    message {
+      ...ListMessage
+    }
+  }
+}

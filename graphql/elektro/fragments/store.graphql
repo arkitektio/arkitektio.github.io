@@ -1,0 +1,8 @@
+fragment ZarrStore on ZarrStore {
+  id
+  key
+  bucket
+  path
+  shape
+  dtype
+}

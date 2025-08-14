@@ -1,0 +1,24 @@
+query GetMultiWellPlate($id: ID!) {
+  multiWellPlate(id: $id) {
+    ...MultiWellPlate
+  }
+}
+
+query GetMultiWellPlates(
+  $filters: MultiWellPlateFilter
+  $pagination: OffsetPaginationInput
+) {
+  multiWellPlates(filters: $filters, pagination: $pagination) {
+    ...ListMultiWellPlate
+  }
+}
+
+query MultiWellPlateOptions($search: String, $values: [ID!]) {
+  options: multiWellPlates(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}

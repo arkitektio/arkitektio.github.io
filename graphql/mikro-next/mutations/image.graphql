@@ -1,0 +1,27 @@
+mutation RequestUpload($key: String!, $datalayer: String!) {
+  requestUpload(input: { key: $key, datalayer: $datalayer }) {
+    ...Credentials
+  }
+}
+
+mutation RequestAccess($store: ID!, $duration: Int) {
+  requestAccess(input: { store: $store, duration: $duration }) {
+    ...AccessCredentials
+  }
+}
+
+mutation PinImage($id: ID!, $pin: Boolean!) {
+  pinImage(input: { id: $id, pin: $pin }) {
+    ...Image
+  }
+}
+
+mutation UpdateImage($input: UpdateImageInput!) {
+  updateImage(input: $input) {
+    ...Image
+  }
+}
+
+mutation DeleteImage($id: ID!) {
+  deleteImage(input: { id: $id })
+}

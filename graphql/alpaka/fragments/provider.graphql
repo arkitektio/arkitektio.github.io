@@ -1,0 +1,15 @@
+fragment Provider on Provider {
+  id
+  name
+  models {
+    id
+    modelId
+  }
+  kind
+}
+
+fragment ListProvider on Provider {
+  id
+  name
+  kind
+}

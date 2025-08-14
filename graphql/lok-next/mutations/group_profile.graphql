@@ -1,0 +1,11 @@
+mutation CreateGroupProfile($input: CreateGroupProfileInput!) {
+  createGroupProfile(input: $input) {
+    ...GroupProfile
+  }
+}
+
+mutation UpdateGroupProfile($input: UpdateGroupProfileInput!) {
+  updateGroupProfile(input: $input) {
+    ...GroupProfile
+  }
+}

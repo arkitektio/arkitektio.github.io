@@ -1,0 +1,23 @@
+projects:
+  mikro_next:
+    schema: http://jhnnsrs-lab/mikro/graphql
+    documents: graphql/mikro-next/**/*.graphql
+
+  fluss_next:
+    schema: http://jhnnsrs-lab/fluss/graphql
+    documents: graphql/fluss-next/**/*.graphql
+  elektro:
+    schema: http://jhnnsrs-lab/elektro/graphql
+    documents: graphql/elektro/**/*.graphql
+
+  kraph:
+    schema: http://jhnnsrs-lab/kraph/graphql
+    documents: graphql/kraph/**/*.graphql
+
+  dokuments:
+    schema: http://jhnnsrs-lab/dokuments/graphql
+    documents: graphql/dokuments/**/*.graphql
+
+  rekuest_next:
+    schema: http://jhnnsrs-lab/rekuest/graphql
+    documents: graphql/rekuest-next/**/*.graphql

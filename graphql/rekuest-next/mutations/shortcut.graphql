@@ -1,0 +1,9 @@
+mutation CreateShortcut($input: CreateShortcutInput!) {
+  createShortcut(input: $input) {
+    ...Shortcut
+  }
+}
+
+mutation DeleteShortcut($id: ID!) {
+  deleteShortcut(input: { id: $id })
+}

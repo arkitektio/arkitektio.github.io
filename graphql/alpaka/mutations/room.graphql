@@ -1,0 +1,9 @@
+mutation CreateRoom($input: CreateRoomInput!) {
+  createRoom(input: $input) {
+    ...Room
+  }
+}
+
+mutation DeleteRoom($input: DeleteRoomInput!) {
+  deleteRoom(input: $input)
+}

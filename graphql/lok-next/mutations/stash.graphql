@@ -1,0 +1,19 @@
+mutation CreateStash($name: String, $description: String = "") {
+  createStash(input: { name: $name, description: $description }) {
+    ...ListStash
+  }
+}
+
+mutation AddItemsToStash($stash: ID!, $items: [StashItemInput!]!) {
+  addItemsToStash(input: { stash: $stash, items: $items }) {
+    ...StashItem
+  }
+}
+
+mutation DeleteStashItems($items: [ID!]!) {
+  deleteStashItems(input: { items: $items })
+}
+
+mutation DeleteStash($stash: ID!) {
+  deleteStash(input: { stash: $stash })
+}

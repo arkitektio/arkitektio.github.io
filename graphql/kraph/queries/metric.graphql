@@ -1,0 +1,21 @@
+query GetMetric($id: ID!) {
+  metric(id: $id) {
+    ...Metric
+  }
+}
+
+query SearchMetrics($search: String, $values: [ID!]) {
+  options: metrics( # Updated from structures to metrics
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}
+
+query ListMetrics($filters: MetricFilter, $pagination: GraphPaginationInput) {
+  metrics(filters: $filters, pagination: $pagination) {
+    ...ListMetric
+  }
+}

@@ -1,16 +1,29 @@
 import React from "react";
-import { withMikro, useMikroQuery } from "@jhnnsrs/mikro";
-import { useDatalayer } from "@jhnnsrs/datalayer";
-import { BioImage } from "@site/src/components/Bioimage";
 import { gql } from "graphql-tag";
+import { useQuery } from "@apollo/client";
+import {App} from "@site/src/lib/app/App";
 // Add react-live imports you need here
+
+const useMikroQuery = (query, options) => {
+  return useQuery(query, {
+    ...options,
+    client: App.useService("mikro").client,
+  });
+};
+
+const useKabinetQuery = (query, options) => {
+  return useQuery(query, {
+    ...options,
+    client: App.useService("kabinet").client,
+  });
+};
+
+
 const ReactLiveScope = {
   React,
   ...React,
-  withMikro,
+  useKabinetQuery,
   useMikroQuery,
-  BioImage,
-  useDatalayer,
   gql,
 };
 export default ReactLiveScope;

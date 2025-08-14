@@ -1,0 +1,18 @@
+fragment State on State {
+  id
+  value
+  stateSchema {
+    hash
+    name
+    ports {
+      ...Port
+    }
+  }
+  updatedAt
+}
+
+fragment StateEvent on State {
+  id
+  value
+  updatedAt
+}

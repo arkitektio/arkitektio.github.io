@@ -1,0 +1,24 @@
+query GetEntityCategory($id: ID!) {
+  entityCategory(id: $id) {
+    ...EntityCategory
+  }
+}
+
+query SearchEntityCategory($search: String, $values: [ID!]) {
+  options: entityCategories(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}
+
+query ListEntityCategory(
+  $filters: EntityCategoryFilter
+  $pagination: OffsetPaginationInput
+) {
+  entityCategories(filters: $filters, pagination: $pagination) {
+    ...ListEntityCategory
+  }
+}

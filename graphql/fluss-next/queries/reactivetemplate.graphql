@@ -1,0 +1,11 @@
+query ReactiveTemplates($pagination: OffsetPaginationInput) {
+  reactiveTemplates(pagination: $pagination) {
+    ...ReactiveTemplate
+  }
+}
+
+query ReactiveTemplate($id: ID!) {
+  reactiveTemplate(id: $id) {
+    ...ReactiveTemplate
+  }
+}

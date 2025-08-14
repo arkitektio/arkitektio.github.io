@@ -1,0 +1,11 @@
+query ListFlavours {
+  flavours {
+    ...ListFlavour
+  }
+}
+
+query GetFlavour($id: ID!) {
+  flavour(id: $id) {
+    ...Flavour
+  }
+}

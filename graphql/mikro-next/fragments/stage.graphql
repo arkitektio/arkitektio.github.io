@@ -1,0 +1,20 @@
+fragment Stage on Stage {
+  id
+  affineViews {
+    ...AffineTransformationView
+    image {
+      id
+      store {
+        shape
+      }
+      name
+    }
+  }
+  pinned
+  name
+}
+
+fragment ListStage on Stage {
+  id
+  name
+}

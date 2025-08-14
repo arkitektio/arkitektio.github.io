@@ -1,0 +1,17 @@
+query GetNaturalEvent($id: ID!) {
+  naturalEvent(id: $id) {
+    ...NaturalEvent
+  }
+}
+
+query SearchNaturalEvents($search: String, $values: [ID!]) {
+  options: naturalEvents(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}
+
+

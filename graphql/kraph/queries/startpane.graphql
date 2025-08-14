@@ -1,0 +1,26 @@
+query StartPane {
+    reagentCategories(filters: {pinned: true}, pagination: {limit: 5}) {
+       id 
+       label
+    }
+    entityCategories(filters: {pinned: true}, pagination: {limit: 5}) {
+       id 
+       label
+    }
+    relationCategories(filters: {pinned: true}, pagination: {limit: 5}) {
+       id 
+       label
+    }
+    structureCategories(filters: {pinned: true}, pagination: {limit: 5}) {
+       id 
+       identifier
+    }
+    protocolEventCategories(filters: {pinned: true}, pagination: {limit: 5}) {
+       id 
+       label
+    }
+    naturalEventCategories(filters: {pinned: true}, pagination: {limit: 5}) {
+       id 
+       label
+    }
+}

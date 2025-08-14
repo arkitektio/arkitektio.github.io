@@ -1,0 +1,56 @@
+query GetStructure($id: ID!) {
+  structure(id: $id) {
+    ...Structure
+  }
+}
+
+query SearchStructures($search: String, $values: [ID!]) {
+  options: structures(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}
+
+query GetInformedStructure(
+  $graph: ID!
+  $identifier: StructureIdentifier!
+  $object: ID!
+) {
+  structureByIdentifier(
+    graph: $graph
+    identifier: $identifier
+    object: $object
+  ) {
+    ...InformedStructure
+  }
+}
+
+query GetKnowledgeViews(
+  $identifier: StructureIdentifier!
+  $object: ID!
+) {
+  knowledgeViews(identifier: $identifier, object: $object) {
+    structureCategory {
+      id
+      graph {
+        id
+        name
+      }
+    }
+    structure {
+      ...InformedStructure
+    }
+  }
+}
+
+query ListStructures(
+  $filters: StructureFilter
+  $pagination: GraphPaginationInput
+) {
+  structures(filters: $filters, pagination: $pagination) {
+    ...ListStructure
+  }
+}

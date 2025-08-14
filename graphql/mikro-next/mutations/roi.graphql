@@ -1,0 +1,15 @@
+mutation PinROI($id: ID!, $pin: Boolean!) {
+  pinRoi(input: { id: $id, pin: $pin }) {
+    ...ROI
+  }
+}
+
+mutation CreateROI($input: RoiInput!) {
+  createRoi(input: $input) {
+    ...ROI
+  }
+}
+
+mutation DeleteROI($id: ID!) {
+  deleteRoi(input: { id: $id })
+}

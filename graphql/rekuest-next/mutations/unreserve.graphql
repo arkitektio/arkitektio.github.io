@@ -1,0 +1,3 @@
+mutation Unreserve($reservation: ID!) {
+  unreserve(input: { reservation: $reservation })
+}

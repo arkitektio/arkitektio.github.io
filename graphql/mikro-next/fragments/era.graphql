@@ -1,0 +1,5 @@
+fragment Era on Era {
+  id
+  begin
+  name
+}

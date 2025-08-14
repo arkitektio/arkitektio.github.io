@@ -1,0 +1,36 @@
+query Me {
+  me {
+    ...DetailUser
+  }
+}
+
+query User($id: ID!) {
+  user(id: $id) {
+    ...DetailUser
+  }
+}
+
+query DetailUser($id: ID!) {
+  user(id: $id) {
+    ...DetailUser
+  }
+}
+
+query Users($filters: UserFilter, $pagination: OffsetPaginationInput) {
+  users(filters: $filters, pagination: $pagination) {
+    ...ListUser
+  }
+}
+
+query UserOptions($search: String, $values: [ID!]) {
+  options: users(filters: { search: $search, ids: $values }) {
+    value: id
+    label: username
+  }
+}
+
+query Profile {
+  me {
+    ...MeUser
+  }
+}

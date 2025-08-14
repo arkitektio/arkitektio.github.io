@@ -1,0 +1,5 @@
+query GetCamera($id: ID!) {
+  camera(id: $id) {
+    ...Camera
+  }
+}

@@ -1,0 +1,29 @@
+mutation from_parquet_like(
+  $dataframe: ParquetLike!
+  $name: String!
+  $origins: [ID!]
+  $dataset: ID
+) {
+  fromParquetLike(
+    input: {
+      dataframe: $dataframe
+      name: $name
+      origins: $origins
+      dataset: $dataset
+    }
+  ) {
+    ...Table
+  }
+}
+
+mutation RequestTableUpload($key: String!, $datalayer: String!) {
+  requestTableUpload(input: { key: $key, datalayer: $datalayer }) {
+    ...Credentials
+  }
+}
+
+mutation RequestTableAccess($store: ID!, $duration: Int) {
+  requestTableAccess(input: { store: $store, duration: $duration }) {
+    ...AccessCredentials
+  }
+}

@@ -1,0 +1,16 @@
+query GlobalSearch(
+  $search: String
+  $noUsers: Boolean!
+  $noGroups: Boolean!
+  $pagination: OffsetPaginationInput
+) {
+  users: users(filters: { search: $search }, pagination: $pagination)
+    @skip(if: $noUsers) {
+    ...ListUser
+  }
+
+  groups: groups(filters: { search: $search }, pagination: $pagination)
+    @skip(if: $noGroups) {
+    ...ListGroup
+  }
+}

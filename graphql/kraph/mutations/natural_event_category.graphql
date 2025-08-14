@@ -1,0 +1,15 @@
+mutation CreateNaturalEventCategory($input: NaturalEventCategoryInput!) {
+  createNaturalEventCategory(input: $input) {
+    ...NaturalEventCategory
+  }
+}
+
+mutation UpdateNaturalEventCategory($input: UpdateNaturalEventCategoryInput!) {
+  updateNaturalEventCategory(input: $input) {
+    ...NaturalEventCategory
+  }
+}
+
+mutation DeleteNaturalEventCategory($id: ID!) {
+  deleteNaturalEventCategory(input: {id: $id}) 
+}

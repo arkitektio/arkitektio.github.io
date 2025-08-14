@@ -1,0 +1,21 @@
+fragment ListFlavour on Flavour {
+  id
+  name
+  release {
+    id
+    version
+    app {
+      identifier
+    }
+  }
+  selectors {
+    ...CudaSelector
+    ...RocmSelector
+  }
+}
+
+
+fragment Flavour on Flavour {
+  ...ListFlavour
+  description
+}

@@ -1,0 +1,5 @@
+query GetObjective($id: ID!) {
+  objective(id: $id) {
+    ...Objective
+  }
+}

@@ -1,0 +1,45 @@
+query Snapshots {
+  snapshots {
+    ...ListSnapshot
+  }
+}
+
+query DetailSnapshot($id: ID!) {
+  snapshot(id: $id) {
+    ...Snapshot
+  }
+}
+
+query RunForAssignation($id: ID!) {
+  runForAssignation(id: $id) {
+    ...DetailRun
+  }
+}
+
+query EventsBetween($id: ID!, $min: Int, $max: Int) {
+  eventsBetween(run: $id, min: $min, max: $max) {
+    ...RunEvent
+  }
+}
+
+query ListRuns($filters: RunFilter, $pagination: OffsetPaginationInput) {
+  runs(filters: $filters, pagination: $pagination) {
+    ...ListRun
+  }
+}
+
+query GetRun($id: ID!) {
+  run(id: $id) {
+    ...DetailRun
+  }
+}
+
+query RunCarousel(
+  $pagination: OffsetPaginationInput
+  $filters: RunFilter
+  $order: RunOrder
+) {
+  runs(pagination: $pagination, filters: $filters, order: $order) {
+    ...CarouselRun
+  }
+}

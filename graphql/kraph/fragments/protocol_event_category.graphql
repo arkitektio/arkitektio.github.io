@@ -1,0 +1,45 @@
+fragment ProtocolEventCategory on ProtocolEventCategory {
+  ...BaseCategory
+  ...BaseNodeCategory
+  plateChildren
+  label
+  ageName
+  label
+  description
+  store {
+    presignedUrl
+  }
+  sourceEntityRoles {
+    ...EntityRoleDefinition
+  }
+  targetEntityRoles {
+    ...EntityRoleDefinition
+  }
+  sourceReagentRoles {
+    ...ReagentRoleDefinition
+  }
+  targetReagentRoles {
+    ...ReagentRoleDefinition
+  }
+  variableDefinitions {
+    ...VariableDefinition
+  }
+}
+
+fragment ListProtocolEventCategory on ProtocolEventCategory {
+  ...BaseListCategory
+  ...BaseNodeCategory
+  label
+  sourceEntityRoles {
+    ...EntityRoleDefinition
+  }
+  targetEntityRoles {
+    ...EntityRoleDefinition
+  }
+  sourceReagentRoles {
+    ...ReagentRoleDefinition
+  }
+  targetReagentRoles {
+    ...ReagentRoleDefinition
+  }
+}

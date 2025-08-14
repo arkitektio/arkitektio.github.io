@@ -1,0 +1,11 @@
+fragment ListServiceInstanceMapping on ServiceInstanceMapping {
+  id
+  key
+  instance {
+    ...ListServiceInstance
+  }
+  client {
+    ...ListClient
+  }
+  optional
+}

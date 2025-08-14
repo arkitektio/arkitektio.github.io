@@ -1,0 +1,28 @@
+fragment NaturalEvent on NaturalEvent {
+  ...BaseNode
+  id
+  label
+
+  validFrom
+  validTo
+}
+
+fragment ListNaturalEvent on NaturalEvent {
+  id
+  validFrom
+  validTo
+  category {
+    label
+    id
+  }
+}
+
+fragment PathNaturalEvent on NaturalEvent {
+  ...ListNaturalEvent
+  category {
+    label
+    store {
+      presignedUrl
+    }
+  }
+}

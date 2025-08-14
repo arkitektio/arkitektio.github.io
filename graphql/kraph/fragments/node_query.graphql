@@ -1,0 +1,18 @@
+fragment NodeQuery on NodeQuery {
+  id
+  graph {
+    id
+    name
+  }
+  name
+  pinned
+  query
+}
+
+fragment ListNodeQuery on NodeQuery {
+  id
+  name
+  query
+  description
+  pinned
+}

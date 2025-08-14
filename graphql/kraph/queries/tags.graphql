@@ -1,0 +1,9 @@
+query SearchTags($search: String, $values: [String!]) {
+  options: tags(
+    filters: { search: $search, values: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: value
+    label: value
+  }
+}

@@ -1,0 +1,42 @@
+fragment MemoryShelve on MemoryShelve {
+  agent {
+    name
+  }
+  id 
+  name
+  drawers {
+    id
+    label
+    description
+    resourceId
+  }
+}
+
+fragment ListMemoryShelve on MemoryShelve {
+  agent {
+    name
+  }
+  id 
+  name
+}
+
+query AgentOptions($search: String, $values: [ID!]) {
+  options: agents(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}
+
+
+fragment AgentChangeEvent on AgentChangeEvent {
+  create {
+    ...ListAgent
+  }
+  update {
+    ...ListAgent
+  }
+  delete
+}

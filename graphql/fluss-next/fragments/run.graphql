@@ -1,0 +1,91 @@
+fragment RunEvent on RunEvent {
+  id
+  source
+  handle
+  kind
+  createdAt
+  exception
+  value
+  t
+  causedBy
+}
+
+fragment Snapshot on Snapshot {
+  id
+  run {
+    id
+    assignation
+  }
+  status
+  events {
+    ...RunEvent
+  }
+  t
+}
+
+fragment ListSnapshot on Snapshot {
+  id
+  run {
+    id
+    assignation
+  }
+  t
+}
+
+fragment DetailRun on Run {
+  id
+  assignation
+  snapshots {
+    id
+    status
+    t
+    createdAt
+  }
+  createdAt
+  latestSnapshot {
+    createdAt
+    events {
+      ...RunEvent
+    }
+    t
+  }
+  status
+  flow {
+    ...Flow
+  }
+}
+
+fragment ListRun on Run {
+  id
+  assignation
+  createdAt
+  status
+  flow {
+    workspace {
+      title
+    }
+  }
+}
+
+fragment CarouselRun on Run {
+  id
+  assignation
+  snapshots {
+    id
+    status
+    t
+    createdAt
+  }
+  createdAt
+  latestSnapshot {
+    createdAt
+    events {
+      ...RunEvent
+    }
+    t
+  }
+  status
+  flow {
+    ...Flow
+  }
+}

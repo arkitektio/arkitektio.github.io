@@ -1,0 +1,12 @@
+fragment ModelCollection on ModelCollection {
+   id
+   name 
+   models {
+     ...ListNeuronModel
+   }
+}
+
+fragment ListModelCollection on ModelCollection {
+    id
+    name
+}

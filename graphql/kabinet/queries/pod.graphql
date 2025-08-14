@@ -1,0 +1,17 @@
+query ListPod {
+  pods {
+    ...ListPod
+  }
+}
+
+query GetPod($id: ID!) {
+  pod(id: $id) {
+    ...Pod
+  }
+}
+
+query GetPodForAgent($clientId: ID!, $instanceId: ID!) {
+  podForAgent(clientId: $clientId, instanceId: $instanceId) {
+    ...Pod
+  }
+}

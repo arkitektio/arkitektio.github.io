@@ -1,0 +1,5 @@
+query ListGithubRepos($filters: GithubRepoFilter!) {
+  githubRepos(filters: $filters) {
+    ...GithubRepo
+  }
+}

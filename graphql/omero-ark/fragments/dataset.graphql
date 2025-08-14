@@ -1,0 +1,15 @@
+fragment ListDataset on Dataset {
+  id
+  name
+  description
+}
+
+fragment Dataset on Dataset {
+  id
+  name
+  description
+  images {
+    ...ListImage
+  }
+  tags
+}

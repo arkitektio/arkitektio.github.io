@@ -1,0 +1,11 @@
+query Assignations($instanceId: InstanceId!) {
+  assignations(instanceId: $instanceId) {
+    ...PostmanAssignation
+  }
+}
+
+query DetailAssignation($id: ID!) {
+  assignation(id: $id) {
+    ...DetailAssignation
+  }
+}
