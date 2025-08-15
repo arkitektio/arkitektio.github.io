@@ -34,7 +34,7 @@ const config = {
   title: "Arkitekt",
   tagline: "streaming analysis for microscopy",
   url: "https://arkitekt.live/",
-  baseUrl: "/", 
+  baseUrl: "/",
 
   trailingSlash: false,
   onBrokenLinks: "warn",
@@ -151,14 +151,14 @@ const config = {
       algolia: {
         // The application ID provided by Algolia
         appId: 'TSJ9BPZE3G',
-  
+
         // Public API key: it is safe to commit it
         apiKey: '3d1912be9aa61b26779d736dcade0043',
         indexName: "arkitekt",
 
-  
-  
-  
+
+
+
         //... other Algolia params
       },
       image: "img/favicon.svg",
