@@ -1,0 +1,11 @@
+query DetailRecording($id: ID!) {
+  recording(id: $id) {
+    ...DetailRecording
+  }
+}
+
+query ListRecordings($pagination: OffsetPaginationInput, $filters: RecordingFilter) {
+  recordings(pagination: $pagination, filters: $filters) {
+    ...ListRecording
+  }
+}

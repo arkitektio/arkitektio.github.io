@@ -1,0 +1,28 @@
+fragment Release on Release {
+  id
+  version
+  app {
+    identifier
+  }
+  flavours {
+    ...ListFlavour
+  }
+  scopes
+  colour
+  description
+}
+
+fragment ListRelease on Release {
+  id
+  version
+  app {
+    identifier
+  }
+  installed
+  scopes
+  flavours {
+    ...ListFlavour
+  }
+  colour
+  description
+}

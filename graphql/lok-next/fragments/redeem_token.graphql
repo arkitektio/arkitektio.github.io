@@ -1,0 +1,17 @@
+fragment ListRedeemToken on RedeemToken {
+  id
+  token
+  user {
+    id
+    email
+  }
+  client {
+    id
+    release {
+      version
+      app {
+        identifier
+      }
+    }
+  }
+}

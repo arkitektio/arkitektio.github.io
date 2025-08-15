@@ -1,0 +1,10 @@
+mutation UpdateServiceInstance($input: UpdateServiceInstanceInput!) {
+  updateServiceInstance(input: $input) {
+    ...ServiceInstance
+  }
+}
+mutation CreateServiceInstance($input: CreateServiceInstanceInput!) {
+  createServiceInstance(input: $input) {
+    ...ServiceInstance
+  }
+}

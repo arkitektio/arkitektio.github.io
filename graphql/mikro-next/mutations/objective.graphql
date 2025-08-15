@@ -1,0 +1,37 @@
+mutation CreateObjective(
+  $serialNumber: String!
+  $name: String
+  $na: Float
+  $magnification: Float
+) {
+  createObjective(
+    input: {
+      name: $name
+      na: $na
+      serialNumber: $serialNumber
+      magnification: $magnification
+    }
+  ) {
+    id
+    name
+  }
+}
+
+mutation EnsureObjective(
+  $serialNumber: String!
+  $name: String
+  $na: Float
+  $magnification: Float
+) {
+  ensureObjective(
+    input: {
+      name: $name
+      na: $na
+      serialNumber: $serialNumber
+      magnification: $magnification
+    }
+  ) {
+    id
+    name
+  }
+}

@@ -1,0 +1,113 @@
+query ConstantAction($id: ID!) {
+  action(id: $id) {
+    ...GraphNodeAction
+  }
+}
+
+query AssignAction($reservation: ID, $implementation: ID, $id: ID, $hash: ActionHash) {
+  action(reservation: $reservation, implementation: $implementation, id: $id, hash: $hash) {
+    name
+    id
+    description
+    ...Ports
+    implementations {
+      id
+      interface
+    }
+    hash
+  }
+}
+
+query ReturnAction($assignation: ID!) {
+  action(assignation: $assignation) {
+    name
+    description
+    ...Ports
+  }
+}
+
+query ActionByHash($hash: ActionHash!) {
+  action(hash: $hash) {
+    id
+    ...Ports
+  }
+}
+
+query AllActions(
+  $pagination: OffsetPaginationInput
+  $filters: ActionFilter
+  $order: ActionOrder
+) {
+  actions(order: $order, pagination: $pagination, filters: $filters) {
+    ...ListAction
+  }
+}
+
+query AllPrimaryActions(
+  $pagination: OffsetPaginationInput
+  $filters: ActionFilter
+  $order: ActionOrder
+) {
+  actions(order: $order, pagination: $pagination, filters: $filters) {
+    ...PrimaryAction
+  }
+}
+
+query ActionSearch($filters: ActionFilter, $pagination: OffsetPaginationInput) {
+  actions: actions(filters: $filters, pagination: $pagination) {
+    ...ListAction
+  }
+}
+
+query DetailAction($id: ID!) {
+  action(id: $id) {
+    ...DetailAction
+  }
+}
+
+query PrimaryActions(
+  $pagination: OffsetPaginationInput
+  $identifier: String
+  $order: ActionOrder
+  $search: String
+) {
+  actions(
+    order: $order
+    pagination: $pagination
+    filters: {
+      demands: [
+        {
+          kind: ARGS
+          matches: [{ at: 0, kind: STRUCTURE, identifier: $identifier }]
+        }
+      ]
+      search: $search
+    }
+  ) {
+    ...PrimaryAction
+  }
+}
+
+query PrimaryReturnActions(
+  $pagination: OffsetPaginationInput
+  $identifier: String
+  $order: ActionOrder
+  $search: String
+) {
+  actions(
+    order: $order
+    pagination: $pagination
+    filters: {
+      demands: [
+        {
+          kind: RETURNS
+          matches: [{ at: 0, kind: STRUCTURE, identifier: $identifier }]
+        }
+        { kind: ARGS, forceStructureLength: 0 }
+      ]
+      search: $search
+    }
+  ) {
+    ...PrimaryAction
+  }
+}

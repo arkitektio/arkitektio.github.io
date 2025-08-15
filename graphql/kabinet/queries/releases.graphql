@@ -1,0 +1,11 @@
+query ListReleases {
+  releases {
+    ...ListRelease
+  }
+}
+
+query GetRelease($id: ID!) {
+  release(id: $id) {
+    ...Release
+  }
+}

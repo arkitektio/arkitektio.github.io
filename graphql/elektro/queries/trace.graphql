@@ -1,0 +1,11 @@
+query DetailTrace($id: ID!) {
+  trace(id: $id) {
+    ...DetailTrace
+  }
+}
+
+query Traces {
+  traces(pagination: { limit: 10 }) {
+    ...ListTrace
+  }
+}

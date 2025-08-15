@@ -1,0 +1,41 @@
+fragment TestCase on TestCase {
+  id
+  name
+  description
+  results {
+    ...ListTestResult
+  }
+  tester {
+    hash
+  }
+}
+
+fragment ListTestCase on TestCase {
+  ...TestCase
+}
+
+fragment TestResult on TestResult {
+  id
+  implementation {
+    id
+    interface
+    agent {
+      name
+    }
+  }
+  tester {
+    id
+    interface
+    agent {
+      name
+    }
+  }
+  case {
+    id
+  }
+  passed
+}
+
+fragment ListTestResult on TestResult {
+  ...TestResult
+}

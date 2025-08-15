@@ -1,0 +1,44 @@
+query GetDefinition($id: ID!) {
+  definition(id: $id) {
+    ...Definition
+  }
+}
+
+query ListDefinitions {
+  definitions {
+    ...ListDefinition
+  }
+}
+
+query PrimaryDefinitions(
+  $pagination: OffsetPaginationInput
+  $identifier: String
+  $search: String
+  $order: DefinitionOrder
+) {
+  definitions(
+    order: $order
+    pagination: $pagination
+    filters: {
+      demands: [
+        {
+          kind: ARGS
+          matches: [{ at: 0, kind: STRUCTURE, identifier: $identifier }]
+        }
+      ]
+      search: $search
+    }
+  ) {
+    ...ListDefinition
+  }
+}
+
+query AllPrimaryDefinitions(
+  $pagination: OffsetPaginationInput
+  $filters: DefinitionFilter
+  $order: DefinitionOrder
+) {
+  definitions(order: $order, pagination: $pagination, filters: $filters) {
+    ...ListDefinition
+  }
+}

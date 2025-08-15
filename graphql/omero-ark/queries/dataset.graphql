@@ -1,0 +1,11 @@
+query ListDatasets {
+  datasets {
+    ...ListDataset
+  }
+}
+
+query GetDataset($id: ID!) {
+  dataset(id: $id) {
+    ...Dataset
+  }
+}

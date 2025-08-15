@@ -1,0 +1,78 @@
+fragment Coord on Coord {
+    x
+    y
+    z
+}
+
+fragment Section on Section {
+    id
+    diam
+    length
+    category
+    coords {
+        ...Coord
+    }
+    connections {
+        ...Connection
+    }
+}
+
+fragment Connection on Connection {
+    parent
+    location
+}
+
+fragment Compartment on Compartment {
+    id
+    mechanisms
+    globalParams {
+        param
+        value
+    }
+    sectionParams {
+        param
+        value
+    }
+}
+
+fragment DetailNeuronModel on NeuronModel {
+  id
+  name
+  config {
+  cells {
+    id
+    biophysics {
+        compartments {
+            ...Compartment
+        } 
+        
+    }
+    topology {
+        sections {
+            ...Section
+        }   
+    }
+  }
+  }
+  comparisons {
+    collection {
+        id
+        name
+    }
+    changes {
+        type 
+        path
+        valueA
+        valueB
+    }
+  }
+  simulations {
+    ...ListSimulation
+  }
+
+}
+
+fragment ListNeuronModel on NeuronModel {
+    id
+    name
+}

@@ -1,0 +1,33 @@
+fragment Definition on Definition {
+  id
+  name
+  hash
+  description
+  args {
+    ...Port
+  }
+  returns {
+    ...Port
+  }
+  flavours {
+    ...ListFlavour
+  }
+}
+
+fragment ListDefinition on Definition {
+  id
+  name
+  hash
+  description
+  flavours {
+    id
+    name
+    release {
+      id
+      version
+      app {
+        identifier
+      }
+    }
+  }
+}

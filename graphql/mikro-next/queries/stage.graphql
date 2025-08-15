@@ -1,0 +1,21 @@
+query GetStage($id: ID!) {
+  stage(id: $id) {
+    ...Stage
+  }
+}
+
+query GetStages($filters: StageFilter, $pagination: OffsetPaginationInput) {
+  stages(filters: $filters, pagination: $pagination) {
+    ...ListStage
+  }
+}
+
+query StageOptions($search: String, $values: [ID!]) {
+  options: stages(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}

@@ -1,0 +1,8 @@
+fragment Streamer on Streamer {
+  user {
+    sub
+  }
+  client {
+    clientId
+  }
+}

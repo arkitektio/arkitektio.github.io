@@ -1,0 +1,11 @@
+query DetailMesh($id: ID!) {
+  mesh(id: $id) {
+    ...Mesh
+  }
+}
+
+query ListMeshes($filters: MeshFilter, $pagination: OffsetPaginationInput) {
+  meshes(filters: $filters, pagination: $pagination) {
+    ...ListMesh
+  }
+}

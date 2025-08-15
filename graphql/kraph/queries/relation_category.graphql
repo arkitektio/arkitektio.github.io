@@ -1,0 +1,24 @@
+query GetRelationCategory($id: ID!) {
+  relationCategory(id: $id) {
+    ...RelationCategory
+  }
+}
+
+query SearchRelationCategory($search: String, $values: [ID!]) {
+  options: relationCategories(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}
+
+query ListRelationCategory(
+  $filters: RelationCategoryFilter
+  $pagination: OffsetPaginationInput
+) {
+  relationCategories(filters: $filters, pagination: $pagination) {
+    ...ListRelationCategory
+  }
+}

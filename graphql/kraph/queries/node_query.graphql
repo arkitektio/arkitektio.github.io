@@ -1,0 +1,38 @@
+query GetNodeQuery($id: ID!) {
+  nodeQuery(id: $id) {
+    ...NodeQuery
+  }
+}
+
+query RenderNodeQuery($id: ID!, $nodeId: ID!) {
+  renderNodeQuery(id: $id, nodeId: $nodeId) {
+    ...Path
+    ...Table
+    ...Pairs
+  }
+}
+
+query SearchNodeQueries($search: String, $values: [ID!]) {
+  options: nodeQueries(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}
+
+query ListNodeQueries(
+  $filters: NodeQueryFilter
+  $pagination: OffsetPaginationInput
+) {
+  nodeQueries(filters: $filters, pagination: $pagination) {
+    ...ListNodeQuery
+  }
+}
+
+query GetNodeView($query: ID!, $nodeId: ID!) {
+  nodeView(query: $query, nodeId: $nodeId) {
+    ...NodeQueryView
+  }
+}

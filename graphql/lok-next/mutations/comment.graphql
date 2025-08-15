@@ -1,0 +1,29 @@
+mutation CreateComment(
+  $object: ID!
+  $identifier: Identifier!
+  $descendants: [DescendantInput!]!
+  $parent: ID
+) {
+  createComment(
+    input: {
+      object: $object
+      identifier: $identifier
+      descendants: $descendants
+      parent: $parent
+    }
+  ) {
+    ...ListComment
+  }
+}
+
+mutation ReplyTo($descendants: [DescendantInput!]!, $parent: ID!) {
+  replyTo(input: { descendants: $descendants, parent: $parent }) {
+    ...ListComment
+  }
+}
+
+mutation ResolveComment($id: ID!) {
+  resolveComment(input: { id: $id }) {
+    ...ListComment
+  }
+}

@@ -1,0 +1,6 @@
+mutation CreateEra($name: String!, $begin: DateTime) {
+  createEra(input: { name: $name, begin: $begin }) {
+    id
+    begin
+  }
+}

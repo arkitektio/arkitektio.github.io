@@ -1,0 +1,29 @@
+fragment NaturalEventCategory on NaturalEventCategory {
+  ...BaseCategory
+  ...BaseNodeCategory
+  plateChildren
+  label
+  ageName
+  description
+  store {
+    presignedUrl
+  }
+  sourceEntityRoles {
+    ...EntityRoleDefinition
+  }
+  targetEntityRoles {
+    ...EntityRoleDefinition
+  }
+}
+
+fragment ListNaturalEventCategory on NaturalEventCategory {
+  ...BaseListCategory
+  ...BaseNodeCategory
+  label
+  sourceEntityRoles {
+    ...EntityRoleDefinition
+  }
+  targetEntityRoles {
+    ...EntityRoleDefinition
+  }
+}

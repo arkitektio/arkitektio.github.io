@@ -1,0 +1,15 @@
+query Shortcuts(
+  $pagination: OffsetPaginationInput
+  $filters: ShortcutFilter
+  $order: ShortcutOrder
+) {
+  shortcuts(order: $order, pagination: $pagination, filters: $filters) {
+    ...ListShortcut
+  }
+}
+
+query Shortcut($id: ID!) {
+  shortcut(id: $id) {
+    ...Shortcut
+  }
+}

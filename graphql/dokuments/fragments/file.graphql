@@ -1,0 +1,15 @@
+fragment File on File {
+  id
+  name
+  documents {
+    ...ListDocument
+  }
+  store {
+    ...BigFileStore
+  }
+}
+
+fragment ListFile on File {
+  id
+  name
+}

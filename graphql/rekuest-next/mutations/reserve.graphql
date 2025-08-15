@@ -1,0 +1,21 @@
+mutation Reserve(
+  $instanceId: InstanceId!
+  $action: ID
+  $hash: ActionHash
+  $implementation: ID
+  $binds: BindsInput
+  $title: String
+) {
+  reserve(
+    input: {
+      instanceId: $instanceId
+      action: $action
+      implementation: $implementation
+      hash: $hash
+      binds: $binds
+      title: $title
+    }
+  ) {
+    ...PostmanReservation
+  }
+}

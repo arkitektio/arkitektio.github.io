@@ -1,0 +1,46 @@
+fragment ServiceInstance on ServiceInstance {
+  identifier
+  service {
+    identifier
+    id
+    description
+    name
+  }
+  id
+
+  allowedUsers {
+    ...ListUser
+  }
+  deniedUsers {
+    ...ListUser
+  }
+  allowedGroups {
+    ...ListGroup
+  }
+  deniedGroups {
+    ...ListGroup
+  }
+  mappings {
+    ...ListServiceInstanceMapping
+  }
+  aliases {
+    ...ListInstanceAlias
+  }
+  logo {
+    presignedUrl
+  }
+}
+
+fragment ListServiceInstance on ServiceInstance {
+  id
+  identifier
+  service {
+    id
+  }
+  allowedUsers {
+    ...ListUser
+  }
+  deniedUsers {
+    ...ListUser
+  }
+}

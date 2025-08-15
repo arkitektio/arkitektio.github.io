@@ -1,0 +1,57 @@
+fragment PostmanAssignation on Assignation {
+  id
+  latestEventKind
+  args
+  reference
+  isDone
+  events {
+    ...AssignationEvent
+  }
+  ephemeral
+  action {
+    hash
+    id
+    name
+    ...Ports
+  }
+  reservation {
+    id
+    title
+    action {
+      name
+    }
+  }
+  implementation {
+    id
+    interface
+    extension
+  }
+  createdAt
+}
+
+fragment DetailAssignation on Assignation {
+  ...PostmanAssignation
+}
+
+fragment AssignationEvent on AssignationEvent {
+  id
+  kind
+  level
+  returns
+  assignation {
+    id
+    reference
+  }
+  progress
+  reference
+  createdAt
+  message
+}
+fragment AssignationChangeEvent on AssignationChangeEvent {
+  create {
+    ...PostmanAssignation
+  }
+  event {
+    ...AssignationEvent
+  }
+}

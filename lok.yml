@@ -1,0 +1,20 @@
+overwrite: true
+schema: "https://go.arkitekt.live/lok/graphql"
+documents: "graphql/lok-next/**/*.graphql"
+generates:
+  src/lib/lok/api/fragments.ts:
+    plugins:
+      - "fragment-matcher"
+  src/lib/lok/api/graphql.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHooks: true
+      reactApolloVersion: 3
+      apolloReactHooksImportFrom: "@site/src/lib/lok/funcs"
+
+  src/lib/lok/graphql.schema.json:
+    plugins:
+      - "introspection"

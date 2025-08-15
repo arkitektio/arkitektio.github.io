@@ -1,0 +1,8 @@
+fragment Path on Path {
+  nodes {
+    ...PathNode
+  }
+  edges {
+    ...Edge
+  }
+}

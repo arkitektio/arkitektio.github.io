@@ -1,0 +1,21 @@
+query GetFile($id: ID!) {
+  file(id: $id) {
+    ...File
+  }
+}
+
+query SearchFiles($search: String, $values: [ID!]) {
+  options: files(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}
+
+query ListFiles($filter: FileFilter, $pagination: OffsetPaginationInput) {
+  files(filters: $filter, pagination: $pagination) {
+    ...ListFile
+  }
+}

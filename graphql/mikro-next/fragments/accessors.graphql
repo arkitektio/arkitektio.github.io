@@ -1,0 +1,18 @@
+fragment Accessor on Accessor {
+  id
+  keys
+  minIndex
+  maxIndex
+}
+
+fragment LabelAccessor on LabelAccessor {
+  ...Accessor
+  maskView {
+    id
+  }
+}
+
+fragment ImageAccessor on ImageAccessor {
+  ...Accessor
+  id
+}

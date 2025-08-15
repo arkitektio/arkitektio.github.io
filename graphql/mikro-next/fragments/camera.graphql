@@ -1,0 +1,9 @@
+fragment Camera on Camera {
+  sensorSizeX
+  sensorSizeY
+  pixelSizeX
+  pixelSizeY
+
+  name
+  serialNumber
+}

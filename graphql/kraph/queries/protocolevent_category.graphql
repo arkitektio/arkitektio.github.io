@@ -1,0 +1,24 @@
+query GetProtocolEventCategory($id: ID!) {
+  protocolEventCategory(id: $id) {
+    ...ProtocolEventCategory
+  }
+}
+
+query SearchProtocolEventCategories($search: String, $values: [ID!]) {
+  options: protocolEventCategories(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}
+
+query ListProtocolEventCategories(
+  $filters: ProtocolEventCategoryFilter
+  $pagination: OffsetPaginationInput
+) {
+  protocolEventCategories(filters: $filters, pagination: $pagination) {
+    ...ProtocolEventCategory
+  }
+}

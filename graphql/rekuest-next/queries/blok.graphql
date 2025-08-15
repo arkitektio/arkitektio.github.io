@@ -1,0 +1,11 @@
+query GetBlok($id: ID!) {
+  blok(id: $id) {
+    ...Blok
+  }
+}
+
+query ListBloks {
+  bloks {
+    ...ListBlok
+  }
+}

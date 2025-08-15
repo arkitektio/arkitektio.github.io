@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { createGraphiQLFetcher, Fetcher } from "@graphiql/toolkit";
-import { useMikro } from "@jhnnsrs/mikro";
-import { useHerre } from "@jhnnsrs/herre";
 import { GraphiQLProvider } from "graphiql";
 import { IQL } from "./IQL";
 import { DocumentNode } from "@apollo/client";
 import Translate from "@docusaurus/Translate";
+import { useService } from "@site/src/lib/arkitekt/provider";
+import { aliasToHttpPath } from "@site/src/lib/arkitekt/alias/helpers";
+import { App } from "@site/src/lib/app/App";
 
 export interface MikroIQLProps {
   query: string;
@@ -13,13 +14,13 @@ export interface MikroIQLProps {
 }
 
 export const MikroIQL: React.FC<MikroIQLProps> = ({ query, onEditQuery }) => {
-  const { config } = useMikro();
-  const { token } = useHerre();
+  const service = App.useService("mikro");
+  const token = App.useToken();
 
   const [sfetcher, setFetcher] = useState<Fetcher | undefined>();
 
   const fetcher = createGraphiQLFetcher({
-    url: config?.endpointUrl || "",
+    url: aliasToHttpPath(service?.alias, "graphql"),
     headers: {
       Authorization: `Bearer ${token}`,
     },

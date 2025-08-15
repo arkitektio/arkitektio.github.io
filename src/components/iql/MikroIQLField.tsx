@@ -3,9 +3,9 @@ import { Fetcher } from "@graphiql/toolkit";
 import { FieldHookConfig, useField } from "formik";
 import { GraphiQLProvider } from "graphiql";
 import React from "react";
-import { useHerre } from "@jhnnsrs/herre";
-import { useMikro } from "@jhnnsrs/mikro";
 import { IQL } from "./IQL";
+import { App } from "@site/src/lib/app/App";
+import { aliasToHttpPath } from "@site/src/lib/arkitekt/alias/helpers";
 
 export interface MikroIQLFieldProps {
   name: string;
@@ -20,25 +20,23 @@ export const MikroQLProvider = (props: {
   query?: string | undefined;
   children: React.ReactNode;
 }) => {
-  const { config } = useMikro();
-  const { token } = useHerre();
+  const alias = App.useService("mikro").alias;
+  const token = App.useToken();
 
   const passingFetcher: Fetcher = async (graphQLParams, fetcherOpts) => {
     console.log("passingFetcher", graphQLParams, fetcherOpts);
-    if (config?.endpointUrl && token) {
-      const data = await fetch(config?.endpointUrl, {
-        method: "POST",
-        body: JSON.stringify(graphQLParams),
-        headers: {
-          "content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...fetcherOpts?.headers,
-        },
-      });
-      console.log("data", data);
-      return data.json();
-    }
-    return {};
+
+    const data = await fetch(aliasToHttpPath(alias, "graphql"), {
+      method: "POST",
+      body: JSON.stringify(graphQLParams),
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+        ...fetcherOpts?.headers,
+      },
+    });
+    console.log("data", data);
+    return data.json();
   };
 
   return (
@@ -66,7 +64,7 @@ export const MikroIQLFieldInner = (props: FieldHookConfig<string>): any => {
 
   const onEditQuery = (
     value: string,
-    documentAst: DocumentNode | undefined,
+    documentAst: DocumentNode | undefined
   ) => {
     form.setValue(value);
   };

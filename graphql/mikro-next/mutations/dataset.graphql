@@ -1,0 +1,67 @@
+mutation CreateDataset($name: String!) {
+  createDataset(input: { name: $name }) {
+    id
+    name
+  }
+}
+
+mutation UpdateDataset($id: ID!, $name: String!) {
+  updateDataset(input: { id: $id, name: $name }) {
+    id
+    name
+  }
+}
+
+mutation PinDataset($id: ID!, $pin: Boolean!) {
+  pinDataset(input: { id: $id, pin: $pin }) {
+    ...Dataset
+  }
+}
+
+mutation PutDatasetsInDataset($selfs: [ID!]!, $other: ID!) {
+  putDatasetsInDataset(input: { selfs: $selfs, other: $other }) {
+    ...Dataset
+  }
+}
+
+mutation ReleaseDatasetsFromDataset($selfs: [ID!]!, $other: ID!) {
+  releaseDatasetsFromDataset(input: { selfs: $selfs, other: $other }) {
+    ...Dataset
+  }
+}
+
+mutation PutImagesInDataset($selfs: [ID!]!, $other: ID!) {
+  putImagesInDataset(input: { selfs: $selfs, other: $other }) {
+    ...Dataset
+  }
+}
+
+mutation ReleaseImagesFromDataset($selfs: [ID!]!, $other: ID!) {
+  releaseImagesFromDataset(input: { selfs: $selfs, other: $other }) {
+    ...Dataset
+  }
+}
+
+mutation PutFilesInDataset($selfs: [ID!]!, $other: ID!) {
+  putFilesInDataset(input: { selfs: $selfs, other: $other }) {
+    ...Dataset
+  }
+}
+
+mutation ReleaseFilesFromDataset($selfs: [ID!]!, $other: ID!) {
+  releaseFilesFromDataset(input: { selfs: $selfs, other: $other }) {
+    ...Dataset
+  }
+}
+
+mutation RevertDataset($dataset: ID!, $history: ID!) {
+  revertDataset(input: { id: $dataset, historyId: $history }) {
+    id
+    name
+    description
+  }
+}
+
+mutation DeleteDataset($id: ID!) {
+  deleteDataset(input: { id: $id })
+}

@@ -1,0 +1,11 @@
+query GetDataset($id: ID!) {
+  dataset(id: $id) {
+    ...Dataset
+  }
+}
+
+query GetDatasets($filters: DatasetFilter, $pagination: OffsetPaginationInput) {
+  datasets(filters: $filters, pagination: $pagination) {
+    ...ListDataset
+  }
+}

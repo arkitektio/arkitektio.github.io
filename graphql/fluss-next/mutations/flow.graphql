@@ -1,0 +1,11 @@
+mutation UpdateWorkspace($id: ID!, $graph: GraphInput!) {
+  updateWorkspace(input: { workspace: $id, graph: $graph }) {
+    ...Workspace
+  }
+}
+
+mutation CreateWorkspace($name: String) {
+  createWorkspace(input: { title: $name }) {
+    ...Workspace
+  }
+}

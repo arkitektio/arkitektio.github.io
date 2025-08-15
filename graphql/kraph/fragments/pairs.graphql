@@ -1,0 +1,10 @@
+fragment Pairs on Pairs {
+  pairs {
+    source {
+      id
+    }
+    target {
+      id
+    }
+  }
+}

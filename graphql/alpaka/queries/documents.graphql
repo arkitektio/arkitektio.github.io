@@ -1,0 +1,15 @@
+query QueryDocuments(
+  $collection: ID!
+  $queryTexts: [String!]!
+  $nResults: Int
+  $where: JSON
+) {
+  documents(
+    collection: $collection
+    queryTexts: $queryTexts
+    nResults: $nResults
+    where: $where
+  ) {
+    ...Document
+  }
+}

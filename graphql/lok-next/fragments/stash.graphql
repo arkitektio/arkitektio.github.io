@@ -1,0 +1,24 @@
+fragment Stash on Stash {
+  id
+  name
+  description
+  createdAt
+  updatedAt
+  owner {
+    id
+    username
+  }
+}
+
+fragment ListStash on Stash {
+  ...Stash
+  items {
+    ...StashItem
+  }
+}
+
+fragment StashItem on StashItem {
+  id
+  identifier
+  object
+}

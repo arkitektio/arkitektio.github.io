@@ -1,0 +1,11 @@
+query GetState($id: ID!) {
+  state(id: $id) {
+    ...State
+  }
+}
+
+query GetStateFor($agent: ID!, $stateHash: String, $demand: SchemaDemandInput) {
+  stateFor(agent: $agent, stateHash: $stateHash, demand: $demand) {
+    ...State
+  }
+}

@@ -1,0 +1,11 @@
+query ListBackends {
+  backends {
+    ...ListBackend
+  }
+}
+
+query GetBackend($id: ID!) {
+  backend(id: $id) {
+    ...Backend
+  }
+}

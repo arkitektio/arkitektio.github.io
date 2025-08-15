@@ -1,0 +1,42 @@
+fragment Structure on Structure {
+  ...BaseNode
+  id
+  object
+  identifier
+  category {
+    id
+    identifier
+    description
+  }
+}
+
+fragment ListStructure on Structure {
+  id
+  category {
+    identifier
+    id
+  }
+}
+
+fragment PathStructure on Structure {
+  ...ListStructure
+  category {
+    identifier
+    store {
+      presignedUrl
+    }
+  }
+}
+
+fragment InformedStructure on Structure {
+  ...BaseNode
+  id
+  category {
+    id
+    identifier
+  }
+  graph {
+    id
+    name
+  }
+}

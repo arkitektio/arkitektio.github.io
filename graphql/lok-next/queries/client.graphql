@@ -1,0 +1,23 @@
+query Clients($filters: ClientFilter, $pagination: OffsetPaginationInput) {
+  clients(filters: $filters, pagination: $pagination) {
+    ...ListClient
+  }
+}
+
+query DetailClient($id: ID!) {
+  client(id: $id) {
+    ...DetailClient
+  }
+}
+
+query MyManagedClients($kind: ClientKind!) {
+  myManagedClients(kind: $kind) {
+    ...ListClient
+  }
+}
+
+query Client($clientId: ID!) {
+  client(clientId: $clientId) {
+    ...DetailClient
+  }
+}

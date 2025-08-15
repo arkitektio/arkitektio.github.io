@@ -1,0 +1,7 @@
+fragment Profile on Profile {
+  id
+  name
+  avatar {
+    presignedUrl
+  }
+}

@@ -1,0 +1,7 @@
+query Children($id: ID!, $pagination: ChildrenPaginationInput) {
+  children(parent: $id, pagination: $pagination) {
+    ...ListFile
+    ...ListImage
+    ...ListDataset
+  }
+}

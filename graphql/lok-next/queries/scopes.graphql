@@ -1,0 +1,14 @@
+query Scopes {
+  scopes {
+    description
+    value
+    label
+  }
+}
+
+query ScopesOptions {
+  options: scopes {
+    value
+    label
+  }
+}

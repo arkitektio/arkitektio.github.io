@@ -1,0 +1,12 @@
+query GlobalSearch($search: String, $pagination: OffsetPaginationInput) {
+  definitions: definitions(
+    filters: { search: $search }
+    pagination: $pagination
+  ) {
+    ...ListDefinition
+  }
+
+  flavours: flavours(filters: { search: $search }, pagination: $pagination) {
+    ...ListFlavour
+  }
+}

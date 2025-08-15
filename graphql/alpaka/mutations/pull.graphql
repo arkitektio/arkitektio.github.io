@@ -1,0 +1,7 @@
+mutation Pull($input: PullInput!) {
+  pull(input: $input) {
+    status
+    detail
+
+  }
+}

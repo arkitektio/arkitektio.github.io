@@ -1,0 +1,6 @@
+mutation CreateViewCollection($name: String!) {
+  createViewCollection(input: { name: $name }) {
+    id
+    name
+  }
+}

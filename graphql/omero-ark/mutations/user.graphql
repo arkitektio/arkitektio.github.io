@@ -1,0 +1,11 @@
+mutation EnsureOmeroUser($username: String!, $password: String!) {
+  ensureOmeroUser(input: { username: $username, password: $password }) {
+    id
+    omeroUsername
+    omeroPassword
+    user {
+      id
+      sub
+    }
+  }
+}

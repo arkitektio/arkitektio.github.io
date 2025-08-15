@@ -1,0 +1,10 @@
+fragment PathRelation on Relation {
+  validFrom
+  validTo
+  category {
+    id
+    label
+  }
+  leftId
+  rightId
+}

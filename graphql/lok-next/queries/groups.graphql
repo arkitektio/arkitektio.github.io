@@ -1,0 +1,18 @@
+query GroupOptions($search: String, $values: [ID!]) {
+  options: groups(filters: { search: $search, ids: $values }) {
+    value: id
+    label: name
+  }
+}
+
+query DetailGroup($id: ID!) {
+  group(id: $id) {
+    ...DetailGroup
+  }
+}
+
+query Groups($filters: GroupFilter, $pagination: OffsetPaginationInput) {
+  groups(filters: $filters, pagination: $pagination) {
+    ...ListGroup
+  }
+}

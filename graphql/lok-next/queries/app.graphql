@@ -1,0 +1,17 @@
+query Apps($filters: AppFilter, $pagination: OffsetPaginationInput) {
+  apps(filters: $filters, pagination: $pagination) {
+    ...ListApp
+  }
+}
+
+query App($identifier: AppIdentifier, $id: ID, $clientId: ID) {
+  app(identifier: $identifier, id: $id, clientId: $clientId) {
+    ...DetailApp
+  }
+}
+
+query DetailApp($id: ID!) {
+  app(id: $id) {
+    ...DetailApp
+  }
+}

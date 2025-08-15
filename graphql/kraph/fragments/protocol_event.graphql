@@ -1,0 +1,42 @@
+fragment ProtocolEvent on ProtocolEvent {
+  ...BaseNode
+  id
+  validFrom
+  validTo
+  category {
+    id
+    label
+    plateChildren
+  }
+  leftEdges {
+    ...Edge
+  }
+  rightEdges {
+    ...Edge
+  }
+  variables {
+    role
+    value
+  }
+
+}
+
+fragment ListProtocolEvent on ProtocolEvent {
+  id
+  validFrom
+  validTo
+  category {
+    label
+    id
+  }
+}
+
+fragment PathProtocolEvent on ProtocolEvent {
+  ...ListProtocolEvent
+  category {
+    label
+    store {
+      presignedUrl
+    }
+  }
+}

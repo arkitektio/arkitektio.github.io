@@ -1,0 +1,11 @@
+mutation CreateUserProfile($input: CreateProfileInput!) {
+  createProfile(input: $input) {
+    ...Profile
+  }
+}
+
+mutation UpdateUserProfile($input: UpdateProfileInput!) {
+  updateProfile(input: $input) {
+    ...Profile
+  }
+}

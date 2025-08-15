@@ -1,0 +1,5 @@
+mutation RequestUpload($input: RequestMediaUploadInput!) {
+  requestUpload(input: $input) {
+    ...PresignedPostCredentials
+  }
+}

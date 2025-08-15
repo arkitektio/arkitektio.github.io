@@ -1,0 +1,6 @@
+fragment GithubRepo on GithubRepo {
+  id
+  name
+  addedAt
+  updatedAt
+}

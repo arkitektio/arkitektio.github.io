@@ -1,0 +1,24 @@
+query GetCollaborativeBroadcast($id: ID!) {
+  collaborativeBroadcast(id: $id) {
+    ...CollaborativeBroadcast
+  }
+}
+
+query SearchollaborativeBroadcasts($search: String, $values: [ID!]) {
+  options: collaborativeBroadcasts(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: title
+  }
+}
+
+query ListCollaborativeBroadcasts(
+  $filter: CollaborativeBroadcastFilter
+  $pagination: OffsetPaginationInput
+) {
+  collaborativeBroadcasts(filters: $filter, pagination: $pagination) {
+    ...CollaborativeBroadcast
+  }
+}

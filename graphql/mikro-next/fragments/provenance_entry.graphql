@@ -1,0 +1,17 @@
+fragment ProvenanceEntry on ProvenanceEntry {
+  id
+  during
+  kind
+  user {
+    sub
+  }
+  client {
+    clientId
+  }
+  date
+  effectiveChanges {
+    field
+    oldValue
+    newValue
+  }
+}

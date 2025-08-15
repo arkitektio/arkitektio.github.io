@@ -1,0 +1,33 @@
+query Implementation($id: ID!) {
+  implementation(id: $id) {
+    ...DetailImplementation
+  }
+}
+
+query Implementations($filters: ImplementationFilter, $pagination: OffsetPaginationInput) {
+  implementations(filters: $filters, pagination: $pagination) {
+    ...DetailImplementation
+  }
+}
+
+query ImplementationAt($agent: ID!, $extension: String, $interface: String, $demand: ActionDemandInput) {
+  implementationAt(agent: $agent, extension: $extension, interface: $interface, demand: $demand) {
+    ...DetailImplementation
+  }
+}
+
+query MyImplementationAt($instanceId: String!, $interface: String, $actionId: ID) {
+  myImplementationAt(
+    instanceId: $instanceId
+    interface: $interface
+    actionId: $actionId
+  ) {
+    ...DetailImplementation
+  }
+}
+
+query ActionImplementationAt($agent: ID!, $actionHash: String!) {
+  implementationAt(agent: $agent, actionHash: $actionHash) {
+    ...DetailImplementation
+  }
+}

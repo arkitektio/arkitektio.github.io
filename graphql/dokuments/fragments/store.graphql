@@ -1,0 +1,7 @@
+fragment BigFileStore on BigFileStore {
+  id
+  key
+  bucket
+  path
+  presignedUrl
+}

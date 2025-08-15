@@ -1,0 +1,5 @@
+fragment Instrument on Instrument {
+  model
+  name
+  serialNumber
+}

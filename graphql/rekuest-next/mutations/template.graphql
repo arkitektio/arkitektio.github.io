@@ -1,0 +1,9 @@
+mutation CreateForeignImplementation($input: CreateForeignImplementationInput!) {
+  createForeignImplementation(input: $input) {
+    id
+  }
+}
+
+mutation DeleteImplementation($id: ID!) {
+  deleteImplementation(input: { implementation: $id })
+}

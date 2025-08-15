@@ -1,0 +1,37 @@
+fragment ZarrStore on ZarrStore {
+  id
+  key
+  bucket
+  path
+  shape
+  dtype
+  chunks
+  version
+}
+
+fragment ParquetStore on ParquetStore {
+  id
+  key
+  bucket
+  path
+}
+
+fragment BigFileStore on BigFileStore {
+  id
+  key
+  bucket
+  path
+  presignedUrl
+}
+
+fragment MediaStore on MediaStore {
+  id
+  key
+  presignedUrl
+}
+
+fragment MeshStore on MeshStore {
+  id
+  key
+  presignedUrl
+}

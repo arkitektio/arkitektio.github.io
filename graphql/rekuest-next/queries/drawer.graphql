@@ -1,0 +1,20 @@
+query SearchMemoryDrawer(
+  $search: String,
+  $implementation: ID,
+  $values: [ID!],
+  $identifier: String,
+  $pagination: OffsetPaginationInput,
+) {
+  options: memoryDrawers(
+    filters: {
+      search: $search,
+      implementation: $implementation,
+      ids: $values,
+      identifier: $identifier,
+    },
+    pagination: $pagination
+  ) {
+    label: label 
+    value: id
+  }
+}

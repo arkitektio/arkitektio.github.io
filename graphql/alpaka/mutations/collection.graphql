@@ -1,0 +1,11 @@
+mutation CreateCollection($input: ChromaCollectionInput!) {
+  createCollection(input: $input) {
+    ...ChromaCollection
+  }
+}
+
+mutation EnsureCollection($input: ChromaCollectionInput!) {
+  ensureCollection(input: $input) {
+    ...ChromaCollection
+  }
+}

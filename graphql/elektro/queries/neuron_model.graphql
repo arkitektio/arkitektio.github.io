@@ -1,0 +1,11 @@
+query DetailNeuronModel($id: ID!) {
+  neuronModel(id: $id) {
+    ...DetailNeuronModel
+  }
+}
+
+query ListNeuronModels {
+  neuronModels(pagination: { limit: 10 }) {
+    ...ListNeuronModel
+  }
+}

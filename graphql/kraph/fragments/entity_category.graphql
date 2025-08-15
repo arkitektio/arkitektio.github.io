@@ -1,0 +1,22 @@
+fragment EntityCategory on EntityCategory {
+  ...BaseCategory
+  ...BaseNodeCategory
+  instanceKind
+  ageName
+  label
+  description
+  store {
+    presignedUrl
+  }
+  bestQuery {
+    ...GraphQuery
+  }
+  pinned
+}
+
+fragment ListEntityCategory on EntityCategory {
+  ...BaseListCategory
+  ...BaseNodeCategory
+  instanceKind
+  label
+}

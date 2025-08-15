@@ -1,0 +1,24 @@
+query GetMetricCategory($id: ID!) {
+  metricCategory(id: $id) {
+    ...MetricCategory
+  }
+}
+
+query ListMetricCategory(
+  $filters: MetricCategoryFilter
+  $pagination: OffsetPaginationInput
+) {
+  metricCategories(filters: $filters, pagination: $pagination) {
+    ...ListMetricCategory
+  }
+}
+
+query SearchMetricCategory($search: String, $values: [ID!]) {
+  options: metricCategories(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}

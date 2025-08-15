@@ -1,0 +1,74 @@
+fragment ListAction on Action {
+  id
+  name
+  description
+  hash
+  kind
+  scope
+  stateful
+  implementations {
+    id
+    agent {
+      id
+    }
+  }
+}
+
+fragment GraphNodeAction on Action {
+  name
+  description
+  kind
+  hash
+  id
+  stateful
+  collections {
+    id
+    name
+  }
+  ...Ports
+  protocols {
+    name
+  }
+}
+
+fragment DetailAction on Action {
+  ...GraphNodeAction
+  implementations {
+    id
+    interface
+  }
+  reservations {
+    ...ListReservation
+  }
+  testCases {
+    ...ListTestCase
+  }
+  tests {
+    id
+    name
+    description
+    runs {
+      implementation_id: arg(key: "implementation")
+      latestEventKind
+    }
+  }
+}
+
+fragment PrimaryAction on Action {
+  id
+  stateful
+  name
+  hash
+  implementations {
+    id
+    interface
+  }
+  args {
+    key
+    identifier
+    kind
+    nullable
+    default
+  }
+  description
+}

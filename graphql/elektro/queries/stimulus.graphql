@@ -1,0 +1,11 @@
+query DetailStimulus($id: ID!) {
+  stimulus(id: $id) {
+    ...DetailStimulus
+  }
+}
+
+query ListStimuli($pagination: OffsetPaginationInput, $filters: StimulusFilter) {
+  stimuli(pagination: $pagination, filters: $filters) {
+    ...ListStimulus
+  }
+}

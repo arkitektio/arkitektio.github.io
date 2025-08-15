@@ -1,0 +1,45 @@
+mutation CreateCamera(
+  $serialNumber: String!
+  $name: String
+  $pixelSizeX: Micrometers
+  $pixelSizeY: Micrometers
+  $sensorSizeX: Int
+  $sensorSizeY: Int
+) {
+  createCamera(
+    input: {
+      name: $name
+      pixelSizeX: $pixelSizeX
+      serialNumber: $serialNumber
+      pixelSizeY: $pixelSizeY
+      sensorSizeX: $sensorSizeX
+      sensorSizeY: $sensorSizeY
+    }
+  ) {
+    id
+    name
+  }
+}
+
+mutation EnsureCamera(
+  $serialNumber: String!
+  $name: String
+  $pixelSizeX: Micrometers
+  $pixelSizeY: Micrometers
+  $sensorSizeX: Int
+  $sensorSizeY: Int
+) {
+  ensureCamera(
+    input: {
+      name: $name
+      pixelSizeX: $pixelSizeX
+      serialNumber: $serialNumber
+      pixelSizeY: $pixelSizeY
+      sensorSizeX: $sensorSizeX
+      sensorSizeY: $sensorSizeY
+    }
+  ) {
+    id
+    name
+  }
+}

@@ -1,0 +1,71 @@
+fragment Image on Image {
+  id
+  name
+  store {
+    ...ZarrStore
+  }
+  views {
+    ...ChannelView
+    ...AffineTransformationView
+    ...MaskView
+    ...InstanceMaskView
+    ...TimepointView
+    ...OpticsView
+    ...AcquisitionView
+    ...RGBView
+    ...WellPositionView
+    ...DerivedView
+    ...ROIView
+    ...FileView
+    ...HistogramView
+  }
+  derivedFromViews {
+    image {
+      id
+      name
+    }
+  }
+
+  pinned
+  renders {
+    ...Snapshot
+    ...Video
+  }
+  dataset {
+    name
+    id
+  }
+  createdAt
+  provenanceEntries {
+    ...ProvenanceEntry
+  }
+  creator {
+    sub
+  }
+  tags
+  rgbContexts {
+    ...ListRGBContext
+  }
+  rois {
+    ...ListROI
+  }
+}
+
+fragment RGBImage on Image {
+  name
+  rgbContexts {
+    ...ListRGBContext
+  }
+}
+
+fragment ListImage on Image {
+  latestSnapshot {
+    id
+    store {
+      key
+      presignedUrl
+    }
+  }
+  id
+  name
+}

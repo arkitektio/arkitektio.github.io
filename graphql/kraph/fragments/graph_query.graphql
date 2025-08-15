@@ -1,0 +1,26 @@
+fragment GraphQuery on GraphQuery {
+  id
+  query
+  name
+  graph {
+    id
+    name
+  }
+  scatterPlots(pagination: { limit: 1 }) {
+    ...ListScatterPlot
+  }
+  render {
+    ...Path
+    ...Pairs
+    ...Table
+  }
+  pinned
+}
+
+fragment ListGraphQuery on GraphQuery {
+  id
+  name
+  query
+  description
+  pinned
+}

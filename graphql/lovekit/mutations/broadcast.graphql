@@ -1,0 +1,5 @@
+mutation EnsureSoloBroadcast($input: EnsureSoloBroadcastInput!) {
+  ensureSoloBroadcast(input: $input) {
+    ...SoloBroadcast
+  }
+}

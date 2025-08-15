@@ -1,0 +1,8 @@
+query RedeemTokens(
+  $filters: RedeemTokenFilter
+  $pagination: OffsetPaginationInput
+) {
+  redeemTokens(filters: $filters, pagination: $pagination) {
+    ...ListRedeemToken
+  }
+}

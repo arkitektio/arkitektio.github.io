@@ -1,0 +1,11 @@
+subscription WatchImages($dataset: ID) {
+  images(dataset: $dataset) {
+    create {
+      ...ListImage
+    }
+    delete
+    update {
+      ...ListImage
+    }
+  }
+}

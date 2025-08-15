@@ -1,0 +1,7 @@
+fragment Video on Video {
+  id
+  store {
+    key
+    presignedUrl
+  }
+}

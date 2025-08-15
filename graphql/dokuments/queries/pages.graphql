@@ -1,0 +1,21 @@
+query GetPage($id: ID!) {
+  page(id: $id) {
+    ...Page
+  }
+}
+
+query SearchPages($search: String, $values: [ID!]) {
+  options: pages(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: index
+  }
+}
+
+query ListPages($filter: PageFilter, $pagination: OffsetPaginationInput) {
+  pages(filters: $filter, pagination: $pagination) {
+    ...ListPage
+  }
+}

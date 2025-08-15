@@ -1,0 +1,33 @@
+fragment ChatResponse on ChatResponse {
+  id
+  object
+  created
+  model
+  usage {
+    promptTokens
+    completionTokens
+    totalTokens
+  }
+  choices {
+    index
+    finishReason
+    message {
+      role
+      content
+      name
+      toolCallId
+      functionCall {
+        name
+        arguments
+      }
+      toolCalls {
+        id
+        type
+        function {
+          name
+          arguments
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+query GlobalSearch(
+  $search: String
+  $noRooms: Boolean!
+  $pagination: OffsetPaginationInput
+) {
+  rooms: rooms(filters: { search: $search }, pagination: $pagination)
+    @skip(if: $noRooms) {
+    ...ListRoom
+  }
+}

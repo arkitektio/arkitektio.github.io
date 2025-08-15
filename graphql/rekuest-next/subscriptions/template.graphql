@@ -1,0 +1,17 @@
+subscription WatchImplementation($implementation: ID!) {
+  implementationChange(implementation: $implementation) {
+    ...DetailImplementation
+  }
+}
+
+subscription WatchImplementations($agent: ID!) {
+  implementations(agent: $agent) {
+    create {
+      ...ListImplementation
+    }
+    update {
+      ...ListImplementation
+    }
+    delete
+  }
+}

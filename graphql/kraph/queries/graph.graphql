@@ -1,0 +1,21 @@
+query GetGraph($id: ID!) {
+  graph(id: $id) {
+    ...Graph
+  }
+}
+
+query SearchGraphs($search: String, $values: [ID!]) {
+  options: graphs(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}
+
+query ListGraphs($filters: GraphFilter, $pagination: OffsetPaginationInput) {
+  graphs(filters: $filters, pagination: $pagination) {
+    ...ListGraph
+  }
+}

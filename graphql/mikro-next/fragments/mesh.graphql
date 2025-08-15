@@ -1,0 +1,12 @@
+fragment Mesh on Mesh {
+  id
+  name
+  store {
+    ...MeshStore
+  }
+}
+
+fragment ListMesh on Mesh {
+  id
+  name
+}

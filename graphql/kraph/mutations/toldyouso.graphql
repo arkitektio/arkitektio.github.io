@@ -1,0 +1,5 @@
+mutation CreateToldyouso($input: ToldYouSoInput!) {
+  createToldyouso(input: $input) {
+    ...Structure
+  }
+}

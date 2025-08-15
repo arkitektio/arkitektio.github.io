@@ -1,0 +1,7 @@
+fragment Snapshot on Snapshot {
+  id
+  store {
+    key
+    presignedUrl
+  }
+}

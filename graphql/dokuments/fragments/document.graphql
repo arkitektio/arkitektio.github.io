@@ -1,0 +1,12 @@
+fragment Document on Document {
+  id
+  title
+  pages {
+    ...Page
+  }
+}
+
+fragment ListDocument on Document {
+  id
+  title
+}

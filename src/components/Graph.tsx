@@ -1,18 +1,17 @@
+import BrowserOnly from "@docusaurus/BrowserOnly";
+import Link from "@docusaurus/Link";
+import { explorerPlugin } from "@graphiql/plugin-explorer";
+import "@graphiql/plugin-explorer/dist/style.css";
 import { createGraphiQLFetcher, Fetcher, Storage } from "@graphiql/toolkit";
 import { GraphiQL } from "graphiql";
-import React from "react";
 import "graphiql/graphiql.css";
-import "@graphiql/plugin-explorer/dist/style.css";
-import "./test.css";
-import BrowserOnly from "@docusaurus/BrowserOnly";
-import { explorerPlugin } from "@graphiql/plugin-explorer";
-import {
-  useArkitektConnect,
-  useArkitektLogin,
-  EasyGuard,
-} from "@jhnnsrs/arkitekt";
 import { GraphQLError } from "graphql";
-import Link from "@docusaurus/Link";
+import React from "react";
+import { App } from "../lib/app/App";
+import { aliasToHttpPath } from "../lib/arkitekt/alias/helpers";
+import { AvailableService, useToken } from "../lib/arkitekt/provider";
+import { NotConnected } from "./Connector";
+import "./test.css";
 
 const explorer = explorerPlugin({} as any);
 
@@ -51,7 +50,7 @@ export const buildStorage = (url: string): Storage => {
 };
 
 const Renderer = ({ url }: { url: string }) => {
-  const { token } = useArkitektLogin();
+  const token = useToken();
 
   const fetcher = createGraphiQLFetcher({
     url: url,
@@ -142,7 +141,7 @@ export const GraphOptions = ({ options }: { options: APIOption[] }) => {
 
 export const APIDocumentation = () => {
   const [options, setOptions] = React.useState<APIOption[]>([]);
-  const { fakts } = useArkitektConnect();
+  const fakts = App.useFakts();
 
   React.useEffect(() => {
     if (!fakts) return;
@@ -167,92 +166,12 @@ export const APIDocumentation = () => {
   );
 };
 
-export const Login = () => {
-  const { login, loading } = useArkitektLogin();
-  const { fakts, remove } = useArkitektConnect();
-
-  return (
-    <div className="h-full flex flex-col flex-1 items-center justify-center dark:text-white ">
-      <div className="px-2 py-2 flex flex-col items-center justify-center">
-        <div className="text-slate-200 justify-center  items-center align-center">
-          You are connected!
-        </div>
-        <div className="text-slate-600 text-xs">
-          You are logged in with this demo website with arkitekt. Just
-          authenticate yourself and you are ready to go
-        </div>
-      </div>
-      <div className="flex flex-row w-full gap-2 justify-center p-3">
-        <>
-          <button
-            className={
-              "px-2  py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md " +
-              (loading ? "animate-pulse" : "")
-            }
-            onClick={() => login()}
-          >
-            <div className="text-md text-center">Login</div>
-          </button>
-          <button
-            className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md text-md"
-            onClick={() => remove()}
-          >
-            {" "}
-            Unconnect
-          </button>
-        </>
-      </div>
-    </div>
-  );
-};
-
-export const Connect = () => {
-  const { registeredEndpoints, load, fakts, loading } = useArkitektConnect();
-
-  return (
-    <div className="h-full flex flex-col flex-1 items-center justify-center dark:text-white ">
-      <div className="text-slate-200 justify-center ">
-        Lets get you connected!
-      </div>
-      <div className="text-slate-600 text-xs">
-        You are not currently connected. Here connectable instances will appear
-        (currently restricted to local arkitekt instance)
-      </div>
-      <div className="flex flex-row gap-2 justify-start p-3">
-        {!loading ? (
-          registeredEndpoints.map((e) => (
-            <button
-              className="px-2 py-2 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md flex flex-col"
-              onClick={() => load({ endpoint: e, requestPublic: true })}
-            >
-              {" "}
-              <div className="text-2xl text-center">{e.name}</div>
-              {e.base_url}
-            </button>
-          ))
-        ) : (
-          <div
-            className="animate-pulse cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md px-2 py-2 "
-            onClick={() => load()}
-          >
-            Cancel connection
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
 export const GraphQuard = (props: { children: React.ReactNode }) => {
   return (
     <>
-      <EasyGuard
-        noAppFallback={<>Not connected</>}
-        notConnectedFallback={<Connect />}
-        notLoggedInFallback={<Login />}
-      >
+      <App.Guard notConnectedFallback={<NotConnected />}>
         {props.children}
-      </EasyGuard>
+      </App.Guard>
     </>
   );
 };
@@ -302,16 +221,21 @@ export const createFallBackFetcher = (
 };
 
 export type AliveDocumentationProps = {
-  faktsKey: string;
+  serviceKey: "mikro" | "kabinet" | "lok";
   storageKey: string;
 };
 
 export const AliveDocumentation = (props: AliveDocumentationProps) => {
-  const { token } = useArkitektLogin();
-  const { fakts } = useArkitektConnect();
+  const token = App.useToken();
+  const service = App.useService(props.serviceKey);
+  const alias = service?.alias;
+
+  if (!alias) {
+    return <div className="flex flex-col h-full w-full">No service found</div>;
+  }
 
   const fetcher = createGraphiQLFetcher({
-    url: fakts[props.faktsKey]?.endpoint_url as string,
+    url: aliasToHttpPath(alias, "graphql"),
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -363,9 +287,7 @@ export const FallbackDocumentation = (props: FallbackDocumentationProps) => {
 };
 
 export type DynamicDocumentationProps = {
-  faktsKey: string;
-  schema: string;
-  description: string;
+  service: AvailableService;
 };
 
 export const DynamicDocumentation = (props: DynamicDocumentationProps) => {
@@ -373,28 +295,12 @@ export const DynamicDocumentation = (props: DynamicDocumentationProps) => {
     <>
       <div className="flex flex-grow h-full flex-col">
         <div className="flex-grow flex overflow-y-auto">
-          <EasyGuard
-            noAppFallback={<>Not connected</>}
-            notConnectedFallback={
-              <FallbackDocumentation
-                faktsKey={props.faktsKey}
-                storageKey={props.faktsKey}
-                schema={props.schema}
-              />
-            }
-            notLoggedInFallback={
-              <FallbackDocumentation
-                faktsKey={props.faktsKey}
-                storageKey={props.faktsKey}
-                schema={props.schema}
-              />
-            }
-          >
+          <App.Guard notConnectedFallback={<> No Documentation</>}>
             <AliveDocumentation
-              faktsKey={props.faktsKey}
-              storageKey={props.faktsKey}
+              serviceKey={props.service.key as "mikro" | "kabinet" | "lok"}
+              storageKey={props.service.key}
             />
-          </EasyGuard>
+          </App.Guard>
         </div>
       </div>
     </>
@@ -414,9 +320,9 @@ export const ServiceSelector = ({
   value,
   options,
 }: {
-  onChange: (value: ServiceOption) => void;
-  value: ServiceOption;
-  options: ServiceOption[];
+  onChange: (value: AvailableService) => void;
+  value: AvailableService;
+  options: AvailableService[];
 }) => {
   return (
     <div className="flex-initial flex flex-row pl-20 gap-2 h-10 mt-2 pr-10">
@@ -424,43 +330,21 @@ export const ServiceSelector = ({
         {" "}
         Core Services
       </div>
-      {options
-        .filter((e) => e.core)
-        .map((e) => (
-          <>
-            <button
-              onClick={() => onChange(e)}
-              disabled={e.faktsKey == value.faktsKey}
-              className={
-                "appearance-none bg-slate-700 hover:bg-slate-400 text-slate-200 font-light py-2 px-2 rounded inline-flex items-center cursor-pointer disabled:opacity-100 opacity-30 transition duration-500 ease-in-out"
-              }
-            >
-              {e.label}
-            </button>
-          </>
-        ))}
-      <div className="py-2 px-2 h-10 my-auto text-slate-600">
-        {" "}
-        Optional Services
-      </div>
-      {options
-        .filter((e) => !e.core)
-        .map((e) => (
-          <>
-            <button
-              onClick={() => onChange(e)}
-              disabled={e.faktsKey == value.faktsKey}
-              className={
-                "appearance-none bg-slate-700 hover:bg-slate-400 text-slate-200 font-light py-2 px-2 rounded inline-flex items-center cursor-pointer disabled:opacity-100 opacity-30 transition duration-500 ease-in-out"
-              }
-            >
-              {e.label}
-            </button>
-          </>
-        ))}
-      <div className="flex-grow"></div>
+      {options.map((e) => (
+        <>
+          <button
+            onClick={() => onChange(e)}
+            disabled={e.key == value.key}
+            className={
+              "appearance-none bg-slate-700 hover:bg-slate-400 text-slate-200 font-light py-2 px-2 rounded inline-flex items-center cursor-pointer disabled:opacity-100 opacity-30 transition duration-500 ease-in-out"
+            }
+          >
+            {e.key}
+          </button>
+        </>
+      ))}
       <div className="flex-initial px-3  text-slate-600 my-auto max-w-50">
-        {value.description}
+        {value.key}
       </div>
       <Link to={"docs/design/api"} className="flex-initial my-auto">
         What am I Seeing?
@@ -469,16 +353,26 @@ export const ServiceSelector = ({
   );
 };
 
-export const DocumentationPage = ({
-  options,
-}: {
-  options: ServiceOption[];
-}) => {
+export const DocumentationPage = ({}: {}) => {
+  const options = App.useServices();
+
+  if (!options || options.length === 0) {
+    return (
+      <div className="flex flex-col h-full w-full">
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-slate-200 text-lg">
+            No services available. Please connect to a service.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const [state, setState] = React.useState(options.at(0));
 
   return (
     <div className="flex flex-col h-[95%] w-full overflow-y-auto">
-      <DynamicDocumentation {...state} />
+      <DynamicDocumentation service={state} />
       <ServiceSelector
         value={state}
         onChange={(e) => setState(e)}
@@ -488,78 +382,10 @@ export const DocumentationPage = ({
   );
 };
 
-export const APIS: ServiceOption[] = [
-  {
-    faktsKey: "mikro",
-    label: "Mikro",
-    schema: "/introspections/mikro.introspection.json",
-    description: "Mikro handles all things microscopy",
-    core: true,
-  },
-  {
-    faktsKey: "rekuest",
-    label: "Rekuest",
-    schema: "/introspections/rekuest.introspection.json",
-    description: "Rekuest manages Nodes and Tasks",
-    core: true,
-  },
-  {
-    faktsKey: "port",
-    label: "Port",
-    schema: "/introspections/port.introspection.json",
-    description: "Port manages containers and apps",
-    core: true,
-  },
-  {
-    faktsKey: "unlok",
-    label: "Lok",
-    schema: "/introspections/unlok.introspection.json",
-    description: "User management and authentication",
-    core: true,
-  },
-  {
-    faktsKey: "fluss",
-    label: "Fluss",
-    schema: "/introspections/fluss.introspection.json",
-    description: "Workflow management and execution log",
-    core: true,
-  },
-  {
-    faktsKey: "kabinet",
-    label: "Kabinet",
-    schema: "/introspections/kabinet.introspection.json",
-    description: "Kabinet will manage all things apps in the future",
-  },
-  {
-    faktsKey: "kluster",
-    label: "Kluster",
-    schema: "/introspections/kluster.introspection.json",
-    description: "Kluster spawns and manages dask clusters on demand",
-  },
-  {
-    faktsKey: "konviktion",
-    label: "Konviktion",
-    schema: "/introspections/konviktion.introspection.json",
-    description: "Connects your data to notion and back",
-  },
-  {
-    faktsKey: "mikro_next",
-    label: "Mikro (Next)",
-    schema: "/introspections/mikro_next.introspection.json",
-    description: "Mikro handles all things microscopy",
-  },
-  {
-    faktsKey: "omero_ark",
-    label: "OmeroArk (Next)",
-    schema: "/introspections/omero_ark.introspection.json",
-    description: "Your Omero server gateway",
-  },
-];
-
 export const Graph = () => {
   return (
     <BrowserOnly fallback={<div>Hallo</div>}>
-      {() => <DocumentationPage options={APIS} />}
+      {() => <DocumentationPage />}
     </BrowserOnly>
   );
 };

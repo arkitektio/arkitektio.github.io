@@ -1,0 +1,65 @@
+fragment Agent on Agent {
+  id
+  instanceId
+  implementations {
+    ...ListImplementation
+  }
+  memoryShelve {
+    id
+  }
+  states {
+    ...State
+  }
+  registry {
+    client {
+      clientId
+    }
+    user {
+      sub
+    }
+  }
+  pinned
+  extensions
+  name
+  active
+  connected
+  lastSeen
+}
+
+fragment ListAgent on Agent {
+  id
+  instanceId
+  active
+  connected
+  name
+  lastSeen
+  pinned
+  registry {
+    client {
+      clientId
+    }
+    user {
+      sub
+    }
+  }
+}
+
+query AgentOptions($search: String, $values: [ID!]) {
+  options: agents(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}
+
+fragment AgentChangeEvent on AgentChangeEvent {
+  create {
+    ...ListAgent
+  }
+  update {
+    ...ListAgent
+  }
+  delete
+}

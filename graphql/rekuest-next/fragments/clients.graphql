@@ -1,0 +1,11 @@
+fragment Client on Client {
+  id
+  name
+  clientId
+}
+
+fragment ListClient on Client {
+  id
+  name
+  clientId
+}

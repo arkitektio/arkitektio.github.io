@@ -1,0 +1,17 @@
+query GetRelation($id: ID!) {
+  relation(id: $id) {
+    ...Relation
+  }
+}
+
+query SearchRelations($search: String, $values: [ID!]) {
+  options: relations(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}
+
+

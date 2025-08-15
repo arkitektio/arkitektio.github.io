@@ -1,0 +1,45 @@
+fragment DetailClient on Client {
+  id
+  token
+  name
+  user {
+    id
+    username
+  }
+  kind
+  release {
+    ...ListRelease
+  }
+  logo {
+    presignedUrl
+  }
+  oauth2Client {
+    clientId
+  }
+  mappings {
+    ...ListServiceInstanceMapping
+  }
+}
+
+fragment ListClient on Client {
+  id
+  user {
+    id
+    username
+  }
+  name
+  kind
+  release {
+    version
+    logo {
+      presignedUrl
+    }
+    app {
+      id
+      identifier
+      logo {
+        presignedUrl
+      }
+    }
+  }
+}

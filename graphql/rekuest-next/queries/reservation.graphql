@@ -1,0 +1,11 @@
+query Reservations($instanceId: InstanceId!) {
+  reservations(instanceId: $instanceId) {
+    ...PostmanReservation
+  }
+}
+
+query DetailReservation($id: ID!) {
+  reservation(id: $id) {
+    ...DetailReservation
+  }
+}

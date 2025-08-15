@@ -1,0 +1,5 @@
+mutation Acknowledge($assignation: ID!) {
+  ack(input: { assignation: $assignation }) {
+    ...PostmanAssignation
+  }
+}

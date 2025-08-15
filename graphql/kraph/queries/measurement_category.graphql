@@ -1,0 +1,24 @@
+query GetMeasurmentCategory($id: ID!) {
+  measurementCategory(id: $id) {
+    ...MeasurementCategory
+  }
+}
+
+query SearchMeasurmentCategory($search: String, $values: [ID!]) {
+  options: measurementCategories(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: label
+  }
+}
+
+query ListMeasurmentCategory(
+  $filters: MeasurementCategoryFilter
+  $pagination: OffsetPaginationInput
+) {
+  measurementCategories(filters: $filters, pagination: $pagination) {
+    ...ListMeasurementCategoryWithGraph
+  }
+}

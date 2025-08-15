@@ -1,0 +1,134 @@
+fragment Leaf on LeafDescendant {
+  bold
+  italic
+  code
+  text
+}
+
+fragment CommentUser on User {
+  id
+  username
+  avatar
+  profile {
+    avatar {
+      presignedUrl
+    }
+  }
+}
+
+fragment Mention on MentionDescendant {
+  user {
+    ...CommentUser
+  }
+}
+
+fragment Paragraph on ParagraphDescendant {
+  size
+}
+
+fragment Descendant on Descendant {
+  kind
+  children {
+    kind
+    children {
+      kind
+      unsafeChildren
+      ...Leaf
+      ...Mention
+      ...Paragraph
+    }
+    ...Leaf
+    ...Mention
+    ...Paragraph
+  }
+  ...Mention
+  ...Paragraph
+  ...Leaf
+}
+
+fragment SubthreadComment on Comment {
+  user {
+    ...CommentUser
+  }
+  parent {
+    id
+  }
+  createdAt
+  descendants {
+    ...Descendant
+  }
+}
+
+fragment ListComment on Comment {
+  user {
+    ...CommentUser
+  }
+  parent {
+    id
+  }
+  descendants {
+    ...Descendant
+  }
+  resolved
+  resolvedBy {
+    ...CommentUser
+  }
+  id
+  createdAt
+  children {
+    ...SubthreadComment
+  }
+}
+
+fragment MentionComment on Comment {
+  user {
+    ...CommentUser
+  }
+  parent {
+    id
+  }
+  descendants {
+    ...Descendant
+  }
+  id
+  createdAt
+  children {
+    ...SubthreadComment
+  }
+  mentions {
+    ...CommentUser
+  }
+  resolved
+  resolvedBy {
+    ...CommentUser
+  }
+  object
+  identifier
+}
+
+fragment DetailComment on Comment {
+  user {
+    ...CommentUser
+  }
+  parent {
+    id
+  }
+  descendants {
+    ...Descendant
+  }
+  id
+
+  resolved
+  resolvedBy {
+    ...CommentUser
+  }
+  createdAt
+  children {
+    ...SubthreadComment
+  }
+  mentions {
+    ...CommentUser
+  }
+  object
+  identifier
+}

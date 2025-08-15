@@ -1,0 +1,11 @@
+query ListResources {
+  resources {
+    ...ListResource
+  }
+}
+
+query GetResource($id: ID!) {
+  resource(id: $id) {
+    ...Resource
+  }
+}

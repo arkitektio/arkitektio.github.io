@@ -1,0 +1,46 @@
+fragment Entity on Entity {
+  ...BaseNode
+  id
+  graph {
+    id
+  }
+  category {
+    id
+    label
+  }
+  label
+  subjectableTo {
+    role
+    category {
+      id
+      label
+    }
+  }
+  targetableBy {
+    role
+    category {
+      id
+      label
+    }
+  }
+}
+
+fragment PathEntity on Entity {
+  ...ListEntity
+  category {
+    label
+    store {
+      presignedUrl
+    }
+  }
+  externalId
+}
+
+fragment ListEntity on Entity {
+  id
+  label
+  category {
+    id
+    label
+  }
+}

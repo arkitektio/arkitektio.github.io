@@ -1,0 +1,34 @@
+fragment Table on Table {
+  origins {
+    id
+  }
+  id
+  name
+  store {
+    ...ParquetStore
+  }
+  columns {
+    name
+    type
+    accessors {
+      ...Accessor
+      ...ImageAccessor
+      ...LabelAccessor
+    }
+  }
+  accessors {
+    ...ImageAccessor
+    ...LabelAccessor
+  }
+}
+
+fragment ListTable on Table {
+  origins {
+    id
+  }
+  id
+  name
+  store {
+    ...ParquetStore
+  }
+}

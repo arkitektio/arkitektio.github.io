@@ -1,0 +1,12 @@
+fragment MultiWellPlate on MultiWellPlate {
+  id
+  views {
+    ...WellPositionView
+  }
+  name
+}
+
+fragment ListMultiWellPlate on MultiWellPlate {
+  id
+  name
+}

@@ -1,0 +1,14 @@
+query ListServices(
+  $pagination: OffsetPaginationInput
+  $filters: ServiceFilter
+) {
+  services(pagination: $pagination, filters: $filters) {
+    ...ListService
+  }
+}
+
+query GetService($id: ID!) {
+  service(id: $id) {
+    ...Service
+  }
+}

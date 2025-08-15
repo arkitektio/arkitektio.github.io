@@ -1,0 +1,35 @@
+fragment Shortcut on Shortcut {
+  id
+  name
+  description
+  action {
+    ...DetailAction
+  }
+  bindNumber
+  savedArgs
+  args {
+    ...Port
+  }
+  returns {
+    ...Port
+  }
+  allowQuick
+}
+
+fragment ListShortcut on Shortcut {
+  id
+  name
+  description
+  action {
+    id
+  }
+  bindNumber
+  savedArgs
+  args {
+    ...Port
+  }
+  returns {
+    ...Port
+  }
+  allowQuick
+}

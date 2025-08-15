@@ -1,0 +1,25 @@
+mutation CreateInstrument(
+  $serialNumber: String!
+  $name: String
+  $model: String
+) {
+  createInstrument(
+    input: { name: $name, model: $model, serialNumber: $serialNumber }
+  ) {
+    id
+    name
+  }
+}
+
+mutation EnsureInstrument(
+  $serialNumber: String!
+  $name: String
+  $model: String
+) {
+  ensureInstrument(
+    input: { name: $name, model: $model, serialNumber: $serialNumber }
+  ) {
+    id
+    name
+  }
+}

@@ -1,0 +1,8 @@
+mutation AssignUserPermissions($input: AssignUserPermissionInput!) {
+  assignUserPermission(input: $input) {
+    user {
+      sub
+    }
+    permission
+  }
+}

@@ -1,0 +1,18 @@
+fragment DetailApp on App {
+  id
+  identifier
+  logo {
+    presignedUrl
+  }
+  releases {
+    ...ListRelease
+  }
+}
+
+fragment ListApp on App {
+  id
+  identifier
+  logo {
+    presignedUrl
+  }
+}

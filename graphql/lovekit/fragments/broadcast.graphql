@@ -1,0 +1,15 @@
+fragment SoloBroadcast on SoloBroadcast {
+  id
+  title
+  streamer {
+    ...Streamer
+  }
+}
+
+fragment CollaborativeBroadcast on CollaborativeBroadcast {
+  id
+  title
+  streamers {
+    ...Streamer
+  }
+}

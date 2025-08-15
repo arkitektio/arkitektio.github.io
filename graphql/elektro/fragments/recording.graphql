@@ -1,0 +1,38 @@
+fragment Recording on Recording {
+    id
+    label
+    cell
+    location
+    position
+    trace {
+        id
+        name
+        store {
+            ...ZarrStore
+        }
+        rois {
+            id 
+            vectors
+            label
+            kind
+        }
+    }
+}
+
+fragment DetailRecording on Recording {
+    id
+    label
+    simulation {
+        ...DetailSimulation
+    }
+}
+
+
+fragment ListRecording on Recording {
+    id
+    label
+    cell
+    simulation {
+        id
+    }
+}

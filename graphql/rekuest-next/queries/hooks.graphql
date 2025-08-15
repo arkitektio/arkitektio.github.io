@@ -1,0 +1,9 @@
+query HooksSearch($search: String, $values: [ID!]) {
+  options: actions(
+    filters: { protocols: ["hook"], ids: $values, search: $search }
+  ) {
+    value: id
+    label: name
+    description: description
+  }
+}

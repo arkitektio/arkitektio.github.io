@@ -1,0 +1,11 @@
+mutation CreateBlok($input: CreateBlokInput!) {
+  createBlok(input: $input) {
+    ...Blok
+  }
+}
+
+mutation MaterializeBlok($input: MaterializeBlokInput!) {
+  materializeBlok(input: $input) {
+    ...MaterializedBlok
+  }
+}

@@ -1,0 +1,85 @@
+mutation CreateAffineTransformationView(
+  $image: ID!
+  $affineMatrix: FourByFourMatrix!
+  $stage: ID
+) {
+  createAffineTransformationView(
+    input: { image: $image, affineMatrix: $affineMatrix, stage: $stage }
+  ) {
+    ...AffineTransformationView
+  }
+}
+
+mutation DeleteAffineTransformationView($id: ID!) {
+  deleteAffineTransformationView(input: { id: $id })
+}
+
+mutation DeleteRGBView($id: ID!) {
+  deleteRgbView(input: { id: $id })
+}
+
+mutation DeleteChannelView($id: ID!) {
+  deleteChannelView(input: { id: $id })
+}
+
+mutation DeleteHistogramView($id: ID!) {
+  deleteHistogramView(input: { id: $id })
+}
+
+mutation CreateRgbView(
+  $image: ID!
+  $context: ID!
+  $gamma: Float
+  $contrastLimitMax: Float
+  $contrastLimitMin: Float
+  $rescale: Boolean
+  $active: Boolean
+  $colorMap: ColorMap
+) {
+  createRgbView(
+    input: {
+      image: $image
+      context: $context
+      gamma: $gamma
+      contrastLimitMax: $contrastLimitMax
+      contrastLimitMin: $contrastLimitMin
+      rescale: $rescale
+      active: $active
+      colorMap: $colorMap
+    }
+  ) {
+    id
+  }
+}
+
+mutation CreateWellPositionView($input: WellPositionViewInput!) {
+  createWellPositionView(input: $input) {
+    ...WellPositionView
+  }
+}
+
+mutation CreateContinousScanView($input: ContinousScanViewInput!) {
+  createContinousScanView(input: $input) {
+    ...ContinousScanView
+  }
+}
+
+
+mutation CreateMaskView($input: MaskViewInput!) {
+  createMaskView(input: $input) {
+    ...MaskView
+  }
+}
+
+mutation CreateInstanceMaskView($input: InstanceMaskViewInput!) {
+  createInstanceMaskView(input: $input) {
+    ...InstanceMaskView
+  }
+}  
+
+
+mutation UpdateRGBView($input: UpdateRGBViewInput!) {
+  updateRgbView(input: $input) {
+    ...RGBView
+  }
+}

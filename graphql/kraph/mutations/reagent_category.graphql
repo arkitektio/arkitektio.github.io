@@ -1,0 +1,11 @@
+mutation CreateReagentCategory($input: ReagentCategoryInput!) {
+  createReagentCategory(input: $input) {
+    ...ReagentCategory
+  }
+}
+
+mutation UpdateReagentCategory($id: ID!) {
+  updateReagentCategory(input: {id: $id}) {
+    ...ReagentCategory
+  }
+}

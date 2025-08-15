@@ -1,0 +1,32 @@
+query GetRoom($id: ID!) {
+  room(id: $id) {
+    ...Room
+  }
+}
+query SearchRooms($search: String, $values: [ID!]) {
+  options: rooms(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: title
+    description: description
+  }
+}
+
+query ListRooms($filter: RoomFilter, $pagination: OffsetPaginationInput) {
+  rooms(filters: $filter, pagination: $pagination) {
+    ...Room
+  }
+}
+
+query Rooms {
+  rooms(pagination: { limit: 10 }) {
+    id
+    title
+    description
+    messages(pagination: { limit: 4 }) {
+      ...ListMessage
+    }
+  }
+}

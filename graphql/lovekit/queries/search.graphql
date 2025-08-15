@@ -1,0 +1,5 @@
+query GlobalSearch($search: String) {
+  streams(filters: { search: $search }) {
+    ...ListStream
+  }
+}

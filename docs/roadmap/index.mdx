@@ -5,22 +5,18 @@ sidebar_label: Next
 sidebar_position: 9
 ---
 
-import workflow from "./workflow.mp4";
 import ui from "./ui.mp4";
-import knowledge from "./knowledge.mp4";
 import assignment from "./assignment.mp4";
-import graph from "./graph.mp4";
-import graphd from "./graph_database.png";
-import Image from "@theme/IdealImage";
+import workflow from "./workflow.mp4";
+import knowledge from "./knowledge.mp4";
 
 # Arkitekt Next
 
-Developing the Arkitekt Platform is an ongoing process. While we are happy with the current version of Arkitekt, we are always looking for ways to
+Developing the Arkitekt Platform is an ongoing process. While we are *happy* with the released version of Arkitekt, we are always looking for ways to
 improve the platform and make it more user-friendly, stable, and reliable. After having adapted the platform to a set of applications, we have now 
 learned a lot more about the needs of users and are working on a lessons-learned-version of Arkitekt that will address the most dire pitfalls of the current version.
-of Arkitekt.
 
-:::note Important Note
+:::info From here be dragons
 
 We are working tirelessly to bring the next version of Arkitekt to you. Currently we are stepping into a pre-alpha phase and are looking for early adopters
 that want to help us test the new version of Arkitekt. If you are interested in testing the new version of Arkitekt, please go ahead and check out
@@ -30,14 +26,18 @@ to ensure reproducability of the paper.
 :::
 
 
-# Main New Features and Improvements
+## The shape of things to come
 
-Here are some of the main new features and improvements that we are working on for the next version of Arkitekt:
+While we could dicusss hours about the new features of the next version of Arkitekt, we have decided to focus on the most important ones here and give you
+already a sneak peak of what is to come, this is by no means a comprehensive list of all the features that we are working on, but it should give you a good
+idea of what to expect.
+
 
 ## Improved User Experience
 
-We are working on improving the user experience of Arkitekt. While Orkestrator is a powerful tool, we are realizing that it can be overwhelming for new users. 
-Our next version will have a more intuitive and user-friendly interface. Here we are focusing on the following areas:
+Users, Users, Users! While we want Arkitekt to be a powerful tool for bioimage analysis, we also want it to be easy to use. Let's face it, if you followed 
+the tutorial and got your first workflow running you saw all of the hurdles. This is why we are working hardcore on improving the user experience of Arkitekt.
+starting with `Orkestrator` our desktop control app. Here we are focusing on the following areas:
 
 ### Improved Design and Layout
 
@@ -45,53 +45,18 @@ The design and layout of "Orkestrator" boasts a lot of features and functionalit
 With the new interface we are working on, we are aiming to make the platform more user-friendly and intuitive, streamlining
 the UI and UX.
 
-<video
-  autoPlay
-  muted
-  loop
-  controls
-  className="rounded rounded-md"
-  width={"100%"}
->
-  <source src={ui} />
-</video>
-
-:::note Note
-The new design of Orkestrator has still no feature parity with the old version. We are working on adding all the features of the old version
-to the new version, but we are also taking the opportunity to rework some of the features that are not as intuitive as we would like them to be.
-:::
-
 
 ### No more Reservations
 
 While Johannes was desperately trying to make reservations work, we realized that the concept of "reserving" a node was not very
 intuitive and was causing a lot of confusion (additionally it was a source of many bugs). So we got rid of it ! The new version of Arkitekt
-will allow you to assign tasks to nodes directly without having to reserve them first. But hey don't worry they are not gone entirely
-and reservations will still be used to predefine the parameters for batch-tasks to make them both more easy to start and more efficient.
-You just don't have to think about them to much:
+will allow you to assign tasks to nodes directly without having to reserve them first. B
 
 Look how easy it is to start a task:
 
-<video
-  autoPlay
-  muted
-  loop
-  controls
-  className="rounded rounded-md"
-  width={"100%"}
->
-  <source src={assignment} />
-</video>
-
-The menu you are seeing here is subject to change, but the general idea is that you can start a task with a single click. Additionally 
-take note of the new "Installable Actions" section. This is a new feature that will allow you to install actions that are not part of your
-instance but might be useful for your workflow. (i.e. you might want to install a "Segmentation" action that is not part of your instance yet)
-But thats (not so distant) "future music" and we are still working on the details of this feature.
-
-
 ### Improved Workflow Design  
 
-Visual Workflow Design in Orkestrator is currently a bit complex and not very intuitive. We have reworked and are continuing to iterate on the workflow design and making it more intuitive.
+Designin visual workflows should be a breeze and honestly in Orkestrator is currently a bit complex and not very intuitive. We have reworked and are continuing to iterate on the workflow design and making it more intuitive.
 The new prototype alreadly includes features such as auto node suggestion, auto-repair of broken workflows, and more and uses design patterns
 that users are already familiar with from other workflow design tools like Blender or Unreal Engine. Here is a sneak peak of the new design:
 
@@ -106,17 +71,19 @@ that users are already familiar with from other workflow design tools like Blend
   <source src={workflow} />
 </video>
 
-We really hope that this new design will make it easier for users to create and manage their workflows in Orkestrator. However if you have any feedback
-on the new design, please feel free to reach out to us on [GitHub](https://github.com/arkitektio)
-
 ## Improved Data management
 
-### Introducing the Knowledge Graph
+Data management is a major pain point in the bioimage community and we are hoping to address some outstanding issues with next version of Arkitekt. 
+Here we are focusing on the following areas:
+
+
+
+### Introducing the Knowledge Graph and Ontologies
 
 A vision of Arkitekt was to capture the reality of biological systems in a database that allows users to create arbitraty measurements
 and interactively link them to each other. But the current version of Arkitekt does not fully allow to capture the intricacies of biological
-interactions intuitevely. The next version of Arkitekt will introduce the "Knowledge Graph" a new feature that will allow users to assign 
-meaning to their analyzed data (e.g. this ROI delineates an Axon) and link them to other data (e.g. this Axon is connected to this Dendrite).
+interactions intuitevely. The next version of Arkitekt will introduce the `Knowledge Graph` a new feature that will allow users to assign 
+meaning to their analyzed data following a more natural language based approach (e.g. this ROI delineates an Axon) and link them to other data (e.g. this Axon is connected to this Dendrite).
 For this Arkitekt will now feature a Graph Database (based on the amazing Apache AGE project) that will allow users to interactively create
 and explore the relationships between their data using their own vocabulary.
 
@@ -131,70 +98,51 @@ and explore the relationships between their data using their own vocabulary.
   <source src={knowledge} />
 </video>
 
+This short video illustrates a very manual approach of labeling and assigning meaning to ROIS in an image. Of course the process shoud be
+ideally automated, but maybe it can give you an idea of what we are aiming for.
+
+:::info On Ontologies
+
+Ontologies and Knowledge Graphs are a *huge* topic and are sadly not coverable in this short introduction. We will of course provide more information
+on how to create and use ontologies in the next version of Arkitekt in the documentation, and explain you how they might just help to make your data
+and your knowledge more sharable.
+
+:::
+
+
+
+<Image img={mikro_graph} />
+
+What we are aiming for it to interlink your Knowledge Graph with your data and metadata, and to allow you to interactively explore the relationships between your data and metadata.
+We want Programmers and Database savy people to use standard graph query languages to interact with the Knowledge Graph,
+and non-programmers to use a more intuitive interface to explore the relationships between their data and metadata.
+
+
+
+
 :::note 
 This is a prelimnary version of the Knowledge Graph and we are working on improving the user experience and the features of the Knowledge Graph.
 We would like to tightly integrate the Knowledge Graph with the Views and Protocols features of the next version of Arkitekt.
 :::
 
-Of course this changes the way you interact with your data. Instead of just having a list of images, you now have a graph of knowledge entities
-that are linked to each other. This is a powerful feature that allows you to capture the intricacies of your data in a more intuitive way. You might
-have noticed in the previous video that ROIs can have these entities attached to them. Like this you can describe your data in a more flexible way
 
-<video
-  autoPlay
-  muted
-  loop
-  controls
-  className="rounded rounded-md"
-  width={"100%"}
->
-  <source src={graph} />
-</video>
-
-Of course you can also attach various metrics to your data. Want to attach a "length" metric to your AIS? Just create a new metric expression
-and attach it to your AIS through for example a ROI Length Measurement? (We will describe that better in the upcoming documentation)
-
-<div className="mt-2 p-6">
-<Image img={graphd} />
-
-<div className="text-gray-400 mb-2">
-<small>
-The new data and metadata model now includes the knowledge graph which brings features from graph-databases to the platform.
-Here you can see the new model applied to the old "paper" example of an interactive workflow. Once Arkitet Next is released we will
-reimaging this workllow in the new system.
-(Its still postgres under the hood)
-</small>
-</div>
-</div>
+##### Insert video of the Knowledge Graph here
 
 ### Introducing Views
-Metadata management is a major pain point in the bioimage community. To often does the metadata get lost or is not properly documented, and
+
+
+Metadata management is hard. To often does the metadata get lost or is not properly documented, and
 often because the metadata system is to rigid to accomodate the needs of the users. The next version of Arkitekt will introduce the concept of
-"Views". Views are ways to describe the metadata of your data in a flexible way emphasizing the multi-dimensionality of images.
-
-Your first channel of the image is supposed to be displayed in a certain color? Just add a `RGBView` to only that channel. 
-You want to describe the acquisition parameters of your entire image? Add a `AcquisitionView` to the whole image
-You want to indicate that this images pixel values represent labels (in a segmentation Map), just add a `PixelView` to the image, and
+"Views". Views are ways to describe the metadata of your data in a flexible way. Your first channel of the image is supposed to be displayed
+in a certain color? Just add a RGBView to that channel. You want to describe the acquisition parameters of your image? Just add a AcquisitionView
+to the image. You want to indicate that this images pixel values represent labels (in a segmentation Map), just add a PixelView to the image, and
 map the labels to your Knowledge Entities. While your image-data might never change, the way you describe it can be as flexible as you need it to be.
-
-:::note Note
-
-A better of this feature is comming soon. We are working on improving the user experience and the features of the Views feature.
-
-:::
 
 ### Introduction of Protocols
 
 Protocols are a way to describe the steps of sample preparation, image acquisition, and image analysis in a structured way, and to link specific protocol-steps
 to your image data. Imaging you want to filter  all your images based on which  a specific antibody was used in the primary staining? If you added the antibody to the
-protocol, and you can now filter your images (attached via ProtocolViews) based on that information. 
-
-:::note note
-
-The usability of this feature is still in development. We are working on improving the user experience and the features of the Protocols feature.
-As we don't want you to write a protocol for every image, we are working on optimizing the procedure to attach protocols to your data.
-
-:::
+protocol, you can now filter your images (attached via ProtocolViews) based on that information. 
 
 # Stability
 
@@ -202,7 +150,7 @@ Stability is a major focus of the development on Arkitekt Next. As the platform 
 some parts of the platform are not as stable as we would like them to be. We are working on improving the stability of the platform
 and making sure that it is robust and reliable. Here we are focusing on the following areas:
 
-### Adressing Dependency Hell
+### Adressing Failure Hell
 
 One of the arguabily biggest features of the Arkitekt platform is its ability to have applications run code that depend on other
 applications. May it be that you schedule a workflow on one app, that calls a plugin on another app. Or when when you have written
@@ -211,68 +159,14 @@ a plugin that internally calls another plugin.
 This is a powerful feature, but our current implementation is not as stable as we would like it to be. Especially when apps fail, and
 we have to cascade the failure to other apps that depend on the failed app. Currently propagating this change to the next app needs is
 handled on the client side, and is therefore not as reliable as we would like it to be. The next version of Arkitekt will adress this
-feature and make sure that the platform is more robust by introducing the "Dependency Graph".
+feature and make sure that the platform is more robust by introducing an automatic way to handle the cascading failure of tasks on the server side.
 
-#### Dependency Graph
 
-The Dependency Graph is a new feature that represents a major overhaul of the rekuest service, and will require application developers
-to define the dependencies of their applications in a more explicit way. Through this the rekuest service will be able to construct a
-graph of dependencies between applications and will be able to handle cascading failures in a more reliable way.
-
-```python title="The old way"
-from arkitekt import register
-from arkitekt import find
-
-@register
-def my_function_that_needs_another_function():
-    # This is how you would call another function in the current version of Arkitekt
-    # This is not very reliable as the client has to handle the failure of the other function
-    # and propagate the failure to the next function
-    try:
-        dependend_function = find("other_function")
-    except:
-        raise Exception("The function is not registered with the platform. This error is annoying for users")
-    
-    dependend_function()
-
-```
-
-```python title="The new way"
-from arkitekt import register, declare
-
-dependend_function = declare("other_function")
-
-@register(dependencies=[dependend_function])
-def my_function_that_needs_another_function():
-    # This is how you would call another function in the next version of Arkitekt
-    # This is more reliabe as the rekuest service will not allow assignments to this
-    # function if the other function is not available
-    dependend_function()
-
-```
-
-:::note Note
-
-The `declare` function will always allow for users to declare dependencies on `Nodes` *not* on `Implementations`. You can
-however `narrow` the dependency to a specific implementation by providing additional parameters to the `declare` function.
-i.e `dependend_function = declare("other_function", strategy="TEST")` will return all currently available implementations of the
-Node `other_function` and make them available for testing.
-
-:::
-
-:::note `declare` vs `reserve`
-
-Declaration and reserving are tigthly linked concepts but are not the same. Declarions of dependencies are done on the `Implementation`
-level and will only result in the reservation of that specific node once this `Implementation` is provisioned. The narrowing parameter
-are therefore similar to the reserve patterns.
-
-:::
-
-### Adressing the fragility of Client-Server relationships
+### Adressing Apps without Servers 
 
 Arkitekt is buld around the concept of apps that want to connect to the platform. But this platform is
 by design modular as we wanted to make it easy for sys admins to only choose the modules they need. Do not
-care about `mikro`? Just don't install it. `Kluster` is exactly what you want because you have a cluster? Just
+care about `mikro`? Just don't install it. `Kluster` is exactly what you want because you have a  dask-cluster? Just
 add it in your `docker-compose` file.
 
 So how do we make sure that the apps can find services that they need to connect to? The Arkitekt answer to this 
@@ -280,24 +174,14 @@ is "Fakts", a small protocol that we developed for the service discovery inside 
 for its intended purpose. However while transitioning from the `Paper` version to the `Next` version we realized that
 apps do not really have a way of declaring specific version requirements and communicate them before they are 
 installed. This is a major issue as it can lead to the installation of apps that are not compatible with your
-underlying services.
-
-#### Extension to Fakts and Manifest
-
-The next version of Arkitekt will introduce elaborate on the concept of the `Manifest` and Fakts will more tigthly
-integrate and inspect the manifest of an app before it is installed. This will allow for the platform to make sure
-that the app is compatible with the services that are available on the platform.
-
-While before the manifest was a simple yaml file that was used to describe the app, the next version of Arkitekt will
-require the manifest to be more explicit about the dependencies of the app. This will allow the platform to make sure
-that the app is compatible with the services that are available on the platform.
-
+underlying services. Fakts next will adress this issue and make sure that the platform is more robust and reliable
+by introductin dependencies to the Fakts protocol, which are declared in the app manifest and can stop you 
+from installing an app that is not compatible with your services.
 
 ```yaml title="The old manifest"
 name: "My App"
 version: "1.0.0"
 ```
-
 
 ```yaml title="The new way"
 name: "My App"
@@ -308,62 +192,39 @@ dependencies:
     - rekuest: "live.arkitekt.rekuest@next"
 ```
 
-Here the app declares that it needs the `kluster` and `mikro` services in the `paper` version and the `rekuest` service in the `next` version.
-When the app is installed, the platform will check if the services are available and if they are compatible with the app. If not, the installation
-will fail preemptively.
+:::note Breaking changes 
 
-:::note Note
-
-The `dependencies` field in the manifest can be a list of services that the app needs to connect to. However it can also be used to get access to 
-specific configuration values that are configurable by the user. i.e 
-
-```yaml
-name: "My App"
-version: "1.0.0"
-dependencies:
-    - kluster: "live.arkitekt.kluster@paper"
-    - should_use_gpu: "config.gpu_enabled"
-
-```
-
-Would allow the app to get access to the `gpu_enabled` configuration value that can be set by an admin in the platform configuration, and
-tight to that specific app. This is a powerful feature that allows for a more fine grained control of the app configuration.
+This is probably the biggest breaking change in arkitekt and will hinder old apps from connecting to the platform. We will
+update the existing apps to the new manifest format, but you might have to update your apps to the new manifest format as wll.
 
 :::
 
-This is a powerful feature but also a source of many bugs. We are working on improving the way dependencies are handled
-
-#### Improved Documentation
+### Improved Documentation
 
 We are working on improving the documentation of Arkitekt. While the current documentation is comprehensive, it can be overwhelming for new users. 
-While we will keep the expert section we will also add a new section for beginners and intermediate users.
+While we will keep the expert section we will also add a new section for beginners and intermediate users, that will guide them through the platform
+step by step. We are also working on improving the search functionality of the documentation, so that users can easily find the information they are looking for.
+All of which has not yet happend.
 
-#### Improved Backend Stack 
+### Improved Backend Stack 
 
 We are working on improving the backend stack of Arkitekt. Currently Arkitekt is built on top of a stack of Graphene, Django, and Postgres. While We are happy with the two latter, `Graphene` has some limitations
-and we are going to replace `Strawberry` which is a new GraphQL library that provides a more type safe and intuitive API. This stack is already powering newer services such as `Kabinet` and `Mikro Next` 
-and we are happy with the results.
+and we are going to replace `Strawberry` which is a new GraphQL library that provides a more type safe and intuitive API. This stack is is already powering everything that you are seing here, and we are
+working on making it more stable and reliable.
 
-#### Performance Updates
+
+### Performance Updates
 
 A major focus of the development on Rekuest will be on improving the performance of the platform, when assigning tasks. While the current version of Arkitekt is not slow by any means, we are working
-of scqueezing out every bit of performance from the platform, when it comes to distributed task assignment.
+of scqueezing out every bit of performance from the platform, when it comes to distributed task assignment. One such tasks is going to be the introduction of "ephemeral" tasks that will not have
+to be stored in the database and can be assigned directly to the worker. This feature does not yet exist, but we are working on it.
 
-#### Improved API Design
+### Improved API Design
 
 We are working on improving the API design of Arkitekt. While the current API is powerful, it does not follow all the best practices. THe next version of Arkitekt will have a more consistent and intuitive API
 based on the `GraphQL` best practices.
 
-#### Improved Security
+### Improved Security
 
 We are working on improving the security of Arkitekt. While currently Arkitekt is `secure by design`, most security features are not `enforced`. 
-The next version of Arkitekt will have more security features that are `enforced` by default.import knowledge from "./knowledge.mp4";
-
-import Image from "@theme/IdealImage";
-import assignment from "./assignment.mp4";
-import graph from "./graph.mp4";
-import graphd from "./graph_database.png";
-import knowledge from "./knowledge.mp4";
-import ui from "./ui.mp4";
-import workflow from "./workflow.mp4";
-
+The next version of Arkitekt will have more security features that are `enforced` by default.

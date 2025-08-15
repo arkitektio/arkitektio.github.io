@@ -1,0 +1,19 @@
+query GetPermissions($identifier: String!, $object: ID!) {
+  permissions(identifier: $identifier, object: $object) {
+    user {
+      sub
+    }
+    permission
+  }
+}
+
+query PermissionOptions($identifier: String!, $search: String, $values: [ID!]) {
+  options: availablePermissions(
+    identifier: $identifier
+    search: $search
+    values: $values
+  ) {
+    value
+    label
+  }
+}

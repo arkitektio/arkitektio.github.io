@@ -1,0 +1,11 @@
+mutation CreateGithubRepo($identifier: String!) {
+  createGithubRepo(input: { identifier: $identifier }) {
+    id
+  }
+}
+
+mutation RescanRepos {
+  rescanRepos {
+    id
+  }
+}

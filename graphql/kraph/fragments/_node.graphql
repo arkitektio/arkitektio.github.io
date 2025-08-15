@@ -1,0 +1,40 @@
+fragment BaseNode on Node {
+  id
+  label
+  graph {
+    id
+  }
+  label
+  bestView {
+    ...NodeQueryView
+  }
+  relevantQueries {
+    ...ListNodeQuery
+  }
+}
+
+fragment Node on Node {
+  ...BaseNode
+  ...Entity
+  ...Structure
+  ...Metric
+  ...Reagent
+}
+
+fragment DetailNode on Node {
+  ...Node
+  graph {
+    id
+    name
+  }
+}
+
+fragment PathNode on Node {
+  id
+  ...PathStructure
+  ...PathEntity
+  ...PathReagent
+  ...PathNaturalEvent
+  ...PathProtocolEvent
+  ...PathMetric
+}

@@ -1,0 +1,15 @@
+query GetImage($id: ID!) {
+  image(id: $id) {
+    ...Image
+  }
+}
+
+query GetImages(
+  $filters: ImageFilter
+  $pagination: OffsetPaginationInput
+  $order: ImageOrder
+) {
+  images(filters: $filters, pagination: $pagination, order: $order) {
+    ...ListImage
+  }
+}

@@ -1,0 +1,15 @@
+query MemoryShelves(
+  $pagination: OffsetPaginationInput
+  $filters: MemoryShelveFilter
+  $order: MemoryShelveOrder
+) {
+  memoryShelves(order: $order, pagination: $pagination, filters: $filters) {
+    ...ListMemoryShelve
+  }
+}
+
+query MemoryShelve($id: ID!) {
+  memoryShelve(id: $id) {
+    ...MemoryShelve
+  }
+}

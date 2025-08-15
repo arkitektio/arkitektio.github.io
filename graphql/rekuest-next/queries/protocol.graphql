@@ -1,0 +1,9 @@
+query ProtocolOptions($search: String, $values: [ID!]) {
+  options: protocols(
+    filters: { search: $search, ids: $values }
+    pagination: { limit: 10 }
+  ) {
+    value: id
+    label: name
+  }
+}

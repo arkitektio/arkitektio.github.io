@@ -1,0 +1,24 @@
+fragment DetailRelease on Release {
+  id
+  version
+  logo {
+    presignedUrl
+  }
+  app {
+    ...ListApp
+  }
+  clients {
+    ...ListClient
+  }
+}
+
+fragment ListRelease on Release {
+  id
+  version
+  logo {
+    presignedUrl
+  }
+  app {
+    ...ListApp
+  }
+}

@@ -1,0 +1,8 @@
+fragment Stream on Stream {
+  id
+}
+
+
+fragment ListStream on Stream {
+  id
+}

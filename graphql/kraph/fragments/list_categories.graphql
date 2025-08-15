@@ -1,0 +1,23 @@
+fragment BaseListCategory on BaseCategory {
+  id
+  description
+  store {
+    presignedUrl
+  }
+  tags {
+    id
+    value
+  }
+}
+
+fragment BaseListNodeCategory on NodeCategory {
+  id
+  positionX
+  positionY
+  width
+  height
+}
+
+fragment BaseListEdgeCategory on EdgeCategory {
+  id
+}

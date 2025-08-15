@@ -1,0 +1,11 @@
+query DetailExperiment($id: ID!) {
+  experiment(id: $id) {
+    ...Experiment
+  }
+}
+
+query ListExperiments($pagination: OffsetPaginationInput, $filters: ExperimentFilter) {
+  experiments(pagination: $pagination, filters: $filters) {
+    ...ListExperiment
+  }
+}

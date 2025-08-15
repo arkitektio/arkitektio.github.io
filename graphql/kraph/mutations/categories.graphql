@@ -1,0 +1,11 @@
+mutation CreateMetricCategory($input: MetricCategoryInput!) {
+  createMetricCategory(input: $input) {
+    ...MetricCategory
+  }
+}
+
+mutation CreateReagentCategory($input: ReagentCategoryInput!) {
+  createReagentCategory(input: $input) {
+    ...ReagentCategory
+  }
+}

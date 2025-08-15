@@ -1,0 +1,36 @@
+fragment RelationCategory on RelationCategory {
+  ...BaseEdgeCategory
+  ...BaseCategory
+  sourceDefinition {
+    tagFilters
+    categoryFilters
+  }
+  targetDefinition {
+    tagFilters
+    categoryFilters
+  }
+  ageName
+  label
+  description
+  store {
+    presignedUrl
+  }
+  bestQuery {
+    ...GraphQuery
+  }
+  pinned
+}
+
+fragment ListRelationCategory on RelationCategory {
+  ...BaseListCategory
+  ...BaseListEdgeCategory
+  sourceDefinition {
+    tagFilters
+    categoryFilters
+  }
+  targetDefinition {
+    tagFilters
+    categoryFilters
+  }
+  label
+}

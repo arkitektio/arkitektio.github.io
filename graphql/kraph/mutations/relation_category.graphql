@@ -1,0 +1,15 @@
+mutation CreateRelationCategory($input: RelationCategoryInput!) {
+  createRelationCategory(input: $input) {
+    ...RelationCategory
+  }
+}
+
+mutation UpdateRelationCategory($input: UpdateRelationCategoryInput!) {
+  updateRelationCategory(input: $input) {
+    ...RelationCategory
+  }
+}
+
+mutation DeleteRelationCategory($id: ID!) {
+  deleteRelationCategory(input: { id: $id })
+}

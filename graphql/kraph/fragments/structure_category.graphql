@@ -1,0 +1,32 @@
+fragment StructureCategory on StructureCategory {
+  ...BaseCategory
+  ...BaseNodeCategory
+  identifier
+  graph {
+    id
+    name
+  }
+  ageName
+  description
+  store {
+    presignedUrl
+  }
+  bestQuery {
+    ...GraphQuery
+  }
+  pinned
+}
+
+fragment ListStructureCategory on StructureCategory {
+  ...BaseCategory
+  ...BaseNodeCategory
+  identifier
+  description
+  store {
+    presignedUrl
+  }
+  tags {
+    id
+    value
+  }
+}
