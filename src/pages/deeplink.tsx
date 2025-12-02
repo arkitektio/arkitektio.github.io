@@ -33,6 +33,10 @@ const matchDeepLink = (target: string | null) => {
   return match ? match.url : null;
 }
 
+const matchOrkestratorDeepLink = (target: string | null) => {
+  return target;
+}
+
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
   const [redirected, setRedirected] = React.useState(null);
@@ -40,7 +44,8 @@ export default function Home(): JSX.Element {
   useEffect(() => {
     const { search } = window.location;
     const params = new URLSearchParams(search);
-    const target = params.get("orkestrator");
+    const target = params.get("live");
+    const orkestrator = params.get("orkestrator");
 
     // decode URI components
     if (target) {
@@ -52,6 +57,26 @@ export default function Home(): JSX.Element {
 
         if (matched) {
           window.location.href = `/${matched}`;
+        }
+        else {
+          setRedirected("No match found");
+        }
+      } catch (error) {
+        console.error("Error decoding URI component:", error);
+        setRedirected(error);
+      }
+    }
+
+    // decode URI components
+    if (orkestrator) {
+      try {
+        const decoded = decodeURIComponent(orkestrator);
+
+        const matched = matchOrkestratorDeepLink(decoded);
+
+
+        if (matched) {
+          window.location.href = `orkestrator://${matched}`;
         }
         else {
           setRedirected("No match found");
