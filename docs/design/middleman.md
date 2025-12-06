@@ -15,11 +15,11 @@ Many of the tools available for bioimage analysis are very good at what they do,
 
 #### Our tools are stuck in the past or stuck in the future
 
-A lot of the bioimage analysis tools have been written in the last decades and even though they have seen a lot of love and dedication by the developers and the community, the age of the tools is starting to show, which has in turn prompted a new era of bioimage apps, that are designed from the core up to be adapt to the new challenges of bioimage analysis (3D, Big Data, etc.). However, these new tools are often not backwards compatible with the old tools, or are even adapted to completly different ecosystem like the cloud.
+A lot of the bioimage analysis tools have been written in the last decades and even though they have seen a lot of love and dedication by the developers and the community, the age of the tools is starting to show, which has in turn prompted a new era of bioimage apps, that are designed from the core up to be adapt to the new challenges of bioimage analysis (3D, Big Data, etc.). However, these new tools are often not backwards compatible with the old tools, or are even adapted to completely different ecosystem like the cloud.
 
 #### Meta data is being lost in translation
 
-While traversing a modern bioimage analysis pipeline, the data is often being transformed from one format to another, and the meta data is lost in translation. Often users after the experimentee have to then to go back to the original data to find the meta data they need to make sense of the data
+While traversing a modern bioimage analysis pipeline, the data is often being transformed from one format to another, and the meta data is lost in translation. Often users after the experiment have to then to go back to the original data to find the meta data they need to make sense of the data
 
 ### What we would like to do with Arkitekt for users
 
@@ -27,7 +27,7 @@ Arkitekt was designed to be a platform for non-experts, acknowledging that every
 
 ### What we would like to do with Arkitekt for developers
 
-With Arkitekt we wanted to acknowled that scienctific data analysis is an always evolving, ever-changing beast, and that the solution for today's data won't work tomorrow. Experts in the feild know their problem space very well, and often require very tailored solutions for their specific usecase.They are the best at solving their own problems, and we believe that the best way to enable them to share their expert knowledge is by providing them with tools that don't get in their way.
+With Arkitekt we wanted to acknowledge that scientific data analysis is an always evolving, ever-changing beast, and that the solution for today's data won't work tomorrow. Experts in the field know their problem space very well, and often require very tailored solutions for their specific usecase.They are the best at solving their own problems, and we believe that the best way to enable them to share their expert knowledge is by providing them with tools that don't get in their way.
 
 With Arkitekt we didn't want the developers to have to worry about adhering to a rigid platform or the constraints of doing all their analysis in the cloud,
 but to enable them to use the tools they are most comfortable with, and to be able to use the tools they already know and love.

@@ -45,14 +45,12 @@
     </filter>
     <filter id="d" width="62.875" height="70.034" x="67.841" y="63.955" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
       <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-      <feGaussianBlur in="BackgroundImage" stdDeviation="4"/>
-      <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_3_6"/>
       <feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
       <feOffset dy="2"/>
       <feGaussianBlur stdDeviation="1"/>
       <feComposite in2="hardAlpha" operator="out"/>
       <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
-      <feBlend in2="effect1_backgroundBlur_3_6" result="effect2_dropShadow_3_6"/>
+      <feBlend in2="BackgroundImageFix" result="effect2_dropShadow_3_6"/>
       <feBlend in="SourceGraphic" in2="effect2_dropShadow_3_6" result="shape"/>
     </filter>
   </defs>

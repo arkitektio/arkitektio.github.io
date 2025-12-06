@@ -11,7 +11,6 @@ import { InstallRepoButton } from "../../../src/components/InstallRepoButton";
 import { DisplayWorkflow } from "../../../src/components/reaktion/DisplayWorkflow";
 import simpleWorkflow from "./simple.json";
 import createWorkflow from "./create_workflow.webm";
-import deployFlow from "./deploy_flow.webm";
 
 We now have a basic understanding of how to call an conversion node on your data, we can visualize the results, now lets put it all together and create our first workflow,
 spanning the most basic nodes.
@@ -106,81 +105,11 @@ the classic way by adding these Repositories to your plugin store.
 </div>
 
 Now follow [previously outlined](./first_tool#installing-our-first-app) steps to `Appify` the latest `stdlib` and `reaktor` version, and deploy them to your server.
-You should now be able to search for `Deploy Flow` and `Otsu Threshold` in the dashboard search bar, and find the two nodes we just installed.
-
-
-## Reserving a Scheduler
-
-Before we are creating a workflow that will be executed in the background, we will go ahead and decide on a `Scheduler`. A `Scheduler` like so many things in Arkitekt
-is just a fancy `App`, just like a `Workflow` is just a `Node`. What this `Scheduler` App will do, is to actually `run` our workflow for us when we call it. It will take care
-of the execution of the workflow tasks, and will make sure to call the right node at the right time. Imaging it like a conductor of an orchestra. It will receive the inputs and
-outputs of all of the workflow nodes and pipe them together just like our workflow blueprint suggests.
-
-In the Arkitekt ecosystem `Schedulers` play a vital role and we actually have installed the two major `Scheduler` types in our previous steps.
-
-- The first type are `fully distributed` Schedulers: This type of Scheduler will call Arkitekt as a middleman for the handling of each workflow step. That means that when you assign a workflow to this type of Scheduler,
-  it will call Arkitekt to run the first node, route the result to the node internal, and ask Arkitekt to run the second node on the result, and so on. This type of Scheduler is great where input and outputs span multiple apps
-  and data is stored centrally (just like in our case). Its also a more fault-tolerant type of Scheduler, as it normally runs directly on the Arkitekt server and thus has direct access to the platform and won't
-  suffer from network errors. The downside is that it will be slower, as it will have to call Arkitekt for each step.
-
-- The second type are `partially distributed` Schedulers.
-
-  This one is a bit more complicated to explain: As mentioned `Schedulers` are just `Apps` and indeed **every** app in Arkitekt can decide to become a Scheduler, if they implement the `Deploy Flow` node.
-  Wouldn't it be great if they could just call their own nodes directly? Well they can.
-  `partially distributed` or `ìn-app` Schedulers are Schedulers that will call their own nodes directly, _without_ the need to call Arkitekt. This means that they can schedule tasks much faster, as they don't have to call Arkitekt for each step.
-  This type of Scheduler is great for workflows where nodes are contained mostly within a single app, and where performance is key. They are also immensly useful for workflow that work `completely` local with **in memory data** in one app.
-  You can see an example of that in our experimental [MikroJ in memory workflow](/docs/showcases). The downside is that they are more fault-prone, as they are not running on the Arkitekt server
-  and if the Scheduling app goes down, the workflow will fail.
-
-The TLDR of which workflow scheduling to choose is: In 99% of cases you will want to use the `fully distributed` Schedulers, as they are more fault tolerant to network errors.
-
-:::info About Schedulers
-
-Schedulers are a core concept in Arkitekt. They are the conductor of your workflow, and they will make sure that your workflow is executed correctly. They are however also a quite advanced
-concept, and you need to probably understand the Arkitekt design a bit better to fully understand their nuances. So don't worry if you don't understand them fully yet. We will try to give you some guidance
-in other parts of the [documentation](/docs/design/terminology/scheduler).
-:::
-
-But lets to just that and prepare a `Scheduler` for our workflow. For this we will use the `Reaktor` app, which we installed in the previous step. `Reaktor` is a distributed `Scheduler` app,
-that will call Arkitekt for each step of the workflow. We will now go ahead and reserve the `Deploy Flow` node of that app, which when called will associate that workflow with that app and
-create a `Node` that is bound to that scheduler.
-
-<video
-  autoPlay
-  muted
-  loop
-  controls
-  className="rounded-sm rounded-md"
-  width={"100%"}
->
-  <source src={deployFlow} />
-</video>
-
-1. Open the `Dashboard` in the sidebar
-
-   You can find the `Deploy Flow` node in the search bar. It is part of the `Reaktor` app, which we installed in the previous step. You can find it by searching for `Deploy Flow` in the search bar.
-
-2. Reserve the Node by Drag and Drop `Reserve`
-
-   In the upcoming Reserve Dialog this time do **NOT** choose Reaktor as an App but rather directly reserve the "Reaktor app" by clicking. This will reserve the `Deploy Flow` node of the `Reaktor` app.
-   Every workflow that you now give this node as an input, will be associated with the `Reaktor` app, and will be executed by it.
-
-:::info Workflow Deployment
-
-When you deploy a workflow, you are telling Arkitekt to associate that workflow with a `Scheduler`. This means that when `Deploy Flow`, you will call a functionality that dynamically creates a `Node`
-on the Arkitekt platform that is associated with that `Scheduler`. This newly created `Node` is then your new way of calling that workflow. You can then call that `Workflow Node` just like any other `Node` on your data.
-:::
-
-:::caution About this process
-
-While we believe the abstraction of workflows as nodes and their deployment again through nodes is a powerful one, we see how it can be a bit confusing at first. We will soon encapsulate this part of the process in a more user friendly way, but for now
-you will have to go through this process. However if anything it should give you a better understanding of the Arkitekt design.
-
-:::
+You should now be able to search for `Otsu Threshold` in the dashboard search bar, and find the node we just installed.
 
 ## Creating the workflow
 
-Now that we have the `Nodes` we need and a potential `Scheduler` lets create the workflow. For this we can finally go to the `Workflow` tab in the sidebar.
+Now that we have the `Nodes` we need lets create the workflow. For this we can finally go to the `Workflow` tab in the sidebar.
 Here we can see a list of all our workflows, and we can create a new one by clicking on the "Create Workflow" button.
 
 You will be presented by the Arkitekt Workflow Designer, which is a drag and drop interface to create workflows.
@@ -224,26 +153,14 @@ Lets see the design in progress.
 
 5. Save the workflow
 
-   You can save the workflow by clicking on the "Save" button on the bottom right. This will save the workflow to your server, making it ready to be deployed.
+   You can save the workflow by clicking on the "Save" button on the bottom right. This will save the workflow to your server.
 
-6. Deploy the workflow
+:::info Ready to Run
 
-   This is now the final step. We now have a workflow, but we need to deploy it to a `Scheduler`. For this we can use the `Deploy Flow` node we reserved in the previous step.
-   Arkitekt will automatically prompt us with this Node when we click deploy on a workflow. So lets do that. Click on the `Deploy` button on the bottom right. You will be prompted with a dialog
-   where you can now select our `Deploy Flow` reservation. This will open an Assign dialog where you can give the Node a dedicated Name (this is the name of the node that will be created on the platform)
-   and choose advanced paramters like the `Stream behaviour` don't worry about that right now. You can leave it at the default value. Click on `Assign` and you are done.
+Once saved, your workflow is immediately available to be run on your data. You don't need to deploy it manually anymore.
 
-7. You should now see a Popup in the bottom right
-
-   If everything was successful you should now see a popup in the bottom right, that tells you that your workflow was successfully deployed. You can now close the workflow designer and go back to the dashboard.
-
-:::note About the Deployment
-
-Once you pressed `Deploy` you were prompted with an `Assign Dialog`. This Dialog is indeed the exact same type of dialog that we saw in the previous section, when we used the `Convert Omero` node.
-And indeed the process is the same. When you deploy a workflow, you are just calling a functionality that dynamically creates a `Node` on the Arkitekt platform that is associated with that App (which is then its `Scheduler`). We hope
-especially Developers will appreciate that a `Node` can recursively create `Nodes`. Indeed they can easily create powerful third party schedulers, that will feel native to the Arkitekt ecosystem.
 :::
 
 ## Running the workflow
 
-Well as a workflow is now just a Node, Running it on our data should seem quite straightforward. Lets see that in the next section...
+Running the workflow on our data should seem quite straightforward. Lets see that in the next section...
