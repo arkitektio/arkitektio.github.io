@@ -137,7 +137,7 @@ export const Privacy = () => {
         <li><span className="font-medium">Business transfers:</span> in case of merger, acquisition, or asset sale, with notice provided.</li>
       </ul>
 
-      <details className="mt-4 rounded border border-zinc-200 p-4 text-white">
+      <details className="mt-4 rounded-sm border border-zinc-200 p-4 text-white">
         <summary className="cursor-pointer font-medium">Service providers we use</summary>
         <div className="mt-3 text-sm text-zinc-200 space-y-2">
           <p><span className="font-medium">Hosting/Infrastructure:</span> Hetzner.</p>

@@ -8,8 +8,8 @@ import Layout from "@theme/Layout";
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <header className="bg-slate-900">
-      <div className="container mx-auto text-center py-24">
+    <header className="bg-background-primary py-20 mb-12">
+      <div className="mx-auto text-center py-24 w-3/4">
         <X className="w-64" />
         <h1 className="text-4xl font-bold text-white">{siteConfig.title}</h1>
         <p className="text-xl py-6 text-white">{siteConfig.tagline}</p>

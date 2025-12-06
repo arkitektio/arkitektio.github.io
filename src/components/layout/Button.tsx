@@ -6,7 +6,7 @@ export const DownloadButton = ({ children }) => {
     <a
       href={"https://github.com/arkitektio/konstruktor/releases"}
       target="_blank"
-      className="bg-primary-300 rounded px-3 py-1 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white "
+      className="bg-primary-300 rounded-sm px-3 py-1 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white "
     >
       {children}
     </a>
@@ -21,7 +21,7 @@ export const DownloadGrid = ({ children }) => {
           "https://github.com/arkitektio/konstruktor/releases/latest/download/konstruktor_0.0.1_amd64.deb"
         }
         target="_blank"
-        className="p-2 bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto "
+        className="p-2 bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto "
       >
         <div className="my-auto mr-2">
           <FaLinux size={"3em"} />
@@ -33,7 +33,7 @@ export const DownloadGrid = ({ children }) => {
           "https://github.com/arkitektio/konstruktor/releases/latest/download/konstruktor_0.0.1_x64_en-US.msi"
         }
         target="_blank"
-        className="bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto"
+        className="bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto"
       >
         <div className="my-auto mr-2">
           <BsWindows size={"3em"} />
@@ -45,7 +45,7 @@ export const DownloadGrid = ({ children }) => {
           "https://github.com/arkitektio/konstruktor/releases/latest/download/konstruktor_0.0.1_x64.dmg"
         }
         target="_blank"
-        className="bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto"
+        className="bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto"
       >
         <div className="my-auto mr-2">
           <FaApple size={"3em"} />
@@ -64,7 +64,7 @@ export const OrkestratorGrid = ({ children }) => {
           "https://github.com/arkitektio/orkestrator/releases/download/v0.0.7/orkestrator_0.0.7_amd64.deb"
         }
         target="_blank"
-        className="p-2 bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto "
+        className="p-2 bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto "
       >
         <div className="my-auto mr-2">
           <FaLinux size={"3em"} />
@@ -76,7 +76,7 @@ export const OrkestratorGrid = ({ children }) => {
           "https://github.com/arkitektio/orkestrator/releases/download/v0.0.7/orkestrator_0.0.7_x64-setup.exe"
         }
         target="_blank"
-        className="bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto"
+        className="bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto"
       >
         <div className="my-auto mr-2">
           <BsWindows size={"3em"} />
@@ -88,7 +88,7 @@ export const OrkestratorGrid = ({ children }) => {
           "https://github.com/arkitektio/orkestrator/releases/download/v0.0.7/orkestrator_0.0.7_x64.dmg"
         }
         target="_blank"
-        className="bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto"
+        className="bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto"
       >
         <div className="my-auto mr-2">
           <FaApple size={"3em"} />
@@ -107,7 +107,7 @@ export const GuckerGrid = ({ children }) => {
           "https://github.com/arkitektio/orkestrator/releases/download/orkestrator-v0.0.6/orkestrator_0.0.6_amd64.deb"
         }
         target="_blank"
-        className="p-2 bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto "
+        className="p-2 bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto "
       >
         <div className="my-auto mr-2">
           <FaLinux size={"3em"} />
@@ -119,7 +119,7 @@ export const GuckerGrid = ({ children }) => {
           "https://github.com/arkitektio/orkestrator/releases/download/orkestrator-v0.0.6/orkestrator_0.0.6_x64_en-US.msi"
         }
         target="_blank"
-        className="bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto"
+        className="bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto"
       >
         <div className="my-auto mr-2">
           <BsWindows size={"3em"} />
@@ -131,7 +131,7 @@ export const GuckerGrid = ({ children }) => {
           "https://github.com/arkitektio/orkestrator/releases/download/orkestrator-v0.0.6/orkestrator_0.0.6_x64.dmg"
         }
         target="_blank"
-        className="bg-primary-300 rounded px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto"
+        className="bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto"
       >
         <div className="my-auto mr-2">
           <FaApple size={"3em"} />

@@ -22,7 +22,7 @@ export const NoHerre = () => {
   return (
     <Popover as="div" className="my-auto ">
       <div>
-        <Popover.Button className="inline-flex border-0 cursor-pointer bg-transparent w-full justify-center rounded-md text-white px-4 py-1 my-auto shadow-primary-300/20 hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+        <Popover.Button className="inline-flex border-0 cursor-pointer bg-transparent w-full justify-center rounded-md text-white px-4 py-1 my-auto shadow-primary-300/20 hover:bg-opacity-30 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
           <VscDebugDisconnect color="#ffffff" size={"2em"} />
         </Popover.Button>
       </div>
@@ -37,7 +37,7 @@ export const NoHerre = () => {
       >
         <Popover.Panel
           static
-          className="absolute right-0 mt-2 mr-2 w-56 origin-top-right divide-y divide-gray-100 border border-1 border-gray-400 rounded-md bg-white shadow-lg shadow ring-1 ring-black ring-opacity-5 focus:outline-none"
+          className="absolute right-0 mt-2 mr-2 w-56 origin-top-right divide-y divide-gray-100 border border border-gray-400 rounded-md bg-white shadow-lg shadow-sm ring-1 ring-black ring-opacity-5 focus:outline-hidden"
         >
           <div className="">
             <div className="px-2 py-2">
@@ -58,7 +58,7 @@ export const ShowMe = () => {
   return (
     <Popover as="div" className="my-auto ">
       <div>
-        <Popover.Button className="inline-flex border-0 cursor-pointer  w-full justify-center rounded-md text-white px-4 py-2 my-auto shadow-primary-300/20 hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+        <Popover.Button className="inline-flex border-0 cursor-pointer  w-full justify-center rounded-md text-white px-4 py-2 my-auto shadow-primary-300/20 hover:bg-opacity-30 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
           {data?.me?.username || "User"}
         </Popover.Button>
       </div>
@@ -73,7 +73,7 @@ export const ShowMe = () => {
       >
         <Popover.Panel
           static
-          className="absolute right-0 mt-2 mr-2 w-56 origin-top-right divide-y divide-gray-100 border border-1 border-gray-400 rounded-md bg-back-800  shadow-lg shadow ring-1 ring-black ring-opacity-5 focus:outline-none"
+          className="absolute right-0 mt-2 mr-2 w-56 origin-top-right divide-y divide-gray-100 border border border-gray-400 rounded-md bg-back-800  shadow-lg shadow-sm ring-1 ring-black ring-opacity-5 focus:outline-hidden"
         >
           <div className="">
             {data && (
@@ -88,7 +88,7 @@ export const ShowMe = () => {
               {data?.me && (
                 <>
                   <button
-                    className="px-2  py-1 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded rounded-md"
+                    className="px-2  py-1 cursor-pointer bg-primary-300 hover:bg-primary-400 rounded-sm rounded-md"
                     onClick={() => logout()}
                   >
                     {" "}
