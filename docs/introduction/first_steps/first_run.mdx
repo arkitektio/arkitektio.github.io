@@ -5,7 +5,6 @@ sidebar_position: 8
 ---
 
 import Image from "@theme/IdealImage";
-import reserveWorkflow from "./reserve_workflow.webm";
 import runWorkflow from "./run_analysis.webm";
 import replay from "./replay.webm";
 import markRoi from "./roi_mark.webm";
@@ -16,42 +15,13 @@ Remember it will take an image , max project it, threshold it and then measure t
 estimate the fraction of the image that is not covered by cells.
 In this section you will learn:
 
-- How to reserve a workflow
-- Where to look when your workflow is not available
 - How to run a workflow
 - How to monitor the progress of a workflow
 - How to inspect the result of a workflow
 
-## How to reserve a workflow
+:::info Immediate Execution
 
-Lets start by reserving our workflow. For this we will navigate to the `Dashboard` tab. Search our Workflow title (which is now a Node) and right-click on the "Reserve" button. This will reserve our workflow for us.
-
-<video
-  autoPlay
-  muted
-  loop
-  controls
-  className="rounded rounded-md my-3"
-  width={"100%"}
->
-  <source src={reserveWorkflow} />
-</video>
-
-Pretty straight forward right? Its the same as reserving a normal node, but now we are reserving a workflow. You will notice however that at the end of the reservation
-we illustrate another feature of the Platform. The user clicked on the reservation and then after clicking on the first provision we were transported to the "Monitor Page":
-
-A workflow includes nodes, and these nodes are the "dependencies" of the workflow. In order to run a workflow we need to make sure that all the nodes are available
-and ready to be used. When we reserve a workflow, the `Scheduler` will in turn reserve all the nodes that are part of the workflow. And then it will wait until they are
-available. This is what we see in the "Monitor Page". Here we can see the status of all the nodes that are part of the workflow. And we can see if they are ready to be used (green)
-or not (red). If they are not ready to be used we can click on the node and see why they are not ready to be used. Most of the time this means you have to start or restart
-the linked application.
-
-:::info The Monitor Page
-
-The monitor page illustrates an important concept of the platform. As Arkitekt with a distributed system, we need to keep track of what can run when. Workflows are a perfect
-example of this. In order to run a workflow we need to make sure that all the nodes are available. This `Dependency Graph Management` is a core feature of the platform, and will
-find its explaination in the [Provision and Reservation](/docs/design/terminology/provision) section. Btw, in the next generation of rekuest, we will make this a lot more intuitive. That's
-the hope at least.
+In the latest version of Arkitekt, workflows and tasks can be executed immediately without a prior reservation step. The system handles the provisioning of resources automatically.
 
 :::
 
@@ -64,7 +34,7 @@ And now we can finally run our analysis. Lets start by navigating to the "Data" 
   muted
   loop
   controls
-  className="rounded rounded-md my-3"
+  className="rounded-sm rounded-md my-3"
   width={"100%"}
 >
   <source src={runWorkflow} />
@@ -102,7 +72,7 @@ linked in your run and can be exported (e.g. in your methods section just like h
   muted
   loop
   controls
-  className="rounded rounded-md my-3"
+  className="rounded-sm rounded-md my-3"
   width={"100%"}
 >
   <source src={replay} />
@@ -125,7 +95,7 @@ But lets not only look at our workflow. Just like we did in the previous section
   muted
   loop
   controls
-  className="rounded rounded-md"
+  className="rounded-sm rounded-md"
   width={"100%"}
 >
   <source src={provenance} />

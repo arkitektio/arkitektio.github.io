@@ -18,7 +18,7 @@ Four steps in an we still haven't performed anything useful on our data. But tha
 
 ## Convert our first File
 
-We will start by converting our first file, utilizing our just reserved "Convert Omero" node. Lets perform this conversion on our
+We will start by converting our first file, utilizing our "Convert Omero" node. Lets perform this conversion on our
 first file. The one we uploaded in the previous section.
 
 <video
@@ -26,7 +26,7 @@ first file. The one we uploaded in the previous section.
   muted
   loop
   controls
-  className="rounded rounded-md my-3"
+  className="rounded-sm rounded-md my-3"
   width={"100%"}
 >
   <source src={convert} />
@@ -40,6 +40,10 @@ on another day you might need to open the "Home", sidebar and step back one day 
 2. Drag and Drop or right click the file we want to convert
 
 This time in our Action menu, a new option should appear: `Convert Omero`. This is our first `Tool Action`. Lets drop on it (or click it).
+
+:::warning TODO
+Clarify if the user needs to ensure the "Omero" app is connected/running for this option to appear, or if it appears even if the app is offline (and would trigger a start).
+:::
 
 3. You are prompted with a dialog.
 
@@ -71,7 +75,7 @@ image` from that pane.
   muted
   loop
   controls
-  className="rounded rounded-md"
+  className="rounded-sm rounded-md"
   width={"100%"}
 >
   <source src={visualize} />
@@ -106,7 +110,7 @@ in the next few steps.
   muted
   loop
   controls
-  className="rounded rounded-md"
+  className="rounded-sm rounded-md"
   width={"100%"}
 >
   <source src={markRoi} />

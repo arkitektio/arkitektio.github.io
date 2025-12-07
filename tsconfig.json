@@ -6,6 +6,11 @@
     "baseUrl": ".",
     "skipLibCheck": true,
     "jsx": "react-jsx",
-    "typeRoots": ["./src/types", "./node_modules/@types"]
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "paths": {
+      "@site/*": ["./*"],
+      "components/*": ["./src/components/*"],
+      "utils": ["./src/lib/utils"]
+    }
   }
 }

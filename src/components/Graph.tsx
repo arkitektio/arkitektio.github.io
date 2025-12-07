@@ -103,7 +103,7 @@ export const Selector = ({
         </div>
       </div>
 
-      <div className="flex-grow"></div>
+      <div className="grow"></div>
       <div className="flex flex-col">
         <div className=" my-auto text-xs text-slate-200 text-end">
           API Endpoint{" "}
@@ -115,7 +115,7 @@ export const Selector = ({
                 onClick={() => onChange(e.url)}
                 disabled={e.url == value}
                 className={
-                  "appearance-none bg-slate-700 hover:bg-slate-400 text-slate-200 font-light py-2 px-2 rounded inline-flex items-center cursor-pointer disabled:opacity-100 opacity-30 "
+                  "appearance-none bg-slate-700 hover:bg-slate-400 text-slate-200 font-light py-2 px-2 rounded-sm inline-flex items-center cursor-pointer disabled:opacity-100 opacity-30 "
                 }
               >
                 {e.label}
@@ -244,7 +244,7 @@ export const AliveDocumentation = (props: AliveDocumentationProps) => {
   const storage = buildStorage(props.storageKey);
 
   return (
-    <div className="flex-grow">
+    <div className="grow">
       <div className="h-full">
         {fetcher && (
           <GraphiQL
@@ -271,7 +271,7 @@ export const FallbackDocumentation = (props: FallbackDocumentationProps) => {
   const storage = buildStorage(props.storageKey);
 
   return (
-    <div className="flex-grow">
+    <div className="grow">
       <div className="h-full">
         {fetcher && (
           <GraphiQL
@@ -293,8 +293,8 @@ export type DynamicDocumentationProps = {
 export const DynamicDocumentation = (props: DynamicDocumentationProps) => {
   return (
     <>
-      <div className="flex flex-grow h-full flex-col">
-        <div className="flex-grow flex overflow-y-auto">
+      <div className="flex grow h-full flex-col">
+        <div className="grow flex overflow-y-auto">
           <App.Guard notConnectedFallback={<> No Documentation</>}>
             <AliveDocumentation
               serviceKey={props.service.key as "mikro" | "kabinet" | "lok"}
@@ -336,7 +336,7 @@ export const ServiceSelector = ({
             onClick={() => onChange(e)}
             disabled={e.key == value.key}
             className={
-              "appearance-none bg-slate-700 hover:bg-slate-400 text-slate-200 font-light py-2 px-2 rounded inline-flex items-center cursor-pointer disabled:opacity-100 opacity-30 transition duration-500 ease-in-out"
+              "appearance-none bg-slate-700 hover:bg-slate-400 text-slate-200 font-light py-2 px-2 rounded-sm inline-flex items-center cursor-pointer disabled:opacity-100 opacity-30 transition duration-500 ease-in-out"
             }
           >
             {e.key}
@@ -359,7 +359,7 @@ export const DocumentationPage = ({}: {}) => {
   if (!options || options.length === 0) {
     return (
       <div className="flex flex-col h-full w-full">
-        <div className="flex-grow flex items-center justify-center">
+        <div className="grow flex items-center justify-center">
           <div className="text-slate-200 text-lg">
             No services available. Please connect to a service.
           </div>

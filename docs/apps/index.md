@@ -7,9 +7,9 @@ sidebar_position: 3
 
 # Apps
 
-This section aims to is a collection of different [Standalone Apps](/docs/apps/standalones) and [Plugin Apps](/docs/apps/plugins) that can hook into the Arkitekt platform.
+This section is a collection of different [Standalone Apps](/docs/apps/standalones) and [Plugin Apps](/docs/apps/plugins) that can hook into the Arkitekt platform.
 As opposed to the [Services](/docs/design/services/) that are designed to be installed and extend the functionality of the Arkitekt platform, by providing
-new ways of storing data and connecting to other systems,  Apps are designed to be the "workhorses" of the platform. 
+new ways of storing data and connecting to other systems, Apps are designed to be the "workhorses" of the platform. 
 They are the entities that provide the actual functionality of the platform, as for the most part the server is just a communication platform and a data store.
 
 #### Standalones
@@ -20,7 +20,7 @@ to the Arkitekt platform. We provide a few different standalones, that are commu
 
 #### Plugins
 
-Plugins are also [Apps](/docs/apps/) but are build using software containers, so come with their own set of requirements and limitations.
+Plugins are also [Apps](/docs/apps/) but are built using software containers, so come with their own set of requirements and limitations.
 They are most often more hooked into the Arkitekt Platform, which can provide a graphical user interface and a more seamless integration with the platform.
 
 
