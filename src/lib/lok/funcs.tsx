@@ -8,8 +8,9 @@ import {
   useQuery as useApolloQuery,
   useSubscription as useApolloSubscription,
 } from "@apollo/client";
-import { useService } from "../arkitekt/provider";
+import { useSelfService, useService } from "../arkitekt/provider";
 import { toast } from "sonner";
+import { App } from "../app/App";
 type MutationFuncType = typeof useApolloMutation;
 type QueryFuncType = typeof useApolloQuery;
 type LazyQueryFuncType = typeof useApolloLazyQuery;
@@ -25,7 +26,7 @@ export type {
 export const ServiceName = "lok";
 
 export const useMutation: MutationFuncType = (doc, options) => {
-  const service = useService(ServiceName);
+  const service = App.useSelfService();
 
   return useApolloMutation(doc, {
     ...options,
@@ -37,19 +38,19 @@ export const useMutation: MutationFuncType = (doc, options) => {
 };
 
 export const useQuery: QueryFuncType = (doc, options) => {
-  const service = useService(ServiceName);
+  const service = App.useSelfService();
 
   return useApolloQuery(doc, { ...options, client: service.client });
 };
 
 export const useSubscription: SubscriptionFuncType = (doc, options) => {
-  const service = useService(ServiceName);
+  const service = App.useSelfService();
 
   return useApolloSubscription(doc, { ...options, client: service.client });
 };
 
 export const useLazyQuery: LazyQueryFuncType = (doc, options) => {
-  const service = useService(ServiceName);
+  const service = App.useSelfService();
 
   return useApolloLazyQuery(doc, { ...options, client: service.client });
 };

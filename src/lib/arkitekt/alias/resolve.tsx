@@ -9,6 +9,22 @@ export const buildChallengeUrl = (alias: Alias): string => {
   return `${protocol}://${alias.host}${port}/${path}/.well-known/fakts-challenge`;
 };
 
+
+export const checkAliasHealth = async (
+  alias: Alias,
+  timeout: number,
+  controller: AbortController,
+): Promise<boolean> => {
+  const url = aliasToHttpPath(alias, alias.challenge);
+
+  const response = await fetchWithTimeout(url, {
+    timeout,
+    controller,
+  });
+
+  return response.ok;
+}
+
 export const resolveWorkingAlias = async ({
   instance,
   timeout = 3000,
@@ -36,5 +52,5 @@ export const resolveWorkingAlias = async ({
     }
   }
 
-  throw new Error(`No working alias found for service: ${instance.identifier}`);
+  throw new Error(`No working alias found for service: ${instance.service}`);
 };

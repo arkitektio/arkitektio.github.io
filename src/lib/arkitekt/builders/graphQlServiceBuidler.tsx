@@ -11,18 +11,18 @@ import { createClient } from "graphql-ws";
 import { Alias } from "../fakts/faktsSchema";
 import { aliasToHttpPath, aliasToWsPath } from "../alias/helpers";
 import { buildGraphQlWard } from "../ward";
-import { Service } from "../types";
-import { ApolloService } from "../provider";
+import { Service, ServiceBuilder } from "../types";
+
 
 export const createGraphQLServiceBuilder =
-  (possibleTypes: any) =>
-  async (config: { alias: Alias; token: string }): Promise<ApolloService> => {
-    const { alias, token } = config;
+  (possibleTypes: any): ServiceBuilder<Service<ApolloClient<any>>> =>
+  (options) => {
+    const { alias, token } = options;
 
     const httpLink = createHttpLink({
       uri: aliasToHttpPath(alias, "graphql"),
       headers: {
-        authorization: token ? `Bearer ${token}` : "",
+        authorization: token ? `Bearer ${token.access_token}` : "",
       },
     });
 
@@ -32,7 +32,7 @@ export const createGraphQLServiceBuilder =
       createClient({
         url: aliasToWsPath(alias, "graphql"),
         connectionParams: () => ({
-          token: token,
+          token: token.access_token,
         }),
       })
     );
@@ -61,5 +61,5 @@ export const createGraphQLServiceBuilder =
       client: client,
       ward: ward, // Replace with appropriate logo component
       alias: alias,
-    };
+    }
   };

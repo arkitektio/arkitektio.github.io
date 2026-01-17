@@ -14,6 +14,9 @@ export const start = async ({
   expirationTime?: number;
   redirectURIs?: string[];
 }): Promise<string> => {
+
+
+
   const response = await fetch(`${endpoint.base_url}start/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

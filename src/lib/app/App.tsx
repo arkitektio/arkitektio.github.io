@@ -4,14 +4,18 @@ import { mikroServiceDefinition } from "../mikro/service";
 import { lokServiceDefinition } from "../lok/service";
 import { kabinetDefinition } from "../kabinet/service";
 import BrowserOnly from "@docusaurus/BrowserOnly";
+import lokReust from "@site/src/lib/lok/api/fragments";
+import { createGraphQLServiceBuilder } from "../arkitekt/builders/graphQlServiceBuidler";
+
+
 
 export const App = buildArkitekt({
   manifest,
   serviceBuilderMap: {
     mikro: mikroServiceDefinition,
-    lok: lokServiceDefinition,
     kabinet: kabinetDefinition,
   },
+  selfServiceBuilder: createGraphQLServiceBuilder(lokReust.possibleTypes),
 });
 
 export const withBrowserGuard = (Component: React.ComponentType<any>) => {
@@ -25,11 +29,10 @@ export const withBrowserGuard = (Component: React.ComponentType<any>) => {
 };
 
 export const MikroInner = App.buildServiceGuard("mikro");
-export const LokInner = App.buildServiceGuard("lok");
 export const KabinetInner = App.buildServiceGuard("kabinet");
 
 export const Guard = {
   Mikro: withBrowserGuard(MikroInner),
-  Lok: withBrowserGuard(LokInner),
+  Lok: App.Guard,
   Kabinet: withBrowserGuard(KabinetInner),
 };

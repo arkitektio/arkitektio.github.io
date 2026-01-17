@@ -1,7 +1,9 @@
+import { report } from "process";
 import { z } from "zod";
 
 // Alias type
 export const AliasSchema = z.object({
+  id: z.string(),
   port: z.number().optional().nullable(),
   host: z.string(),
   ssl: z.boolean(),
@@ -21,11 +23,14 @@ export const AuthFaktSchema = z.object({
   client_id: z.string(),
   client_secret: z.string(),
   token_url: z.string().url(),
+  report_url: z.string().url(),
+  client_token: z.string(),
 });
 
 // SelfFakt type
 export const SelfFaktSchema = z.object({
   deployment_name: z.string(),
+  alias: AliasSchema,
 });
 
 // ActiveFakts type

@@ -6,17 +6,10 @@ import { ServiceDefinition } from "../arkitekt/provider";
 
 export const mikroServiceDefinition: ServiceDefinition = {
   builder: createGraphQLServiceBuilder(mikroResult.possibleTypes),
-  requirements: [
-    {
-      key: "mikro",
-      service: "live.arkitekt.mikro",
-      optional: false,
-    },
-  ],
   name: "Mikro",
   description: "Mikro is a service for managing microservices.",
   logo: () => <Database className="w-8 h-8 mx-auto  text-foreground" />,
   key: "mikro",
   service: "live.arkitekt.mikro",
-  optional: false,
+  optional: true,
 };

@@ -28,6 +28,7 @@ export const claim = async (
   const json = await response.json();
 
   const claim = ClaimAnswerSchema.safeParse(json);
+  console.log("Claim response:", json);
 
   if (!claim.success) {
     console.error("Malformed Claim Answer", claim, json);
