@@ -38,6 +38,13 @@ export const useSelfService = (key: string): Service=> {
 };
 
 
+export type AvailableService = {
+  key: string;
+  definition: any;
+  service: Service;
+};
+
+
 export const useAvailableServices = () => {
   const { connection } = useArkitekt();
 
@@ -45,7 +52,7 @@ export const useAvailableServices = () => {
     throw new Error("Arkitekt not connected");
   }
 
-  return Object.keys(connection.serviceMap).map(key =>({key: key, definition: connection.serviceBuilderMap[key], instance: connection.serviceMap[key]}));
+  return Object.keys(connection.serviceMap).map(key =>({key: key, definition: connection.serviceBuilderMap[key], service: connection.serviceMap[key]}));
 }
 
 export const usePotentialService = (key: string): Service | undefined => {

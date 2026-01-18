@@ -9,7 +9,7 @@ import { GraphQLError } from "graphql";
 import React from "react";
 import { App } from "../lib/app/App";
 import { aliasToHttpPath } from "../lib/arkitekt/alias/helpers";
-import { AvailableService, useToken } from "../lib/arkitekt/provider";
+import { AvailableService, Service, useToken } from "../lib/arkitekt/provider";
 import { NotConnected } from "./Connector";
 import "./test.css";
 
@@ -221,7 +221,7 @@ export const createFallBackFetcher = (
 };
 
 export type AliveDocumentationProps = {
-  serviceKey: "mikro" | "kabinet" | "lok";
+  serviceKey: "mikro" | "kabinet";
   storageKey: string;
 };
 
@@ -237,7 +237,7 @@ export const AliveDocumentation = (props: AliveDocumentationProps) => {
   const fetcher = createGraphiQLFetcher({
     url: aliasToHttpPath(alias, "graphql"),
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token.access_token}`,
     },
   });
 
@@ -297,7 +297,7 @@ export const DynamicDocumentation = (props: DynamicDocumentationProps) => {
         <div className="grow flex overflow-y-auto">
           <App.Guard notConnectedFallback={<> No Documentation</>}>
             <AliveDocumentation
-              serviceKey={props.service.key as "mikro" | "kabinet" | "lok"}
+              serviceKey={props.service.key as "mikro" | "kabinet"}
               storageKey={props.service.key}
             />
           </App.Guard>
@@ -354,7 +354,7 @@ export const ServiceSelector = ({
 };
 
 export const DocumentationPage = ({}: {}) => {
-  const options = App.useServices();
+  const options = App.useAvailableServices();
 
   if (!options || options.length === 0) {
     return (
