@@ -50,7 +50,7 @@ To get started, you will need to create a new project using the Arkitekt CLI. Yo
 
 ```bash
 
-arkitekt init
+arkitekt-next init
 
 ```
 
@@ -61,7 +61,7 @@ for the GraphQL API:
 We can now generate a configuration file for our code generation for our project by running the following command:
 
 ```bash
-arkitekt gen init mikro
+arkitekt-next gen init mikro
 ```
 
 It will ask you where you want to generate the module for your generated code. Leave it as the default and press enter.
@@ -98,7 +98,7 @@ This is a simple query that retrieves all datasets from the server. After saving
 
 ```bash
 
-arkitekt gen compile mikro
+arkitekt-next gen compile mikro
 
 ```
 
@@ -109,7 +109,7 @@ This should now create a directory named `api` in the same directory, that conta
 To use the generated code, you will need to import the generated query and use it to interact with the GraphQL API. You can do this by running the following code:
 
 ```python
-from arkitekt import easy
+from arkitekt_next import easy
 from api.mikro import first_query
 
 # Create a new app

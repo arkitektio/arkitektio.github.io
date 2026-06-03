@@ -10,27 +10,27 @@ import TabItem from "@theme/TabItem";
 
 # Getting Started!
 
-The easiest way to install the library is to use poetry or pip:
+The easiest way to install the library is to use pip:
 
-```python
-pip install "arkitekt[all]"
+```bash
+pip install "arkitekt-next[all]"
 ```
 
 This will install the library with all its dependencies, including the Arkitekt
 CLI as well as all supporting libraries for each service.
 
-This is the recommend way to install arkitekt, especially if you are not planning
-to use arkitekt as a dependency in another project.
+This is the recommended way to install arkitekt-next, especially if you are not planning
+to use it as a dependency in another project.
 
 :::info Modular Arkitekt
 If you are planning to only
-use arkitekt as a dependency in another project, you can install it without the
-CLI and add it additional dependencies as needed.
+use arkitekt-next as a dependency in another project, you can install it without the
+CLI and add additional dependencies as needed.
 
-```python
-pip install arkitekt
-# pip install mikro (for microscopy support)
-# pip install rekuest (for registering nodes)
+```bash
+pip install arkitekt-next
+pip install mikro-next   # for microscopy image support
+pip install rekuest-next # for registering nodes
 ```
 
 :::
@@ -50,20 +50,18 @@ The Arkitekt API here sits in the background just like any other python library,
 are in full control of the execution of your code.
 
 ```python
-from arkitekt import easy
-from mikro.api.schema import from_xarray
+from arkitekt_next import easy
+from mikro_next.api.schema import from_array_like
 import numpy as np
 
 # whatever python code
 
-with easy("my_little_app",  url="http://localhost:8000"):
+with easy("my_little_app", url="http://localhost:8000"):
     # do stuff with the arkitekt api
-    # new image
     img = np.random.rand(100, 100)
-    image = from_xarray(img, name="my_image") # uploads image to the mikro service
+    image = from_array_like(img, name="my_image")  # uploads image to the mikro service
 
 # Whatever python code
-
 ```
 
 This is a very simple example of how you can use the Arkitekt API to interact with the
@@ -76,18 +74,19 @@ To get started with the classical style, you can follow the [Classic Tutorial](/
 
 ## Plugin
 
-App that follow the `integrated style` are more integrated into the Arkitekt ecosystem.
-The Integrated style is your best choice if you want to **provide new functionality** (nodes)
-and develop your own Arkitekt App.  In the integrated style the Arkitekt CLI takes more control over your development process, ands streamline
-the process of developing and your app publishing apps so that it can be used by other users.
+Apps that follow the `plugin style` are more integrated into the Arkitekt ecosystem.
+The Plugin style is your best choice if you want to **provide new functionality** (nodes)
+and develop your own Arkitekt App. In the plugin style the Arkitekt CLI takes more control over your development process, and streamlines
+the process of developing and publishing apps so that they can be used by other users.
 
 
 ```python
-from arkitekt import register
-from mikro.api.schema import from_xarray, RepresentationFragment
+from arkitekt_next import register
+from mikro_next.api.schema import from_array_like, Image
+import numpy as np
 
 @register
-def create_random_image(x_size: int, y_size: int) -> RepresentationFragment:
+def create_random_image(x_size: int, y_size: int) -> Image:
     """ Random Image
 
     Creates a random image with the given size.
@@ -101,42 +100,39 @@ def create_random_image(x_size: int, y_size: int) -> RepresentationFragment:
 
     Returns
     -------
-    RepresentationFragment
+    Image
         The created image.
     """
-
-    img = np.random.rand(100, 100)
-
-    return from_xarray(image, "Random Image")
+    img = np.random.rand(x_size, y_size)
+    return from_array_like(img, name="Random Image")
 
 
 if __name__ == "__main__":
     # here you can run other code, that
     # will not be executed when the app is
-    # run by the arkitekt cli
+    # run by the arkitekt-next cli
     pass
-
 ```
 
 Here we are creating an app that can be run by the Arkitekt CLI and that
-provides a Node (Add two Numbers) that can be used by other apps. The
-`@register` decorator is used to mark a function as a node. 
+provides a Node that can be used by other apps. The
+`@register` decorator is used to mark a function as a node.
 
-While you can run this script like any other python script ( executing the
-`if __name__ == "__main__"` block ) in the integrated style you are using
-the Arkitekt CLI to run yout app via:
+While you can run this script like any other python script (executing the
+`if __name__ == "__main__"` block), in the plugin style you use
+the Arkitekt CLI to run your app via:
 
 ```bash
-arkitekt run dev
+arkitekt-next run dev
 ```
 
 The CLI will then create the App context for your app and register the functions
-that are marked with the `@register` decorator as nodes
+that are marked with the `@register` decorator as nodes.
 
 :::info Why do we use this?
 
 This pattern might seem strange at first, but it has a few advantages, such as nice developer experience features like hot-reloading,
- but most importantly and easy portability of your app to other Arkitekt instances. 
+but most importantly an easy portability of your app to other Arkitekt instances.
 :::
 
-To get started with the integrated style, you can follow the [Integrated Tutorial](//docs/developers/python/plugin)
+To get started with the plugin style, you can follow the [Plugin Tutorial](/docs/developers/python/plugin)

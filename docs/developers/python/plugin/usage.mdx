@@ -37,7 +37,7 @@ cd demo
 Inside the folder, we will run the following command to create a new arkitekt app.
 
 ```bash
-arkitekt init
+arkitekt-next init
 ```
 
 This will launch the arkitekt CLI and ask you a few questions about your app. Don't worry, you can always change
@@ -98,12 +98,12 @@ instance, enabling them as nodes. You can imaging the app.py file as the "main" 
 Lets take a look at the app.py file that was created for us, if you chose the `filter` template:
 
 ```python
-from arkitekt import register
-from mikro.api.schema import RepresentationFragment, from_xarray
+from arkitekt_next import register
+from mikro_next.api.schema import Image, from_array_like
 
 
 @register
-def max_intensity_projection(image: RepresentationFragment) -> RepresentationFragment:
+def max_intensity_projection(image: Image) -> Image:
     """Z-Project the Maximum Intensity
 
     This function projects the maximum intensity of the input image
@@ -111,36 +111,36 @@ def max_intensity_projection(image: RepresentationFragment) -> RepresentationFra
 
     Parameters
     ----------
-    image : RepresentationFragment
+    image : Image
         The input image
 
     Returns
     -------
-    RepresentationFragment
+    Image
         The projected image
 
     """
-    image = image.data.max(dim="z")
-    return from_xarray(
-        image, name="Max Intensity Projection" + image.name, origins=[image]
+    projected = image.data.max(dim="z")
+    return from_array_like(
+        projected, name="Max Intensity Projection " + image.name, origins=[image]
     )
 ```
 
 This is the `hello world` of arkitekt apps. A simple function that takes an image as input and returns a new image
-as output. Lets break it down.
+as output. Let's break it down.
 
 ```python
-from arkitekt import register
-from mikro.api.schema import RepresentationFragment, from_xarray
+from arkitekt_next import register
+from mikro_next.api.schema import Image, from_array_like
 ```
 
-First we import the `register` decorator from the arkitekt package. This is the decorator that we will use to register
-our functions with the arkitekt instance. We also import the `RepresentationFragment` and `from_xarray` functions from
-the mikro package (which will help us interact with the Mikro service on the connected instance). Calling `from_xarray` will create a new representation/image from any xarray or numpy object.
+First we import the `register` decorator from the `arkitekt_next` package. This is the decorator that we will use to register
+our functions with the arkitekt instance. We also import the `Image` type and `from_array_like` function from
+the `mikro_next` package (which will help us interact with the Mikro service on the connected instance). Calling `from_array_like` will create a new image from any xarray or numpy array-like object.
 
 ```python
 @register
-def max_intensity_projection(image: RepresentationFragment) -> RepresentationFragment:
+def max_intensity_projection(image: Image) -> Image:
     """Z-Project the Maximum Intensity
 
     This function projects the maximum intensity of the input image
@@ -148,12 +148,12 @@ def max_intensity_projection(image: RepresentationFragment) -> RepresentationFra
 
     Parameters
     ----------
-    image : RepresentationFragment
+    image : Image
         The input image
 
     Returns
     -------
-    RepresentationFragment
+    Image
         The projected image
 
     """
@@ -162,32 +162,28 @@ def max_intensity_projection(image: RepresentationFragment) -> RepresentationFra
 
 And this is our function. It takes a single argument, which is an image, and returns a new image. The function is decorated
 with the `@register` decorator, which will register the function with the arkitekt instance when the app is run. A lot of
-the information that is needed to register the function is extracted from the function signature. For example, the name of
+the information needed to register the function is extracted from the function signature. For example, the name of
 the function is extracted from the function name, the description is extracted from the docstring, and the input and output
-types are extracted from the function signature. The `@register` decorator also takes a few optional arguments, which can
-be used to customize the registration process. You can read more about the `@register` decorator in the decorators section.
+types are extracted from the type annotations. The `@register` decorator also takes a few optional arguments, which can
+be used to customize the registration process.
 
 ```python
-image = image.data.max(dim="z")
-return from_xarray(
-    image, name="Max Intensity Projection" + image.name, origins=[image]
+projected = image.data.max(dim="z")
+return from_array_like(
+    projected, name="Max Intensity Projection " + image.name, origins=[image]
 )
 ```
 
-And this is the body of our function. When calling our function, the arkitekt instance will pass in a `RepresentationFragment`
+And this is the body of our function. When calling our function, the arkitekt instance will pass in an `Image`
 object, which contains the input data. We can access the data by calling `image.data`. The data is stored as an xarray object,
 which we can use to perform our calculations. In this case, we are calculating the maximum intensity projection of the image
-along the z-axis. We then create a new Image on the platform from the calculated data and return it, through the `from_xarray`
+along the z-axis. We then create a new Image on the platform from the calculated data and return it through the `from_array_like`
 function. (Note that we are also adding a prefix to the name of the image, to make it easier to distinguish between the input
 and output images)
 
-:::info Why Representation Fragment?
+:::info About the Image type
 
-If you are wondering why our image is called a `RepresentationFragment` and not just an image, please read the [mikro](https://mikro.dev)
-and graphql sections of the docs. But in short, a `RepresentationFragment` is a representation of an image that is stored
-on a mikro instance. It contains information about the image, such as its name, description, and data. Besides the data,
-it also contains a "fragment" of metadata from all of the metadata that is associated with the image. The nomenclature is
-a bit confusing, and we _will definetly_ change it in the future, but for now, just think of it as an image.
+`Image` (from `mikro_next`) represents an image stored on a Mikro-Next instance. It contains information about the image such as its name, description, and data. You can access the underlying xarray data via `image.data`, which gives you full access to the image array for computation.
 
 :::
 

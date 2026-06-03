@@ -10,7 +10,7 @@ sidebar_label: Classic Style
 Lets's create an Arkitekt App, as it is the connection layer between your code and the arkitet server. If you don't know what we mean by an App, check out the [App](/docs/design/terminology/app) section of the terminology page.
 
 ```python
-from arkitekt import easy
+from arkitekt_next import easy
 
 
 app = easy("my-app-name")
@@ -28,7 +28,7 @@ setup:
    pointing the app to an arkitekt instance. This is by design. Your code should not be aware of the backend it is connecting to, as this allows easy installation of your code anywhere. Arkitekt uses the fakt service to discover the backend, and will retrieve its configuration from the backend, before connecting to it, on the first call within the context (a useful feature for system admins to configure apps after deployment). Of course you can opt out of this behaviours by passing an explicity url of the arkitekt server or by changing the fakts attributes before entering the context.
 
    ```python
-    from arkitekt import easy
+    from arkitekt_next import easy
     from fakts.grants.remote import AnyOtherGrantType
 
     app = easy("my-app-name")
@@ -51,29 +51,29 @@ setup:
 4. The context manager also sets some context specific variables (contextvars).
    This means we can inject its dependencys within this context automatically sing the governing
    app context. This allows for more functional code. For example, you can use simply call
-   `from_xarray` to save an xarray on the mikro instance of the governing app context, without
+   `from_array_like` to save an xarray on the mikro instance of the governing app context, without
    explicitly passing the apps mikro server to the function. You can always opt out of this behaviour
    by specifically passing the desired context to the function.
 
    ```python
-    from arkitekt import easy
-    from mikro.api.schema import from_xarray
+    from arkitekt_next import easy
+    from mikro_next.api.schema import from_array_like
     import xarray as xr
 
     app = easy("my-app-name")
 
     with app:
-        image = from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"])) # stores the xarray on the mikro instance of the governing app context
+        image = from_array_like(xr.DataArray((100,100,1), dims=["x", "y", "z"])) # stores the xarray on the mikro instance of the governing app context
 
          # or
 
-        image = from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"]), rath=app.mikro.rath) # stores the xarray on the specified mikro instance
+        image = from_array_like(xr.DataArray((100,100,1), dims=["x", "y", "z"]), rath=app.mikro.rath) # stores the xarray on the specified mikro instance
    ```
 
    :::note
    This behaviour allows for more functional and concise code but can also lead to unexpected
    behaviour. For example, if you have multiple app contexts running in parallel, the
-   `from_xarray` function will use the app context that is currently active. This can lead to
+   `from_array_like` function will use the app context that is currently active. This can lead to
    unexpected behaviour if you are not aware of this.
    :::
 
@@ -86,10 +86,10 @@ setup:
    sync code
 
    ```python
-    from arkitekt import Arkitekt
+    from arkitekt_next import easy
     import asyncio
 
-    app = Arkitekt()
+    app = easy("my-app-name")
 
     async def main():
         async with app:
@@ -110,16 +110,16 @@ setup:
    of the context in which your code is running.
 
    ```python
-    from arkitekt import easy
-    from mikro.api.schema import from_xarray
+    from arkitekt_next import easy
+    from mikro_next.api.schema import from_array_like
 
-    app = Arkitekt()
+    app = easy("my-app-name")
 
     with app:
          # do stuff with arkitekt
-         from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="my-image")
+         from_array_like(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="my-image")
 
-    from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="my-failed-image")  # will fail
+    from_array_like(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="my-failed-image")  # will fail
    ```
 
 # Lets get started
