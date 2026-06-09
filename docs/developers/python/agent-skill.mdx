@@ -1,0 +1,78 @@
+---
+id: agent-skill
+title: AI Agent Skill
+sidebar_label: AI Agent Skill
+sidebar_position: 8
+---
+
+# The arkitekt-next Agent Skill
+
+We publish an **Agent Skill** that teaches AI coding assistants (Claude Code,
+the Claude Agent SDK, and other tools that understand the open
+[`SKILL.md`](https://code.claude.com/docs) format) how to build `arkitekt-next`
+apps correctly — registering functions, choosing between standalone and plugin
+apps, handling complex data with structures, calling actions, and using the
+CLI.
+
+Drop it into your assistant and it will scaffold and edit apps following the
+conventions in these docs instead of guessing.
+
+## Get the skill
+
+The skill is a single self-contained `SKILL.md` file, hosted here:
+
+```bash
+curl -O https://arkitekt.live/skills/arkitekt-next/SKILL.md
+```
+
+You can also [view the raw file](/skills/arkitekt-next/SKILL.md) directly.
+
+## Install it
+
+### Claude Code
+
+Place the file in a skill directory so Claude Code discovers it. Project-local
+skills live under `.claude/skills/`:
+
+```bash
+mkdir -p .claude/skills/building-arkitekt-next-apps
+curl -o .claude/skills/building-arkitekt-next-apps/SKILL.md \
+  https://arkitekt.live/skills/arkitekt-next/SKILL.md
+```
+
+For a skill available in **every** project, use the user directory
+`~/.claude/skills/building-arkitekt-next-apps/SKILL.md` instead.
+
+Claude Code loads the skill's short description at startup and pulls in the full
+instructions automatically the moment you start working on an `arkitekt-next`
+app — no manual invocation required.
+
+### Other agents
+
+Any tool that supports the `SKILL.md` convention can use the same file. Point it
+at the URL above, or vendor the file into your repository so it travels with the
+code.
+
+## What the skill covers
+
+- The mental model: registered functions become platform **actions** whose UI,
+  validation, and docs are derived from your type hints and docstrings.
+- Choosing between **standalone** apps (`easy` / `interactive` builders) and
+  **plugin** apps (`arkitekt-next init`).
+- The rules for a safe plugin `app.py` (no import-time side effects, no
+  `easy(...)` call, no leaking globals).
+- Passing complex data by reference with `shrink` / `expand` **structures** and
+  `mikro_next` helpers like `from_array_like`.
+- Calling existing actions with `find` / `call` / `iterate`, including the Qt
+  `wrap` pattern.
+- Reporting progress and the advanced `@state` / `@context` / `@startup` /
+  `@background` decorators.
+- A full **CLI cheat-sheet** (`init`, `run`, `manifest`, `kabinet`, `inspect`,
+  `gen`) and a pre-flight checklist.
+
+:::tip Keep it in sync
+The skill mirrors the guidance in the [Python plugin guide](./plugin/index.mdx)
+and the [`arkitekt-next` CLI reference](https://arkitekt.live/docs/cli). If the
+API changes, update both `static/skills/arkitekt-next/SKILL.md` and the relevant
+docs pages together.
+:::
