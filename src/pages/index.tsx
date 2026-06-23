@@ -5,6 +5,28 @@ import X from "@site/static/img/favicon.svg";
 import Layout from "@theme/Layout";
 
 
+function OutdatedDisclaimer() {
+  return (
+    <div className="bg-yellow-200 text-black border-b-4 border-yellow-600 mx-12 rounded-lg ">
+      <div className="mx-auto max-w-5xl px-6 py-8 text-center">
+        <p className="text-2xl md:text-3xl font-extrabold  tracking-tight">
+          ⚠️ Heads up — this site is (painfully) outdated ⚠️
+        </p>
+        <p className="text-lg md:text-xl font-semibold mt-4">
+          As of <span className="underline">June 2026</span> we are in the midst
+          of preparing the release of the next <strong>Arkitekt</strong>.
+        </p>
+        <p className="text-base md:text-lg mt-3">
+          Everything you see here reflects an older version and is no longer accurate.
+          We strongly discourage using this version for any new projects, and we are working hard to get the new version ready for release.
+          
+          Just a little more wait — please check back soon (probably in July)!
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
@@ -36,6 +58,8 @@ export default function Home(): JSX.Element {
     >
       <HomepageHeader />
       <main>
+
+      <OutdatedDisclaimer />
         <HomepageFeatures />
       </main>
     </Layout>
