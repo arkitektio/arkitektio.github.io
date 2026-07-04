@@ -77,7 +77,7 @@ export default function HomePage() {
 
           <p className="mt-6 max-w-xl text-lg text-white/60">
             Arkitekt is a middleman between your data, your tools and your
-            team — turning scattered scripts, FIJI scripts, into shareable, reactive analysis
+            team. It turns scattered scripts, FIJI scripts, into shareable, reactive analysis
             apps.
           </p>
 
@@ -110,7 +110,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* product screenshot — anchored into the lower-right corner and oversized
+        {/* product screenshot. Anchored into the lower-right corner and oversized
             so it bleeds off the edge, clipped by the hero's overflow-hidden */}
         <div className="relative z-0 mt-10 px-6 sm:px-12 lg:absolute lg:bottom-0 lg:right-0 lg:mt-0 lg:w-[64%] lg:translate-x-[12%] lg:translate-y-[16%] lg:px-0">
           <div className="overflow-hidden rounded-xl  lg:rounded-none lg:rounded-tl-2xl lg:border-b-0 lg:border-r-0">
@@ -129,7 +129,7 @@ export default function HomePage() {
           Arkitekt is an{' '}
           <span className="text-fd-foreground">open-source platform</span> for{' '}
           <span className="text-fd-foreground">bioimages and beyond</span>. It connects your
-          data, analysis tools and team through a single reactive datahub — and
+          data, analysis tools and team through a single reactive datahub. It
           adapts to how <span className="text-fd-foreground">your lab</span>{' '}
           already works.
         </p>
@@ -150,6 +150,40 @@ export default function HomePage() {
 
       {/* ─────────────────────── Core services ─────────────────── */}
       <CoreBento />
+
+      {/* ───────────────────────── AI? ─────────────────────────── */}
+      <section className="w-full my-16">
+        <div className="relative overflow-hidden rounded-3xl border border-fd-border bg-fd-card/50 p-8 backdrop-blur sm:p-12">
+          {/* brand glow */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-fd-primary/10 blur-[120px]"
+          />
+          <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-fd-primary/40 bg-fd-primary/10 px-3.5 py-1.5 text-sm font-medium text-fd-primary">
+                <Sparkles className="size-3.5" />
+                AI?
+              </span>
+              <h2 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">
+                Yes, we use AI. No, nothing here is vibe-coded.
+              </h2>
+              <p className="mt-4 text-lg text-fd-muted-foreground">
+                We build the new version of Arkitekt with AI. We never build it
+                without supervision. Looks are deceiving: polish is not proof of
+                carelessness, and every line is read, understood and owned by a
+                human.
+              </p>
+            </div>
+            <Button asChild size="lg" className="shrink-0 rounded-full">
+              <Link href="/docs/ai">
+                How we use AI
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {/* ──────────────────────── Features ─────────────────────── */}
       <section className="w-full">

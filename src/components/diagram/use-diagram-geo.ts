@@ -4,9 +4,9 @@
    to a wrapper, plus (for the flex-reflow figures) conversion of each child
    card/box rect into wrapper-local coordinates. Two flavours:
 
-   • useMeasuredAnchors — for figures whose layout reflows (flexbox) and whose
+   • useMeasuredAnchors: for figures whose layout reflows (flexbox) and whose
      wires are routed from *measured* node positions (deployment-strategies).
-   • useScaledViewport / useContainerWidth — for figures authored at a fixed
+   • useScaledViewport / useContainerWidth: for figures authored at a fixed
      BASE_W and CSS-scaled to fit (provenance-flow, ecosystem-orbit). */
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';

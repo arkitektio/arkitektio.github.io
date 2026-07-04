@@ -3,8 +3,8 @@ import React from 'react';
 /**
  * MeshTunnel
  *
- * Visual aid for the (optional, experimental) Arkitekt Mesh: an outside app —
- * a laptop on the road, a remote compute node — reaching a platform that sits
+ * Visual aid for the (optional, experimental) Arkitekt Mesh: an outside app
+ * (a laptop on the road, a remote compute node) reaching a platform that sits
  * behind NAT on a private lab network. The **Ionscale coordinator** lives on
  * the public internet and only does the *control plane* work (auth +
  * discovery / signalling). The actual workload travels through a direct,
@@ -34,7 +34,7 @@ export function MeshTunnel() {
             Arkitekt Mesh
           </span>
           <span className="text-sm text-white/55">
-            Reach your platform from anywhere — control plane vs. data plane
+            Reach your platform from anywhere: control plane vs. data plane
           </span>
         </div>
 
@@ -55,7 +55,7 @@ export function MeshTunnel() {
           <text x="36" y="166" fontFamily={SANS} fontSize="11" fontWeight="700" letterSpacing="2" fill="rgba(255,255,255,0.4)">
             INTERNET · ON THE ROAD
           </text>
-          {/* lab zone (right) — behind NAT */}
+          {/* lab zone (right), behind NAT */}
           <rect x="450" y="140" width="410" height="300" rx="18" fill="rgba(127,201,155,0.04)" stroke={GREEN} strokeOpacity="0.45" strokeWidth="1.5" />
           <text x="466" y="166" fontFamily={SANS} fontSize="11" fontWeight="700" letterSpacing="2" fill="rgba(255,255,255,0.5)">
             YOUR LAB · BEHIND NAT
@@ -156,18 +156,18 @@ export function MeshTunnel() {
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] text-white/50">
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-0 w-6 border-t-[3px] border-dashed" style={{ borderColor: GREEN }} />
-            WireGuard tunnel — your data, peer-to-peer
+            WireGuard tunnel: your data, peer-to-peer
           </span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-0 w-6 border-t-2 border-dotted border-white/50" />
-            Ionscale control — auth &amp; discovery only
+            Ionscale control: auth &amp; discovery only
           </span>
         </div>
       </div>
       <figcaption className="mt-3 text-center text-sm text-fd-muted-foreground">
         <strong>Optional &amp; experimental.</strong> Outside apps reach a platform behind NAT over
         an encrypted <em>WireGuard</em> tunnel, brokered by an <em>Ionscale</em> coordinator that
-        handles only auth &amp; discovery — your workload data flows directly peer-to-peer and never
+        handles only auth &amp; discovery. Your workload data flows directly peer-to-peer and never
         passes through it.
       </figcaption>
     </figure>

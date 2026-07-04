@@ -1,6 +1,6 @@
 # arkitekt-fuma
 
-The documentation and marketing site for **[Arkitekt](https://github.com/arkitektio)** — an
+The documentation and marketing site for **[Arkitekt](https://github.com/arkitektio)**. Arkitekt is an
 open-source platform for bioimage analysis and beyond. Arkitekt is a "middleman"
 that sits between your data, your tools and your team, turning scattered scripts
 into shareable, reactive analysis apps.
@@ -46,7 +46,7 @@ mirrors the site navigation:
 
 Each folder uses a `meta.json` to control sidebar ordering and labels. To add a
 page, drop a new `.mdx` file in the relevant folder with a `title` and
-`description` in its frontmatter — `meta.json` controls where it appears.
+`description` in its frontmatter. The `meta.json` controls where it appears.
 
 MDX components (callouts, code blocks, custom React widgets) are available inside
 content. Frontmatter and MDX options are configured in
@@ -79,6 +79,6 @@ environment variable at build time.
 
 ## Learn more
 
-- [Arkitekt documentation](https://jhnnsrs.github.io/arkitekt-fuma/) — the live site.
-- [Fumadocs](https://fumadocs.dev) — the docs framework.
-- [Next.js Static Exports](https://nextjs.org/docs/app/guides/static-exports) — the build target.
+- [Arkitekt documentation](https://jhnnsrs.github.io/arkitekt-fuma/). The live site.
+- [Fumadocs](https://fumadocs.dev). The docs framework.
+- [Next.js Static Exports](https://nextjs.org/docs/app/guides/static-exports). The build target.

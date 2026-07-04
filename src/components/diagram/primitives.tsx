@@ -1,4 +1,4 @@
-/* Presentational SVG/DOM primitives shared by the diagrams — the band labels,
+/* Presentational SVG/DOM primitives shared by the diagrams: the band labels,
    network enclosures, firewall line, crossing markers, help/info dots, wire
    polylines, and the in-view reveal style. Each is theme-token-aware and free
    of any one diagram's metaphor. */
@@ -92,7 +92,7 @@ export function HelpDot({ x, y, href, title, label }: { x: number; y: number; hr
   );
 }
 
-/** A plain "?" marker with a hover tooltip (no link) — for asides. */
+/** A plain "?" marker with a hover tooltip (no link). Use it for asides. */
 export function InfoDot({ x, y, tip }: { x: number; y: number; tip: string }) {
   return (
     <g style={{ cursor: 'help' }} aria-label={tip}>

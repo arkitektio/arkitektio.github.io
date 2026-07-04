@@ -3,8 +3,8 @@
 
    GraphiQL composes every surface from a handful of HSL-triple custom properties
    (`hsl(var(--color-base))`, `hsl(var(--color-neutral))`, …). Its dark rules are
-   scoped to `body.graphiql-dark .graphiql-container` — higher specificity than a
-   plain `.dark .graphiql-container` — so our overrides match or beat that:
+   scoped to `body.graphiql-dark .graphiql-container`. That is higher specificity
+   than a plain `.dark .graphiql-container`, so our overrides match or beat that:
    container rules are nested under our own `.arkitekt-graphiql` wrapper, and dark
    rules are prefixed with `html.dark` so they tie/win against GraphiQL's body
    scope (and win on source order, since this file is imported last).
@@ -14,7 +14,7 @@
    the site's real `--color-fd-*` tokens (see `useGraphiqlThemeSync` in
    Graph.tsx), so the explorer is the *same* near-neutral palette and dynamic
    brand hue as the page. The near-neutral triples below are the fallback until
-   that runs / if it can't resolve — deliberately low-saturation, never purple. */
+   that runs / if it can't resolve. They are deliberately low-saturation, never purple. */
 
 .arkitekt-graphiql .graphiql-container,
 .graphiql-dialog,
@@ -106,10 +106,10 @@ html.dark [data-radix-popper-content-wrapper] {
 /* ── Editor syntax ───────────────────────────────────────────────────────────
    The accent hues (`--ark-cm-*`) are injected at runtime from the brand hue with
    complementary/triadic offsets (see `useGraphiqlThemeSync`), so the editor is a
-   cohesive brand-tinted scheme that re-tints with the brand — not flat white.
+   cohesive brand-tinted scheme that re-tints with the brand. It is not flat white.
    The fallbacks below keep it colourful before hydration; punctuation/comments
    stay quiet neutrals derived from the foreground token. NB: we deliberately do
-   NOT redefine the `--ark-cm-*` vars on this wrapper — that would shadow the
+   NOT redefine the `--ark-cm-*` vars on this wrapper. That would shadow the
    injected ones, since a value set on a closer ancestor wins. */
 .arkitekt-graphiql .CodeMirror {
   background: transparent;
@@ -167,7 +167,7 @@ html.dark [data-radix-popper-content-wrapper] {
 }
 
 /* ── Controls: tabs, toolbar + buttons ───────────────────────────────────────
-   Rounder and calmer than GraphiQL's stock chrome — drop the hard shadows and
+   Rounder and calmer than GraphiQL's stock chrome. We drop the hard shadows and
    stray highlight edges on tabs/buttons, and give hovers a soft brand tint. */
 .arkitekt-graphiql .graphiql-tabs {
   gap: 6px;

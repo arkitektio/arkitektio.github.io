@@ -40,7 +40,7 @@ const CY = 405;
 const RI = 100;
 const RO = 172;
 const R_APP = 345;
-// app arc leaves a wedge on the LEFT (≈230°–310°) for the actions-in arrow.
+// app arc leaves a wedge on the LEFT (≈230° to 310°) for the actions-in arrow.
 const APP_FROM = 310;
 const APP_TO = 230 + 360;
 
@@ -89,7 +89,7 @@ const ENTRY = { x: 132, y: CY };
 
 // Action & data flows are keyed to the brand AND the theme: lightness/chroma
 // come from `--orbit-flow-*` (which flip between light/dark), the hue from the
-// brand — so flows rotate with `--brand-hue` and re-tune per theme.
+// brand. So flows rotate with `--brand-hue` and re-tune per theme.
 const CTRL = flowColor('var(--brand-hue)');
 const AGENT = flowColor('calc(var(--brand-hue) + 30)');
 const DATA = flowColor('calc(var(--brand-hue) + 150)');
@@ -101,7 +101,7 @@ const cardStyle = (hue: number | string, isHot: boolean): CSSProperties => cardS
 
 const wedge = (a0: number, a1: number, ri: number, ro: number) => wedgePath(CX, CY, ri, ro, a0, a1);
 
-// Selectable "user stories" — real bioimaging tasks a scientist might ask for.
+// Selectable "user stories": real bioimaging tasks a scientist might ask for.
 const STORIES = [
   { id: 'acquire', title: 'Acquire an image', blurb: 'Grab a fresh image from the scope.', icon: Microscope },
   { id: 'segment', title: 'Segment this image', blurb: 'Find the cells in an image.', icon: Scan },
@@ -119,7 +119,7 @@ type Datum = { kind: 'image' | 'mask' | 'graph' | 'plot'; label: string; clean?:
    Each story is a reproducible list of declarative Steps. A step describes the
    resting state (desc, highlights, bubbles) plus an optional enter animation
    (a glowing edge `edge` and/or an app progress bar `fill`). A player walks the
-   list — auto-advancing or under user control. */
+   list. Steps advance automatically or under user control. */
 type Bubble = { label: string; text: string; progress: number };
 type Edge = { from: Pt; to: Pt; color: string };
 type Step = {
@@ -152,11 +152,11 @@ function brokerSteps(title: string, srcPt: Pt, srcDeg: number, t: number, inColo
   return [
     { title, desc: descIn, hot: ['server'], edge: { from: srcPt, to: serverEdge(srcDeg), color: inColor }, ...inMikro, dur: 540, hold: 220 },
     { title, desc: 'Rekuest routes the request to the right app.', hot: ['Rekuest', 'server'], ...inMikro, hold: 650 },
-    { title, desc: descRun, hot: [label], edge: { from: serverEdge(ang), to: spokeOuter(t), color: appColor(t) }, bubbles: [{ label, text: 'Action received — starting…', progress: 0 }], ...inMikro, dur: 540, hold: 450 },
+    { title, desc: descRun, hot: [label], edge: { from: serverEdge(ang), to: spokeOuter(t), color: appColor(t) }, bubbles: [{ label, text: 'Action received. Starting…', progress: 0 }], ...inMikro, dur: 540, hold: 450 },
     { title, desc: `${label} is running…`, hot: [label], bubbles: [{ label, text: 'Running…', progress: 1 }], fill: label, datum: produces, datumAt: produces ? label : undefined, dur: 1100, hold: 250 },
     { title, desc: `${label} uploads its results to the server…`, hot: [label, 'Mikro', 'server'], edge: { from: spokeOuter(t), to: serverEdge(ang), color: DATA }, bubbles: [{ label, text: 'Uploading data…', progress: 1 }], ...out, dur: 600, hold: 250 },
     { title, desc: 'Mikro saves the results to the database.', hot: ['Mikro', 'server'], bubbles: [{ label, text: 'Saving…', progress: 1 }], ...out, hold: 650 },
-    { title, desc: `Data stored — ${label} finished ✓`, hot: ['Mikro', 'server'], bubbles: [{ label, text: 'Finished ✓ · stored', progress: 1 }], ...out, hold: 700 },
+    { title, desc: `Data stored. ${label} finished ✓`, hot: ['Mikro', 'server'], bubbles: [{ label, text: 'Finished ✓ · stored', progress: 1 }], ...out, hold: 700 },
   ];
 }
 
@@ -213,7 +213,7 @@ function classifySteps(): Step[] {
   ];
 }
 
-// ── Story 4: "see it better" — the AI agent calls three apps ───────────────
+// ── Story 4: "see it better": the AI agent calls three apps ───────────────
 function enhanceSteps(): Step[] {
   const T = 'See it better';
   const ag = findApp('AI Agent');
@@ -237,7 +237,7 @@ function enhanceSteps(): Step[] {
     for (const s of sub) steps.push({ ...s, bubbles: [...(s.bubbles ?? []), { label: 'AI Agent', text: `Calling ${p.label}… (${k + 1}/3)`, progress: (k + 0.5) / 3 }] });
     steps.push({
       title: T,
-      desc: `${p.label} finished — reported back to the agent.`,
+      desc: `${p.label} finished. Reported back to the agent.`,
       hot: ['AI Agent', 'Mikro', 'server'],
       edge: { from: serverEdge(agA), to: spokeOuter(ag), color: AGENT },
       bubbles: [{ label: 'AI Agent', text: `${p.label} done ✓ (${k + 1}/3)`, progress: (k + 1) / 3 }],
@@ -253,7 +253,7 @@ function enhanceSteps(): Step[] {
   return steps;
 }
 
-// ── Story 5: smart microscopy — the custom Protocol app drives a loop ──────
+// ── Story 5: smart microscopy: the custom Protocol app drives a loop ──────
 function smartSteps(): Step[] {
   const T = 'Smart microscopy';
   const pr = findApp('Protocol');
@@ -278,11 +278,11 @@ function smartSteps(): Step[] {
     // Protocol → server → Acquire
     steps.push({ title: T, desc: `Cycle ${c}: the protocol asks for a new frame.`, hot: ['Protocol', 'Acquire'], edge: { from: serverEdge(acqA), to: spokeOuter(acq), color: appColor(acq) }, bubbles: [{ label: 'Acquire', text: 'Acquiring…', progress: 0 }, proto(`Cycle ${c} · acquire`)], dur: 540, hold: 350 });
     steps.push({ title: T, desc: `Cycle ${c}: the microscope captures an image.`, hot: ['Acquire'], bubbles: [{ label: 'Acquire', text: 'Captured ✓', progress: 1 }, proto(`Cycle ${c} · acquire`)], fill: 'Acquire', datum: img, datumAt: 'Acquire', dur: 1000, hold: 250 });
-    // Protocol → server → Analyze (measure & decide) — image now resides in Mikro
+    // Protocol → server → Analyze (measure & decide). Image now resides in Mikro
     steps.push({ title: T, desc: `Cycle ${c}: the protocol measures the stored frame.`, hot: ['Protocol', 'Analyze', 'Mikro'], edge: { from: serverEdge(anaA), to: spokeOuter(ana), color: appColor(ana) }, bubbles: [{ label: 'Analyze', text: 'Measuring…', progress: 0 }, proto(`Cycle ${c} · measure`)], datum: img, datumAt: 'Mikro', dur: 540, hold: 350 });
     steps.push({ title: T, desc: `Cycle ${c}: it quantifies and decides what to do next.`, hot: ['Analyze'], bubbles: [{ label: 'Analyze', text: 'Measured ✓', progress: 1 }, proto(`Cycle ${c} · decide`)], fill: 'Analyze', datum: plot, datumAt: 'Analyze', dur: 1000, hold: 250 });
     if (c < cycles) {
-      steps.push({ title: T, desc: 'The protocol decides to image again — closing the loop.', hot: ['Protocol', 'Mikro', 'server'], bubbles: [proto('Next cycle…')], datum: plot, datumAt: 'Mikro', hold: 750 });
+      steps.push({ title: T, desc: 'The protocol decides to image again, closing the loop.', hot: ['Protocol', 'Mikro', 'server'], bubbles: [proto('Next cycle…')], datum: plot, datumAt: 'Mikro', hold: 750 });
     }
   }
   steps.push({ title: T, desc: 'The protocol converges and stores the best result.', hot: ['Protocol', 'Mikro', 'server'], bubbles: [{ label: 'Protocol', text: 'Protocol complete ✓', progress: 1 }], datum: lastImage, datumAt: 'Mikro', hold: 1000 });
@@ -298,7 +298,7 @@ function buildSteps(story: StoryId): Step[] {
   return acquireSteps();
 }
 
-// ── URL persistence (?story=…&step=…) — deep-linkable & back-navigable ──────
+// ── URL persistence (?story=…&step=…): deep-linkable & back-navigable ──────
 function readStoryUrl(): { story: StoryId; step: number } {
   if (typeof window === 'undefined') return { story: 'acquire', step: 0 };
   const p = new URLSearchParams(window.location.search);
@@ -352,7 +352,7 @@ export function EcosystemOrbit() {
       applyingFromUrl.current = true;
       setStory(s);
       setCur(step);
-      if (deepLinked) setPlaying(false); // arrived via a link — don't auto-play
+      if (deepLinked) setPlaying(false); // arrived via a link, so don't auto-play
     };
     apply();
     window.addEventListener('popstate', apply);
@@ -382,7 +382,7 @@ export function EcosystemOrbit() {
     writeStoryUrl(story, cur, push);
   }, [story, cur]);
 
-  // restart the graph at step 0 when the story changes — but keep the user's
+  // restart the graph at step 0 when the story changes, but keep the user's
   // play/pause choice (once paused into manual mode, stay there).
   useEffect(() => {
     if (applyingFromUrl.current) return; // URL-driven: keep the deep-linked step
@@ -523,12 +523,12 @@ export function EcosystemOrbit() {
               </div>
             </div>
 
-            {/* live log — part of the diagram, borderless */}
+            {/* live log: part of the diagram, borderless */}
             <div className="mt-2 px-1 font-mono">
               <div className="text-[10px] tracking-[0.16em] text-primary/70">LIVE LOG</div>
               <div className="mt-1.5 flex min-h-[2.75rem] flex-col gap-1">
                 {log.length === 0 ? (
-                  <span className="text-[11px] text-fd-muted-foreground">Idle — waiting for the next step…</span>
+                  <span className="text-[11px] text-fd-muted-foreground">Idle. Waiting for the next step…</span>
                 ) : (
                   log.map(([label, s]) => (
                     <div key={label} className="flex items-center gap-2 text-[11px]">
@@ -575,7 +575,7 @@ function ControlPanel({
   return (
     <div className={className}>
       <div className="rounded-2xl border border-fd-border bg-fd-muted/30 p-6 sm:p-7">
-        {/* TEMPORAL CONTROL — narration + stepper (above the story picker) */}
+        {/* TEMPORAL CONTROL: narration + stepper (above the story picker) */}
         <div className="min-h-[5rem]">
           <div className="font-mono text-[10px] tracking-[0.16em] text-primary/70">{runTitle || 'LIVE'}</div>
           <p key={desc} className="animate-pop-in mt-2.5 text-[15px] leading-relaxed text-fd-foreground/90">{desc}</p>
@@ -600,7 +600,7 @@ function ControlPanel({
 
         <div className="my-5 h-px bg-fd-border" />
 
-        {/* STORY SELECTOR — below the temporal control */}
+        {/* STORY SELECTOR: below the temporal control */}
         <div className="font-mono text-[11px] tracking-[0.18em] text-primary/80">PICK A STORY</div>
         <div className="mt-3 flex flex-col gap-2">
           {STORIES.map((s) => {
@@ -637,7 +637,7 @@ function ControlPanel({
 }
 
 function Diagram({ inView, flows, hot, status, userMsg, desc, datum, datumAt, compact }: { inView: boolean; flows: Flow[]; hot: Set<string>; status: Record<string, { text: string; progress: number }>; userMsg: string | null; desc: string; datum: Datum | null; datumAt: string | null; compact: boolean }) {
-  // Quick, uniform fade-in (no scale, no stagger) — the `delay` arg is ignored.
+  // Quick, uniform fade-in (no scale, no stagger). The `delay` arg is ignored.
   const bloom = (_delay: number): CSSProperties => ({
     opacity: inView ? 1 : 0,
     transition: 'opacity .25s ease',
@@ -672,7 +672,7 @@ function Diagram({ inView, flows, hot, status, userMsg, desc, datum, datumAt, co
           );
         })}
 
-        {/* inner donut: five equal continuous segments — uncoloured */}
+        {/* inner donut: five equal continuous segments, uncoloured */}
         {services.map((s, i) => {
           const a0 = -36 + i * 72;
           const d = wedge(a0, a0 + 72, RI, RO);
@@ -739,7 +739,7 @@ function Diagram({ inView, flows, hot, status, userMsg, desc, datum, datumAt, co
         </div>
       </Centered>
 
-      {/* center hub — shows the live server message while the server works,
+      {/* center hub: shows the live server message while the server works,
           otherwise the Arkitekt mark */}
       <Centered x={CX} y={CY}>
         <div className="grid place-items-center rounded-full">
@@ -769,7 +769,7 @@ function Diagram({ inView, flows, hot, status, userMsg, desc, datum, datumAt, co
         })()
       )}
 
-      {/* core-service labels — neutral; hidden when the diagram is small */}
+      {/* core-service labels: neutral; hidden when the diagram is small */}
       {!compact &&
         services.map((s, i) => {
           const ang = i * 72;
@@ -903,7 +903,7 @@ function Diagram({ inView, flows, hot, status, userMsg, desc, datum, datumAt, co
   );
 }
 
-/** A small primitive render of a datum — a symbol that rides along with the data
+/** A small primitive render of a datum: a symbol that rides along with the data
     (shown on the device that produced it, and on the user when delivered). */
 function DatumSymbol({ datum, className }: { datum: Datum; className?: string }) {
   return (
@@ -949,7 +949,7 @@ function DatumGlyph({ datum }: { datum: Datum }) {
       </svg>
     );
   }
-  // image / mask — a little microscopy plane (dark, with fluorescent blobs)
+  // image / mask: a little microscopy plane (dark, with fluorescent blobs)
   return (
     <svg viewBox="0 0 96 72" className="size-full">
       <rect width="96" height="72" fill="#0b0b14" />

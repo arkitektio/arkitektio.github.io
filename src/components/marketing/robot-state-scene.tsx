@@ -6,11 +6,12 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Grid, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { Model as FairinoRobot } from './three/robot';
+import { toThreeColor } from './resolve-color';
 
 /**
  * A stripped-down react-three-fiber vignette for the observable-state card: just
  * the Fairino FR5 arm on its mount, slewing gently on its base. No controller
- * node, no command packets — the surrounding card already tells the "live state"
+ * node, no command packets. The surrounding card already tells the "live state"
  * story, so here we only want the robot itself.
  *
  * Accent colours are pulled from the live `--color-fd-primary` brand variable so
@@ -26,7 +27,7 @@ function readBrandColor(fallback = '#7c6cff') {
   document.body.appendChild(probe);
   const resolved = getComputedStyle(probe).color;
   document.body.removeChild(probe);
-  return resolved || fallback;
+  return toThreeColor(resolved, fallback);
 }
 
 // Read once on mount (this component is client-only via dynamic ssr:false, so
@@ -57,7 +58,7 @@ function FairinoModel() {
     g.updateMatrixWorld(true);
     const grounded = new THREE.Box3().setFromObject(g);
     // Keep the arm's own base axis on the wrapper origin (the model's local
-    // origin sits at the base plate) and only lift it onto the floor — do NOT
+    // origin sits at the base plate) and only lift it onto the floor. Do NOT
     // recentre on the bounding box, or the base slew below pivots around the
     // box centre and the whole arm appears to orbit instead of rotate in place.
     g.position.set(0, -grounded.min.y, 0);

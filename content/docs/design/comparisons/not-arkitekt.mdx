@@ -1,11 +1,11 @@
 ---
 title: What Arkitekt is not
-description: Where Arkitekt draws the line against Dask, Nextflow and ROS — and how it aims to integrate with the tools we love instead of competing with them.
+description: Where Arkitekt draws the line against Dask, Nextflow and ROS, and how it aims to integrate with the tools we love instead of competing with them.
 ---
 
 Arkitekt is often mistaken for tools it deliberately is *not*. People reach for
-the comparison they already know — "so it's like Dask?", "is this just
-Nextflow?", "are you doing ROS?" — and are surprised when Arkitekt behaves
+the comparison they already know: "so it's like Dask?", "is this just
+Nextflow?", "are you doing ROS?" They are surprised when Arkitekt behaves
 differently.
 
 So let's draw those boundaries clearly. But first, the important part:
@@ -14,7 +14,7 @@ So let's draw those boundaries clearly. But first, the important part:
 
 Dask, Nextflow and ROS are some of the best engineering the scientific-computing
 community has ever produced. We use them, we learn from them, and Arkitekt is
-better *because* they exist. Nothing on this page is a knock on them — it is a
+better *because* they exist. Nothing on this page is a knock on them. It is a
 map of where each of them shines and where Arkitekt picks up.
 
 </Callout>
@@ -25,7 +25,7 @@ its job, and the right answer is almost always to run Arkitekt **with** them, no
 instead of them.
 
 So what *is* Arkitekt? It is a **reactive platform** that sits between your data,
-your tools and your team — a stateful middleman that turns scattered scripts and
+your tools and your team. It is a stateful middleman that turns scattered scripts and
 instruments into live, composable apps. That framing is the key to every
 comparison below.
 
@@ -36,14 +36,14 @@ Python ecosystem to a genuinely hard problem: scaling array, dataframe and
 task-graph computation across many cores and machines. You hand it a big
 computation, it splits the work, schedules it, and hands you the result.
 
-Arkitekt is **not a pure parallelization library** — and never wants to be. We
+Arkitekt is **not a pure parallelization library**. It never wants to be. We
 are a *reactive platform built on a concurrency model*. The unit of work in
 Arkitekt is not a transient task in a graph you submit and forget; it is a
 long-lived, stateful **app** that stays alive, holds context (a loaded model, an
 open instrument connection, a running viewer) and brokers data and compute
 between other apps and your team.
 
-That is a different problem from "split this computation across a cluster" — and
+That is a different problem from "split this computation across a cluster". And
 when you *do* need raw parallel compute, the last thing we want is to reinvent
 Dask badly. We just call it.
 
@@ -58,20 +58,20 @@ See [Kluster](/docs/design/services/kluster).
 ## Not just stateless execution (Nextflow)
 
 [Nextflow](https://www.nextflow.io/) is, frankly, a triumph. For reproducible,
-**stateless** batch pipelines on a cluster it is hard to beat — describe your
+**stateless** batch pipelines on a cluster it is hard to beat. Describe your
 processes in a clean DSL, point it at your infrastructure, and it reliably grinds
 through enormous batch jobs where every step starts fresh and exits when done.
 We borrowed more than a few good ideas from it.
 
 Arkitekt is **not "just" a stateless executor**. Smart microscopy is rarely
 stateless: a deep-learning model is loaded once and reused across thousands of
-frames, an instrument stays connected, and — crucially — *the result of one step
+frames, an instrument stays connected, and, crucially, *the result of one step
 steers the next acquisition*. That live, closed feedback loop does not map onto a
 fire-and-forget batch process. Arkitekt apps stay alive, keep their state, and
 talk through messages, so the model loads once and the loop stays tight.
 
 This statefulness is a double-edged sword (a leaking app keeps leaking; a batch
-process just exits), so it does not make Arkitekt "better" — it makes it suited
+process just exits), so it does not make Arkitekt "better". It makes it suited
 to a different shape of problem. For big, embarrassingly parallel batch science,
 reach for Nextflow with our blessing.
 
@@ -87,18 +87,18 @@ Arkitekt apps from Nextflow workflows and back.
 ## Not robotic swarm orchestration (ROS)
 
 [ROS](https://www.ros.org/) is the backbone of modern robotics for a reason. It
-owns real-time control and swarm orchestration — coordinating motors, sensors and
+owns real-time control and swarm orchestration. It coordinates motors, sensors and
 actuators down at the hardware, with the timing guarantees that demands. It is
 extraordinary, hard-won engineering, and we have nothing but respect for it.
 
 Arkitekt is **not robotics middleware**, and we would never pretend otherwise. We
 do not orchestrate a robot's joints, and we do not coordinate a swarm in real
-time — that layer is firmly out of scope, and ROS is exactly the right tool for
+time. That layer is firmly out of scope, and ROS is exactly the right tool for
 it.
 
 But the moment your robot (or microscope, or stage) exposes a high-level
-**action** — "pick the sample", "move to position", "run the scan" — Arkitekt
-becomes your friend. Wrap that action as an app and it turns into an action you can
+**action**, Arkitekt becomes your friend. Think "pick the sample", "move to
+position", "run the scan". Wrap that action as an app and it turns into an action you can
 compose into reactive workflows alongside your analysis and your data. ROS drives
 the metal; Arkitekt choreographs the science on top.
 
@@ -112,7 +112,7 @@ Once your hardware speaks in actions, expose it as an Arkitekt
 <Callout type="info">
 
 Think we misrepresent one of these tools, or that Arkitekt should draw the line
-somewhere else? We would genuinely love your feedback — please open a discussion
+somewhere else? We would genuinely love your feedback. Please open a discussion
 on the [GitHub Discussions](https://github.com/orgs/arkitektio/discussions) page.
 
 </Callout>

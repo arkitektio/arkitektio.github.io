@@ -105,9 +105,9 @@ export function AsyncApiCard() {
           Control everything, freely.
         </h2>
         <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
-          Every action is just a function — sync or async. Call{' '}
+          Every action is just a function, sync or async. Call{' '}
           <code>progress()</code> to report how far along you are, and{' '}
-          <code>yield</code> results as they are produced — the platform streams
+          <code>yield</code> results as they are produced. The platform streams
           them straight to the caller.
         </p>
 

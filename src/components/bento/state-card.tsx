@@ -6,7 +6,7 @@ import { BentoCard } from './primitives';
 import { RobotStateScene } from '@/components/marketing';
 
 // A fake observable robot state. Each tick the agent mutates it and the change
-// is "published" live — this stands in for the real @state instance a dashboard
+// is "published" live. This stands in for the real @state instance a dashboard
 // would watch over the platform at `publish_interval`.
 const POSES = ['idle', 'reaching', 'gripping', 'lifting', 'placing'] as const;
 
@@ -46,7 +46,7 @@ export function StateCard() {
         <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
           Declare an <code>@state</code> dataclass and any action can read or
           mutate it just by type-hinting it. Every change is published to the
-          platform automatically — so dashboards and other apps watch your
+          platform automatically. Dashboards and other apps watch your
           robot in real time.
         </p>
 
@@ -82,7 +82,7 @@ export function StateCard() {
         </pre>
       </div>
 
-      {/* live state — the Fairino arm in 3D, with its observable state read out
+      {/* live state. The Fairino arm in 3D, with its observable state read out
           on top: each command landing on the arm mutates the state below. */}
       <div className="relative z-10 min-h-[20rem] overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0c] shadow-[0_0_80px_-40px_var(--color-fd-primary)] lg:min-h-[24rem]">
         {/* brand glow behind the scene */}

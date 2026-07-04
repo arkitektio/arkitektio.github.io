@@ -5,7 +5,7 @@ import { Camera, LayoutPanelTop, MousePointerClick } from 'lucide-react';
 import { BentoCard } from './primitives';
 
 // The component catalog a blok draws from. The platform ships these and you
-// compose them in JSX — props are either static, a $state binding, or an
+// compose them in JSX. Props are either static, a $state binding, or an
 // @action callback.
 const CATALOG = ['Page', 'Label', 'Text', 'Button', 'Stack', 'Image'];
 

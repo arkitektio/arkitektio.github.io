@@ -10,12 +10,12 @@ import { cardStyle, Centered, flow as flowColor, hueDot, iconBox, iconColor, ler
    visual language (theme-aware `--orbit-*` / `--brand-hue` OKLCH tokens).
 
    Layout (wide):
-     • top    — the human. Their request is the ROOT TASK; an arrow drops it in.
-     • left   — the robot apps (agents). Every call is brokered by Rekuest, and a
+     • top:    the human. Their request is the ROOT TASK; an arrow drops it in.
+     • left:   the robot apps (agents). Every call is brokered by Rekuest, and a
                 delegation mints the callee its OWN child token pointing to parent.
-     • centre — the server, split left/right: Rekuest (mints + signs) and Mikro
+     • centre: the server, split left/right: Rekuest (mints + signs) and Mikro
                 (decodes on every write, the stamped store), Arkitekt mark inside.
-     • right  — the Mikro provenance tree: a nested task hierarchy.
+     • right:  the Mikro provenance tree: a nested task hierarchy.
 
    When the container is narrow the layout reflows: the human moves to the right
    of the donut and the provenance tree drops below the diagram, full-width and
@@ -37,7 +37,7 @@ const APPS: AppMeta[] = [
 ];
 const appOf = (label: string) => APPS.find((a) => a.label === label)!;
 
-// ── responsive layout — all geometry lives here, switched on `stacked` ───────
+// ── responsive layout: all geometry lives here, switched on `stacked` ───────
 type Layout = {
   stacked: boolean;
   BASE_W: number; BASE_H: number;
@@ -88,7 +88,7 @@ const nodePt = (L: Layout, name: string): Pt => {
 // ── the run: ONE declarative task tree is the single source of truth ─────────
 // App A is the root task; it schedules B and C as siblings. Each node owns its
 // token + saved image (and the bespoke narration in `copy`). Both the step graph
-// and the tree pane are generated from this — adding an agent is a one-line edit.
+// and the tree pane are generated from this. Adding an agent is a one-line edit.
 type Task = {
   id: string; // '#42'
   app: string; // must match an APPS[].label
@@ -112,16 +112,16 @@ const RUN: Task = {
       copy: {
         mint: 'App A delegates to App B. Rekuest mints App B its OWN token (task #43) that points back to #42.',
         dispatch: 'Rekuest dispatches robot App B with its own child token.',
-        save: 'App B saves its progress image to Mikro — decoded to task #43, whose parent is #42.',
+        save: 'App B saves its progress image to Mikro. It decodes to task #43, whose parent is #42.',
       },
       children: [],
     },
     {
       id: '#44', app: 'App C', token: 'tok·b7d2', image: 'image_003.tif', parent: '#42',
       copy: {
-        mint: 'App A also schedules App C — a sibling child token (task #44) pointing back to the same root #42.',
+        mint: 'App A also schedules App C. That mints a sibling child token (task #44) pointing back to the same root #42.',
         dispatch: 'Rekuest dispatches robot App C with its token.',
-        save: 'App C saves its image to Mikro with the same token — decoded to task #44, a sibling of #43 under root #42.',
+        save: 'App C saves its image to Mikro with the same token. It decodes to task #44, a sibling of #43 under root #42.',
       },
       children: [],
     },
@@ -142,7 +142,7 @@ const tokOf = (t: Task): Tok => ({ id: t.token, task: t.id, parent: t.parent });
 // A deterministic pre-order walk emits the beats; per task it is mint → dispatch
 // → save, wrapped by a leading `request` and a trailing `done`. Each task is
 // stamped with the step index at which its tree node (`revealAt`) and write leaf
-// (`saveAt`) become visible, so the reveal is `cur >=` index — no hand-kept
+// (`saveAt`) become visible, so the reveal is `cur >=` index. No hand-kept
 // counters to drift out of sync. The walk is geometry-free; positions are
 // injected later by `toStep(beat, layout)`.
 type BeatKind = 'request' | 'mint' | 'dispatch' | 'save' | 'done';
@@ -186,7 +186,7 @@ function toStep(beat: Beat, L: Layout): Step {
   const t = beat.task;
   switch (beat.kind) {
     case 'request':
-      return { kind: 'request', hot: ['Human'], user: 'run my pipeline', desc: 'A human starts the run — their request is the root task.', hold: 1100 };
+      return { kind: 'request', hot: ['Human'], user: 'run my pipeline', desc: 'A human starts the run. Their request is the root task.', hold: 1100 };
     case 'mint': {
       const root = isRoot(t!);
       return {
@@ -212,11 +212,11 @@ function toStep(beat: Beat, L: Layout): Step {
         edge: { from: nodePt(L, t!.app), to: L.mikIn, color: DATA },
         token: tokOf(t!), tokenAt: t!.app, running: t!.app,
         decode: { client: t!.app, task: t!.id, parent: t!.parent },
-        desc: t!.copy?.save ?? `${t!.app} saves its image to Mikro — decoded to task ${t!.id}.`,
+        desc: t!.copy?.save ?? `${t!.app} saves its image to Mikro. It decodes to task ${t!.id}.`,
         dur: 900, hold: 1100,
       };
     case 'done':
-      return { kind: 'done', hot: ['Mikro'], done: true, desc: 'Every delegation minted its own token pointing back to its parent — one verifiable task tree under the human root.', hold: 2800 };
+      return { kind: 'done', hot: ['Mikro'], done: true, desc: 'Every delegation minted its own token pointing back to its parent. Together they form one verifiable task tree under the human root.', hold: 2800 };
   }
 }
 
@@ -347,9 +347,9 @@ export function ProvenanceFlow() {
       </div>
       <figcaption className="mt-3 text-center text-sm text-fd-muted-foreground">
         <strong>One token per task, one tree per run.</strong> A human's request is the root task.
-        <em> Rekuest</em> brokers every call — and when one robot app delegates to another, it mints
+        <em> Rekuest</em> brokers every call. When one robot app delegates to another, it mints
         the callee its own signed token that points back to the parent. On each write, <em>Mikro</em>
-        decodes the token and records who acted, which app, and the parent task — so the whole run
+        decodes the token and records who acted, which app, and the parent task. So the whole run
         forms one verifiable provenance tree you can query, audit, or revert.
       </figcaption>
     </figure>
@@ -376,7 +376,7 @@ function Diagram({ L, inView, hot, flow, tokenPt, step, fill, compact, cur }: { 
           root task
         </text>
 
-        {/* topology spokes — Rekuest brokers every call (no app→app links) */}
+        {/* topology spokes. Rekuest brokers every call (no app→app links) */}
         {APPS.map((w) => {
           const p = L.appPt(w.label);
           return <line key={`d-${w.label}`} x1={L.rekIn.x} y1={L.rekIn.y} x2={p.x} y2={p.y} strokeWidth="1.3" strokeDasharray="3 7" style={{ stroke: 'var(--orbit-spoke)', ...bloom }} />;
@@ -565,7 +565,7 @@ function Diagram({ L, inView, hot, flow, tokenPt, step, fill, compact, cur }: { 
   );
 }
 
-/** The Mikro provenance tree card — usable inside the diagram or as a DOM block. */
+/** The Mikro provenance tree card. Usable inside the diagram or as a DOM block. */
 function TreePane({ cur, done }: { cur: number; done?: boolean }) {
   const revealedTasks = countRevealed(BUILT_TREE, cur, 'revealAt');
   const revealedWrites = countRevealed(BUILT_TREE, cur, 'saveAt');
@@ -648,7 +648,7 @@ function TreeBranch({ node, cur }: { node: BuiltTask; cur: number }) {
   );
 }
 
-/** A tiny saved "progress image" — a microscopy-ish plane tinted by the agent,
+/** A tiny saved "progress image". A microscopy-ish plane tinted by the agent,
     carrying the provenance token overlaid in its corner. */
 function ImageThumb({ hue, className }: { hue: number; className?: string }) {
   return (
@@ -669,7 +669,7 @@ function ImageThumb({ hue, className }: { hue: number; className?: string }) {
   );
 }
 
-/** The GraphQL mark — a hexagon of nodes with the inscribed triangle. */
+/** The GraphQL mark: a hexagon of nodes with the inscribed triangle. */
 function GraphQLMark({ className }: { className?: string }) {
   const GQL = '#E10098';
   const verts = [-90, -30, 30, 90, 150, 210].map((d) => ({

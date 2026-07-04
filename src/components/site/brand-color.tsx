@@ -31,7 +31,7 @@ export function BrandColorScript() {
 
 /**
  * The brand-hue controls (label, slider, swatches, save/random) without any
- * surrounding popover chrome — drop it into whatever container you like. Reports
+ * surrounding popover chrome. Drop it into whatever container you like. Reports
  * the live hue via `onHueChange` so a trigger can mirror the current colour.
  */
 export function BrandColorControls({

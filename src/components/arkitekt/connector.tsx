@@ -274,7 +274,7 @@ const menuContentClass =
 
 /**
  * Signed-out account popover: sign in with the default coordination server,
- * sign in with another one, and tweak the brand colour — all in one place.
+ * sign in with another one, and tweak the brand colour. All in one place.
  */
 export const NotConnectedNav = () => {
   const { connectTo, connecting } = useConnectToServer();
@@ -379,7 +379,7 @@ const Avatar = ({
   className: string;
 }) => {
   // Fall back to initials (or a generic icon) if there's no avatar URL or the
-  // image fails to load — a broken <img> should never leak into the UI.
+  // image fails to load. A broken <img> should never leak into the UI.
   const [broken, setBroken] = React.useState(false);
   React.useEffect(() => setBroken(false), [url]);
   const showImage = Boolean(url) && !broken;
@@ -409,8 +409,8 @@ const Avatar = ({
 };
 
 /**
- * Signed-in account popover: who you are, the brand colour, and sign out — the
- * mirror of {@link NotConnectedNav}, keyed off the avatar.
+ * Signed-in account popover: who you are, the brand colour, and sign out. It is
+ * the mirror of {@link NotConnectedNav}, keyed off the avatar.
  */
 export const ShowMeNav = () => {
   const { data } = useMeQuery();

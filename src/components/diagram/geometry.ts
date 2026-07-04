@@ -1,5 +1,5 @@
-/* Shared, pure geometry for the docs/marketing diagrams. No React, no DOM —
-   just the math the figures kept re-deriving: trig, donut wedges, orthogonal
+/* Shared, pure geometry for the docs/marketing diagrams. No React, no DOM.
+   Just the math the figures kept re-deriving: trig, donut wedges, orthogonal
    "elbow" wire routing into horizontal lanes, and firewall-crossing detection.
    Keep this file pure and parameterized: per-diagram routing *decisions* (which
    edge takes which route) stay in the diagram; only the maths live here. */

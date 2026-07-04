@@ -1,6 +1,6 @@
 ---
 title: Provenance & Audit Logging
-description: How Arkitekt records who changed what, under whose authority, and during which task — turning every data change into a durable, queryable audit trail.
+description: How Arkitekt records who changed what, under whose authority, and during which task. Every data change becomes a durable, queryable audit trail.
 ---
 
 import { GithubRepo, ProvenanceFlow } from "@/components/docs";
@@ -11,7 +11,7 @@ attributed. This page explains how that promise is kept.
 
 The answer is **provenance-aware audit logging**. Every create, update, and delete on a tracked
 record is captured as a history row, and each row is attributed to *who* made the change,
-*which app* they used, and — crucially — the verified **task** it happened under. This lets an
+*which app* they used, and, crucially, the verified **task** it happened under. This lets an
 administrator ask, after the fact, questions like:
 
 > *"Which automated run touched this record, on whose authority, and what exactly did it change?"*
@@ -39,7 +39,7 @@ Every change produces a **provenance entry** that carries:
 
 This is what makes the human-versus-machine distinction concrete. When an agent runs an action on
 your behalf, the entry records both facts at once: that the work was **authorized by you**, and
-that it was **carried out by a machine** — never collapsing one into the other.
+that it was **carried out by a machine**. It never collapses one into the other.
 
 ## What is a task?
 
@@ -53,7 +53,7 @@ identity rather than by request, all of those changes still collapse onto the sa
 
 ## How it fits together
 
-Provenance is not bolted on at the end — it falls out of how the platform's layers stack. Each
+Provenance is not bolted on at the end. It falls out of how the platform's layers stack. Each
 layer has one job, and provenance is what you get when they are composed in order:
 
 ```
@@ -78,25 +78,25 @@ layer has one job, and provenance is what you get when they are composed in orde
   context the upper layers build on.
 - **[authentikate](https://github.com/jhnnsrs/authentikate)** owns identity. It verifies the
   signed provenance token and resolves the acting *user*, *client*, and *organization*. There is
-  no bypass for provenance — the signature is always checked.
+  no bypass for provenance. The signature is always checked.
 - **[koherent](https://github.com/jhnnsrs/koherent)** consumes that verified context and turns
   each data change into a durable, attributed history row, building a `Task` from the token's
   claims.
 
 Because each layer depends on the one above it, the audit trail is only ever written from a
-*verified* request — there is no path that records an unattributed or unsigned change.
+*verified* request. There is no path that records an unattributed or unsigned change.
 
 ## One token, many changes
 
 The reason a task can group many changes is worth spelling out, because it is the heart of *why*
-provenance is trustworthy — and it is not something the audit layer does by force. It falls out
+provenance is trustworthy. It is not something the audit layer does by force. It falls out
 of how a [rekuest-next](https://github.com/jhnnsrs/rekuest-next) agent runs a task.
 
 <ProvenanceFlow />
 
 When a user calls a registered function on an agent, the agent receives a single, server-signed
 **provenance token** for that one run. While the function executes, every outgoing operation it
-makes — every mutation, no matter how many — is transparently stamped with that **same** token.
+makes, every mutation no matter how many, is transparently stamped with that **same** token.
 The application code does nothing special; the token is set once and propagates to everything the
 function does.
 
@@ -108,8 +108,8 @@ links back to a single task, and you can later query *"show me everything this r
 
 Because provenance is recorded as first-class data, it is exposed directly in each service's
 GraphQL API as a queryable, filterable `provenance` field on the records that carry it. You can
-ask a record for its full history, filter records by the task or user that changed them, and —
-for most actions — revert a change to restore the previous state.
+ask a record for its full history, filter records by the task or user that changed them, and,
+for most actions, revert a change to restore the previous state.
 
 <GithubRepo url="https://github.com/jhnnsrs/koherent" title="Koherent" />
 

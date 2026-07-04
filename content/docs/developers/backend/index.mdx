@@ -1,16 +1,16 @@
 ---
 title: Backend Libraries
-description: The server-side Python libraries that Arkitekt services are built from — for developers building or extending an Arkitekt backend service.
+description: The server-side Python libraries that Arkitekt services are built from. Written for developers building or extending an Arkitekt backend service.
 ---
 
 Arkitekt's [services](/docs/design/services) are Django applications that share a small set of
 focused libraries, each owning one concern so the services don't have to reinvent it:
 
-- **[kante](https://github.com/jhnnsrs/kante)** — the GraphQL transport (ASGI) and request
+- **[kante](https://github.com/jhnnsrs/kante)** provides the GraphQL transport (ASGI) and request
   context the other layers build on.
-- **[authentikate](https://github.com/jhnnsrs/authentikate)** — identity: it verifies tokens and
+- **[authentikate](https://github.com/jhnnsrs/authentikate)** handles identity: it verifies tokens and
   resolves the acting user, client, and organization for each request.
-- **[koherent](/docs/developers/backend/koherent)** — provenance-aware audit logging: it turns
+- **[koherent](/docs/developers/backend/koherent)** provides provenance-aware audit logging: it turns
   every data change into a durable, attributed history row.
 
 <Callout type="info">
@@ -22,4 +22,4 @@ the pages here are the hands-on reference.
 
 ## Where to start
 
-- [Koherent](/docs/developers/backend/koherent) — add provenance & audit logging to a service.
+- [Koherent](/docs/developers/backend/koherent): add provenance & audit logging to a service.

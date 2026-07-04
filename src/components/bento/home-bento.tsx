@@ -14,13 +14,13 @@ export function HomeBento() {
   return (
     <section className="w-full pb-16">
       <BentoGrid>
-        {/* (async) API — everything is a controllable, progress-yielding task */}
+        {/* (async) API. Everything is a controllable, progress-yielding task */}
         <AsyncApiCard />
 
-        {/* observable state — a robot whose state updates live */}
+        {/* observable state. A robot whose state updates live */}
         <StateCard />
 
-        {/* wide media — the Orkestrator managing microscopy data */}
+        {/* wide media. The Orkestrator managing microscopy data */}
         <BentoCard className="p-2 sm:col-span-2">
           <ScreenshotSlot
             src="/img/image.png"
@@ -48,13 +48,13 @@ export function HomeBento() {
           </Button>
         </BentoCard>
 
-        {/* provenance — everything is audited & recorded */}
+        {/* provenance. Everything is audited & recorded */}
         <ProvenanceCard />
 
-        {/* declare — programmatic workflows resolved across remote agents */}
+        {/* declare. Programmatic workflows resolved across remote agents */}
         <DeclareCard />
 
-        {/* bloks — dashboards declared in JSX from the component catalog */}
+        {/* bloks. Dashboards declared in JSX from the component catalog */}
         <BlokCard />
 
         {/* customizability copy + install CTA */}
@@ -64,7 +64,7 @@ export function HomeBento() {
               Composable from top to bottom.
             </h2>
             <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
-              Open-source and modular — swap the pieces you need and connect the
+              Open-source and modular. Swap the pieces you need and connect the
               tools you already use. Spin up the whole platform with a single
               command.
             </p>

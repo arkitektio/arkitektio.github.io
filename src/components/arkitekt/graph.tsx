@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 
 const explorer = explorerPlugin({} as any);
 
-/** Convert sRGB bytes (0–255) to GraphiQL's `H, S%, L%` triple. */
+/** Convert sRGB bytes (0-255) to GraphiQL's `H, S%, L%` triple. */
 const rgbToHslTriple = (r8: number, g8: number, b8: number): string => {
   const r = r8 / 255;
   const g = g8 / 255;
@@ -54,8 +54,8 @@ const rgbToHslTriple = (r8: number, g8: number, b8: number): string => {
  * Resolve a site CSS custom property to GraphiQL's `H, S%, L%` triple.
  *
  * The site's tokens are `oklch(...)`, and `getComputedStyle().color` may serialize
- * back as `oklch(...)`/`color(srgb …)` (not `rgb(...)`) depending on the browser —
- * so we can't string-parse it as RGB. Instead we paint the resolved color onto a
+ * back as `oklch(...)`/`color(srgb …)` (not `rgb(...)`) depending on the browser.
+ * So we can't string-parse it as RGB. Instead we paint the resolved color onto a
  * 1×1 canvas, which always reads back as sRGB bytes regardless of the input space.
  */
 const resolveTriple = (cssVar: string): string | null => {
@@ -81,7 +81,7 @@ const resolveTriple = (cssVar: string): string | null => {
 /**
  * Mirror the site's live design tokens into the custom properties GraphiQL's
  * stylesheet reads, so the explorer is literally the same palette as the rest of
- * the page — neutral dark surfaces and the dynamic brand accent — instead of
+ * the page. It uses neutral dark surfaces and the dynamic brand accent instead of
  * GraphiQL's stock saturated-purple/pink theme. We resolve each token through a
  * probe element (turning the site's oklch values into rgb) and convert to the
  * HSL triples GraphiQL expects. Tracks the brand hue and light/dark.
@@ -112,7 +112,7 @@ const useGraphiqlThemeSync = () => {
 
       // Syntax palette: each token hue is the brand hue plus an offset, so the
       // editor reads as a cohesive brand-tinted scheme (keyword on-brand, the
-      // rest complementary/triadic) instead of flat white — and re-tints with
+      // rest complementary/triadic) instead of flat white. It re-tints with
       // the brand. Lightness flips for light vs dark so it stays legible.
       const syn = (offset: number, sat: number, lDark: number, lLight: number) =>
         `hsl(${Math.round((((h + offset) % 360) + 360) % 360)}, ${sat}%, ${

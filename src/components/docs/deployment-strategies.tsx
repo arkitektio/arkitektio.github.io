@@ -30,23 +30,23 @@ import {
 /* Deployment strategies, in the ProvenanceFlow visual language (theme-aware
    `--orbit-*` / `--brand-hue` OKLCH tokens).
 
-   Layout is flexbox: a column of bands — PUBLIC INTERNET on top, then the
+   Layout is flexbox: a column of bands. PUBLIC INTERNET sits on top, then the
    ground floor holding two side-by-side network boxes (ANOTHER NETWORK and
    YOUR LOCAL NETWORK). Every box and node card is a flex child that sizes
    itself; nothing is hand-placed. The only absolutely-positioned layer is the
    SVG wire overlay, whose edges are routed from the *measured* positions of the
-   node cards — so the diagram and its connectors always agree.
+   node cards. So the diagram and its connectors always agree.
 
    One fixed point of view: your app always lives in your local network, and a
    remote app on another network always wants in. Across the three strategies
-   only server placement changes — and with it which of your two planes crosses
+   only server placement changes. That determines which of your two planes crosses
    the NAT/firewall, and whether the remote app can reach in:
-     • data  (green)   — your workload. Crossing it means your data leaves.
-     • auth  (indigo)  — the auth & discovery handshake (every app needs it).
+     • data  (green):  your workload. Crossing it means your data leaves.
+     • auth  (indigo): the auth & discovery handshake (every app needs it).
    The Data / Auth / Both switch isolates one plane. Nothing animates. */
 
-const DATA = flow(150); // workload data — green
-const AUTH = flow('var(--brand-hue)'); // auth & discovery — brand indigo
+const DATA = flow(150); // workload data (green)
+const AUTH = flow('var(--brand-hue)'); // auth & discovery (brand indigo)
 const RED = flow(28, '0.21'); // dropped at the firewall
 
 type Plane = 'data' | 'auth';
@@ -62,15 +62,15 @@ type Edge = { from: string; to?: string; plane: Plane; variant?: Variant; route:
 
 type Strategy = { key: string; title: string; readiness: string; story: string; nodes: Node[]; edges: Edge[] };
 
-const TAILSCALE = 'Air-gapped by default — but you’re of course free to bridge in with your own VPN, e.g. Tailscale or WireGuard.';
+const TAILSCALE = 'Air-gapped by default. You’re of course free to bridge in with your own VPN, e.g. Tailscale or WireGuard.';
 
-// ── the three strategies — node lists + semantic edges (geometry is measured) ──
+// ── the three strategies: node lists + semantic edges (geometry is measured) ──
 const PARTNER: Strategy = {
   key: 'partner',
   title: 'Kommunity partner',
   readiness: 'Demo only',
   story:
-    'Your app runs in your local network, but the servers live on the partner’s public cloud — so its data and auth calls cross the boundary out to the internet. An app on another network reaches those same public servers just as easily. The catch is trust, not reachability: your data lives on infrastructure you don’t own.',
+    'Your app runs in your local network, but the servers live on the partner’s public cloud. So its data and auth calls cross the boundary out to the internet. An app on another network reaches those same public servers just as easily. The catch is trust, not reachability: your data lives on infrastructure you don’t own.',
   nodes: [
     mk('coord', 'coordinator', 'Coordination server', 'partner · public'),
     mk('central', 'central', 'Data-Server','partner · public'),
@@ -90,7 +90,7 @@ const LOCAL: Strategy = {
   title: 'Local + coordination',
   readiness: 'Recommended',
   story:
-    'Your app and the central server both sit in your local network, so your workload data never leaves it — only the lightweight auth & discovery handshake crosses the firewall to the Arkitekt-run coordination server. An app on another network can still reach in, over an experimental, encrypted WireGuard mesh tunnel.',
+    'Your app and the central server both sit in your local network, so your workload data never leaves it. Only the lightweight auth & discovery handshake crosses the firewall to the Arkitekt-run coordination server. An app on another network can still reach in, over an experimental, encrypted WireGuard mesh tunnel.',
   nodes: [
     mk('coord', 'coordinator', 'Coordination server', 'Arkitekt-run'),
     mk('outside', 'outside', 'Remote app', 'another network', 'other'),
@@ -110,7 +110,7 @@ const SELFHOST: Strategy = {
   title: 'Fully self-hosted',
   readiness: 'Advanced',
   story:
-    'Everything — your app, the central server, and your own coordination server — runs inside your local network, so neither data nor auth ever crosses the boundary. By the same token there is no way in for an app on another network: the firewall drops it. That isolation is the point (air-gapped / CI).',
+    'Everything (your app, the central server, and your own coordination server) runs inside your local network, so neither data nor auth ever crosses the boundary. By the same token there is no way in for an app on another network: the firewall drops it. That isolation is the point (air-gapped / CI).',
   nodes: [
     mk('outside', 'outside', 'Remote app', 'another network', 'other'),
     mk('app', 'apps', 'Your app', 'local network', 'mine'),
@@ -167,7 +167,7 @@ export function DeploymentStrategies() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,var(--orbit-grid)_1px,transparent_0)] [background-size:36px_36px]" />
         </div>
 
-        {/* strategy tabs — part of the card, divided by the same border */}
+        {/* strategy tabs. Part of the card, divided by the same border */}
         <div role="tablist" aria-label="Deployment strategies" className="flex border-b border-fd-border">
           {STRATEGIES.map((st, i) => {
             const on = i === active;
@@ -229,7 +229,7 @@ export function DeploymentStrategies() {
       </div>
       <figcaption className="mt-3 text-center text-sm text-fd-muted-foreground">
         <strong>Your app always stays in your local network.</strong> What changes between strategies
-        is where the servers live — and therefore which of your connections cross the NAT/firewall
+        is where the servers live. That determines which of your connections cross the NAT/firewall
         boundary, and whether an app on another network can reach in at all.
       </figcaption>
     </figure>
@@ -279,7 +279,7 @@ function buildEdge(e: Edge, g: Geo): Built | null {
     if (!t) return null;
     pts = elbow({ x: a.cx, y: a.top }, { x: t.cx, y: t.top }, lane(e, g));
   } else {
-    // blocked — head toward your network, dropped at the firewall
+    // blocked: head toward your network, dropped at the firewall
     const tx = g.mine ? g.mine.x + 34 : a.cx;
     pts = elbow({ x: a.cx, y: a.top }, { x: tx, y: fw }, lane(e, g));
     const last = pts[pts.length - 1];
@@ -304,7 +304,7 @@ function Diagram({ s, show, inView }: { s: Strategy; show: Show; inView: boolean
 
   return (
     <div ref={wrapRef} className="relative mx-auto min-w-[700px] max-w-[880px]">
-      {/* wire overlay — the only absolutely-positioned layer */}
+      {/* wire overlay: the only absolutely-positioned layer */}
       {geo && (
         <svg className="absolute inset-0 z-0 h-full w-full" viewBox={`0 0 ${geo.W} ${geo.H}`} preserveAspectRatio="none" fill="none" aria-hidden style={bloom}>
           <defs>
@@ -315,7 +315,7 @@ function Diagram({ s, show, inView }: { s: Strategy; show: Show; inView: boolean
           {/* network enclosures (drawn behind the transparent flex boxes) */}
           {geo.mine && <Enclosure box={geo.mine} tone="mine" />}
           {geo.other && <Enclosure box={geo.other} tone="other" />}
-          {/* the firewall line — both networks hang their top edge off it */}
+          {/* the firewall line. Both networks hang their top edge off it */}
           <FirewallLine y={geo.firewallY} x1={6} x2={geo.W - 6} />
 
           {visible.map((e, i) => {
@@ -337,8 +337,8 @@ function Diagram({ s, show, inView }: { s: Strategy; show: Show; inView: boolean
                     x={b.helpPt.x}
                     y={b.helpPt.y}
                     href={DISCOVERY_URL}
-                    label="How apps discover the server — read about Service Discovery"
-                    title="Each app runs a discovery handshake with the server — learn more about Service Discovery"
+                    label="How apps discover the server. Read about Service Discovery"
+                    title="Each app runs a discovery handshake with the server. Learn more about Service Discovery"
                   />
                 )}
                 {e.info && b.infoPt && <InfoDot x={b.infoPt.x} y={b.infoPt.y} tip={e.info} />}
@@ -381,7 +381,7 @@ function Diagram({ s, show, inView }: { s: Strategy; show: Show; inView: boolean
           </div>
         </div>
 
-        {/* ground floor — two networks side by side, behind the NAT/firewall */}
+        {/* ground floor: two networks side by side, behind the NAT/firewall */}
         <div className="relative flex min-h-[176px] items-stretch gap-5 px-4 pb-2">
           {/* NAT chip sits on the firewall line (top edge of the ground floor) */}
           <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 -translate-y-1/2">

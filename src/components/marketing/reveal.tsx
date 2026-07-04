@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 /**
  * Fires once when the element first scrolls into view. Used to drive the
- * sequenced (staggered) card reveals on the home page — pair the returned
+ * sequenced (staggered) card reveals on the home page. Pair the returned
  * `inView` flag with a per-item `transitionDelay` to play cards in order.
  */
 export function useInView<T extends HTMLElement>(threshold = 0.2) {

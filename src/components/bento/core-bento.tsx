@@ -47,7 +47,7 @@ export function CoreBento() {
           Powered by the Arkitekt core
         </h2>
         <p className="mt-2 text-fd-muted-foreground">
-          A handful of focused services do the heavy lifting — call them from any
+          A handful of focused services do the heavy lifting. Call them from any
           language through the client SDKs.
         </p>
       </div>

@@ -95,46 +95,46 @@ entities. They split cleanly into two halves: the **catalogue** (what _can_ be i
 These entities describe the apps that are available to install, independent of where or whether they
 are running.
 
-- **Repo** — A collection of versioned releases of apps. A Repo provides the means to discover and keep
+- **Repo**: A collection of versioned releases of apps. A Repo provides the means to discover and keep
   apps up to date. The most common kind is a `GithubRepo`, which points at a specific `user`, `repo` and
   `branch` on GitHub and is scanned to extract the apps it contains.
 
-- **App** — A piece of software that implements a certain functionality, identified by a unique
+- **App**: A piece of software that implements a certain functionality, identified by a unique
   `identifier`. Think _Napari_, _Fiji_ or _Stardist_. An App is essentially a stable name under which
   many versioned releases live.
 
-- **Release** — A specific version of an App, following [Semantic Versioning](https://semver.org/) — for
+- **Release**: A specific version of an App, following [Semantic Versioning](https://semver.org/), for
   example _Napari 0.4.10_ or _Stardist 0.1.0_. A Release captures the functionality of an App at a point
   in time and carries metadata such as its logo and entrypoint.
 
-- **Flavour** — A specific build configuration of a Release. The core functionality is the same, but the
-  environment differs — _Stardist 0.1.0 with CUDA 10.2_ versus _Stardist 0.1.0 on the CPU_, or different
+- **Flavour**: A specific build configuration of a Release. The core functionality is the same, but the
+  environment differs: _Stardist 0.1.0 with CUDA 10.2_ versus _Stardist 0.1.0 on the CPU_, or different
   Python/JDK versions. Each Flavour is tied to a `DockerImage` and the Repo it was built from. Flavours
   are how Kabinet realises the [App Flavours](#app-flavours) concept above: the system can pick the right
   Flavour automatically based on the resources a backend offers.
 
-- **Definition** — The description of an [Action](/docs/design/terminology/node) (and its associated
+- **Definition**: The description of an [Action](/docs/design/terminology/node) (and its associated
   state) that a Flavour provides. Definitions are hashed and can be grouped into `Collection`s and
-  `Protocol`s, which powers the [definition-based container search](#definition-based-container-search) —
-  finding the right container for a given bioimage task rather than just by name.
+  `Protocol`s, which powers the [definition-based container search](#definition-based-container-search).
+  This finds the right container for a given bioimage task rather than just by name.
 
 ### The Runtime
 
 These entities track what is actually deployed on connected [Container Backends](#container-backend-apps).
 
-- **Backend** — A registered Container Backend App. Each Backend belongs to an organization and a `client`,
+- **Backend**: A registered Container Backend App. Each Backend belongs to an organization and a `client`,
   declares a `kind`, and sends a `last_heartbeat` so Kabinet can monitor its health. Backends are the only
   actors allowed to mutate the runtime state of their own pods.
 
-- **Resource** — A unit of compute a Backend exposes (for instance a particular GPU or node), identified
+- **Resource**: A unit of compute a Backend exposes (for instance a particular GPU or node), identified
   by a `resource_id` and described by free-form `qualifiers`. Resources let Kabinet reason about where a
   Flavour can run.
 
-- **Deployment** — The _intent_ to run a specific Flavour on a specific Backend, with its parameters and
+- **Deployment**: The _intent_ to run a specific Flavour on a specific Backend, with its parameters and
   access rights. A Deployment records whether the image has been `pulled` and holds both typed and secret
   parameters.
 
-- **Pod** — A running instance of a Deployment — the actual container providing the app's functionality.
+- **Pod**: A running instance of a Deployment, the actual container providing the app's functionality.
   Pods carry a `status` (e.g. `PENDING`), are tied to a Backend (and optionally a Resource), and accumulate
   `LogDump`s. They are the only model actively maintained by the Backend, and clients can subscribe to
   changes in pod state in real time.

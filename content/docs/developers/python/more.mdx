@@ -34,7 +34,7 @@ def hello_world(name: str) -> str:
 
 So what do we need to change? First of all we need to change the name of the function. We will call it `max_project`. Then we need to
 change the documentation. We will call it `Max Project` and change the description to `Max Project a microscopy image`. Documenting
-your functions is very important — it will help you and others to understand what your function does, and it will help users find your function
+your functions is very important. It will help you and others to understand what your function does, and it will help users find your function
 in the UI.
 
 But how do we tell Arkitekt that we are no longer working with strings but need "Images"? This is done through updating the type hint of our function. We will change it from `str` to `Image`,
@@ -78,7 +78,7 @@ service), you can also create your own structures (even non-serializable ones) t
 
 `arkitekt-next` provides several decorators beyond `@register` to help you manage your app's lifecycle and share state between actions.
 
-### `@startup` — Run code on agent start
+### `@startup`: Run code on agent start
 
 Use `@startup` to run initialization logic once when your app connects to the server (e.g. loading a model into memory).
 
@@ -95,7 +95,7 @@ def run_inference(image: Image) -> Image:
     ...
 ```
 
-### `@background` — Run persistent background tasks
+### `@background`: Run persistent background tasks
 
 Use `@background` to run an async function as a long-running background task while your app is connected.
 
@@ -110,7 +110,7 @@ async def poll_hardware():
         await asyncio.sleep(5)
 ```
 
-### `@state` — Share mutable state between actions
+### `@state`: Share mutable state between actions
 
 Use `@state` to define a dataclass that holds shared state across all your actions. The state is initialized once and injected into any action that declares it as a parameter.
 
@@ -133,7 +133,7 @@ def run_inference(image: Image, my_state: MyState) -> Image:
     return from_array_like(result, name="inference result")
 ```
 
-### `@context` — Inject app-level context into actions
+### `@context`: Inject app-level context into actions
 
 Use `@context` to define a context class that provides access to connected services (e.g. database clients) within your actions.
 

@@ -140,7 +140,7 @@ export function Ecosystem() {
           </span>
         </div>
 
-        {/* federated edge — the instruments & compute the workflow runs on */}
+        {/* federated edge: the instruments & compute the workflow runs on */}
         <div className="mt-10 border-t border-white/10 pt-8">
           <div className="mb-5 font-mono text-[11px] tracking-[0.18em] text-white/40">
             FEDERATED EDGE · INSTRUMENTS & COMPUTE

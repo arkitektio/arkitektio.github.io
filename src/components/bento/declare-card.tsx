@@ -5,7 +5,7 @@ import { Camera, Cpu, Network } from 'lucide-react';
 import { BentoCard } from './primitives';
 
 // The remote agents a declared dependency could resolve to. The platform load
-// balances across matching agents and heals the reservation if one drops — we
+// balances across matching agents and heals the reservation if one drops. We
 // cycle the "bound" highlight to hint at that live resolution.
 const agents = [
   { id: 'agent-7f3', host: 'lab-cam-01' },
@@ -38,8 +38,8 @@ export function DeclareCard() {
         <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
           Describe the actions and state another agent must provide with{' '}
           <code>@declare</code>. Type-hint the protocol and rekuest resolves a
-          matching remote agent, injects a proxy, and load balances calls — so
-          your action composes a workflow across machines.
+          matching remote agent, injects a proxy, and load balances calls. Your
+          action composes a workflow across machines.
         </p>
 
         <pre className="mt-5 overflow-x-auto rounded-xl border border-fd-border bg-[#0a0a0c] p-4 font-mono text-[12px] leading-relaxed text-white/80">

@@ -33,12 +33,12 @@
   --color-fd-primary-foreground: oklch(0.98 0.01 var(--brand-hue));
   --color-fd-ring: oklch(0.55 calc(var(--brand-chroma) * 0.6) var(--brand-hue));
 
-  /* Logo cube faces — derived from the brand hue so the mark re-tints with the theme */
+  /* Logo cube faces. Derived from the brand hue so the mark re-tints with the theme */
   --brand-logo-light: oklch(0.6 calc(var(--brand-chroma) * 0.9) var(--brand-hue));
   --brand-logo-mid: oklch(0.52 var(--brand-chroma) var(--brand-hue));
   --brand-logo-dark: oklch(0.46 var(--brand-chroma) var(--brand-hue));
 
-  /* Ecosystem-orbit figure tokens — light theme (see ecosystem-orbit.tsx) */
+  /* Ecosystem-orbit figure tokens. Light theme (see ecosystem-orbit.tsx) */
   --orbit-surface: oklch(0.985 0.004 var(--brand-hue));
   --orbit-grid: rgba(0, 0, 0, 0.06);
   --orbit-guide: rgba(0, 0, 0, 0.1);
@@ -84,12 +84,12 @@
   --color-fd-primary-foreground: oklch(0.16 0.02 var(--brand-hue));
   --color-fd-ring: oklch(0.60 calc(var(--brand-chroma) * 0.6) var(--brand-hue));
 
-  /* Logo cube faces — slightly brighter so the mark reads on dark surfaces */
+  /* Logo cube faces. Slightly brighter so the mark reads on dark surfaces */
   --brand-logo-light: oklch(0.72 calc(var(--brand-chroma) * 0.9) var(--brand-hue));
   --brand-logo-mid: oklch(0.64 var(--brand-chroma) var(--brand-hue));
   --brand-logo-dark: oklch(0.56 var(--brand-chroma) var(--brand-hue));
 
-  /* Ecosystem-orbit figure tokens — dark theme */
+  /* Ecosystem-orbit figure tokens. Dark theme */
   --orbit-surface: #08080c;
   --orbit-grid: rgba(255, 255, 255, 0.04);
   --orbit-guide: rgba(255, 255, 255, 0.07);

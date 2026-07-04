@@ -1,6 +1,6 @@
 ---
 title: Koherent
-description: Add provenance-aware audit logging to an Arkitekt backend service — record, attribute, and expose every data change as a queryable GraphQL field.
+description: Add provenance-aware audit logging to an Arkitekt backend service. Record, attribute, and expose every data change as a queryable GraphQL field.
 ---
 
 import { GithubRepo } from "@/components/docs";
@@ -8,9 +8,9 @@ import { GithubRepo } from "@/components/docs";
 <GithubRepo url="https://github.com/jhnnsrs/koherent" title="Koherent" />
 
 <Callout type="info" title="Concepts first?">
-This page is the hands-on integration guide. For the *why* — what provenance is, how the layers
-stack, and how a single task groups many changes — read
-[Provenance & Audit Logging](/docs/design/architecture/provenance) first.
+This page is the hands-on integration guide. For the *why*, read
+[Provenance & Audit Logging](/docs/design/architecture/provenance) first. It covers what
+provenance is, how the layers stack, and how a single task groups many changes.
 </Callout>
 
 ## Installation
@@ -37,14 +37,14 @@ AUTH_USER_MODEL = "authentikate.User"
 
 Koherent is responsible for three things and nothing else:
 
-1. **Recording** — a `ProvenanceField` on your model captures every create/update/delete as a
+1. **Recording**: a `ProvenanceField` on your model captures every create/update/delete as a
    history row (via django-simple-history).
-2. **Attributing** — a signal stamps each history row with the acting `user`, the `client`
+2. **Attributing**: a signal stamps each history row with the acting `user`, the `client`
    (app), and a `Task` resolved from the request's verified provenance token.
-3. **Exposing** — Strawberry types (`ProvenanceEntry`, `Task`) and a flat, semantic filter
+3. **Exposing**: Strawberry types (`ProvenanceEntry`, `Task`) and a flat, semantic filter
    (`ProvenanceFilterMixin`) surface that history in your GraphQL API.
 
-It does **not** authenticate requests, mint tokens, or define the transport — those belong to
+It does **not** authenticate requests, mint tokens, or define the transport. Those belong to
 [authentikate](https://github.com/jhnnsrs/authentikate) and
 [kante](https://github.com/jhnnsrs/kante) respectively. Koherent is the piece that sits between
 them and turns an authenticated, context-carrying request into a durable, queryable audit trail.
@@ -114,8 +114,8 @@ schema = strawberry.federation.Schema(
 )
 ```
 
-Any mutation that calls `model.save()` now produces an attributed history row automatically — no
-explicit logging call needed.
+Any mutation that calls `model.save()` now produces an attributed history row automatically. No
+explicit logging call is needed.
 
 ## Querying provenance
 
@@ -139,8 +139,8 @@ constant number of queries.
 
 ## Filtering by provenance
 
-`ProvenanceFilterMixin` adds a flat, **exact-match** `provenance` filter to a model's filter type
-— no nested traversal required:
+`ProvenanceFilterMixin` adds a flat, **exact-match** `provenance` filter to a model's filter type.
+No nested traversal is required:
 
 ```graphql
 query {
@@ -155,29 +155,29 @@ Available predicates: `taskId`, `agentClientId`, `issuer`, `changedBy` (user sub
 
 [authentikate](https://github.com/jhnnsrs/authentikate) owns identity; Koherent consumes it.
 
-- **Models** — `AUTH_USER_MODEL` is `authentikate.User`, and Koherent's `Task.assigner` /
+- **Models**: `AUTH_USER_MODEL` is `authentikate.User`, and Koherent's `Task.assigner` /
   `ProvenanceEntry.client` point at authentikate's `User` and `Client`. Tasks are scoped to an
   authentikate `Organization`.
-- **The verified provenance token** — `AuthentikateExtension` validates the incoming Rekuest
+- **The verified provenance token**: `AuthentikateExtension` validates the incoming Rekuest
   provenance token (a separate EdDSA trust domain configured under `AUTHENTIKATE["provenance"]`)
-  and attaches it to the request. There is no static-token bypass for provenance — the signature
+  and attaches it to the request. There is no static-token bypass for provenance. The signature
   is always checked.
-- **The auth context** — Koherent's history signal reads the user, client, organization, and
+- **The auth context**: Koherent's history signal reads the user, client, organization, and
   token that authentikate put on the request to stamp each row and to build the `Task` from the
   token's claims. The root human causer is resolved to a local `User` when one exists; otherwise
   the task is recorded with a null assigner but the raw sub is kept.
 
 Because of this dependency, `AuthentikateExtension` must precede `KoherentExtension` in the
-schema's extension list — Koherent reads what authentikate has already put on the request.
+schema's extension list. Koherent reads what authentikate has already put on the request.
 
 ## Interaction with `kante`
 
 [kante](https://github.com/jhnnsrs/kante) provides the GraphQL transport (ASGI app) and the
 request context that both extensions build on.
 
-- **Context types** — `KoherentExtension` switches on kante's `HttpContext` and `WsContext`. For
+- **Context types**: `KoherentExtension` switches on kante's `HttpContext` and `WsContext`. For
   HTTP requests it sets the request's provenance token into a context variable for the duration
-  of the operation; for websockets it does not (the connection — and its headers — is shared
+  of the operation; for websockets it does not (the connection and its headers are shared
   across operations, so there is no reliable per-operation provenance).
 - **Mutations over websockets are rejected.** Since the task context can't be tracked per
   operation on a persistent socket, Koherent raises rather than record an unattributed change.

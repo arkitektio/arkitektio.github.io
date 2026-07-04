@@ -20,7 +20,7 @@ const giants: Giant[] = [
     name: 'Zarr',
     href: 'https://zarr.dev',
     description:
-      'Chunked, compressed, N-dimensional arrays — the storage backbone for streaming bioimage data. It powers mikro and elektro and pretty much all of our data needs on the server. ',
+      'Chunked, compressed, N-dimensional arrays. They are the storage backbone for streaming bioimage data. It powers mikro and elektro and pretty much all of our data needs on the server. ',
   },
   {
     name: 'Dask',
@@ -90,7 +90,7 @@ export default function GiantsPage() {
           <p className="mt-4 max-w-2xl text-lg text-fd-muted-foreground">
             &ldquo;If I have seen further it is by standing on the shoulders of
             giants.&rdquo; Arkitekt would not exist without the open-source
-            projects and communities below — thank you.
+            projects and communities below. Thank you.
           </p>
         </div>
 
@@ -125,7 +125,7 @@ export default function GiantsPage() {
           </h2>
           <p className="max-w-xl text-fd-muted-foreground">
             We give back wherever we can. If you maintain a project we rely on
-            and we&apos;ve missed you here, let us know — we&apos;d be glad to add
+            and we&apos;ve missed you here, let us know. We&apos;d be glad to add
             you.
           </p>
         </div>

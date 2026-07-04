@@ -7,17 +7,17 @@ import { useInView, revealClass } from './reveal';
 /* ─────────────────────────── data ─────────────────────────── */
 
 // Each card draws a clear boundary against a tool Arkitekt is often confused
-// with — then points at how we *integrate* with it instead of competing. Hues
+// with. It then points at how we *integrate* with it instead of competing. Hues
 // (oklch) keep the multi-colour palette of the surrounding marketing sections.
 const tools = [
   {
     tag: 'NOT A PARALLELIZATION LIBRARY',
     tool: 'Dask',
     icon: Boxes,
-    great: 'We love Dask — it is brilliant at scaling array, dataframe & task-graph compute across a cluster.',
+    great: 'We love Dask. It is brilliant at scaling array, dataframe & task-graph compute across a cluster.',
     isNot: 'Arkitekt is not a pure parallelization library.',
     weAre:
-      'We are a concurrency platform: long-lived, stateful actor apps that broker data and compute — not ephemeral task graphs you submit and forget.',
+      'We are a concurrency platform: long-lived, stateful actor apps that broker data and compute. They are not ephemeral task graphs you submit and forget.',
     link: '/docs/design/services/next/kluster',
     linkLabel: 'How we run Dask',
     hue: 195,
@@ -26,10 +26,10 @@ const tools = [
     tag: 'NOT A STATELESS PIPELINE',
     tool: 'Nextflow',
     icon: Workflow,
-    great: 'We love Nextflow — it is a triumph at reproducible, stateless batch pipelines on a cluster.',
+    great: 'We love Nextflow. It is a triumph at reproducible, stateless batch pipelines on a cluster.',
     isNot: 'Arkitekt is not just a stateless executor.',
     weAre:
-      'Smart microscopy is rarely stateless — a model is loaded once and results steer the next acquisition. Our apps stay alive and keep their state across a live feedback loop.',
+      'Smart microscopy is rarely stateless. A model is loaded once and results steer the next acquisition. Our apps stay alive and keep their state across a live feedback loop.',
     link: '/docs/design/vs/nextflow',
     linkLabel: 'Arkitekt vs Nextflow',
     hue: 268,
@@ -38,10 +38,10 @@ const tools = [
     tag: 'NOT ROBOTICS MIDDLEWARE',
     tool: 'ROS',
     icon: Bot,
-    great: 'We love ROS — it owns real-time robotic control and swarm orchestration down to the hardware.',
+    great: 'We love ROS. It owns real-time robotic control and swarm orchestration down to the hardware.',
     isNot: 'Arkitekt does not orchestrate robotic swarms.',
     weAre:
-      'That layer is out of scope — but the moment your robot exposes a high-level action, wrap it as an Arkitekt app and we become your friend.',
+      'That layer is out of scope. But the moment your robot exposes a high-level action, wrap it as an Arkitekt app and we become your friend.',
     link: '/docs/apps',
     linkLabel: 'Wrap it as an app',
     hue: 90,
@@ -65,8 +65,8 @@ export function NotArkitekt() {
             KNOW THE BOUNDARIES · WHAT ARKITEKT IS NOT
           </div>
           <p className="mt-3 text-sm leading-relaxed text-white/60">
-            Arkitekt is a reactive platform for live, stateful science — not a
-            replacement for the tools we admire. Here is where we draw the line,
+            Arkitekt is a reactive platform for live, stateful science. It is not
+            a replacement for the tools we admire. Here is where we draw the line,
             and how we aim to work{' '}
             <span className="text-white/80">with</span> each of them instead of
             against them.
