@@ -7,3 +7,9 @@ export const Connector = dynamic(
   () => import('@/components/arkitekt/connector').then((m) => m.Connector),
   { ssr: false, loading: () => null },
 );
+
+// Labelled sign-in button + avatar menu for the marketing/home top nav.
+export const NavConnector = dynamic(
+  () => import('@/components/arkitekt/connector').then((m) => m.NavConnector),
+  { ssr: false, loading: () => null },
+);

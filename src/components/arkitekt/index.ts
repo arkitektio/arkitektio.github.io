@@ -4,7 +4,7 @@
 // re-exported here; import them directly from their module so they only land in
 // the explorer route's bundle. Likewise, the raw `connector` is private — use
 // the SSR-safe `Connector` wrapper below.
-export { Connector } from './connector-client';
+export { Connector, NavConnector } from './connector-client';
 export { ArkitektRoot } from './root';
 export { Guard } from './guard';
 export { InstallRepoButton } from './install-repo-button';

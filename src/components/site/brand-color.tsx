@@ -29,9 +29,23 @@ export function BrandColorScript() {
   return <script dangerouslySetInnerHTML={{ __html: code }} />;
 }
 
-export function BrandColorPicker() {
-  const [hue, setHue] = useState(267);
+/**
+ * The brand-hue controls (label, slider, swatches, save/random) without any
+ * surrounding popover chrome — drop it into whatever container you like. Reports
+ * the live hue via `onHueChange` so a trigger can mirror the current colour.
+ */
+export function BrandColorControls({
+  onHueChange,
+}: {
+  onHueChange?: (hue: number) => void;
+}) {
+  const [hue, setHueState] = useState(267);
   const [saved, setSaved] = useState(false);
+
+  function setHue(next: number) {
+    setHueState(next);
+    onHueChange?.(next);
+  }
 
   // Sync from whatever the early script already applied.
   useEffect(() => {
@@ -45,6 +59,7 @@ export function BrandColorPicker() {
     } catch {
       /* ignore */
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function preview(next: number) {
@@ -73,6 +88,71 @@ export function BrandColorPicker() {
   }
 
   return (
+    <div>
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <Palette className="size-4 text-fd-primary" />
+        Brand color
+      </div>
+      <p className="mt-1 text-xs text-fd-muted-foreground">
+        A new hue is picked on every visit. Found one you like? Save it.
+      </p>
+
+      <input
+        type="range"
+        min={0}
+        max={359}
+        value={hue}
+        onChange={(e) => preview(Number(e.target.value))}
+        aria-label="Hue"
+        className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full"
+        style={{
+          background:
+            'linear-gradient(to right, oklch(0.62 0.19 0), oklch(0.62 0.19 60), oklch(0.62 0.19 120), oklch(0.62 0.19 180), oklch(0.62 0.19 240), oklch(0.62 0.19 300), oklch(0.62 0.19 360))',
+        }}
+      />
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {PRESETS.map((preset) => (
+          <button
+            key={preset}
+            type="button"
+            onClick={() => preview(preset)}
+            aria-label={`Hue ${preset}`}
+            className={cn(
+              'size-6 rounded-full ring-1 ring-inset ring-black/10 transition-transform hover:scale-110',
+              Math.abs(hue - preset) < 6 && 'ring-2 ring-fd-foreground',
+            )}
+            style={{ background: swatch(preset) }}
+          />
+        ))}
+      </div>
+
+      <div className="mt-4 flex gap-2">
+        <button
+          type="button"
+          onClick={save}
+          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md bg-fd-primary px-3 py-1.5 text-xs font-medium text-fd-primary-foreground transition-opacity hover:opacity-90"
+        >
+          {saved ? <Check className="size-3.5" /> : null}
+          {saved ? 'Saved' : 'Save'}
+        </button>
+        <button
+          type="button"
+          onClick={shuffle}
+          className="inline-flex items-center justify-center gap-1.5 rounded-md border border-fd-border px-3 py-1.5 text-xs font-medium text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground"
+        >
+          <Shuffle className="size-3.5" />
+          Random
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function BrandColorPicker() {
+  const [hue, setHue] = useState(267);
+
+  return (
     <details className="group relative [&_summary::-webkit-details-marker]:hidden">
       <summary
         aria-label="Brand color"
@@ -85,62 +165,7 @@ export function BrandColorPicker() {
       </summary>
 
       <div className="absolute right-0 z-50 mt-2 w-64 rounded-xl border border-fd-border bg-fd-popover p-4 text-fd-popover-foreground shadow-xl">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <Palette className="size-4 text-fd-primary" />
-          Brand color
-        </div>
-        <p className="mt-1 text-xs text-fd-muted-foreground">
-          A new hue is picked on every visit. Found one you like? Save it.
-        </p>
-
-        <input
-          type="range"
-          min={0}
-          max={359}
-          value={hue}
-          onChange={(e) => preview(Number(e.target.value))}
-          aria-label="Hue"
-          className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full"
-          style={{
-            background:
-              'linear-gradient(to right, oklch(0.62 0.19 0), oklch(0.62 0.19 60), oklch(0.62 0.19 120), oklch(0.62 0.19 180), oklch(0.62 0.19 240), oklch(0.62 0.19 300), oklch(0.62 0.19 360))',
-          }}
-        />
-
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {PRESETS.map((preset) => (
-            <button
-              key={preset}
-              type="button"
-              onClick={() => preview(preset)}
-              aria-label={`Hue ${preset}`}
-              className={cn(
-                'size-6 rounded-full ring-1 ring-inset ring-black/10 transition-transform hover:scale-110',
-                Math.abs(hue - preset) < 6 && 'ring-2 ring-fd-foreground',
-              )}
-              style={{ background: swatch(preset) }}
-            />
-          ))}
-        </div>
-
-        <div className="mt-4 flex gap-2">
-          <button
-            type="button"
-            onClick={save}
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md bg-fd-primary px-3 py-1.5 text-xs font-medium text-fd-primary-foreground transition-opacity hover:opacity-90"
-          >
-            {saved ? <Check className="size-3.5" /> : null}
-            {saved ? 'Saved' : 'Save'}
-          </button>
-          <button
-            type="button"
-            onClick={shuffle}
-            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-fd-border px-3 py-1.5 text-xs font-medium text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground"
-          >
-            <Shuffle className="size-3.5" />
-            Random
-          </button>
-        </div>
+        <BrandColorControls onHueChange={setHue} />
       </div>
     </details>
   );
