@@ -72,13 +72,13 @@ export default function HomePage() {
           <h1 className="mt-7 max-w-3xl text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
             Bioimage analysis,
             <br />
-            <span className="text-primary">your way.</span>
+            <span className="text-primary">a bit more fun.</span>
           </h1>
 
           <p className="mt-6 max-w-xl text-lg text-white/60">
-            Arkitekt is a middleman between your data, your tools and your
-            team. It turns scattered scripts, FIJI scripts, into shareable, reactive analysis
-            apps.
+            Arkitekt is a real-time middleman between your data, your tools and your
+            team. It turns scattered scripts and messy glue-code into shareable, reactive analysis
+            workflows.
           </p>
 
           {/* CTAs */}
@@ -126,12 +126,12 @@ export default function HomePage() {
       {/* ─────────────────────── Statement ─────────────────────── */}
       <section className="w-full my-16 flex flex-col items-center gap-6 text-center">
         <p className="max-w-5xl text-3xl font-medium leading-snug tracking-tight text-fd-muted-foreground sm:text-4xl">
-          Arkitekt is an{' '}
-          <span className="text-fd-foreground">open-source platform</span> for{' '}
-          <span className="text-fd-foreground">bioimages and beyond</span>. It connects your
-          data, analysis tools and team through a single reactive datahub. It
-          adapts to how <span className="text-fd-foreground">your lab</span>{' '}
-          already works.
+          Ohhh I wish my lab had a <span className="text-fd-foreground">reactive datahub</span> that
+          could <span className="text-fd-foreground">orchestrate my analysis</span> and{' '} where i can
+          <span className="text-fd-foreground">share my data</span> with the team.
+        </p>
+        <p className="max-w-md text-md text-fd-muted-foreground">
+          No Scientist ever.
         </p>
       </section>
 
@@ -139,8 +139,7 @@ export default function HomePage() {
       {/* ─────────────────── Ecosystem orbit map ────────────────── */}
       <EcosystemOrbit />
 
-      {/* ────────────────────── Ecosystem ──────────────────────── */}
-      <Ecosystem />
+      
 
       {/* ─────────────────── What Arkitekt is not ──────────────── */}
       <NotArkitekt />
@@ -152,8 +151,8 @@ export default function HomePage() {
       <CoreBento />
 
       {/* ───────────────────────── AI? ─────────────────────────── */}
-      <section className="w-full my-16">
-        <div className="relative overflow-hidden rounded-3xl border border-fd-border bg-fd-card/50 p-8 backdrop-blur sm:p-12">
+      <section className="w-full">
+        <div className="relative overflow-hidden rounded-3xl p-2 backdrop-blur sm:p-6">
           {/* brand glow */}
           <div
             aria-hidden
@@ -166,18 +165,17 @@ export default function HomePage() {
                 AI?
               </span>
               <h2 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">
-                Yes, we use AI. No, nothing here is vibe-coded.
+                Yes, we use AI <i>sometimes</i>. No, nothing here is vibe-coded.
               </h2>
               <p className="mt-4 text-lg text-fd-muted-foreground">
-                We build the new version of Arkitekt with AI. We never build it
-                without supervision. Looks are deceiving: polish is not proof of
-                carelessness, and every line is read, understood and owned by a
-                human.
+                Arkitekt is older than AI and the core of the platform has been
+                painstakingly engineered without any ML magic. Look at our code,
+                talk to us humans, there is no hype here.
               </p>
             </div>
-            <Button asChild size="lg" className="shrink-0 rounded-full">
+            <Button asChild size="lg" className="shrink-0 rounded-md" variant={"outline"}>
               <Link href="/docs/ai">
-                How we use AI
+                Our AI mantra
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
@@ -187,22 +185,6 @@ export default function HomePage() {
 
       {/* ──────────────────────── Features ─────────────────────── */}
       <section className="w-full">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="group relative rounded-xl border border-fd-border bg-fd-card/50 p-6 backdrop-blur transition-colors hover:border-fd-primary/50"
-            >
-              <div className="flex size-10 items-center justify-center rounded-lg bg-fd-primary/10 text-fd-primary">
-                <feature.icon className="size-5" />
-              </div>
-              <h3 className="mt-4 font-semibold">{feature.title}</h3>
-              <p className="mt-2 text-sm text-fd-muted-foreground">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
 
         {/* closing CTA */}
         <div className="mt-12 flex flex-col items-center gap-4 rounded-2xl border border-fd-border bg-fd-card/50 px-8 py-12 text-center backdrop-blur">

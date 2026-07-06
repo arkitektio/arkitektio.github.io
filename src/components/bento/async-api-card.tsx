@@ -102,13 +102,12 @@ export function AsyncApiCard() {
           (ASYNC) API
         </span>
         <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-          Control everything, freely.
+          Register idiomatic Python code
         </h2>
         <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
-          Every action is just a function, sync or async. Call{' '}
+          Every action is just a function, sync or async. Use standard python calls like {' '}
           <code>progress()</code> to report how far along you are, and{' '}
-          <code>yield</code> results as they are produced. The platform streams
-          them straight to the caller.
+          <code>yield</code> results as they are produced. 
         </p>
 
         {/* async / sync toggle */}
@@ -150,7 +149,9 @@ export function AsyncApiCard() {
             <span className="text-[#82aaff]">for</span> i, plane{' '}
             <span className="text-[#82aaff]">in enumerate</span>(stack):{'\n'}
             {'        '}
-            <span className="text-[#ffcb6b]">progress</span>(i{' '}
+            <span className="text-[#ffcb6b]">{mode && mode === 'async' && 
+            <span className="text-[#c792ea]">await </span>}{mode && mode === 'async' ?
+            "aprogress": "progress"}</span>(i{' '}
             <span className="text-[#89ddff]">*</span> 10){'\n'}
             {'        '}
             <span className="text-[#c792ea]">yield</span>{' '}
@@ -195,9 +196,7 @@ export function AsyncApiCard() {
         </div>
         <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-white/10">
           <div
-            className={`h-full rounded-full transition-[width] duration-300 ease-out ${
-              done ? 'bg-emerald-500' : 'bg-fd-primary'
-            }`}
+            className={`h-full rounded-full transition-[width] duration-300 ease-out bg-fd-primary`}
             style={{ width: `${pct}%` }}
           />
         </div>

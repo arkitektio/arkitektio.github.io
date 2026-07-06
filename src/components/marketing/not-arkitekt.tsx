@@ -14,7 +14,7 @@ const tools = [
     tag: 'NOT A PARALLELIZATION LIBRARY',
     tool: 'Dask',
     icon: Boxes,
-    great: 'We love Dask. It is brilliant at scaling array, dataframe & task-graph compute across a cluster.',
+    great: 'We love and use Dask heavily. It is brilliant at scaling array, dataframe & task-graph compute across a cluster.',
     isNot: 'Arkitekt is not a pure parallelization library.',
     weAre:
       'We are a concurrency platform: long-lived, stateful actor apps that broker data and compute. They are not ephemeral task graphs you submit and forget.',
@@ -26,7 +26,7 @@ const tools = [
     tag: 'NOT A STATELESS PIPELINE',
     tool: 'Nextflow',
     icon: Workflow,
-    great: 'We love Nextflow. It is a triumph at reproducible, stateless batch pipelines on a cluster.',
+    great: 'We love Nextflow: for running stateless batch pipelines on a cluster.',
     isNot: 'Arkitekt is not just a stateless executor.',
     weAre:
       'Smart microscopy is rarely stateless. A model is loaded once and results steer the next acquisition. Our apps stay alive and keep their state across a live feedback loop.',
@@ -38,7 +38,7 @@ const tools = [
     tag: 'NOT ROBOTICS MIDDLEWARE',
     tool: 'ROS',
     icon: Bot,
-    great: 'We love ROS. It owns real-time robotic control and swarm orchestration down to the hardware.',
+    great: 'We love ROS. It rules at real-time robotic control and swarm orchestration',
     isNot: 'Arkitekt does not orchestrate robotic swarms.',
     weAre:
       'That layer is out of scope. But the moment your robot exposes a high-level action, wrap it as an Arkitekt app and we become your friend.',
@@ -62,14 +62,12 @@ export function NotArkitekt() {
         {/* heading */}
         <div className="mb-10 max-w-2xl">
           <div className="font-mono text-[11px] tracking-[0.18em] text-white/40">
-            KNOW THE BOUNDARIES · WHAT ARKITEKT IS NOT
+             WHAT ARKITEKT IS NOT
           </div>
           <p className="mt-3 text-sm leading-relaxed text-white/60">
-            Arkitekt is a reactive platform for live, stateful science. It is not
-            a replacement for the tools we admire. Here is where we draw the line,
-            and how we aim to work{' '}
-            <span className="text-white/80">with</span> each of them instead of
-            against them.
+            Arkitekt is a reactive platform for live, stateful workflows. It is not
+            a replacement for the tools we admire. We integrate {" "}
+            <span className="text-white/80">we dont compete</span> 
           </p>
         </div>
 

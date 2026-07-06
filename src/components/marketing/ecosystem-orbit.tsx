@@ -103,10 +103,10 @@ const wedge = (a0: number, a1: number, ri: number, ro: number) => wedgePath(CX, 
 
 // Selectable "user stories": real bioimaging tasks a scientist might ask for.
 const STORIES = [
-  { id: 'acquire', title: 'Acquire an image', blurb: 'Grab a fresh image from the scope.', icon: Microscope },
+  { id: 'acquire', title: 'Acquire an image', blurb: 'Delish images fresh from the microscope.', icon: Microscope },
   { id: 'segment', title: 'Segment this image', blurb: 'Find the cells in an image.', icon: Scan },
   { id: 'classify', title: 'What is this?', blurb: 'Tag it in the knowledge graph.', icon: Tag },
-  { id: 'enhance', title: 'See it better', blurb: 'Let an AI agent clean it up.', icon: Sparkles },
+  { id: 'enhance', title: 'Can you help me?', blurb: 'Let an AI agent clean it up.', icon: Sparkles },
   { id: 'smart', title: 'Smart microscopy', blurb: 'Run an adaptive imaging protocol.', icon: FlaskConical },
 ] as const;
 type StoryId = (typeof STORIES)[number]['id'];
@@ -484,7 +484,7 @@ export function EcosystemOrbit() {
     <section className="w-full pb-16">
       <div
         ref={revealRef}
-        className="relative isolate overflow-hidden rounded-3xl border border-fd-border bg-[var(--orbit-surface)] px-6 py-12 text-fd-foreground sm:px-10 lg:px-14"
+        className="relative isolate overflow-hidden  px-6 py-12 text-fd-foreground sm:px-10 lg:px-14"
       >
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute left-1/2 top-[26%] h-[34rem] w-[40rem] -translate-x-1/2 rounded-full bg-primary/12 blur-[140px]" />
@@ -493,9 +493,9 @@ export function EcosystemOrbit() {
 
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <div className="font-mono text-[11px] tracking-[0.2em] text-primary/80">APPS TO HELP YOU OUT</div>
+            <div className="font-mono text-[11px] tracking-[0.2em] text-primary/80">We need your apps</div>
             <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">
-              You control the workflow, Arkitekts orchestrates it.
+              You bring your apps, Arkitekt brings the orchestration.
             </h2>
           </div>
         </div>
@@ -896,8 +896,8 @@ function Diagram({ inView, flows, hot, status, userMsg, desc, datum, datumAt, co
 
       {/* legend */}
       <div className="absolute right-2 top-1 flex flex-col gap-2.5 font-mono text-[11px] text-fd-muted-foreground" style={bloom(150)}>
-        <div className="flex items-center gap-2.5"><span className="size-[15px] rounded-full border-[2.5px] border-primary bg-primary/15" /> Server <span className="text-fd-muted-foreground/60">· services combined</span></div>
-        <div className="flex items-center gap-2.5"><span className="h-[10px] w-[15px] rounded border-[1.6px] border-fd-muted-foreground/50" /> Apps <span className="text-fd-muted-foreground/60">· outer layer</span></div>
+        <div className="flex items-center gap-2.5"><span className="size-[15px] rounded-full border-[2.5px] border-primary bg-primary/15" /> Hub <span className="text-fd-muted-foreground/60">· your data storage  </span> </div>
+        <div className="flex items-center gap-2.5"><span className="h-[10px] w-[15px] rounded border-[1.6px] border-fd-muted-foreground/50" /> Apps <span className="text-fd-muted-foreground/60">· your workers</span></div>
       </div>
     </div>
   );

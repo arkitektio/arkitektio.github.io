@@ -8,9 +8,9 @@ import { BentoCard } from './primitives';
 // balances across matching agents and heals the reservation if one drops. We
 // cycle the "bound" highlight to hint at that live resolution.
 const agents = [
-  { id: 'agent-7f3', host: 'lab-cam-01' },
-  { id: 'agent-1a9', host: 'lab-cam-02' },
-  { id: 'agent-c20', host: 'lab-cam-03' },
+  { id: 'agent-7f3', host: 'lab-seg-01' },
+  { id: 'agent-1a9', host: 'lab-seg-02' },
+  { id: 'agent-c20', host: 'lab-seg-03' },
 ];
 
 export function DeclareCard() {
@@ -30,41 +30,41 @@ export function DeclareCard() {
       {/* copy */}
       <div>
         <span className="font-mono text-[11px] tracking-[0.16em] text-fd-primary">
-          PROGRAMMATIC WORKFLOWS
+           WORKFLOWS ARE JUST CODE
         </span>
         <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-          Declare what you depend on.
+          Declare dependencies, resolve them automatically 
         </h2>
         <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
-          Describe the actions and state another agent must provide with{' '}
+          Your workflows can depend on outside functions through a simple{' '}
           <code>@declare</code>. Type-hint the protocol and rekuest resolves a
-          matching remote agent, injects a proxy, and load balances calls. Your
-          action composes a workflow across machines.
+          matching remote agent, injects a proxy, and load balances calls (if you
+          are into that) Your action composes a workflow across machines.
         </p>
 
         <pre className="mt-5 overflow-x-auto rounded-xl border border-fd-border bg-[#0a0a0c] p-4 font-mono text-[12px] leading-relaxed text-white/80">
           <code>
             <span className="text-[#c792ea]">@declare</span>(app=
-            <span className="text-[#c3e88d]">&quot;lab&quot;</span>){'\n'}
+            <span className="text-[#c3e88d]">&quot;stardist&quot;</span>){'\n'}
             <span className="text-[#82aaff]">class</span>{' '}
-            <span className="text-[#ffcb6b]">Camera</span>:{'\n'}
+            <span className="text-[#ffcb6b]">Segmentor</span>:{'\n'}
             {'    '}
             <span className="text-[#82aaff]">async def</span>{' '}
-            <span className="text-[#ffcb6b]">snap</span>(self, exposure_ms:{' '}
+            <span className="text-[#ffcb6b]">segment_cells</span>(self, feature_size:{' '}
             <span className="text-[#82aaff]">float</span>){' '}
             <span className="text-[#89ddff]">{'->'}</span>{' '}
-            <span className="text-[#82aaff]">bytes</span>: ...{'\n'}
+            <span className="text-[#82aaff]">Image</span>: ...{'\n'}
             {'\n'}
             <span className="text-[#c792ea]">@register</span>
             {'\n'}
             <span className="text-[#82aaff]">def</span>{' '}
-            <span className="text-[#ffcb6b]">capture</span>(camera:{' '}
-            <span className="text-[#82aaff]">Camera</span>){' '}
+            <span className="text-[#ffcb6b]">double_segment</span>(segmentor:{' '}
+            <span className="text-[#82aaff]">Segmentor</span>){' '}
             <span className="text-[#89ddff]">{'->'}</span>{' '}
             <span className="text-[#82aaff]">bytes</span>:{'\n'}
             {'    '}
-            <span className="text-[#c792ea]">return</span> camera.
-            <span className="text-[#ffcb6b]">snap</span>(exposure_ms=10)
+            <span className="text-[#c792ea]">return</span> segmentor.
+            <span className="text-[#ffcb6b]">segment_cells</span>(feature_size=0.5)
           </code>
         </pre>
       </div>
@@ -74,7 +74,7 @@ export function DeclareCard() {
         {/* your action */}
         <div className="flex items-center gap-3 rounded-xl border border-fd-primary/40 bg-fd-primary/10 px-3 py-2.5 font-mono text-[12px] text-white/90">
           <Cpu className="size-4 text-fd-primary" />
-          capture()
+          double_segment()
           <span className="ml-auto text-[10px] tracking-[0.12em] text-fd-primary">
             YOUR ACTION
           </span>
@@ -84,7 +84,7 @@ export function DeclareCard() {
         <div className="my-1 ml-[1.15rem] h-4 w-px bg-white/15" />
         <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 font-mono text-[12px] text-white/80">
           <Network className="size-4 text-white/60" />
-          @declare Camera
+          @declare Segmentor
           <span className="ml-auto text-[10px] tracking-[0.12em] text-white/45">
             RESOLVING
           </span>

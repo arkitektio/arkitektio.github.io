@@ -1,5 +1,6 @@
 import { Fingerprint, ShieldCheck } from 'lucide-react';
 import { BentoCard } from './primitives';
+import Link from 'next/link';
 
 // A short, illustrative audit trail. Static. It stands in for the real,
 // queryable provenance records Arkitekt writes for every action.
@@ -22,7 +23,7 @@ export function ProvenanceCard() {
           </h2>
         </div>
         <p className="mt-3 text-sm text-fd-muted-foreground">
-          Every action, input and output is recorded in the database. You get a
+          Every action, input and output is recorded at task assignment. You get a
           complete, queryable provenance trail of who ran what, on which data,
           and when.
         </p>
@@ -49,9 +50,9 @@ export function ProvenanceCard() {
         <span className="text-sm text-fd-muted-foreground">
           Cryptographic signing
         </span>
-        <span className="ml-auto rounded-full border border-fd-primary/40 bg-fd-primary/10 px-2.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-fd-primary">
-          SOON
-        </span>
+        <Link href="/docs/provenance" className="ml-auto rounded-full border border-fd-primary/40 bg-fd-primary/10 px-2.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-fd-primary">
+          ?
+        </Link>
       </div>
     </BentoCard>
   );

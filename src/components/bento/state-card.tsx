@@ -38,16 +38,16 @@ export function StateCard() {
       {/* copy */}
       <div>
         <span className="font-mono text-[11px] tracking-[0.16em] text-fd-primary">
-          OBSERVABLE STATE
+          Show me where you are at
         </span>
         <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-          State that updates, live.
+          Observability baked in
         </h2>
         <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
-          Declare an <code>@state</code> dataclass and any action can read or
-          mutate it just by type-hinting it. Every change is published to the
+          Declare any <code>@state</code> dataclass and any agent can read it (but only
+          you mutate it). Every change is published to the
           platform automatically. Dashboards and other apps watch your
-          robot in real time.
+          that change. Did we say we keep track of it for replay and provenance too? We do.
         </p>
 
         <pre className="mt-5 overflow-x-auto rounded-xl border border-fd-border bg-[#0a0a0c] p-4 font-mono text-[12px] leading-relaxed text-white/80">
@@ -74,7 +74,7 @@ export function StateCard() {
             <span className="text-[#82aaff]">int</span>:{'\n'}
             {'    '}robot.picks{' '}
             <span className="text-[#89ddff]">+=</span> 1{'  '}
-            <span className="text-[#546e7a]"># published automatically</span>
+            <span className="text-[#546e7a]"># published automatically (in the background and thread safe)</span>
             {'\n'}
             {'    '}
             <span className="text-[#c792ea]">return</span> robot.picks

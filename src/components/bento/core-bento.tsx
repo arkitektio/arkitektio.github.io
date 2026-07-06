@@ -17,21 +17,20 @@ const services = [
     icon: Layers,
     tag: 'MICROSCOPY DATA',
     blurb: 'Stores & serves n-dimensional images, ROIs and rich metadata.',
-    hue: 195,
   },
   {
     name: 'Kraph',
     icon: Share2,
     tag: 'KNOWLEDGE GRAPH',
     blurb: 'Links samples, experiments and results into one graph.',
-    hue: 90,
+  
   },
   {
     name: 'Kabinet',
     icon: Box,
     tag: 'APP REGISTRY',
     blurb: 'Discovers, deploys & manages Apps across the platform.',
-    hue: 150,
+ 
   },
 ];
 
