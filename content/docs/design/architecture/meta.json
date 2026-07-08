@@ -1,4 +1,4 @@
 {
   "title": "Architecture",
-  "pages": ["service-discovery", "security", "provenance"]
+  "pages": ["service-discovery", "provenance"]
 }

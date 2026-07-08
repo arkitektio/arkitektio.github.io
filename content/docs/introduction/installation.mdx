@@ -11,8 +11,8 @@ Arkitekt is a **server-client platform**. The heavy lifting is done by **apps**:
 processing, the training, and the analysis. And those apps can run *anywhere*: on a GPU box under your
 desk, on a workstation down the hall, on a node in the cloud. What they cannot do is work in a vacuum.
 They need a **central server** to register against, to authenticate through, to find one another, and
-to keep track of data and results. The server is not where the work happens. It is the hub that turns
-a loose scattering of apps into a single, coherent platform. And before any of it can happen, the apps
+to keep track of data and results. The server is not where the work happens. It is the **hub** that turns
+a loose scattering of apps into a single, coherent platform: the center that every app connects to and through. And before any of it can happen, the apps
 and that server first have to **find each other and meet**.
 
 That sounds like it should be trivial, and twenty years ago it would have been: give the server a
@@ -133,7 +133,6 @@ will slow down the platform. Also note that in our tests, on equal hardware, the
 
 Arkitekts installer and admin interface (once installed) will guide you through the installation process and the deployment of the platform on your specific hardware.
 Once installed it serves a simple desktop app that additionally acts as an updater, as well as an admin interface to the platform and allows you to **start** and **stop** the platform.
-Additionally it will act as a beacon that advertises the platform on your local network, so that other users can find it.
 
 Go ahead and download our installer for your operating system "Konstruktor", and follow the instructions:
 
@@ -179,26 +178,26 @@ downtime. If you encounter any problems with the update, please consult the [Tro
   and your data should be safe.
 </Callout>
 
-## Advertising [#advertising]
+## Local-network advertising (removed) [#advertising]
 
-One benefit of the graphical installer is that it can also advertise the platform on your local network. This means that
-other users and apps can find the platform on your local network and connect to it, without having to know the IP address of your
-machine. You will find the advertisement section in the dashboard interface of the installer. Just click on the "Network" adapters
-that you want to advertise the platform on. When in doubt just click on all of them.
+<Callout type="warn" title="This feature was removed">
+  Earlier versions of Arkitekt could **advertise** the platform on your local network,
+  a UDP broadcast beacon so that apps could discover it without knowing its IP address.
+  We have **removed** this feature. Local networks turned out to be too much of a mess:
+  firewalls, changing addresses, blocked broadcasts, VPNs, and machines with several
+  network interfaces meant advertising worked unreliably, and only ever within a single
+  LAN in the first place.
 
-<Callout type="info" title="About Advertising">
-  Advertising the platform on your local network is a great way to make it discoverable for other users and apps, and we spent *a lot of time*
-  to make this work. It is however not a foolproof method and might not work in all cases. If you encounter problems with the advertisement
-  of the platform, please consult the [Troubleshooting section](/docs/troubleshooting/startup) for more information. If you need to reach your
-  platform from *outside* your local network, that includes a laptop on the road, a collaborator's machine, or a compute node in another building.
-  Have a look at the [Arkitekt Mesh](#arkitekt-mesh) below, which extends discovery beyond the LAN.
+  Discovery is now handled entirely by the [mesh](#arkitekt-mesh), which lets your
+  authenticated endpoints find and reach each other across *any* network, not just the
+  one they happen to share.
 </Callout>
 
 ## The Arkitekt Mesh [#arkitekt-mesh]
 
-Advertising works beautifully as long as everyone lives on the same local network. The moment you want to reach your platform from
-*somewhere else*, the broadcast beacon stops being enough. That might be your laptop on the train, a collaborator at another institute, or a GPU
-node sitting behind a different NAT. The **Arkitekt Mesh** is the answer to that problem: a way to securely reach your platform, and let your apps reach
+Reaching your platform is easy when everything lives on one trusted local network. The moment you want to reach it from
+*somewhere else*, sharing a network stops being something you can rely on. That might be your laptop on the train, a collaborator at another institute, or a GPU
+node sitting behind a different NAT. The **mesh** is the answer to that problem: a way to securely reach your platform, and let your apps reach
 it, from anywhere, without poking holes in your firewall or memorizing IP addresses.
 
 The mesh is best understood as a **personal/private mesh** in the spirit of Tailscale, rather than as a federation of independent servers.
@@ -244,12 +243,6 @@ arkitekt mesh leave
 
 You can run `arkitekt mesh join` on as many machines as you like: your laptop, your lab workstation, a remote compute node. They will all
 be able to discover and reach one another through the same coordinator, while the heavy lifting stays peer-to-peer between them.
-
-<Callout type="info" title="Mesh vs. Advertising">
-  Advertising and the mesh solve the *same* discovery problem at two different scales. Advertising broadcasts your platform to whoever is on the
-  same local network; the mesh lets your authenticated endpoints find each other across networks, with the coordinator standing in for the local
-  broadcast beacon. On a single trusted LAN, advertising alone is usually enough. The moment you cross a network boundary, reach for the mesh.
-</Callout>
 
 ### When a direct connection can't be made [#mesh-relay-fallback]
 

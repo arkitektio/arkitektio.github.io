@@ -1,0 +1,192 @@
+---
+title: Privacy Policy
+description: What data Arkitekt collects, why, and what happens to it. Short version, we don't want your data. Written as plainly as possible, GDPR-aware.
+---
+
+**Last updated:** July 8, 2026
+
+<Callout type="info" title="The short version">
+We don't want your data. None of it. We are not an ad company, we don't
+profile you, we don't sell anything, and there is no growth team measuring your
+every click. Everything below exists so that the parts of Arkitekt that *do*
+touch personal data (mostly: your email, so we can log you in) are handled
+honestly and lawfully. If you only read the docs, we know essentially nothing
+about you, and we'd like to keep it that way.
+</Callout>
+
+This page explains, as plainly as possible, what data we collect, why, and what
+happens to it. If anything here is unclear, email us, see contact details at the
+bottom.
+
+## Who we are
+
+Arkitekt is operated by Johannes Roos, based in Austria. For GDPR purposes, we
+are the **data controller** for the personal data described below.
+
+## Different parts, different rules
+
+Arkitekt is not one single service, and the amount of data involved depends
+entirely on *which* part you use. Most people only ever use the first tier, and
+for that tier we collect no personal data at all beyond what any web server sees.
+
+Find the row that matches what you're doing:
+
+| What you use | Where it lives | What that means for your data |
+|---|---|---|
+| **Just reading the docs / website** | Static site on **GitHub Pages**, fronted by **Cloudflare** | No account, no sign-up, no tracking. The only data involved is standard web-server logging (your IP, briefly). Nothing is stored about *you*. |
+| **An account on `go.arkitekt.live`** | Our hosted account service | We store your email address so you can log in and receive account emails. Transactional email is sent via **Resend**. That's the extent of it. |
+| **Signing in with a social provider** | GitHub / Google / ORCID etc. | We receive a minimal identity token (email + name) from the provider you chose, only to create your login. We don't get access to your provider account. |
+| **`demo.arkitekt.live`** | Our public demo instance | ⚠️ Whatever you upload is **stored, and currently stored unencrypted**. This is a playground, treat it as public. See the warning below. |
+
+Each tier is described in more detail below. If a section doesn't match what you
+use, it doesn't apply to you.
+
+---
+
+## Tier 1: Reading the docs and website
+
+The documentation and marketing site are **static files**. They are hosted on
+**GitHub Pages** and served through **Cloudflare** for DNS and CDN/security.
+
+- There is **no account, no login, no sign-up** involved in reading the docs.
+- We run **no analytics, no tracking cookies, no advertising cookies**. There is
+  no consent banner because there is genuinely nothing to consent to.
+- The only data that exists is the ordinary technical logging that GitHub Pages
+  and Cloudflare perform for *any* website: your IP address, timestamp,
+  requested URL, and user agent, used for delivery, caching, and abuse
+  protection. We do not receive, store, or analyse this ourselves beyond what
+  those providers expose for operational security.
+
+If reading the docs is all you do, this is the entire story. We do not know who
+you are, and we don't want to.
+
+## Tier 2: An account on `go.arkitekt.live`
+
+To use hosted Arkitekt features you may create an account. Here we deliberately
+ask for **the bare minimum**.
+
+### What we collect, and why
+
+| Data | Why we collect it | Legal basis |
+|---|---|---|
+| Email address | To create your account and send account-related emails (confirmation, password reset, important notices) | Necessary to perform our contract with you (GDPR Art. 6(1)(b)) |
+| Name (if you provide one) | To personalise communication, entirely optional | Your consent / contract |
+
+We do **not** ask for anything beyond what's needed to create and secure your
+account. No phone number, no address, no company, no "how did you hear about us",
+no profiling fields. If a field isn't needed to log you in or keep your account
+safe, we don't have it.
+
+### Email delivery (Resend)
+
+Account emails (signup confirmation, password resets) are sent through
+[**Resend**](https://resend.com/legal/privacy-policy). To send you an email,
+Resend necessarily sees your email address, your name if you gave one, and the
+content of that email. We have email **open-tracking and click-tracking turned
+off**, we don't want to know whether you opened an email.
+
+### Cookies
+
+If we set a cookie at all, it is strictly a **session cookie** required to keep
+you logged in. Nothing else is stored on your device, and no cross-site tracking
+happens.
+
+## Tier 3: Signing in with a social provider
+
+If you choose "sign in with GitHub / Google / ORCID" (or another provider), that
+provider hands us a minimal identity token, typically your **email address and
+name**, purely so we can create or match your Arkitekt login.
+
+- We only receive the specific fields you approve on the provider's consent
+  screen. We do **not** get access to your account, your repositories, your
+  contacts, or anything else.
+- The provider is an independent controller for their own processing, your
+  relationship with GitHub, Google, ORCID, etc. is governed by *their* privacy
+  policy, not this one.
+- Once you're logged in, the data we hold is the same minimal set as Tier 2:
+  email, and name if provided.
+
+## Tier 4: `demo.arkitekt.live`
+
+<Callout type="warn" title="Please don't put anything real here">
+`demo.arkitekt.live` is a public playground so you can try Arkitekt without
+installing anything. Whatever you upload to it is **stored on our server, and
+currently stored unencrypted**. Treat everything on the demo as effectively
+public and disposable. **Do not upload sensitive, personal, confidential, or
+unpublished research data to the demo.** We may reset or wipe it at any time.
+</Callout>
+
+The demo exists purely for convenience and evaluation. If you want to work with
+real data, run your own Arkitekt instance, where the data stays on
+infrastructure *you* control and we never see it.
+
+---
+
+## Who else touches your data (our processors)
+
+We use a small number of external services to run Arkitekt. Each only receives
+the minimum data needed to do its job, and each operates under a Data Processing
+Agreement (DPA) where applicable.
+
+| Service | What it's used for | What data it sees | Where it's based |
+|---|---|---|---|
+| **GitHub Pages** | Hosting the static docs/website | IP address (standard web-server logging) | United States |
+| **Cloudflare** | DNS, CDN and security for the site | IP address of site visitors, as part of normal web traffic | Global network, EU-based option available depending on config |
+| **Resend** | Sending transactional account emails | Your email address, name (if given), and the content of the email we send you | United States |
+| **Social login providers** (GitHub, Google, ORCID, …) | Authenticating you, only if you choose social login | The identity fields you approve, typically email + name | Varies by provider |
+
+**We do not sell, rent, or share your data with advertisers.** We do not use
+these services' marketing or tracking features, for example, email open/click
+tracking in Resend is turned **off**.
+
+## How long we keep your data
+
+- **Account data (email, name):** kept for as long as your account is active. If
+  you delete your account, we delete this data within **[X days — fill in]**.
+- **Server logs:** kept for **[X days — fill in]** for security/debugging
+  purposes, then automatically deleted.
+- **Demo data (`demo.arkitekt.live`):** not guaranteed to be kept *or* deleted
+  on any schedule, the demo may be wiped or reset at any time without notice.
+- **Emails sent via Resend:** subject to Resend's own retention policy for
+  delivery logs (see their [privacy policy](https://resend.com/legal/privacy-policy)),
+  we don't separately archive email content ourselves beyond what's needed to
+  resend a failed message.
+
+## Your rights
+
+Under GDPR (and similar laws elsewhere), you have the right to:
+
+- **Access** — ask what data we hold about you
+- **Rectification** — ask us to correct inaccurate data
+- **Erasure** — ask us to delete your data ("right to be forgotten")
+- **Portability** — get a copy of your data in a machine-readable format
+- **Object / restrict processing** — ask us to stop or limit how we use your data
+- **Withdraw consent** — where processing is based on consent, at any time
+
+To exercise any of these, email us (below). We'll respond within 30 days, as
+required by GDPR. For most requests on a project this size, we can typically
+handle it much faster.
+
+## Security
+
+- All traffic to Arkitekt's hosted services is encrypted via HTTPS/TLS.
+- We don't store passwords in plain text, **[describe your actual hashing
+  approach, e.g. "passwords are hashed using argon2/bcrypt"]**.
+- We only collect what we need, and don't retain data longer than necessary (see
+  retention above).
+- **Exception:** data you upload to `demo.arkitekt.live` is currently stored
+  **unencrypted**, see the demo warning above.
+
+## Changes to this policy
+
+If we materially change what we collect or how we use it, we'll update this page
+and note the change date at the top. For significant changes, we'll also email
+active account holders.
+
+## Contact
+
+Questions, data requests, or concerns: **[johannes.roos@jku.at](mailto:johannes.roos@jku.at)**
+
+If you believe we've mishandled your data, you also have the right to lodge a
+complaint with your local data protection authority, in Austria, this is the
+[Datenschutzbehörde](https://www.dsb.gv.at/).

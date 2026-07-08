@@ -43,7 +43,6 @@ Step Three: The Deployment
 - [I can't see the logs of my Deployment](#i-cant-see-the-logs-of-my-deployment)
 - [The services of my deployment keep crashing](#the-services-of-my-deployment-keep-crashing)
 - [I never see all my services turn green](#i-never-see-all-my-services-turn-green)
-- [I couldn't advertise my Deployment](#i-couldnt-advertise-my-deployment)
 
 Step Four: The Access
 
@@ -251,23 +250,6 @@ for a long time (> 40 seconds), it is probably failing. There is however two typ
 
 Anyhow if you have a service that is not turning green, please open an Issue on our [GitHub](https://github.com/arkitektio/konstruktor). We will try to help you!
 
-### I couldn't advertise my Deployment
-
-Advertising your Deployment will set your Konstruktor instance as a "Beacon". It will send out messages inside your network (UDP Broadcast) that will allow other
-all Apps to discover your Deployment. For this to work, you need to have UDP Broadcast enabled in your network (which we will check for), and your network needs
-to tell us your IP address (which we will also check for). By default Konstruktor will not advertise but wait for you to check the network interfaces you want to
-advertise on. For this to work, you need to make sure that your firewall allows these broadcasts.
-
-<Callout type="warn" title="On Advertising">
-
-
-Importantly it will also stop when you close Konstruktor. So if you want to advertise your Deployment, you need to keep Konstruktor open.
-
-</Callout>
-
-Advertising your Deployment is not necessary for it to work. It is just a convenience feature that allows you to discover your Deployment from other Apps.
-If apps are not able to discover your Deployment, or you experience any other issue please open an Issue on our [GitHub](https://github.com/arkitektio/konstruktor). We will try to help you!
-
 ### My Deployment is running, but it doesnt appear in Orkestrator
 
 If your Deployment is running, but it doesn't appear in Orkestrator, it means that Orkestrator was not able to discover your Deployment. This can have many reasons.
@@ -279,12 +261,12 @@ If your Deployment is running, but it doesn't appear in Orkestrator, it means th
    - Desktop App: Restart the whole App.
    - Webbrowser: Reload the webpage.
 
-3. Make sure you share the same network as your deployment.
+3. Make sure you can reach your deployment, either on the same machine, or across networks through the [mesh](/docs/design/security/mesh). (Local-network advertising has been removed, see the [installation guide](/docs/introduction/installation#advertising).)
 
 4. For automatic detection: Make sure that:
 
    - You are on the same machine as your deployment when using Webbrowser. (e.g you are able to access localhost:8000)
-   - You are on the same network as your deployment when using the Desktop App and you advertise your deployment on the correct network interface.
+   - Your deployment and the Desktop App have both [joined the mesh](/docs/introduction/installation#joining-the-mesh), so they can discover each other.
 
 5. For manual connection. If the automatic steps fail, you can always try to manually connect
    your instance by entering in the ipaddr or hostname of your deployment followed by the Lok Service Port (8000) in the `Advanced Connect` tab of Orkestrator.
@@ -299,4 +281,4 @@ If you can't access your server from another computer, it means that your server
 2. Make sure you are using the correct IP address. Or if you are using a hostname, make sure that the hostname is resolvable.
 3. Make sure you are using the correct port for the Lok service. By default Arkitekt uses port 8000. If you are using a different port, make sure you are using the correct one.
 4. Make sure your firewall allows incoming connections on the Lok service port. By default Arkitekt uses port 8000.
-5. Try to advertise your deployment on other network interfaces.
+5. To reach a deployment across networks (a different building, NAT, or off-site), use the [mesh](/docs/design/security/mesh) rather than relying on a shared local network.

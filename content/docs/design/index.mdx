@@ -1,38 +1,88 @@
 ---
 title: Design
-description: An introduction to the Arkitekt design docs, covering the Server and Apps that make up the platform.
+description: The core design of Arkitekt as a hub, a central middleman that your apps connect to and through, and the parts that make it up.
 ---
 
-When discussing the design of Arkitekt we will first have to adress to different aspects of the platform, which are:
+At its heart, Arkitekt is a **hub**. Picture a hub-and-spoke: a single center with
+everything else radiating out from it. Arkitekt is that center. Your **apps**, the
+tools that do the actual work, are the spokes. They do not talk to each other
+directly; they connect *to* the hub, and everything, data, compute, results,
+flows *through* it. That is what makes a loose scattering of tools behave like one
+coherent platform.
 
-- Apps
-- Server (and its services)
-- Coordinator (and authentication)
+The hub plays two roles at once:
 
+- It is a **middleman**, brokering requests between apps so they can rely on one
+  another without knowing anything about each other.
+- It is a **datahub**, a central place where your lab's data lives and can be
+  explored, in real time, throughout its lifecycle.
 
-## Apps
+What the hub does *not* do is decide who is allowed in, or introduce apps to it in
+the first place. That is a separate job, and it belongs to the **coordinator**
+(described below). Keeping the two apart matters: the hub holds your data and does
+the brokering, while the coordinator handles identity and discovery.
 
-Apps are the main building blocks of any work done on Arkitekt platform. They are the entities that provide the actual functionality of the platform, as for the 
-most part the server is just a communication platform and a data store. Apps are the entities that provide the actual functionality of the platform.
+The rest of these docs unpack the pieces of this picture. The three you meet first
+are:
 
+- The **Hub** itself (and the services it is built from)
+- **Apps** (the spokes that connect to it)
+- The **Coordinator** (a separate piece: authentication and discovery)
 
-## Server
+## The Hub
 
-The server is the core of the Arkitekt platform. It is the 'heart' of the platform and provides the backbone for the Arkitekt platform. It represents the central
-access point for the `Apps` and provides a communication platform between them. As a modular platform, Arkitekts server is build around multiple `Services`
-that provide the functionality of the platform. When deploying Arkitekt, you can choose to [personalize](/docs/design/deployment/) your Arkitekt Server with the services you need, and personalize
-the server to your needs.
+The hub is the center of everything: the part you install and run, and the point
+every app connects to. It is a **middleman** and a **datahub** in one, it brokers
+communication between apps, and it stores the data they produce so the whole lab
+can build on it. On its own the hub does very little "analysis"; its job is to
+broker and to remember. The heavy lifting is left to the apps, and identity is left
+to the coordinator.
 
+The hub is modular. It is built from a set of [**Services**](/docs/design/services)
+(like Mikro for data, or Rekuest for tasks), and when you deploy Arkitekt you choose
+[which services](/docs/design/deployment/) your hub needs.
 
-<Callout type="info" title="On the term `Server`">
+<Callout type="info" title="Hub vs. Server">
 
-While the term `Server` is often used to describe one single physical machine, this is not always the case. In the context of Arkitekt, a `Server` is a logical entity that provides a set of services. This means that a `Server` can be just one  physical machine, but it can also be a cluster of machines, or a adapting collection of virtual machnines in the cloud. You will see us sometimes use the world `Deployment`, which more commonly describe the sets of services
-that are deployed on multiple machines.
+You will also see us call the hub a **Server** (or a **Deployment**). That is the
+*technical* name for what the hub runs on. A `Server` is a logical entity, not
+necessarily one physical machine: it can be a single computer under your desk, a
+cluster, or an adapting set of virtual machines in the cloud. Whichever it is, the
+*concept* it realizes is the hub, the central thing your apps connect to.
 
 </Callout>
 
-## Coordinator
+## Apps
 
-The coordinator is arguably on the surface the most boring and uninteresting part of the Arkitekt platform. It is a service that is responsible for authentication and authorization of users, and for managing the access to the different services of the Arkitekt platform. The coordinator is also responsible for managing the access to the different apps that are deployed on the platform. The coordinator is a service that is responsible for managing the access to the different services of the Arkitekt platform, and for managing the access to the different apps that are deployed on the platform.
-Under the hood its probably the single most important part of the Arktikt platform, as it is responsible for managing the access to the different services and apps that are deployed on the platform. Without the coordinator, the Arkitekt platform would not be able to function properly, as it would not be able to manage the access to the different services and apps that are deployed on the platform.
+Apps are the **spokes**, and the true stars of any work done on Arkitekt. While the
+hub only connects and remembers, apps are the entities that actually *do* something
+with your data, from a web app that visualizes results to a machine-learning model
+running in a container.
 
+Crucially, apps connect only to the hub, never directly to one another. An app
+exposes part of its functionality to the hub, and the hub makes that functionality
+available to *other* apps, to you, and to workflows. This is how a net of
+capabilities grows across your lab without any two tools ever needing to know about
+each other. To read more, see [Apps vs Services](/docs/design/terminology/apps-vs-services).
+
+## The Coordinator
+
+The coordinator is a piece of its own, separate from the hub. It sits between you,
+your apps, and the hub, and its job is to make sure everyone is who they say they
+are and can find one another. On the surface it is the most boring part of the
+platform, and under the hood probably the single most important. It is the
+**control plane**: the part that manages who can access which services and apps, and
+how the pieces of a deployment find and trust each other. In Arkitekt this role is
+filled by [**Lok**](/docs/design/services/lok), and it covers two jobs that belong
+together:
+
+- **Authentication and authorization** of users and apps, so every request is made
+  by someone who is logged in and allowed to make it.
+- **Discovery**, so apps and servers can locate one another, both on a local network
+  via the [Fakts protocol](/docs/design/architecture/service-discovery), and across
+  networks via the [mesh](/docs/design/security/mesh), where the same coordinator
+  role runs as a *coordination server*.
+
+Without the coordinator, you and your apps could never safely reach the hub:
+nothing would know who anyone is, and the apps and the hub would never meet. For the
+full picture, see [Identity & Access](/docs/design/security/identity).

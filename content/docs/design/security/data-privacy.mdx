@@ -1,0 +1,65 @@
+---
+title: Data & Privacy
+description: "Where your data actually lives, how Arkitekt stores it, and the difference between self-hosting and our hosted services."
+---
+
+The most important privacy fact about Arkitekt is architectural: it is a
+**middleman**. Its job is to broker data between your tools, not to accumulate it.
+Where your data physically lives depends entirely on how you run Arkitekt.
+
+## Self-hosted: your data stays yours
+
+The full platform is designed to be **self-hosted**, on a single machine, a
+cluster, or your own cloud. In this mode the data sits on infrastructure *you*
+control, and the maintainers never see it. This is the recommended way to work
+with real or sensitive research data.
+
+## Our hosted services
+
+We also run a small number of hosted services, and each handles data differently.
+The [Privacy Policy](/docs/privacy) is the authoritative, tiered description; in
+short:
+
+- **Docs & website** — static files on GitHub Pages behind Cloudflare. No account,
+  no tracking.
+- **`go.arkitekt.live`** — the hosted account service. It stores the minimum needed
+  to log you in (your email, and name if you give one); transactional email is sent
+  via Resend.
+- **`demo.arkitekt.live`** — a public playground so you can try Arkitekt without
+  installing anything.
+
+<Callout type="warn" title="Don't put anything real on the demo">
+Whatever you upload to `demo.arkitekt.live` is **stored, and currently stored
+unencrypted**. Treat everything there as public and disposable, do not upload
+sensitive, confidential or unpublished data. If you want to work with real data,
+[self-host](/docs/design/deployment) instead.
+</Callout>
+
+## How data is stored
+
+Inside a deployment, Arkitekt separates **metadata** from **binary data**:
+
+- **[Mikro](/docs/design/services/mikro)** stores the actual image data in a
+  standard **S3 object store**, exposed through a **MinIO** server. Metadata (the
+  queryable description of that data) lives in a relational database, PostgreSQL by
+  default, and is served over GraphQL.
+- Access to the binary data is brokered, not handed out wholesale. A preflight
+  request to the Mikro API returns authenticated **presigned URLs or temporary
+  credentials**, so clients get scoped, time-limited access to exactly the objects
+  they need.
+- **[Fluss](/docs/design/services/fluss)** (workflows) stores only **references** to
+  data, not the data itself. The heavy bytes stay in the storage service; the
+  workflow logs just point at them.
+
+MinIO is therefore the mission-critical store, it holds everything that streams
+through the platform.
+
+## In transit and accountable
+
+- **Encryption in transit.** When you host your own instance you can enable
+  **TLS**, so data moving between client and server is encrypted. See [Security
+  Measures](/docs/design/security/measures).
+- **Accountability.** Every create, update and delete on tracked data is recorded
+  with *who* changed it, under whose authority, and during which task. That audit
+  trail is described in [Provenance & Audit
+  Logging](/docs/design/architecture/provenance).

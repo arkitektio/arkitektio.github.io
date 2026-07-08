@@ -1,0 +1,70 @@
+---
+title: Security & Privacy
+description: "How Arkitekt thinks about security, privacy and performance: the trust model, where your data lives, and the honest limits of an early-stage platform."
+---
+
+Security, privacy and performance are not separate concerns in Arkitekt, they are
+three faces of the same design goal: keeping you in control of your data while
+still letting you move fast. This section pulls that story together.
+
+<Callout type="info" title="We don't want your data">
+Arkitekt is a **middleman**, not a data silo. When you run your own instance, the
+data stays on infrastructure *you* control and we never see it. The parts of the
+platform that *do* touch personal data are kept to the bare minimum, and are
+described in full in the [Privacy Policy](/docs/privacy).
+</Callout>
+
+## The trust model in brief
+
+- **Everything is authenticated and authorized.** There is no way to reach the API
+  without a valid identity and the right permissions. See [Security
+  Measures](/docs/design/security/measures).
+- **The organization is the hard boundary.** A single deployment can host many
+  organizations, each fully isolated. Data never silently crosses from one
+  organization to another.
+- **Open by default, *within* your organization.** Science is collaborative, so
+  colleagues in the same organization can build on each other's data by default,
+  with role-based access control to tighten things where you need to.
+- **You and the machine stay distinct.** When an agent acts on your behalf, the
+  audit trail records both facts at once: that a human authorized the work, and
+  that a machine carried it out. This attribution is recorded through
+  [Provenance & Audit Logging](/docs/design/architecture/provenance).
+
+## What's in this section
+
+- **[Identity & Access](/docs/design/security/identity)** — how you and your apps
+  log in: OAuth2, OpenID Connect, JWT, the Fakts discovery flow, and scopes.
+- **[Data & Privacy](/docs/design/security/data-privacy)** — where your data
+  lives, how it is stored, and the difference between self-hosting and our hosted
+  services.
+- **[Security Measures](/docs/design/security/measures)** — the concrete
+  protections: authorization, sandboxing, TLS, multi-tenancy and audit logs.
+- **[The Mesh](/docs/design/security/mesh)** — how endpoints reach each
+  other securely across networks, peer-to-peer, without the coordinator ever seeing
+  your data, and how to bring your own VPN instead.
+- **[Performance & Real-time](/docs/design/security/performance)** — how Arkitekt
+  streams, scales and handles large bioimage data.
+
+You may also want to read [Service
+Discovery](/docs/design/architecture/service-discovery) for how apps find and
+authenticate to a deployment.
+
+## Honest limits
+
+We would rather be upfront than oversell. Arkitekt is powerful, but it is also
+young, and a few things are still works in progress:
+
+<Callout type="warn" title="Arkitekt is early-stage software">
+
+- We currently **discourage multi-user production deployments** while we finish
+  hardening the platform. See the [deployment
+  guide](/docs/design/deployment).
+- Some of the more powerful remote features (online monitoring, remote control)
+  are best run behind a **VPN** for now. See [Using a VPN](/docs/design/various/vpn).
+- **Scope-based access control is not yet fully enforced** across the platform, we
+  are rolling it out gradually so as not to break app development.
+- Data you upload to the public **`demo.arkitekt.live`** instance is currently
+  stored **unencrypted**, treat it as public. See the [Privacy
+  Policy](/docs/privacy).
+
+</Callout>

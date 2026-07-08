@@ -1,5 +1,5 @@
 ---
-title: Security
+title: Security Measures
 description: The security measures Arkitekt implements, from authentication and sandboxing to TLS and audit logs.
 ---
 
@@ -27,7 +27,7 @@ can interact with our protected APIs.
 
 ## User Management & Multi-Tenancy
 
-Every Arkitekt coordination server ships with a multi-tenancy system at its core. A single server is not limited to one lab or one project: it can host multiple **organizations**, each with its own users, data, and configuration, fully isolated from one another. This means a department, a core facility, or a whole institute can run on a single deployment while every organization remains a self-contained world.
+Every Arkitekt server ships with a multi-tenancy system at its core. A single deployment is not limited to one lab or one project: it can host multiple **organizations**, each with its own users, data, and configuration, fully isolated from one another. This means a department, a core facility, or a whole institute can run on a single deployment while every organization remains a self-contained world.
 
 **Open by default, within your organization** - We designed the defaults around how science actually works. By default, every (human) user inside an organization *can* look at the data of their colleagues in the same organization. Science is collaborative, and forcing people to explicitly share every dataset before anyone can build on it tends to grind real work to a halt. The boundary that always holds is the organization itself. Data never silently crosses from one organization to another.
 

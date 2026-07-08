@@ -5,6 +5,7 @@ import {
   GitFork,
   Microscope,
   Network,
+  ShieldCheck,
   Sparkles,
   Workflow,
 } from 'lucide-react';
@@ -203,6 +204,20 @@ export default function HomePage() {
           </Button>
         </div>
       </section>
+
+      {/* ───────────────────────── Footer ──────────────────────── */}
+      <footer className="mt-16 flex flex-col items-center gap-1 text-center text-sm text-fd-muted-foreground">
+        <Link
+          href="/docs/privacy"
+          className="inline-flex items-center gap-1.5 transition-colors hover:text-fd-foreground"
+        >
+          <ShieldCheck className="size-3.5" />
+          Mind your privacy
+        </Link>
+        <p className="text-xs">
+          We don&apos;t want your data. Here&apos;s exactly what we do and don&apos;t touch.
+        </p>
+      </footer>
     </main>
   );
 }
