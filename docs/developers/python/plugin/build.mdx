@@ -28,7 +28,7 @@ all the dependencies and the code. In a default configuration, Arkitekt uses Doc
 To start building your plugin, you will have to initialize a `Flavour` for your project. You can do this by running the following command:
 
 ```bash
-arkitekt port init
+arkitekt-next kabinet init
 ```
 
 This will ask you a few questions about your project and will create a new flavour in your project ".arkitekt" directory. The content of
@@ -113,7 +113,7 @@ We are still working on the documentation for the selectors, so for now, you can
 To build the container and your plugins, you can run the following command:
 
 ```bash
-arkitekt port build
+arkitekt-next kabinet build
 ```
 
 This will build the container with your local docker daemon and add a new build in your local directory.
@@ -124,7 +124,7 @@ Importantly this build is not yet published and uploaded and can only be used on
 Staging a Build allows you to test out your just build plugin against your local Arkitekt instance. To stage a build, you can run the following command:
 
 ```bash
-arkitekt port stage
+arkitekt-next kabinet stage
 ```
 
 This will run the container locally and will instruct it to connect to your local Arkitekt instance. 
@@ -136,7 +136,7 @@ This is a great way to test your plugin before you publish it.
 To publish a build, you can run the following command:
 
 ```bash
-arkitekt port publish
+arkitekt-next kabinet publish
 ```
 
 This is the final step in the process of building your plugin. This will upload your container to a registry, and will create

@@ -20,7 +20,7 @@ The integrated Style revolves around the concepts of Apps. So lets create one. O
 want to create your new app and run :
 
 ```bash
-arkitekt init
+arkitekt-next init
 ```
 
 This should start an installation wizard, which will guide you through the process of creating a new app and will ask you a few questions
@@ -63,7 +63,7 @@ This is the main file of your app. And the entrypoint that the CLI will call whe
 It is a python file, that contains all the [Nodes](/docs/design/terminology/node) of your app. Lets open it up
 
 ```python
-from arkitekt import register
+from arkitekt_next import register
 
 @register
 def hello_world(name: str) -> str:
@@ -83,13 +83,13 @@ def hello_world(name: str) -> str:
     return greeting
 ```
 
-This is the default code that is generated for you. It contains a single function that defines and implement the 
-"Hello World" Node [Node](/docs/design/terminology/node). Its pretty straigtforward but lets break it down:
+This is the default code that is generated for you. It contains a single function that defines and implements the
+"Hello World" Node [Node](/docs/design/terminology/node). It's pretty straightforward but let's break it down:
 
 ```python
-from arkitekt import register
+from arkitekt_next import register
 ```
-This is defining import that make this python code an Arkitekt. `register` is a decorator that can mark any function in your app, as a Node.
+This import is what makes this Python code an Arkitekt app. `register` is a decorator that can mark any function in your app as a Node.
 You can have as many Nodes as you want in your app, and once you run your app, they will become available on the Arkitekt Server and 
 can be used by others.
 
@@ -105,7 +105,7 @@ an Arkitekt Server and have it running. For strategies of how to do that, check 
 Open up your terminal and run:
 
 ```bash
-arkitekt run dev --url localhost:8000
+arkitekt-next run dev --url localhost:8000
 ```
 
 This will start your app in development mode and connect it to your local Arkitekt Server. You should see something like this:

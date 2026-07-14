@@ -18,7 +18,7 @@ authentication, waiting for assignemnts from the server, etc.). This App object 
 adjusted to fit your exact configuration need by using different builders (more on this later).
 
 ```python
-from arkitekt import easy
+from arkitekt_next import easy
 
 app = easy("your_app_name", version="your_app_version")
 
@@ -53,20 +53,20 @@ A few words about this setup:
    by specifically passing the desired context to the function.
 
    ```python
-    from arkitekt import Arkitekt
-    from mikro import from_xarray
+    from arkitekt_next import easy
+    from mikro_next.api.schema import from_array_like
     import xarray as xr
 
     app = easy()
 
     with app:
-        image = from_xarray(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="image name") # stores the xarray on the mikro instance of the governing app context
+        image = from_array_like(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="image name") # stores the array on the mikro instance of the governing app context
    ```
 
    :::note
    This behaviour allows for more functional and concise code but can also lead to unexpected
    behaviour. For example, if you have multiple app contexts running in parallel, the
-   `from_xarray` function will use the app context that is currently active. You can always opt out of this behaviour
+   `from_array_like` function will use the app context that is currently active. You can always opt out of this behaviour
    by specifically passing the desired context to the function.
    :::
 
@@ -79,7 +79,7 @@ A few words about this setup:
    sync code.
 
    ```python
-    from arkitekt import Arkitekt
+    from arkitekt_next import easy
     import asyncio
 
     app = easy()

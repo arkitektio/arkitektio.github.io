@@ -30,8 +30,8 @@ Lets start with the simplest example. Imaging you have a numpy array that you wa
 Lets first look at what code we need to upload the data to Arkitekt.
 
 ```python
-from arkitekt import easy
-from mikro.api.schema import from_xarray
+from arkitekt_next import easy
+from mikro_next.api.schema import from_array_like
 import xarray as xr
 import numpy as np
 
@@ -41,7 +41,7 @@ i = np.random.rand(100,100,1)
 image_data = xr.DataArray(i, dims=["x", "y", "c"])
 
 with app:
-   image = from_xarray(image_data, name="Random image") # stores the xarray on the mikro instance
+   image = from_array_like(image_data, name="Random image") # stores the array on the mikro instance
    print(image.data)
 ```
 
@@ -71,7 +71,7 @@ The python API heavily relies on the concept of context managers. This is a pyth
 ## About that line of code
 
 ```python
-image = from_xarray(image_data, name="Random image")
+image = from_array_like(image_data, name="Random image")
 print(image.data)
 ```
 
@@ -79,8 +79,8 @@ These two lines of code is a bit more complex than the other lines of code in th
 
 ### Functions are your friend
 
-First lets talk about the function `from_xarray`. As you might notice its imported from the `mikro.api.schema` module, which contains a plethora of methods to interact with the Mikro data server (e.g for creating images, marking rois, commenting, subscribe to image events, ...). These functions
-will provide ways of briding your local data with the data on the server. The `from_xarray` function is one of these functions. It will take an array-like structure as an argument and create an image on the server, that is then stored in the database and the object store, and return a reference to that back to you.
+First lets talk about the function `from_array_like`. As you might notice it's imported from the `mikro_next.api.schema` module, which contains a plethora of methods to interact with the Mikro data server (e.g for creating images, marking rois, commenting, subscribe to image events, ...). These functions
+will provide ways of bridging your local data with the data on the server. The `from_array_like` function is one of these functions. It will take any array-like structure (numpy array, xarray DataArray, etc.) as an argument and create an image on the server, stored in the database and the object store, and return a reference back to you.
 
 ### But there are steps in between
 
@@ -95,14 +95,14 @@ You might notice that we don't pass a reference to **where** our server is locat
 While we personally love the flexibility of context managers, some prefer being more explicit about the context. If you are one of those people, you can also pass the underlying `App` mikro api client object to the `from_xarray` function as an argument. This will make the code more explicit, but also more verbose. We will use the context manager in this tutorial, but feel free to use the explicit way if you prefer that.
 
 ```python
-image = from_xarray(image_data, name="Random image", rath=app.mikro.rath) # this uses the mikro service graphql client (rath) directly
+image = from_array_like(image_data, name="Random image", rath=app.mikro.rath) # this uses the mikro service graphql client (rath) directly
 ```
 
 2. Configuration, Authentication, Authentication
 
 But hey, wasn't Arkitekt a secure and modular platform? How does our app now on which service to store our data? And how do we ensure that not everyone can upload data? This is where the configuration and authentication part comes in. Our app also contains a strategy of how we want to authentication our python script and ourselves against the Arkitekt server. So when we call this function for the first time, the `App` will try to establish a trust relationship with the server. Which strategy we will use greatly depends on how you would like your app to be used, and is highly custimizable. By default and suitable for most usecasses (if you use the `easy`builder ) it will now open a webbrowser for you where you will see the Arkitekt Server, ask you if you trust this app, and if you would like to (temporarilly) grant it access to your data. If you accept, the app will be granted access to the server, and will be send a token that it can use to authenticate itself against the server in the future. Importantly
 
-1. We are calling the `from_xarray` function from the `mikro.api.schema` module. This function is a convenience function that will in turn call the apps mikro services api, with the given parameters. Lets inspect these parameters on their way to the server:
+1. We are calling the `from_array_like` function from the `mikro_next.api.schema` module. This function is a convenience function that will in turn call the apps mikro services api, with the given parameters. Lets inspect these parameters on their way to the server:
 
 ### Illustration of the upload process
 
