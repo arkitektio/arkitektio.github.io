@@ -6,3 +6,4 @@ export { DeploymentStrategies } from './deployment-strategies';
 export { MeshTunnel } from './mesh-tunnel';
 export { ProvenanceFlow } from './provenance-flow';
 export { GuckerGrid } from './gucker-grid';
+export { MikroSpaces } from './mikro-spaces';

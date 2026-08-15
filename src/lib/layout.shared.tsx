@@ -1,5 +1,12 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { Atom, BookOpen, Network, Newspaper, Sparkles } from 'lucide-react';
+import {
+  Atom,
+  BookOpen,
+  MonitorPlay,
+  Network,
+  Newspaper,
+  Sparkles,
+} from 'lucide-react';
 import { Logo } from '@/components/site';
 import { NavConnector } from '@/components/arkitekt';
 import { appName, gitConfig } from './shared';
@@ -27,6 +34,12 @@ export function baseOptions(): BaseLayoutProps {
         url: '/blog',
         active: 'nested-url',
         icon: <Newspaper />,
+      },
+      {
+        text: 'Presentations',
+        url: '/presentations',
+        active: 'nested-url',
+        icon: <MonitorPlay />,
       },
       {
         text: 'Explorer',

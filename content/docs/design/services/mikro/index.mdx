@@ -71,3 +71,10 @@ is exposed through the GraphQL API, and can be used to filter and query images. 
 use the [Postgres](https://postgressql.org) database directly to query the metadata. If you are seeking to
 minimize the number of dependencies, you can also use the [SQLite](https://sqlite.org) database which provides
 the same functionality, but is a single file database that does not require a separate database server.
+
+## Space
+
+Beyond storage and metadata, Mikro keeps track of *space*: where your images, masks, tables and
+annotations live relative to each other, and how a viewer can tell you everything it knows about
+the cell under your cursor. Read about it in
+[Coordinate Systems and Attribute Plans](/docs/design/services/mikro/coordinate-systems).
