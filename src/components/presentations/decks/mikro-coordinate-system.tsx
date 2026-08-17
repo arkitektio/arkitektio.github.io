@@ -9,10 +9,8 @@
    step when either moves. */
 
 import type { ReactNode } from 'react';
-import Link from 'next/link';
 import { DeckFrame } from '../deck-frame';
 import {
-  Bullets,
   Caption,
   Columns,
   DeckSlide,
@@ -24,15 +22,12 @@ import {
 } from '../slide';
 import {
   AisQuestionFigure,
-  ArrayFigure,
   AttributePlanFigure,
-  EpochFigure,
+  ComposeFigure,
   GraphFigure,
   HoverAnswerFigure,
-  LineageFigure,
-  PathFigure,
-  PixelToPhysicalFigure,
   SpreadsheetFigure,
+  TransformIntroFigure,
 } from './mikro-coordinate-figures';
 
 /** GraphQL / SQL block sized for the slide canvas. */
@@ -44,62 +39,82 @@ function CodeBlock({ children }: { children: ReactNode }) {
   );
 }
 
-/** The axis table used on the "what is a coordinate system" slide. */
-function AxisTable({
+/** A demo recording. Until the file is dropped into `public/`, the dashed
+    placeholder behind the player is what shows — so the deck stays presentable
+    while the video is still being cut. */
+function DemoVideo({ src }: { src: string }) {
+  return (
+    <div className="relative mx-auto aspect-video max-h-[380px] w-full max-w-[680px] overflow-hidden rounded-xl border border-dashed border-fd-border">
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-fd-muted-foreground">
+        <span className="text-[19px] font-semibold">demo recording</span>
+        <span className="font-mono text-[13px]">{src}</span>
+      </div>
+      <video
+        autoPlay
+        muted
+        loop
+        controls
+        playsInline
+        className="absolute inset-0 size-full object-contain"
+      >
+        <source src={src} />
+      </video>
+    </div>
+  );
+}
+
+/** One array shape, written as the axes it actually has. */
+function Signature({
   name,
-  rows,
+  axes,
+  note,
   tone = 'default',
 }: {
   name: string;
-  rows: [string, string, string][];
+  /** `[type, name]` per axis. Deliberately no units: the array's own axes never
+      carry any — a unit is what an edge into another space adds. */
+  axes: [string, string][];
+  note?: string;
   tone?: 'default' | 'primary';
 }) {
   return (
     <div
       className={
         tone === 'primary'
-          ? 'flex flex-col gap-2 rounded-xl border border-fd-primary/40 bg-fd-primary/5 p-4'
-          : 'flex flex-col gap-2 rounded-xl border border-fd-border bg-fd-card/60 p-4'
+          ? 'flex items-center gap-5 rounded-xl border border-fd-primary/40 bg-fd-primary/5 px-5 py-3'
+          : 'flex items-center gap-5 rounded-xl border border-fd-border bg-fd-card/60 px-5 py-3'
       }
     >
-      <span className="font-mono text-[15px] font-bold">{name}</span>
-      <table className="w-full border-separate border-spacing-y-1 text-left font-mono text-[15px]">
-        <thead>
-          <tr className="text-[12px] uppercase tracking-[0.12em] text-fd-muted-foreground">
-            <th className="font-medium">axis</th>
-            <th className="font-medium">type</th>
-            <th className="font-medium">unit</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(([axis, type, unit]) => (
-            <tr key={axis}>
-              <td className="text-fd-foreground">{axis}</td>
-              <td className="text-fd-muted-foreground">{type}</td>
-              <td className={unit === '—' ? 'text-fd-muted-foreground' : 'text-fd-primary'}>
-                {unit}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <span className="w-[180px] shrink-0 text-[19px] font-semibold leading-tight tracking-tight">
+        {name}
+      </span>
+      <div className="flex flex-wrap items-center gap-2">
+        {axes.map(([type, axisName], i) => (
+          <span key={`${type}-${axisName}-${i}`} className="flex items-center gap-2">
+            {i > 0 ? (
+              <span className="text-[15px] text-fd-muted-foreground" aria-hidden>
+                ×
+              </span>
+            ) : null}
+            <span className="flex flex-col rounded-lg border border-fd-border bg-fd-background/60 px-2.5 py-1">
+              <span className="font-mono text-[13px] font-bold text-fd-primary">
+                {type}
+              </span>
+              <span className="font-mono text-[11px] text-fd-muted-foreground">
+                {axisName}
+              </span>
+            </span>
+          </span>
+        ))}
+      </div>
+      {note ? (
+        <span className="ml-auto text-right text-[15px] leading-snug text-fd-muted-foreground">
+          {note}
+        </span>
+      ) : null}
     </div>
   );
 }
-
-const EDGE_KINDS: [string, string][] = [
-  ['IDENTITY', 'the same grid, renamed'],
-  ['SCALE', 'pyramid levels, pixel size'],
-  ['TRANSLATION', 'an offset, nothing else'],
-  ['AFFINE', 'registration and calibration'],
-  ['ROTATION', 'a sample mounted askew'],
-  ['MAP_AXIS', 'reorder or rename axes'],
-  ['SEQUENCE', 'several edges, applied in order'],
-  ['BY_DIMENSION', 'a different rule per axis'],
-  ['FIELD', 'a label mask into a table index'],
-  ['BIJECTION', 'one-to-one, both directions'],
-  ['UNMAPPABLE', 'no correspondence exists, and that is recorded'],
-];
 
 export function MikroCoordinateSystemDeck() {
   return (
@@ -116,9 +131,9 @@ export function MikroCoordinateSystemDeck() {
           <>
             <span>Arkitekt</span>
             <span aria-hidden>·</span>
-            <span>25 slides</span>
+            <span>22 slides</span>
             <span aria-hidden>·</span>
-            <span>~15 min</span>
+            <span>~18 min</span>
           </>
         }
       />
@@ -157,186 +172,175 @@ export function MikroCoordinateSystemDeck() {
       <SectionSlide title="Can we do better?" />
 
       <DeckSlide
-        eyebrow="The Mikro way"
-        title="Ask by hovering"
-        lead="Same gesture. The answer arrives in place, because the connection between the pixels and the number was never allowed to go missing."
+        eyebrow="The wish"
+        title="Wouldn't it be nice if we could just get the information like that?"
+        lead="Same gesture as before. You point, and the number is simply there — no export, no folder, no remembering which run this was."
       >
         <div className="flex flex-1 flex-col justify-center gap-4">
           <Figure>
             <HoverAnswerFigure />
           </Figure>
           <Caption>
-            Nothing was recomputed and nothing was looked up by filename. The
-            viewer already had everything it needed to go from the pixel under
-            your cursor to the row that describes it.
+            Point at a segment, read its length. That is the entire interaction
+            we want: the question answered where it was asked, while you are
+            still looking at the thing you asked about.
           </Caption>
         </div>
       </DeckSlide>
 
       <DeckSlide
-        eyebrow="How it works"
-        title="Keep the transform from every step"
-        lead="Each processing step records how it relates to what it came from — as its own edge, with a kind and a version. The chain is what the viewer walks."
+        eyebrow="Introducing"
+        title={
+          <>
+            Spatial <span className="text-fd-primary">Query</span>
+          </>
+        }
+        lead="Asking the data a question through a place, rather than through a filename. You hand it a point in some space; it hands back everything that lives there."
       >
-        <div className="flex flex-1 flex-col justify-center gap-4">
-          <Figure>
-            <LineageFigure />
-          </Figure>
+        <div className="grid flex-1 grid-cols-3 content-center gap-4">
+          <Panel title="you give it a place">
+            <span className="text-[18px] leading-snug">
+              A coordinate in whatever space you happen to be looking at — a
+              pixel in a tile, a point on the slide, a spot in the atlas.
+            </span>
+          </Panel>
+          <Panel title="it walks the graph" tone="primary">
+            <span className="text-[18px] leading-snug">
+              Mikro knows how those places relate, so it can carry your point
+              from where you clicked to wherever the answer is kept.
+            </span>
+          </Panel>
+          <Panel title="you get what is there">
+            <span className="text-[18px] leading-snug">
+              The mask label, the row of measurements, the annotation — whatever
+              has been recorded at that place, in that instant.
+            </span>
+          </Panel>
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="Live demo"
+        title="Spatial Query, in the viewer"
+        lead="The same neuron, the same gesture — this time against real data."
+      >
+        <div className="flex flex-1 flex-col justify-center gap-3">
+          <DemoVideo src="/presentations/mikro/spatial-query-demo.webm" />
           <Caption>
-            Even a step that destroyed the geometry is recorded, as{' '}
-            <Term>UNMAPPABLE</Term> — the alternative is lying with an identity.
-            Placement and the crossing into records hang off the chain rather
-            than sitting in it; a <Term>FIELD</Term> edge is pointedly not a
-            derivation.{' '}
-            <Link
-              href="/docs/design/services/mikro/coordinate-systems#transformations-maps-between-places"
-              className="text-fd-primary underline underline-offset-2"
-            >
-              Transformations, in the docs
-            </Link>
+            Every hover is answered locally. Nothing in this recording is a
+            round-trip to the server.
           </Caption>
         </div>
       </DeckSlide>
 
       <SectionSlide
-        index="01"
-        title="Spaces"
-        lead="The nodes: places where data lives."
+        title="How does that work?"
+        lead="The rest of this is the background."
       />
 
       <DeckSlide
-        eyebrow="Spaces"
-        title="A pixel index is not a location"
-        lead="An array knows its own indices. That is genuinely all it knows."
-      >
-        <Columns
-          ratio="narrow-left"
-          left={
-            <Bullets
-              items={[
-                <>Indices are structural: they address memory, not the world.</>,
-                <>
-                  Two tiles of the same slide have no idea whether they overlap.
-                </>,
-                <>
-                  Bake micrometers into the pixels and you have destroyed the
-                  original and still cannot re-register it later.
-                </>,
-              ]}
-            />
-          }
-          right={<ArrayFigure />}
-        />
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="Spaces"
-        title="Units are an interpretation, not a property"
-        lead="Mikro leaves the grid alone and stores the interpretation next to it, as one thing you can point at."
+        eyebrow="Background"
+        title="A coordinate system is a name and some axes"
+        lead="Nothing more: a named frame of reference, whose axes have a type and — sometimes — a unit. A transformation is how you get from one of them into another."
       >
         <div className="flex flex-1 flex-col justify-center gap-4">
           <Figure>
-            <PixelToPhysicalFigure />
+            <TransformIntroFigure />
           </Figure>
           <Caption>
-            The pixel grid stays exactly as acquired, with unitless axes. A single
-            transformation says what those pixels mean in a space whose axes carry
-            micrometers. Change your mind about the calibration and you edit the
-            edge, not the image.
+            The same point, expressed twice. The pixel grid is left exactly as
+            acquired; the transformation carries the point into a space whose
+            axes mean micrometers. Neither frame owns the other, and neither
+            stores the other&rsquo;s numbers.
           </Caption>
         </div>
       </DeckSlide>
 
-
+      <DeckSlide
+        eyebrow="Background"
+        title="Why that is worth the trouble"
+        lead="Because transformations compose. Translate a point once and you can keep translating it — stepping from where you are to wherever the answer happens to live."
+      >
+        <div className="flex flex-1 flex-col justify-center gap-4">
+          <Figure>
+            <ComposeFigure />
+          </Figure>
+          <Caption>
+            A pixel in a mask reaches the tile it was segmented from, the slide
+            that tile was placed on, and the atlas the slide was registered
+            into. Every hop is one recorded fact; the walk is what makes a
+            spatial query possible at all.
+          </Caption>
+        </div>
+      </DeckSlide>
 
       <DeckSlide
-        eyebrow="Spaces"
-        title="A coordinate system is a name and its axes"
-        lead="No matrices, no parent, no special cases. An axis has a name, a type and — sometimes — a unit."
+        eyebrow="Background"
+        title="Why this is hard to keep in a database"
+        lead="The naive schema — a position column, a world matrix on each image — works right up until the day something changes."
       >
-        <Columns
-          left={
-            <AxisTable
-              name="camera pixels"
-              rows={[
-                ['t', 'TIME', '—'],
-                ['z', 'SPACE', '—'],
-                ['y', 'SPACE', '—'],
-                ['x', 'SPACE', '—'],
-              ]}
-            />
-          }
-          right={
-            <AxisTable
-              tone="primary"
-              name="slide"
-              rows={[
-                ['t', 'TIME', 's'],
-                ['z', 'SPACE', 'um'],
-                ['y', 'SPACE', 'um'],
-                ['x', 'SPACE', 'um'],
-              ]}
-            />
-          }
-        />
+        <div className="grid flex-1 grid-cols-3 content-center gap-4">
+          <Panel title="updates">
+            <span className="text-[18px] leading-snug">
+              Recalibrate the objective and every precomputed position is wrong.
+              You now have to find them all, and you will not.
+            </span>
+          </Panel>
+          <Panel title="conflicting information">
+            <span className="text-[18px] leading-snug">
+              The stage says one thing, the registration says another. Both are
+              real measurements. A single position column has to pick a winner.
+            </span>
+          </Panel>
+          <Panel title="no one answer">
+            <span className="text-[18px] leading-snug">
+              The same tile is somewhere on the slide and somewhere in the
+              atlas. &ldquo;Where is it?&rdquo; has no answer until you say
+              relative to what.
+            </span>
+          </Panel>
+        </div>
         <Caption className="mt-4">
-          Same shape, different claims. A missing unit is the honest state of a
-          raw pixel grid — not a gap to be filled in with a guess.
+          Every one of these is the same mistake: a derived number stored as if
+          it were a fact.
         </Caption>
       </DeckSlide>
 
       <DeckSlide
-        eyebrow="Spaces"
-        title="Data lives in exactly one space"
-        lead="Residence, not hierarchy. Every resident carries a single reference to the space it is expressed in."
+        eyebrow="Background"
+        title="So model it as a graph"
+        lead="Keep the facts, drop the answers. Places become nodes, the relations between them become edges, and every question is a walk."
       >
-        <Columns
-          ratio="narrow-right"
-          left={
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                'datasets',
-                'pyramid levels',
-                'lenses and crops',
-                'measurement tables',
-                'meshes',
-                'annotation collections',
-              ].map((resident) => (
-                <div
-                  key={resident}
-                  className="rounded-xl border border-fd-border bg-fd-card/60 px-4 py-3 text-[18px]"
-                >
-                  {resident}
-                </div>
-              ))}
-            </div>
-          }
-          right={
-            <>
-              <Panel title="the useful consequence" tone="primary">
-                A space with no residents at all is still a perfectly good space —
-                a slide, a scene, an atlas. A pure frame of reference that things
-                point into.
-              </Panel>
-              <Caption>
-                This is why there is no longer a <Term>kind</Term> enum telling you
-                what a space is &ldquo;for&rdquo;. What lives in it says that.
-              </Caption>
-            </>
-          }
-        />
+        <div className="grid flex-1 grid-cols-2 content-center gap-6">
+          <div className="flex flex-col gap-3 rounded-2xl border border-fd-border bg-fd-card/60 p-7">
+            <span className="font-mono text-[13px] font-bold uppercase tracking-[0.14em] text-fd-muted-foreground">
+              nodes
+            </span>
+            <span className="text-[21px] leading-snug">
+              Coordinate systems. A camera grid, a slide, a scene, a table&rsquo;s
+              row index — anything you can express a position in.
+            </span>
+          </div>
+          <div className="flex flex-col gap-3 rounded-2xl border border-fd-primary/35 bg-fd-primary/5 p-7">
+            <span className="font-mono text-[13px] font-bold uppercase tracking-[0.14em] text-fd-primary">
+              edges
+            </span>
+            <span className="text-[21px] leading-snug">
+              Transformations. Directed, versioned, and each one recorded
+              exactly once — so correcting a fact is editing one row.
+            </span>
+          </div>
+        </div>
+        <Caption className="mt-4">
+          Conflicting registrations stop being a conflict: they are two edges,
+          and the client picks the path it trusts.
+        </Caption>
       </DeckSlide>
 
-      <SectionSlide
-        index="02"
-        title="Transformations"
-        lead="The edges: maps between places."
-      />
-
       <DeckSlide
-        eyebrow="Transformations"
-        title="Every spatial fact is one node or one edge"
-        lead="Coordinate systems are nodes, transformations are directed edges, and each fact is stored exactly once."
+        eyebrow="Background"
+        title="The graph, in Mikro"
+        lead="Reduced to almost nothing — this is the whole model, and the AIS question is a walk across it."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
           <Figure className="max-w-[720px]">
@@ -351,105 +355,138 @@ export function MikroCoordinateSystemDeck() {
       </DeckSlide>
 
       <DeckSlide
-        eyebrow="Transformations"
-        title="Eleven kinds of edge"
-        lead="Enough to describe real acquisitions — including the case where no mapping exists."
+        eyebrow="Why it helps"
+        title="An array stops having to be a picture"
+        lead="Once a space is just typed axes, nothing forces an array to be spatial. An image is a space × a space. A volume is one more of those. Say what the axes are and the model follows."
       >
-        <div className="grid flex-1 grid-cols-3 content-center gap-2.5 text-[17px]">
-          {EDGE_KINDS.map(([kind, what]) => (
-            <div
-              key={kind}
-              className={
-                kind === 'UNMAPPABLE'
-                  ? 'flex flex-col gap-1 rounded-xl border border-fd-primary/40 bg-fd-primary/5 px-4 py-2.5'
-                  : 'flex flex-col gap-1 rounded-xl border border-fd-border bg-fd-card/60 px-4 py-2.5'
-              }
-            >
-              <span className="font-mono text-[13px] font-bold text-fd-primary">
-                {kind}
-              </span>
-              <span className="text-[15px] leading-snug text-fd-muted-foreground">
-                {what}
-              </span>
-            </div>
-          ))}
+        <div className="flex flex-1 flex-col justify-center gap-2.5">
+          <Signature
+            name="image"
+            axes={[
+              ['SPACE', 'y'],
+              ['SPACE', 'x'],
+            ]}
+          />
+          <Signature
+            name="volume"
+            axes={[
+              ['SPACE', 'z'],
+              ['SPACE', 'y'],
+              ['SPACE', 'x'],
+            ]}
+          />
+          <Signature
+            name="timelapse"
+            axes={[
+              ['TIME', 't'],
+              ['SPACE', 'y'],
+              ['SPACE', 'x'],
+            ]}
+          />
+          <Signature
+            name="spectral stack"
+            axes={[
+              ['CHANNEL', 'c'],
+              ['SPACE', 'y'],
+              ['SPACE', 'x'],
+            ]}
+            note="a channel axis is not a spatial one, and never pretended to be"
+          />
+          <Caption className="mt-1">
+            Still no units anywhere — these are the array&rsquo;s own axes. What
+            they mean in micrometers or seconds is what an edge adds.
+          </Caption>
         </div>
       </DeckSlide>
 
       <DeckSlide
-        eyebrow="Transformations"
-        title="An edge says how much to trust it"
-        lead="A registration you eyeballed and one you validated against fiducials are not the same claim, and the schema refuses to pretend otherwise."
+        eyebrow="Why it helps"
+        title="And FLIM comes out for free"
+        lead="A photon arrival histogram is not a special data product. It is a second time axis — microtime — measured in nanoseconds instead of seconds."
       >
-        <div className="grid flex-1 grid-cols-3 content-center gap-4">
-          <Panel title="validity">
-            <div className="flex flex-col gap-1.5 font-mono text-[17px]">
-              <span>MANUAL</span>
-              <span>INFERRED</span>
-              <span className="text-fd-primary">VALIDATED</span>
-            </div>
-          </Panel>
-          <Panel title="version">
-            <span className="text-[18px] leading-snug">
-              Bumped every time the edge is refined. Consumers can tell whether
-              what they cached still holds.
+        <div className="flex flex-1 flex-col justify-center gap-4">
+          <Signature
+            tone="primary"
+            name="FLIM stack"
+            axes={[
+              ['TIME', 't'],
+              ['TIME', 'τ'],
+              ['SPACE', 'y'],
+              ['SPACE', 'x'],
+            ]}
+            note="macrotime and microtime, side by side"
+          />
+          <Columns
+            left={
+              <Panel title="no new model">
+                Two TIME axes on one array is already legal. Nothing in the
+                schema had to learn what fluorescence lifetime is.
+              </Panel>
+            }
+            right={
+              <Panel title="and it calibrates the same way" tone="primary">
+                The bin index <Term>τ</Term> becomes nanoseconds through a{' '}
+                <Term>SCALE</Term> edge — the same kind of edge that turns
+                pixels into micrometers.
+              </Panel>
+            }
+          />
+          <Caption>
+            The general case keeps paying out: anything you can name as an axis
+            — angle, illumination, phase, k — arrives with transformations and
+            spatial queries already working on it.
+          </Caption>
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="The objection"
+        title="Hold on — that sounds like a lot of work"
+        lead="If every step needs an edge, am I the one who has to write them? Do I have to put an affine into this every time I crop something?"
+      >
+        <div className="grid flex-1 grid-cols-2 content-center gap-6">
+          <div className="flex flex-col gap-3 rounded-2xl border border-fd-border bg-fd-card/60 p-7">
+            <span className="font-mono text-[13px] font-bold uppercase tracking-[0.14em] text-fd-muted-foreground">
+              what it looks like you signed up for
             </span>
-          </Panel>
-          <Panel title="value relation">
-            <div className="flex flex-col gap-1.5 font-mono text-[17px]">
-              <span>IDENTICAL</span>
-              <span>TRANSFORMED</span>
-              <span>CATEGORIZED</span>
+            <div className="flex flex-col gap-1.5 font-mono text-[17px] text-fd-muted-foreground">
+              <span>affine matrices, by hand</span>
+              <span>a version bump, remembered</span>
+              <span>a validity, chosen honestly</span>
+              <span>an axis map, per crop</span>
             </div>
-          </Panel>
+          </div>
+          <div className="flex items-center">
+            <span className="text-[26px] font-semibold leading-tight tracking-tight">
+              Nobody is going to do that. A model that depends on people
+              volunteering bookkeeping is a model that is wrong by Tuesday.
+            </span>
+          </div>
         </div>
       </DeckSlide>
 
       <DeckSlide
-        eyebrow="Transformations"
-        title="Edges are facts, paths are queries"
-        lead="The server never composes matrices down to a single world answer. It stores the edges; the client walks the ones it needs."
+        eyebrow="The answer"
+        title="No — the app tells us what it did"
+        lead="You do not describe the transformation. The code that performed it does, because it is the only thing that actually knows."
       >
-        <Columns
-          ratio="narrow-right"
-          left={<PathFigure />}
-          right={
-            <Bullets
-              stagger
-              items={[
-                <>
-                  The same dataset can sit in two scenes under two different
-                  registrations, with neither one privileged.
-                </>,
-                <>
-                  A viewer asks for the path it wants — <Term>pathToWorld</Term>{' '}
-                  on a layer — and composes it locally.
-                </>,
-                <>
-                  There is no cached &ldquo;global position&rdquo; field to
-                  invalidate, because there is no global position field.
-                </>,
-              ]}
-            />
-          }
-        />
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="Transformations"
-        title="Refine the calibration, not the data"
-        lead="This is the payoff for keeping the grid unitless."
-      >
-        <div className="flex flex-1 flex-col justify-center gap-5">
-          <div className="grid grid-cols-3 items-center gap-4">
+        <div className="flex flex-1 flex-col justify-center gap-4">
+          <div className="grid grid-cols-3 items-stretch gap-4">
             {[
-              ['You improve one edge', 'a better affine from a fiducial slide'],
-              ['Its version bumps', 'MANUAL v1 becomes VALIDATED v2'],
-              ['The tile moves', 'every path through the edge is corrected'],
+              ['You call an app', 'crop this, downsample it, segment it'],
+              [
+                'It reports what it did',
+                'the algorithm knows it halved the grid',
+              ],
+              ['Mikro records the edge', 'SCALE v1, INFERRED, and it is done'],
             ].map(([step, detail], i) => (
               <div
                 key={step}
-                className="flex flex-col gap-2 rounded-xl border border-fd-border bg-fd-card/60 p-5"
+                className={
+                  i === 2
+                    ? 'flex flex-col gap-2 rounded-xl border border-fd-primary/40 bg-fd-primary/5 p-5'
+                    : 'flex flex-col gap-2 rounded-xl border border-fd-border bg-fd-card/60 p-5'
+                }
               >
                 <span className="font-mono text-[13px] font-bold text-fd-primary">
                   {`0${i + 1}`}
@@ -464,59 +501,31 @@ export function MikroCoordinateSystemDeck() {
             ))}
           </div>
           <Panel tone="primary">
-            The tile moves; the pixels do not. Your annotations, masks and crops
-            were never expressed in micrometers, so there is nothing for them to
-            re-derive.
+            The graph is a by-product of running your analysis, not a second job
+            beside it. The affines you were dreading are the ones the code
+            already computed.
           </Panel>
         </div>
       </DeckSlide>
 
-      <SectionSlide
-        index="03"
-        title="From pixels to records"
-        lead="Back to the AIS: crossing from the mask into the measurements."
-      />
-
       <DeckSlide
-        eyebrow="Records"
-        title="FIELD is the one crossing"
-        lead="Geometry and record-land meet in exactly one place: the edge from a label mask into a table's index space."
+        eyebrow="Live demo"
+        title="Demo time"
+        lead="Run a step, watch the edge appear."
       >
-        <Columns
-          left={
-            <>
-              <Panel title="the FIELD edge" tone="primary">
-                A label mask is a lookup. Pixel value 42 means &ldquo;row 42 of
-                that table&rdquo;. That is a transformation like any other — it
-                just lands somewhere without micrometers.
-              </Panel>
-              <Caption>
-                Which is why it is an edge, and why <Term>CATEGORIZED</Term>{' '}
-                exists as a value relation.
-              </Caption>
-            </>
-          }
-          right={
-            <>
-              <Panel title="what is not an edge">
-                Table-to-table links. A column that references another table is a
-                foreign key on the column —{' '}
-                <Term>TableColumn.references</Term> — not a coordinate
-                transformation.
-              </Panel>
-              <Caption>
-                One crossing from geometry into records keeps the graph a graph
-                about space.
-              </Caption>
-            </>
-          }
-        />
+        <div className="flex flex-1 flex-col justify-center gap-3">
+          <DemoVideo src="/presentations/mikro/provenance-demo.webm" />
+          <Caption>
+            Nothing in this recording was annotated by hand. The chain is what
+            the app reported on its way out.
+          </Caption>
+        </div>
       </DeckSlide>
 
       <DeckSlide
         eyebrow="Records"
         title="How long is that AIS?"
-        lead="An attribute plan is the recipe for answering it, computed at query time from the graph."
+        lead="One last edge does the crossing: FIELD says a mask pixel's value is a row number. Everything after that is a recipe the graph hands your viewer."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
           <Figure>
@@ -526,85 +535,10 @@ export function MikroCoordinateSystemDeck() {
             <Term>attributePlans(system)</Term> returns one plan per measurement
             table reachable from your space. Each plan is a{' '}
             <Term>SampleStep</Term> — read the mask pixel, get a label and carry
-            the timepoint through — followed by a <Term>LookupStep</Term>.
+            the timepoint through — followed by a <Term>LookupStep</Term>. It
+            takes no coordinate, so it is fetched once and then run locally on
+            every mouse move. That is the hover from slide five, closed.
           </Caption>
-        </div>
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="Records"
-        title="The plan takes no coordinate"
-        lead="That is the whole trick: fetch it once when the layer loads, then run it locally on every mouse move."
-      >
-        <Columns
-          ratio="narrow-right"
-          left={
-            <CodeBlock>{`-- the LookupStep, parameterised
-SELECT "length_um", "mean_intensity"
-FROM   read_parquet('ais.parquet')
-WHERE  "t" = ?
-  AND  "i" = ?`}</CodeBlock>
-          }
-          right={
-            <Bullets
-              stagger
-              items={[
-                <>Zero round-trips per hover. DuckDB runs it against parquet.</>,
-                <>
-                  Two tables measured from one mask means two plans, not two
-                  queries you have to write.
-                </>,
-                <>
-                  A plan goes stale when the <Term>FIELD</Term> edge or any step
-                  on the path is version-bumped — and it can tell you so.
-                </>,
-              ]}
-            />
-          }
-        />
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="Time"
-        title="Time is just another axis"
-        lead="A TIME axis with no unit is a frame counter. Give the space an epoch and the same axis becomes wall-clock time."
-      >
-        <div className="flex flex-1 flex-col justify-center gap-4">
-          <Figure className="max-w-[700px]">
-            <EpochFigure />
-          </Figure>
-          <Caption>
-            No separate era model, no timestamp duplicated onto every frame. The
-            anchor lives on the coordinate system, next to the axes it anchors.
-          </Caption>
-        </div>
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="One fact, stored once"
-        title="Why the placement is not on the image"
-        lead="The obvious design is to hang an affine matrix off every image. It is also the one that quietly goes wrong."
-      >
-        <div className="grid flex-1 grid-cols-2 content-center gap-6">
-          <div className="flex flex-col gap-3 rounded-2xl border border-fd-border bg-fd-card/60 p-7">
-            <span className="font-mono text-[13px] font-bold uppercase tracking-[0.14em] text-fd-muted-foreground">
-              placement copied onto each image
-            </span>
-            <span className="text-[21px] leading-snug">
-              Crop it, downsample it, hand it to a colleague, and now several
-              copies of the same fact exist. They can disagree, and eventually
-              they do.
-            </span>
-          </div>
-          <div className="flex flex-col gap-3 rounded-2xl border border-fd-primary/35 bg-fd-primary/5 p-7">
-            <span className="font-mono text-[13px] font-bold uppercase tracking-[0.14em] text-fd-primary">
-              placement stored once, as an edge
-            </span>
-            <span className="text-[21px] leading-snug">
-              One edge, one version, one place to correct it. Everything that
-              reaches the slide through that edge is corrected with it.
-            </span>
-          </div>
         </div>
       </DeckSlide>
 
@@ -634,8 +568,41 @@ WHERE  "t" = ?
       </DeckSlide>
 
       <DeckSlide
+        eyebrow="Limitations"
+        title="Where this does not reach — yet"
+        lead="The model is honest about what it cannot express, which is the only reason it is worth trusting about the rest."
+      >
+        <div className="grid flex-1 grid-cols-2 content-center gap-4">
+          <Panel title="only what reports back">
+            <span className="text-[18px] leading-snug">
+              A step run outside the platform leaves no edge. The honest record
+              is a gap — and a gap is still a gap, not a bridge.
+            </span>
+          </Panel>
+          <Panel title="linear maps only">
+            <span className="text-[18px] leading-snug">
+              Scale, translation, rotation, affine. A non-rigid warp — tissue
+              that deformed between rounds — has no kind of its own yet.
+            </span>
+          </Panel>
+          <Panel title="nothing arbitrates">
+            <span className="text-[18px] leading-snug">
+              Two paths to the same space can disagree. Validity and version
+              help you choose; the choosing is still yours.
+            </span>
+          </Panel>
+          <Panel title="the world outside flattens it">
+            <span className="text-[18px] leading-snug">
+              Export to a standard format and the graph collapses back into one
+              baked-in matrix. Outside Mikro, you are back to one answer.
+            </span>
+          </Panel>
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
         eyebrow="Next"
-        title="Go and poke at it"
+        title="Let's go explore"
         lead="The graph is queryable, and so are the plans."
       >
         <Columns

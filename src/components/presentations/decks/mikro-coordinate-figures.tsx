@@ -182,7 +182,7 @@ export function AisQuestionFigure() {
 /** Slide 2: the number exists, three analysis steps away, in someone's folder. */
 export function SpreadsheetFigure() {
   return (
-    <svg viewBox="0 0 620 250" className="w-full" role="img" aria-label="A pipeline from image to segmentation mask to a spreadsheet sitting in an unrelated folder">
+    <svg viewBox="0 0 620 250" className="w-full" role="img" aria-label="A pipeline from image to segmentation mask to a spreadsheet sitting in an unrelated folder, with a callout: we lose interactive exploration">
       <NeuronScene x={16} y={44} w={150} h={110} />
       <Label x={91} y={36} fill={FG} size={13} weight={700}>image</Label>
       <Cursor x={96} y={72} />
@@ -212,10 +212,14 @@ export function SpreadsheetFigure() {
         <Label x={520} y={30} anchor="middle" size={13} fill={FG} weight={700}>somewhere else</Label>
       </g>
 
-      {/* the only thing linking the number back to the pixels: you */}
-      <path d="M 520 176 q -220 44 -430 -6" fill="none" stroke={MUTED} strokeWidth={1.6} strokeDasharray="5 6" markerEnd="url(#sheet-muted)" />
-      <rect x={252} y={196} width={128} height={26} rx={8} fill={SURFACE} stroke={BORDER} strokeWidth={1.4} />
-      <Label x={316} y={214} size={12}>which row was it?</Label>
+      {/* what the detour actually cost */}
+      <g>
+        <rect x={20} y={180} width={580} height={52} rx={12} fill={PRIMARY} fillOpacity={0.08} stroke={PRIMARY} strokeWidth={1.8} strokeOpacity={0.5} />
+        <circle cx={46} cy={206} r={11} fill={PRIMARY} fillOpacity={0.15} stroke={PRIMARY} strokeWidth={1.4} />
+        <path d="M 41 201 l 10 10 M 51 201 l -10 10" stroke={PRIMARY} strokeWidth={1.8} strokeLinecap="round" />
+        <Label x={70} y={202} anchor="start" size={16} weight={700} fill={FG}>we lose interactive exploration</Label>
+        <Label x={70} y={222} anchor="start" size={12.5}>the pixels can no longer be asked anything</Label>
+      </g>
 
       <Markers id="sheet" />
     </svg>
@@ -296,6 +300,121 @@ export function LineageFigure() {
       <Label x={310} y={205} size={11}>still shows up, as UNMAPPABLE</Label>
 
       <Markers id="lin" />
+    </svg>
+  );
+}
+
+/* --- 0b. what a coordinate system is --------------------------------------- */
+
+/** A small labelled frame: an origin, two axes and (optionally) a marked point.
+    Used by the two intro figures so the same point can be drawn twice. */
+function MiniFrame({
+  x,
+  y,
+  size = 132,
+  name,
+  unit,
+  point,
+  tone = 'pixel',
+}: {
+  x: number;
+  y: number;
+  size?: number;
+  name: string;
+  unit: string;
+  point: { u: number; v: number; label: string };
+  tone?: 'pixel' | 'physical';
+}) {
+  const physical = tone === 'physical';
+  const accent = physical ? PRIMARY : MUTED;
+  const step = size / 6;
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={size}
+        height={size}
+        rx={4}
+        fill={physical ? PRIMARY : SURFACE}
+        fillOpacity={physical ? 0.06 : 1}
+        stroke={physical ? PRIMARY : BORDER}
+        strokeWidth={1.5}
+        strokeOpacity={physical ? 0.6 : 1}
+      />
+      {[1, 2, 3, 4, 5].map((i) => (
+        <g key={i} stroke={BORDER} strokeWidth={1} opacity={0.55}>
+          <line x1={x + i * step} y1={y} x2={x + i * step} y2={y + size} />
+          <line x1={x} y1={y + i * step} x2={x + size} y2={y + i * step} />
+        </g>
+      ))}
+      <circle cx={x} cy={y} r={4} fill={accent} />
+      <circle cx={x + point.u * step} cy={y + point.v * step} r={7} fill={PRIMARY} fillOpacity={0.85} />
+      <Label x={x + size / 2} y={y - 12} fill={FG} size={14} weight={700}>
+        {name}
+      </Label>
+      <Label x={x + size / 2} y={y + size + 20} size={12} fill={physical ? PRIMARY : MUTED}>
+        {unit}
+      </Label>
+      <Label x={x + size / 2} y={y + size + 38} size={12} fill={FG}>
+        {point.label}
+      </Label>
+    </g>
+  );
+}
+
+/** Slide 9: a coordinate system names its axes; a transformation carries the
+    same point from one of them into another. */
+export function TransformIntroFigure() {
+  return (
+    <svg viewBox="0 0 620 240" className="w-full" role="img" aria-label="One point expressed in a pixel frame and in a physical frame, joined by a single transformation">
+      <MiniFrame x={70} y={44} name="camera pixels" unit="axes: t z y x, no unit" point={{ u: 4, v: 2, label: '(y 2, x 4)' }} />
+
+      <line x1={230} y1={110} x2={330} y2={110} stroke={PRIMARY} strokeWidth={2.2} markerEnd="url(#tfi-primary)" />
+      <rect x={236} y={80} width={90} height={26} rx={8} fill={SURFACE} stroke={PRIMARY} strokeWidth={1.5} />
+      <Label x={281} y={98} fill={PRIMARY} size={13} weight={700}>SCALE</Label>
+      <Label x={281} y={132} size={12}>one transformation</Label>
+
+      <MiniFrame x={352} y={44} name="the slide" unit="axes carry um" point={{ u: 4, v: 2, label: '(y 13.0 um, x 26.0 um)' }} tone="physical" />
+
+      <Markers id="tfi" />
+    </svg>
+  );
+}
+
+/** Slide 10: transformations compose, so a point can be stepped all the way
+    through a chain of spaces without anything being precomputed. */
+export function ComposeFigure() {
+  const nodes = [
+    { x: 16, name: 'mask px', unit: 'no unit', tone: 'pixel' as const },
+    { x: 180, name: 'tile px', unit: 'no unit', tone: 'pixel' as const },
+    { x: 344, name: 'the slide', unit: 'um', tone: 'physical' as const },
+    { x: 508, name: 'atlas', unit: 'mm', tone: 'physical' as const },
+  ];
+  return (
+    <svg viewBox="0 0 620 220" className="w-full" role="img" aria-label="A point stepped through four spaces by composing three transformations">
+      {nodes.map((n) => (
+        <SpaceNode key={n.name} x={n.x} y={54} w={96} h={54} name={n.name} unit={n.unit} tone={n.tone} />
+      ))}
+
+      {[
+        { x: 112, kind: 'IDENTITY' },
+        { x: 276, kind: 'SCALE' },
+        { x: 440, kind: 'AFFINE' },
+      ].map((edge) => (
+        <g key={edge.kind}>
+          <line x1={edge.x} y1={81} x2={edge.x + 64} y2={81} stroke={PRIMARY} strokeWidth={2.2} markerEnd="url(#cmp-primary)" />
+          <Label x={edge.x + 32} y={46} size={11} fill={PRIMARY} weight={700}>{edge.kind}</Label>
+        </g>
+      ))}
+
+      {/* the same point, carried the whole way */}
+      <circle cx={64} cy={81} r={7} fill={PRIMARY} fillOpacity={0.85} />
+      <path d="M 64 126 q 246 44 492 -8" fill="none" stroke={PRIMARY} strokeWidth={1.6} strokeDasharray="5 5" strokeOpacity={0.7} markerEnd="url(#cmp-primary)" />
+      <Label x={310} y={172} size={13} fill={FG} weight={700}>one point, stepped all the way through</Label>
+      <Label x={310} y={192} size={12}>composed on demand, stored nowhere</Label>
+
+      <Markers id="cmp" />
     </svg>
   );
 }

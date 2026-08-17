@@ -12,3 +12,4 @@ export {
   TitleSlide,
 } from './slide';
 export { MikroCoordinateSystemDeck } from './decks/mikro-coordinate-system';
+export { VolumeViewerDeck } from './decks/volume-viewer';

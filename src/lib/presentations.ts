@@ -26,9 +26,19 @@ export const presentations: Presentation[] = [
       'How long is this AIS? Answering one pointed question means crossing an image, a mask and a table — this is the model that makes that a query instead of a convention.',
     topic: 'Mikro',
     tags: ['Coordinates', 'Metadata', 'Microscopy'],
-    slides: 25,
-    minutes: 15,
+    slides: 22,
+    minutes: 18,
     docsHref: '/docs/design/services/mikro/coordinate-systems',
+  },
+  {
+    slug: 'volume-viewer',
+    title: 'Large scale volume viewing',
+    description:
+      'A dataset that fits in neither memory nor a screen, opened in a browser tab. Chunks instead of files, a resolution per frame, and bytes that never pass through the platform.',
+    topic: 'Orkestrator',
+    tags: ['Viewing', 'Performance', 'Microscopy'],
+    slides: 34,
+    minutes: 26,
   },
 ];
 
