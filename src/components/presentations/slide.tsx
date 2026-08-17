@@ -14,7 +14,7 @@ import { cn } from '@/lib/cn';
 /** The eyebrow line: small, mono, brand-tinted. Doubles as the deck's chapter. */
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <span className="font-mono text-[13px] font-bold uppercase tracking-[0.18em] text-fd-primary">
+    <span className="font-light text-[13px] font-bold  tracking-[0.18em] text-fd-primary">
       {children}
     </span>
   );
@@ -112,12 +112,14 @@ export function DeckSlide({
   eyebrow,
   title,
   lead,
+  logo,
   children,
   notes,
   contentClassName,
 }: {
   eyebrow?: string;
   title: ReactNode;
+  logo?: ReactNode;
   lead?: ReactNode;
   children?: ReactNode;
   notes?: string;
@@ -128,9 +130,11 @@ export function DeckSlide({
       <div className="flex h-[600px] w-full flex-col gap-4 pt-2">
         <header className="flex flex-col gap-2">
           {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
+          
           <h2 className="text-[40px] font-bold leading-[1.08] tracking-[-0.025em]">
             {title}
           </h2>
+          
           {lead ? (
             <p className="max-w-[900px] text-[20px] leading-snug text-fd-muted-foreground">
               {lead}
@@ -140,6 +144,7 @@ export function DeckSlide({
         <div className={cn('flex min-h-0 flex-1 flex-col', contentClassName)}>
           {children}
         </div>
+        
       </div>
     </Slide>
   );

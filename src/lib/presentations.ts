@@ -6,6 +6,7 @@
 export type Presentation = {
   slug: string;
   title: string;
+  logo?: React.ReactNode;
   /** One line for the card and the page subtitle. */
   description: string;
   /** Which part of Arkitekt the deck is about. */

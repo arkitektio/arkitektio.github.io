@@ -41,6 +41,11 @@ export default function VolumeViewerPage() {
             <p className="mt-2 max-w-2xl text-fd-muted-foreground">
               {presentation.description}
             </p>
+            {presentation.logo && (
+              <p className="mt-2 max-w-2xl text-fd-muted-foreground">
+                {presentation.logo}
+              </p>
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-4 text-xs text-fd-muted-foreground">
             <span className="inline-flex items-center gap-1.5">

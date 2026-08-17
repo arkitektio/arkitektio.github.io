@@ -114,7 +114,7 @@ export function VolumeScaleFigure() {
   return (
     <svg viewBox="0 0 620 250" className="w-full" role="img" aria-label="A terabyte-scale volume next to the handful of megapixels a screen can show">
       <Block x={40} y={72} w={186} h={150} d={44} />
-      <Label x={133} y={40} fill={FG} size={14} weight={700}>one acquisition</Label>
+      <Label x={160} y={50} fill={FG} size={14} weight={700}>one acquisition</Label>
       <Label x={133} y={242} size={12}>more voxels than you will ever see</Label>
 
       {/* the screen */}
@@ -127,7 +127,7 @@ export function VolumeScaleFigure() {
       </g>
 
       <line x1={296} y1={150} x2={420} y2={150} stroke={MUTED} strokeWidth={1.8} strokeDasharray="5 5" markerEnd="url(#scale-muted)" />
-      <Label x={358} y={138} size={13} fill={FG} weight={700}>orders of magnitude</Label>
+      <Label x={358} y={138} size={11} fill={FG} weight={700}>orders of magnitude</Label>
 
       <Markers id="scale" />
     </svg>
@@ -140,33 +140,33 @@ export function ProxyFigure() {
   return (
     <svg viewBox="0 0 620 250" className="w-full" role="img" aria-label="A volume downsampled and cropped until it fits on a workstation, with a callout: you never look at the volume">
       <Block x={20} y={62} w={92} h={78} d={26} />
-      <Label x={70} y={44} fill={FG} size={13} weight={700}>the volume</Label>
+      <Label x={80} y={20} fill={FG} size={13} weight={700}>the volume</Label>
 
       <line x1={152} y1={104} x2={196} y2={104} stroke={MUTED} strokeWidth={2} markerEnd="url(#proxy-muted)" />
       <Label x={174} y={93} size={11}>downsample</Label>
 
       <Block x={206} y={74} w={62} h={54} d={18} />
-      <Label x={238} y={44} fill={FG} size={13} weight={700}>a proxy</Label>
+      <Label x={250} y={44} fill={FG} size={13} weight={700}>a proxy</Label>
 
       <line x1={294} y1={104} x2={338} y2={104} stroke={MUTED} strokeWidth={2} markerEnd="url(#proxy-muted)" />
       <Label x={316} y={93} size={11}>crop</Label>
 
       <Block x={348} y={86} w={34} h={30} d={10} />
-      <Label x={366} y={44} fill={FG} size={13} weight={700}>a region</Label>
+      <Label x={370} y={66} fill={FG} size={13} weight={700}>crop</Label>
 
       <line x1={400} y1={104} x2={444} y2={104} stroke={MUTED} strokeWidth={2} markerEnd="url(#proxy-muted)" />
       <Label x={422} y={93} size={11}>copy</Label>
 
       <rect x={454} y={68} width={140} height={74} rx={8} fill={SURFACE} stroke={BORDER} strokeWidth={1.5} />
       <Label x={524} y={100} fill={FG} size={13} weight={700}>a workstation</Label>
-      <Label x={524} y={120} size={11}>with enough RAM, hopefully</Label>
+      <Label x={524} y={120} size={10}>with enough RAM</Label>
 
       {/* what the detour actually cost */}
       <g>
         <rect x={20} y={180} width={580} height={52} rx={12} fill={PRIMARY} fillOpacity={0.08} stroke={PRIMARY} strokeWidth={1.8} strokeOpacity={0.5} />
         <circle cx={46} cy={206} r={11} fill={PRIMARY} fillOpacity={0.15} stroke={PRIMARY} strokeWidth={1.4} />
         <path d="M 41 201 l 10 10 M 51 201 l -10 10" stroke={PRIMARY} strokeWidth={1.8} strokeLinecap="round" />
-        <Label x={70} y={202} anchor="start" size={16} weight={700} fill={FG}>you never look at the volume</Label>
+        <Label x={70} y={202} anchor="start" size={16} weight={700} fill={FG}>You never look at the expenisvely acquired volume</Label>
         <Label x={70} y={222} anchor="start" size={12.5}>only at whatever survived being made small enough</Label>
       </g>
 
@@ -1007,9 +1007,9 @@ export function ObviousFigure() {
       <g>
         <path d="M 268 120 l -22 8 l 22 10 z" fill={SURFACE} stroke={PRIMARY} strokeWidth={1.8} />
         <rect x={266} y={56} width={330} height={112} rx={16} fill={SURFACE} stroke={PRIMARY} strokeWidth={1.8} />
-        <Label x={431} y={98} fill={FG} size={21} weight={700}>well — just don&rsquo;t draw</Label>
+        <Label x={431} y={98} fill={FG} size={21} weight={700}>Well,just don&rsquo;t draw</Label>
         <Label x={431} y={128} fill={FG} size={21} weight={700}>what you don&rsquo;t see?</Label>
-        <Label x={431} y={154} size={13}>...dummy</Label>
+        <Label x={431} y={154} size={13}>.....</Label>
       </g>
 
       <Label x={431} y={200} size={13} fill={MUTED}>— someone, every single time</Label>

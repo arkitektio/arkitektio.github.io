@@ -306,7 +306,7 @@ export function VolumeViewerDeck() {
       <DeckSlide
         eyebrow="The problem"
         title="You acquired more than you can look at"
-        lead="Cleared tissue, light sheet, a whole slide at high magnification. The dataset is measured in terabytes; the thing you view it on is measured in megapixels."
+        lead="Cleared tissue, light sheet, modern microscopy is multi-gigabytes the thing you view it on is measured in megapixels."
         notes="Keep it concrete — name the instrument in the room."
       >
         <div className="flex flex-1 items-center">
@@ -318,12 +318,13 @@ export function VolumeViewerDeck() {
 
       <DeckSlide
         eyebrow="The problem"
-        title="The ImageJ way"
+        title="The Fiji way"
+        logo={<BrandMark src="/presentations/volume-viewer/logo-fiji.png" name="Fiji" />}
         lead="Make it smaller until it fits: downsample it, crop the interesting bit, copy that onto a machine with enough memory. This works, and it is what everyone does."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
           <div className="flex justify-end">
-            <BrandMark src="/presentations/volume-viewer/logo-fiji.png" name="Fiji" />
+            
           </div>
           <Figure>
             <ProxyFigure />
@@ -331,7 +332,7 @@ export function VolumeViewerDeck() {
           <Caption>
             Every step throws something away, and every step makes a copy that
             has to be tracked. What you spend your day looking at is several
-            transformations removed from what you acquired.
+            analysis steps removed from the data you acquired.
           </Caption>
         </div>
       </DeckSlide>
@@ -339,21 +340,13 @@ export function VolumeViewerDeck() {
       <DeckSlide
         eyebrow="The problem"
         title="The money way"
-        lead="Or you buy your way out of it. There is very good commercial software for exactly this — Imaris and its neighbours will happily open your volume, and they are genuinely good at it. They are also priced accordingly."
+        lead="Or you buy your way out of it. There is very good commercial software for exactly thism IMARIS and its neighbours will happily open your volume, and they are genuinely good at it. They are also priced accordingly."
         notes="Be fair here — the software is good. The point is who gets to use it, not whether it works."
       >
-        <div className="flex justify-end">
-          <BrandMark
-            src="/presentations/volume-viewer/logo-imaris.png"
-            name="Imaris"
-            symbol="®"
-          />
-        </div>
         <div className="grid flex-1 grid-cols-3 content-center gap-4">
           <Panel title="a licence per seat">
             <span className="text-[18px] leading-snug">
-              Renewed yearly, modules sold separately. Priced so that an
-              institute owns one — and you book time on it.
+              Renewed yearly, modules sold separately. 
             </span>
           </Panel>
           <Panel title="and a machine under it">
@@ -370,9 +363,8 @@ export function VolumeViewerDeck() {
           </Panel>
         </div>
         <Caption className="mt-4">
-          None of this is a complaint about the software — it is a statement
-          about who gets to see the data. Which raises the obvious question:{' '}
-          <span className="font-semibold text-fd-foreground">
+          None of this is a complaint about the software  but 
+          <span className="ml-5 font-semibold text-fd-foreground">
             why is there no poor man&rsquo;s Imaris?
           </span>
         </Caption>
@@ -386,13 +378,8 @@ export function VolumeViewerDeck() {
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
           <SourceVideo src="/presentations/volume-viewer/imaris-ovary-lightsheet.mp4" />
-          <Caption>
-            An E14.5 mouse ovary–mesonephros complex: FOXL2 marking the gonad
-            (cyan), PAX8 the reproductive ducts (red), Hoechst the whole thing
-            (grey) — then the transition from native data to isosurfaces.
-          </Caption>
           <Caption className="text-[13px]">
-            Figure 2—video 1 from McKey, Anbarci, Bunce, Ontiveros, Behringer &amp;
+            video 1 from McKey, Anbarci, Bunce, Ontiveros, Behringer &amp;
             Capel,{' '}
             <span className="italic">
               Integration of mouse ovary morphogenesis with developmental
@@ -405,7 +392,7 @@ export function VolumeViewerDeck() {
             >
               CC BY 4.0
             </a>
-            ; converted from the Ogg Theora original on Wikimedia Commons.
+            
           </Caption>
         </div>
       </DeckSlide>
@@ -417,7 +404,7 @@ export function VolumeViewerDeck() {
 
       <DeckSlide
         eyebrow="Why it is hard"
-        title="One: the data does not fit anywhere"
+        title="The data does not fit anywhere"
         lead="Every stage of the machine is smaller than the dataset. Not a little smaller — smaller by enough that two of these bars cannot be drawn."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
@@ -435,9 +422,7 @@ export function VolumeViewerDeck() {
 
       <DeckSlide
         eyebrow="The obvious objection"
-        title="Well — just don't draw what you can't see?"
-        lead="Someone says this every single time, and it is a completely fair thing to say. It is also the whole second half of the problem."
-        notes="Let it land. The next slide is the answer: you can do exactly this for a mesh, and you cannot for a volume."
+        title="Well..."
       >
         <div className="flex flex-1 items-center">
           <Figure>
@@ -448,8 +433,8 @@ export function VolumeViewerDeck() {
 
       <DeckSlide
         eyebrow="Why it is hard"
-        title="Two: there is no surface to draw"
-        lead="A mesh is hollow — you draw its skin, and you know where that skin is before you fetch it. A volume is solid, and it will not tell you what it contains until you have paid to look."
+        title="Your data is not a computer game"
+        lead="A mesh is vectors, and you know where that skin is before you fetch it. A volume is solid, and it will not tell you what it contains until you have paid to look."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
           <Figure>
@@ -458,9 +443,8 @@ export function VolumeViewerDeck() {
           <Caption>
             Culling a mesh is free: bounds are in the index, so anything outside
             the frustum is never requested. A volume has voxels everywhere, and
-            whether a chunk shows anything at all depends on the opacity you
-            picked at render time — so every candidate has to arrive before it
-            can be ruled out.
+            whether a chunk shows anything at all depends on the <b>opacity</b> you
+            picked at render time.
           </Caption>
         </div>
       </DeckSlide>
@@ -468,7 +452,7 @@ export function VolumeViewerDeck() {
       <DeckSlide
         eyebrow="The landscape"
         title="So nobody is doing this?"
-        lead="Plenty of people are, and the rendering is a solved problem in more than one place. Look at the last two columns, though: the tools you can act inside are the ones nobody can open, and the ones anybody can open are the ones you cannot act inside."
+        lead="Plenty of people are, and the rendering is a solved problem in more than one place Nothing is perfect t"
         notes="The honest answer to 'how are you different from Neuroglancer' is: we are not, at rendering. We differ at knows-the-data and act-on-it. Say that plainly. Do not sneer at these. Neuroglancer really does ray-march voxels (ON, MAX, MIN) — off by default per layer, which is why people remember it as the mesh viewer. webKnossos: verify its 3D viewport before claiming anything; I could not confirm true volume rendering as opposed to slice planes plus meshes."
       >
         <div className="flex flex-1 flex-col justify-center gap-2">
@@ -632,7 +616,8 @@ export function VolumeViewerDeck() {
 
       <DeckSlide
         eyebrow="Live demo"
-        title="Open a terabyte"
+        title="Open some Gigabystes"
+        lead="quickly, from home"
         notes="Nothing was prepared for this recording — the dataset is the one the microscope wrote. Say that over the top of it rather than putting it on the slide."
       >
         <div className="flex flex-1 items-center justify-center">
@@ -801,65 +786,24 @@ export function VolumeViewerDeck() {
         </div>
       </DeckSlide>
 
-      <DeckSlide
-        eyebrow="The payoff"
-        title="And you can still just point at it"
-        lead="Everything the coordinate deck promised holds in 3D: hover a segment inside the volume and the measurements for that object arrive, with no round-trip."
-      >
-        <div className="grid flex-1 grid-cols-2 content-center gap-6">
-          <div className="flex flex-col gap-3 rounded-2xl border border-fd-border bg-fd-card/60 p-7">
-            <span className="font-mono text-[13px] font-bold uppercase tracking-[0.14em] text-fd-muted-foreground">
-              what you do
-            </span>
-            <span className="text-[21px] leading-snug">
-              Move the cursor over something in the volume.
-            </span>
-          </div>
-          <div className="flex flex-col gap-3 rounded-2xl border border-fd-primary/35 bg-fd-primary/5 p-7">
-            <span className="font-mono text-[13px] font-bold uppercase tracking-[0.14em] text-fd-primary">
-              what comes back
-            </span>
-            <span className="text-[21px] leading-snug">
-              The label under the cursor and its row of measurements — sampled
-              from the chunk you are already looking at.
-            </span>
-          </div>
-        </div>
-        <Caption className="mt-4">
-          A spatial query does not care that the space happens to be large.
-        </Caption>
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="Live demo"
-        title="Demo time"
-        lead="Zoom in until the chunks change level, then hover something."
-      >
-        <div className="flex flex-1 flex-col justify-center gap-3">
-          <DemoVideo src="/presentations/volume-viewer/hover-in-volume.webm" />
-          <Caption>
-            Watch the resolution step as the level changes — that is the budget
-            being re-spent, once per frame.
-          </Caption>
-        </div>
-      </DeckSlide>
 
       <SectionSlide
         title="Examples"
-        lead="The same viewer, pointed at real data."
+        lead="The same viewer, pointed at real data. But not confocal"
       />
 
       <DeckSlide
         eyebrow="Example 01"
-        title="A large scale volume — one neuron"
-        lead="A single cell traced through a volume far larger than it. Zoomed out you are looking at a coarse level of the whole block; zoomed in, at full-resolution chunks around one process."
+        title="FLIM Data"
+        lead="You can choose the renderer on the fly"
+        notes="Nothing was prepared for this recording — the dataset is the one the microscope wrote. Say that over the top of it rather than putting it on the slide."
       >
-        <div className="flex flex-1 flex-col justify-center gap-3">
-          <DemoVideo src="/presentations/volume-viewer/example-neuron.webm" />
-          <Caption>
-            Nothing was cropped to make this openable. The dataset in the tab is
-            the dataset on disk.
-          </Caption>
+        <div className="flex flex-1 items-center justify-center">
+          <DemoVideo
+            src="/presentations/volume-viewer/flim-data.mp4"
+            height={486}
+            ratio={1600 / 832}
+          />
         </div>
       </DeckSlide>
 
@@ -869,73 +813,15 @@ export function VolumeViewerDeck() {
         lead="Thousands of tiles, acquired over hours, placed into one slide space. Pan across the whole section, then zoom to a nucleus without ever leaving the page."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
-          <DemoVideo src="/presentations/volume-viewer/example-whole-slide.webm" />
-          <Caption>
-            The tiles were never stitched into a new image. Each one is placed
-            by its own edge, so the overview and the individual tile are the
-            same data seen through different paths.
-          </Caption>
+          <DemoVideo
+            src="/presentations/volume-viewer/whole-slide-imaging.mp4"
+            height={486}
+            ratio={1600 / 832}
+          />
         </div>
       </DeckSlide>
 
-      <DeckSlide
-        eyebrow="Example 03"
-        title="FLIM data"
-        lead="An array with two time axes: seconds across the experiment, nanoseconds within the pulse. The viewer does not treat the second one specially — it is an axis like any other, and you can move along it."
-      >
-        <div className="flex flex-1 flex-col justify-center gap-3">
-          <DemoVideo src="/presentations/volume-viewer/example-flim.webm" />
-          <Caption>
-            Scrub the microtime axis and you are walking the decay, per pixel,
-            out of the same chunked array — no separate lifetime product, no
-            second viewer.
-          </Caption>
-        </div>
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="The objection"
-        title="What about interaction?"
-        lead="Showing you the data is the easy half. Imaris does not just display a volume — you click things in it, measure them, correct them — and that is most of why people put up with the licence."
-        notes="This one needs its answer on the next slide. Do not leave the objection standing."
-      >
-        <div className="grid flex-1 grid-cols-3 content-center gap-4">
-          <Panel title="looking is not the job">
-            <span className="text-[18px] leading-snug">
-              You came to mark something, measure it, fix a bad segmentation —
-              not to admire it.
-            </span>
-          </Panel>
-          <Panel title="and they are good at it">
-            <span className="text-[18px] leading-snug">
-              Decades of surface editing, tracing and measurement tools, all
-              working on the volume in front of you.
-            </span>
-          </Panel>
-          <Panel title="so: a browser tab?">
-            <span className="text-[18px] leading-snug">
-              A viewer that can only show you things is a poster. The fair
-              question is what happens when you click.
-            </span>
-          </Panel>
-        </div>
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="The answer"
-        title="Marking a segment on an image"
-        lead="You draw on it, and what you drew becomes an object in the graph — in the space you drew it in, at the level you happened to be looking at."
-      >
-        <div className="flex flex-1 flex-col justify-center gap-3">
-          <DemoVideo src="/presentations/volume-viewer/example-marking.webm" />
-          <Caption>
-            It is not an overlay in the viewer&rsquo;s memory. The mark lives in
-            that image&rsquo;s own space, so it stays registered through every
-            later re-registration — and anything else on the platform can ask
-            about it, measure it, or run on it.
-          </Caption>
-        </div>
-      </DeckSlide>
+  
 
       <DeckSlide
         eyebrow="Limitations"
@@ -946,8 +832,7 @@ export function VolumeViewerDeck() {
         <div className="grid flex-1 grid-cols-2 content-center gap-4">
           <Panel title="throughput is the ceiling">
             <span className="text-[18px] leading-snug">
-              Storage moving bytes is the bottleneck, not the API. In our
-              showcases a 1 Gbit/s link was the practical limit.
+              Storage moving bytes is the bottleneck, not the API. It depends on your internet.
             </span>
           </Panel>
           <Panel title="first look is the slow one">
@@ -958,41 +843,14 @@ export function VolumeViewerDeck() {
           </Panel>
           <Panel title="the browser has a budget too">
             <span className="text-[18px] leading-snug">
-              GPU memory is finite and shared with everything else in the tab.
-              Very deep volumes hit that before they hit the network.
+              GPU memory is finite and if your computer is old its not goign to be fun.
             </span>
           </Panel>
           <Panel title="it needs a pyramid">
             <span className="text-[18px] leading-snug">
-              Data written as one flat, unchunked array has nothing to select
-              from — it has to be converted first.
+              We need to convert out data first.
             </span>
           </Panel>
-        </div>
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="Recap"
-        title="The whole thing in four lines"
-        lead="If you remember nothing else."
-      >
-        <div className="flex flex-1 flex-col justify-center gap-3">
-          {[
-            'The array is a grid of chunks, each fetchable on its own, and it exists at several resolutions.',
-            'The viewer spends a fixed budget per frame: pick the level your zoom justifies, fetch the chunks the view lands on.',
-            'The bytes go from storage to your browser directly; the platform only ever answers where they are.',
-            'Placement comes from the coordinate graph, so overlays stay registered and a refined calibration moves everything at once.',
-          ].map((line, i) => (
-            <div
-              key={line}
-              className="flex items-start gap-4 rounded-xl border border-fd-primary/25 bg-fd-primary/5 px-5 py-4"
-            >
-              <span className="font-mono text-[15px] font-bold text-fd-primary">
-                {`0${i + 1}`}
-              </span>
-              <span className="text-[19px] leading-snug">{line}</span>
-            </div>
-          ))}
         </div>
       </DeckSlide>
 
@@ -1004,23 +862,10 @@ export function VolumeViewerDeck() {
         <div className="grid flex-1 grid-cols-3 content-center gap-4">
           <Panel title="open your own data" tone="primary">
             <span className="text-[18px] leading-snug">
-              Any dataset in Mikro with a pyramid opens in the viewer. Scroll
-              through z, zoom until the level steps, mark something.
+              Lets test it with way more data
             </span>
           </Panel>
-          <Panel title="write meshes with fabriks">
-            <span className="text-[18px] leading-snug">
-              <code className="font-mono text-[16px]">pip install fabriks</code>{' '}
-              turns a collection of surfaces into an LOD octree any viewer can
-              plan against.
-            </span>
-          </Panel>
-          <Panel title="and read the graph underneath">
-            <span className="text-[18px] leading-snug">
-              The spaces and edges it walks are the ones from the
-              coordinate-system deck — same model, a great deal more data.
-            </span>
-          </Panel>
+          
         </div>
       </DeckSlide>
     </DeckFrame>
