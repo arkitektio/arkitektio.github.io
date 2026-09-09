@@ -46,16 +46,35 @@ Apps also need to *find* a deployment and get their configuration. That is the j
 of the **Fakts** protocol, described in [Service
 Discovery](/docs/design/architecture/service-discovery).
 
-Fakts uses a device-code-style flow, similar in spirit to OAuth2:
+Fakts is a standard **OAuth2 device authorization flow** (RFC 8628) with one
+Arkitekt-specific addition: the token response also carries the app's rendered
+service configuration.
 
-1. The app presents its **Manifest** (identifier, version, requested scopes).
-2. It receives a user-validation code.
-3. You approve the app in the browser.
-4. The app receives a token and fetches the deployment configuration it needs.
+1. The app fetches the deployment's `.well-known/fakts` document, which lists the
+   OAuth2 endpoints to use.
+2. It posts its **Manifest** (identifier, version, scopes, required services) to
+   the device authorization endpoint. This registers it as a public OAuth2 client
+   and returns a device code and a verification link.
+3. You open the link, review the app and the permissions it asks for, choose
+   which service instances it may use, and approve.
+4. The app polls the token endpoint with the device-code grant and receives an
+   access token, a rotating refresh token, and the configuration of every service
+   it asked for, in one response.
+5. From then on it refreshes through the same token endpoint. Each refresh also
+   re-renders the configuration, so a changed deployment reaches connected apps
+   without anyone re-approving.
 
-On the client side, two small libraries pair up to do this: **Fakts** retrieves
-configuration, and **Herre** is the asynchronous OAuth2 client that manages the
-tokens. (Note that *Herre* is a client library, not a server, the server is Lok.)
+Because every step is plain OAuth2, the tokens an app ends up holding are the
+same signed JWTs Lok issues to everyone else, and any service can verify them
+locally. On the client side the [fakts](https://github.com/jhnnsrs/fakts) and
+[fakts-ts](https://github.com/jhnnsrs/fakts-ts) libraries implement the flow
+for Python and TypeScript apps. The server side is Lok.
+
+In the Paper version this was two packages: **Fakts** fetched the configuration
+and **Herre**, an asynchronous OAuth2 client, ran a second grant to obtain the
+tokens. Since the Next version the token response carries the configuration, so
+the two have merged into one flow. See [What's changed from Paper to
+Next](/docs/design/architecture/service-discovery#whats-changed-from-paper-to-next).
 
 ## Scopes
 

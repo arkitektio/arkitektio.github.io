@@ -27,6 +27,34 @@ As you can see, the manifest contains information about the app, such as its nam
 description. This information will be presented to the user, when they are asked to authenticate
 your app, or they can be used to search for your app in the soon to be released App Store.
 
+### Requirements
+
+When an app connects to a deployment through the
+[Fakts protocol](/docs/design/architecture/service-discovery), the manifest also
+declares which services the app needs. Each requirement names a `key` the app
+uses to look the service up, the `service` identifier it must be an instance of,
+and whether it is `optional`:
+
+```yaml
+identifier: "com.example.app"
+version: "0.1.0"
+scopes:
+- openid
+requirements:
+- key: rekuest
+  service: live.arkitekt.rekuest
+- key: mikro
+  service: live.arkitekt.mikro
+- key: kabinet
+  service: live.arkitekt.kabinet
+  optional: true
+```
+
+The user sees these requirements when approving the app and picks, for each one,
+which running instance of that service the app is allowed to use. A required
+service that is missing or denied stops the app from connecting, an optional one
+simply switches that feature off.
+
 ### Extensions to the Manifest
 
 The simple manifest described above is enough to identify your app on the platform, but it a Manifest

@@ -3,27 +3,34 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { checkAliasHealth } from "./alias/resolve";
 import { buildAliases } from "./builder";
 import { ArkitektContext } from "./context";
-import { AliasStorageSchema } from "./fakts/aliasStorageSchema";
 import { FaktsEndpoint, FaktsEndpointSchema } from "./fakts/endpointSchema";
-import { ActiveFakts, ActiveFaktsSchema, Alias } from "./fakts/faktsSchema";
+import { ActiveFakts, Alias } from "./fakts/faktsSchema";
 import { flow } from "./fakts/flow";
 import { Manifest } from "./fakts/manifestSchema";
-import { TokenResponse, TokenResponseSchema } from "./fakts/tokenSchema";
 import { useArkitekt } from "./hooks";
-import { login } from "./oauth/login";
-import { AppContext, ConnectedContext, EnhancedManifest, ReportRequest, Service, ServiceBuilder, ServiceBuilderMap, ServiceDefinition } from "./types";
+import { isAbortLikeError, normalizeToken, shouldRefreshToken } from "./runtime/auth";
+import { loadStoredSession, SessionStore, StoredSession } from "./runtime/session";
+import {
+  AppContext,
+  ConnectedContext,
+  EnhancedManifest,
+  GetToken,
+  ReportRequest,
+  Service,
+  ServiceBuilder,
+  ServiceBuilderMap,
+  ServiceDefinition,
+} from "./types";
 import { enhanceManifest, report } from "./utils";
 
 
-export type AliasMap = {
-  [key: string]: Alias;
-};
+export type { AliasMap } from "./runtime/session";
 
 export type ServiceMap = {
   [key: string]: Service;
 };
 
-export const buildServiceMap = ({map, manifest, aliasMap, token, fakts}: {map: ServiceBuilderMap, manifest: EnhancedManifest, aliasMap: AliasMap, token: TokenResponse, fakts: ActiveFakts}): ServiceMap => {
+export const buildServiceMap = ({map, manifest, aliasMap, getToken, fakts}: {map: ServiceBuilderMap, manifest: EnhancedManifest, aliasMap: AliasMap, getToken: GetToken, fakts: ActiveFakts}): ServiceMap => {
   const services: ServiceMap= {};
 
   for (const key in map) {
@@ -40,13 +47,13 @@ export const buildServiceMap = ({map, manifest, aliasMap, token, fakts}: {map: S
       manifest,
       alias: aliasMap[key],
       fakts: fakts,
-      token: token,
+      getToken: getToken,
       instance: fakts.instances[key],
     }
     )
   }
 
-  return services;;
+  return services;
 }
 
 
@@ -74,71 +81,6 @@ export const mappedAliasesStillReachable = async ({aliasMap, controller, timeout
 }
 
 
-
-
-const refreshToken = async (fakts: ActiveFakts, currentToken: TokenResponse, controller: AbortController): Promise<TokenResponse> => {
-  const response = await fetch(`${fakts.auth.token_url}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token: currentToken.refresh_token || "",
-      client_id: "arkitekt-client",
-    }),
-    signal: controller.signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to refresh token: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return TokenResponseSchema.parse(data);
-}
-
-
-
-
-type AuthClient = {
-
-  token: TokenResponse,
-  refresh: () => Promise<void>,
-  load: () => TokenResponse,
-
-}
-
-
-
-class MyAuthClient implements AuthClient {
-  private fakts: ActiveFakts;
-  private controller: AbortController;
-  private currentToken: TokenResponse;
-
-  constructor(fakts: ActiveFakts, initialToken: TokenResponse, controller: AbortController) {
-    this.fakts = fakts;
-    this.currentToken = initialToken;
-    this.controller = controller;
-  }
-
-  public async refresh() {
-    // Using an async lock to prevent multiple simultaneous refreshes
-
-
-
-
-    this.currentToken = await refreshToken(this.fakts, this.currentToken, this.controller);
-    localStorage.setItem("token", JSON.stringify(this.currentToken));
-  }
-
-  public load() {
-    return this.currentToken;
-  }
-
-}
-
-
 export const ArkitektProvider = ({
   children,
   manifest,
@@ -158,21 +100,39 @@ export const ArkitektProvider = ({
   const [connecting, setConnecting] = useState(false);
   const [currentController, setCurrentController] = useState<AbortController | null>(null);
 
-
   const connectingRef = useRef<boolean>(false);
 
+  // The session and its refresh chain live outside React state (see
+  // SessionStore). React follows refreshes through the listener below.
+  const [store] = useState(() => new SessionStore());
+  const getToken: GetToken = store.getToken;
 
+  useEffect(
+    () =>
+      store.onRefreshed((session) => {
+        setContext((x) => ({
+          ...x,
+          connection: x.connection
+            ? { ...x.connection, token: session.token, fakts: session.fakts }
+            : x.connection,
+        }));
+      }),
+    [store],
+  );
 
   const setValidatedConnection = (connection: ConnectedContext) => {
     setContext(x => ({
       ...x,
       connection: connection,
+      autoLoginError: undefined,
     })
     );
-    localStorage.setItem("endpoint", JSON.stringify(connection.endpoint));
-    localStorage.setItem("fakts", JSON.stringify(connection.fakts));
-    localStorage.setItem("token", JSON.stringify(connection.token));
-    localStorage.setItem("aliasMap", JSON.stringify({aliasMap: connection.aliasMap}));
+    store.set({
+      endpoint: connection.endpoint,
+      fakts: connection.fakts,
+      token: connection.token,
+      aliasMap: connection.aliasMap,
+    });
   }
 
   const setAutoLoginError = (error: string) => {
@@ -183,102 +143,26 @@ export const ArkitektProvider = ({
     }));
   }
 
-  const setCoordinatorNotReachable = (error: string) => {
-    // We cannot reach the Coordinator at all, clear everything
-    setContext(x => ({
-      ...x,
-      autoLoginError: error,
-      connection: undefined,
-    }));
-    localStorage.removeItem("endpoint");
-    localStorage.removeItem("fakts");
-    localStorage.removeItem("aliasMap");
-    localStorage.removeItem("token");
-  }
-
-
-  const setAliasDoNoLongerMatchManifest = (error: string) => {
-    // The stored aliases no longer match the manifest, we need to reauthenticate
-    setContext(x => ({
-      ...x,
-      autoLoginError: error,
-      connection: undefined,
-    }));
-    localStorage.removeItem("fakts");
-    localStorage.removeItem("aliasMap");
-    localStorage.removeItem("token");
-  }
-
-
-  const setAliasesArePersistentlyNotReachable = (error: string) => {
-    setContext(x => ({
-      ...x,
-      autoLoginError: error,
-      connection: undefined,
-    }));
-
-    localStorage.removeItem("fakts");
-    localStorage.removeItem("aliasMap");
-    localStorage.removeItem("token");
-  }
-
-
-   const setRefreshTokenNotValid = (error: string) => {
-    setContext(x => ({
-      ...x,
-      autoLoginError: error,
-      connection: undefined,
-    }));
-    localStorage.removeItem("token");
-    localStorage.removeItem("aliasMap");
-  }
-
-
-
-
-  const refreshToken = async () => {
-    if (!context.connection) {
-      throw new Error("No connection to refresh token for");
-    }
-  }
-
-
-
-
-
-
-
-
-
-
   const connect = async (options: {
     endpoint: FaktsEndpoint;
     controller: AbortController;
   }): Promise<ConnectedContext> => {
-    // Build Manifest
   try {
 
     setConnecting(true);
     setCurrentController(options.controller);
     localStorage.setItem("endpoint", JSON.stringify(options.endpoint));
 
-
     const enhancedManifest = await enhanceManifest(manifest);
 
-    const fakts = await flow({
+    // One grant, one response: tokens and the rendered instances together.
+    const { fakts, token: grantToken } = await flow({
       endpoint: options.endpoint,
       controller: options.controller,
       manifest: enhancedManifest,
     });
 
-    // Save fakts to local storage
-    localStorage.setItem("fakts", JSON.stringify(fakts));
-
-
-    const token = await login(fakts.auth);
-
-    localStorage.setItem("token", JSON.stringify(token));
-
+    const token = normalizeToken(grantToken);
 
     const { aliasReports, aliasMap, functional } = await buildAliases({
       fakts,
@@ -286,27 +170,26 @@ export const ArkitektProvider = ({
       controller: options.controller,
     });
 
-    localStorage.setItem("aliasMap", JSON.stringify({aliasMap: aliasMap}));
-
-
     const reportRequest : ReportRequest = {
       alias_reports: aliasReports,
-      token: fakts.auth.client_token,
       functional: functional,
     };
 
-    await report(fakts.auth.report_url, reportRequest);
+    await report(options.endpoint.base_url, token.access_token, reportRequest);
 
     if (!functional) {
       throw new Error("Could not connect to all required services");
     }
 
+    // Persist before building clients: the clients pull their token through
+    // `getToken`, which reads from the stored session.
+    store.set({ endpoint: options.endpoint, fakts, token, aliasMap });
 
     const serviceMap = buildServiceMap({
       map: serviceBuilderMap,
       manifest: enhancedManifest,
       aliasMap: aliasMap,
-      token: token,
+      getToken: getToken,
       fakts: fakts,
     });
 
@@ -314,10 +197,9 @@ export const ArkitektProvider = ({
       manifest: enhancedManifest,
       alias: fakts.self.alias,
       fakts: fakts,
-      token: token,
+      getToken: getToken,
     }
     );
-
 
     setValidatedConnection({
         endpoint: options.endpoint,
@@ -332,6 +214,9 @@ export const ArkitektProvider = ({
     );
     } catch (e) {
       console.error("Connection failed:", e);
+      if (!store.current) {
+        store.clear();
+      }
       throw e;
     } finally {
       setConnecting(false);
@@ -344,8 +229,7 @@ export const ArkitektProvider = ({
     setContext(
       { manifest: context.manifest, connection: undefined }
     );
-    localStorage.removeItem("fakts");
-    localStorage.removeItem("token");
+    store.clear();
   };
 
   const cancelConnection = () => {
@@ -397,20 +281,24 @@ export const ArkitektProvider = ({
     if (!oldEndpoint) {
       throw new Error("No endpoint found in local storage");
     }
-    const endpoint: FaktsEndpoint = JSON.parse(oldEndpoint);
+    const endpoint: FaktsEndpoint = FaktsEndpointSchema.parse(JSON.parse(oldEndpoint));
     const options = { controller: new AbortController(), endpoint: endpoint };
 
     await connect({ ...options, endpoint });
   };
 
   const tryReconnect = async ({manifest, serviceBuilderMap, controller}: {manifest: EnhancedManifest, serviceBuilderMap: ServiceBuilderMap, controller: AbortController}) => {
-    const faktsRaw = localStorage.getItem("fakts");
-    const tokenRaw = localStorage.getItem("token");
-    const endpointRaw = localStorage.getItem("endpoint");
-    const aliasMapRaw = localStorage.getItem("aliasMap");
     console.log("Attempting auto-login with stored data...");
 
-    if (!faktsRaw || !tokenRaw || !endpointRaw || !aliasMapRaw) {
+    let session: StoredSession | null = null;
+    try {
+      session = loadStoredSession();
+    } catch (e) {
+      console.warn("Stored session is not usable under the current protocol, clearing it", e);
+      store.clear();
+    }
+
+    if (!session) {
       setAutoLoginError("No stored session data found");
       return
     }
@@ -418,100 +306,92 @@ export const ArkitektProvider = ({
     setConnecting(true);
 
     try {
+      store.set(session);
 
-      const fakts = ActiveFaktsSchema.parse(JSON.parse(faktsRaw));
-      const token = TokenResponseSchema.parse(JSON.parse(tokenRaw));
-      const endpoint = FaktsEndpointSchema.parse(JSON.parse(endpointRaw));
-      const aliasStorage = AliasStorageSchema.parse(JSON.parse(aliasMapRaw));
+      // A token that is about to expire (or already has) is refreshed before
+      // any client is built. This also doubles as the "is this session still
+      // alive" check: a revoked refresh token fails here, and we fall back to
+      // asking the user to sign in again.
+      if (shouldRefreshToken(session.token)) {
+        await store.forceRefresh();
+        session = store.current!;
+      }
 
-      if (!aliasMapStillValidForManifest(aliasStorage.aliasMap, manifest)) {
-        setContext({
-              manifest: manifest,
-              autoLoginError: "Stored aliases no longer valid for manifest",
-              connection: undefined,
-          });
-        setConnecting(false);
+      if (!aliasMapStillValidForManifest(session.aliasMap, manifest)) {
+        throw new Error("Stored aliases no longer valid for manifest");
       }
 
       const stillReachable = await mappedAliasesStillReachable({
-        aliasMap: aliasStorage.aliasMap,
+        aliasMap: session.aliasMap,
         controller: controller,
         timeout: 150,
       });
 
-      let currentAliasMap = aliasStorage.aliasMap;
+      let currentAliasMap = session.aliasMap;
 
       if (!stillReachable) {
         const { aliasReports, aliasMap, functional } = await buildAliases({
-            fakts,
+            fakts: session.fakts,
             manifest: manifest,
             controller: controller,
         });
 
         const reportRequest : ReportRequest = {
           alias_reports: aliasReports,
-          token: fakts.auth.client_token,
           functional: functional,
         };
 
-        localStorage.setItem("aliasReports", JSON.stringify({aliasMap: aliasMap}));
         if (!functional) {
-          setContext({
-            manifest: manifest,
-            autoLoginError: "Could not connect to all required services",
-            connection: undefined,
-          });
-          setConnecting(false);
-          return;
+          throw new Error("Could not connect to all required services");
         }
 
-        await report(fakts.auth.report_url, reportRequest);
+        await report(session.endpoint.base_url, session.token.access_token, reportRequest);
 
         currentAliasMap = aliasMap;
-
+        store.set({ ...session, aliasMap: currentAliasMap });
       }
-
 
       const serviceMap = buildServiceMap({
         map: serviceBuilderMap,
         manifest: manifest,
         aliasMap: currentAliasMap,
-        token: token,
-        fakts: fakts,
+        getToken: getToken,
+        fakts: session.fakts,
       });
 
       const selfService  = selfServiceBuilder({
         manifest: manifest,
-        alias: fakts.self.alias,
-        fakts: fakts,
-        token: token,
+        alias: session.fakts.self.alias,
+        fakts: session.fakts,
+        getToken: getToken,
       }
       );
 
-
-      const context : AppContext = {
+      const nextContext : AppContext = {
         manifest: manifest,
         connection: {
-          endpoint: endpoint,
-          fakts: fakts,
+          endpoint: session.endpoint,
+          fakts: session.fakts,
           manifest: manifest,
           aliasMap: currentAliasMap,
           serviceBuilderMap: serviceBuilderMap,
           serviceMap: serviceMap,
           selfService: selfService,
-          token: token,
+          token: session.token,
         },
       };
 
-      setContext(context);
+      setContext(nextContext);
       setConnecting(false);
     } catch (e) {
       console.log(e)
-      localStorage.removeItem("fakts");
-      localStorage.removeItem("token");
+      // Keep the endpoint so "reconnect" knows where to go.
+      store.clear(["fakts", "token", "aliasMap"]);
       setContext({
             manifest: manifest,
-            autoLoginError: e instanceof Error ? e.message : "Auto-login failed",
+            autoLoginError: isAbortLikeError(e)
+              ? "Connection cancelled by user"
+              : e instanceof Error ? e.message : "Auto-login failed",
             connection: undefined,
       });
       setConnecting(false);
@@ -535,7 +415,7 @@ export const ArkitektProvider = ({
 
   return (
     <ArkitektContext.Provider
-      value={{ ...context, connect, disconnect, reconnect, connecting, cancelConnection }}
+      value={{ ...context, connect, disconnect, reconnect, connecting, cancelConnection, getToken }}
     >
       {children}
     </ArkitektContext.Provider>

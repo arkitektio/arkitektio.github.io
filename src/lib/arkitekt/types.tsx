@@ -25,11 +25,23 @@ export type Service<T = unknown> = {
 
 
 
+/**
+ * How every client obtains a usable access token.
+ *
+ * Normally this refreshes only when the token is near expiry. `forceRefresh`
+ * is for the one case that cannot be decided from the clock: the server just
+ * rejected the token we hold, so the cached one — however fresh it looks — is
+ * exactly the one that must not be reused.
+ */
+export type GetToken = (options?: {
+  forceRefresh?: boolean;
+}) => Promise<TokenResponse>;
+
 export type ServiceBuilder<T = unknown> = (options: {
   manifest: Manifest;
   alias: Alias;
   fakts: ActiveFakts;
-  token: TokenResponse;
+  getToken: GetToken;
 }) => T;
 
 
@@ -62,14 +74,13 @@ export type AliasReport = {
 
 export type ReportRequest = {
   alias_reports: { [key: string]: AliasReport };
-  token: string;
   functional: boolean;
 };
 
 
 
 export type EnhancedManifest = Manifest & {
-  node_id: string;
+  node_id?: string;
 };
 
 
@@ -107,6 +118,8 @@ export type AppFunctions = {
   reconnect: () => Promise<void>;
   connecting?: boolean;
   cancelConnection: () => void;
+  /** Current access token, refreshed through the OAuth2 token endpoint when needed. */
+  getToken: GetToken;
 };
 
-export type ArkitektContextType<T extends ServiceBuilderMap, S extends ServiceBuilder> = AppContext<T, S>;
+export type ArkitektContextType<T extends ServiceBuilderMap, S extends ServiceBuilder> = AppContext<T, S> & AppFunctions;

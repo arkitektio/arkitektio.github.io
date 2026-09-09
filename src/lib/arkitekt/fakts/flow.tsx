@@ -1,58 +1,49 @@
 // @ts-nocheck
-import { EnhancedManifest } from "../provider";
-import { challenge } from "./challenge";
-import { claim } from "./claim";
+import { EnhancedManifest } from "../types";
 import { FaktsEndpoint } from "./endpointSchema";
-import { ActiveFakts } from "./faktsSchema";
+import { GrantResult, pollToken } from "./pollToken";
 import { popOutWindowOpen } from "./popout";
-import { start } from "./start";
+import { deviceAuthorization } from "./start";
 
+/**
+ * The canonical fakts grant: register + stage a device code, let a human
+ * approve it, then poll the OAuth2 token endpoint once. Tokens and the
+ * rendered service instances come back together in that single response —
+ * there is no separate claim or client_credentials trip any more.
+ */
 export const flow = async ({
   endpoint,
   controller,
   manifest,
   expirationTime,
-  challengeTimeout,
-  maxRetries,
 }: {
   endpoint: FaktsEndpoint;
   controller: AbortController;
   manifest: EnhancedManifest;
   expirationTime?: number;
-  redirectURIs?: string[];
-  retrieveTimeout?: number;
-  challengeTimeout?: number;
-  maxRetries?: number;
-}): Promise<ActiveFakts> => {
-  // 1. Request device code
-  const code = await start({
+}): Promise<GrantResult> => {
+  // 1. Device authorization (also dynamically registers our public client)
+  const authorization = await deviceAuthorization({
     endpoint,
     controller,
     manifest,
     expirationTime,
   });
 
-  // 2. Open configuration window
-  const handle = await popOutWindowOpen({ endpoint, code });
+  // 2. Open the configure page for the human
+  const handle = await popOutWindowOpen(authorization.verification_uri_complete);
 
-  // 3. Poll challenge endpoint for token
-  let token: string;
+  // 3. Poll the token endpoint until approved → tokens + instances
   try {
-    token = await challenge({
-      endpoint,
+    return await pollToken({
+      tokenEndpoint: authorization.token_endpoint,
+      deviceCode: authorization.device_code,
+      clientId: authorization.client_id,
       controller,
-      code,
-      challengeTimeout,
-      maxRetries,
+      interval: authorization.interval,
+      expiresIn: authorization.expires_in,
     });
   } finally {
     await handle?.close();
   }
-
-  if (!token) {
-    throw new Error("Failed to retrieve token from challenge endpoint");
-  }
-
-  // 4. Use token to claim Fakts config
-  return await claim(endpoint, token, controller);
 };

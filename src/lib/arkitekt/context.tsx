@@ -13,6 +13,10 @@ export const ArkitektContext = createContext<ArkitektContextType<any, any>>({
   reconnect: async () => {
     throw new Error("No provider");
   },
+  cancelConnection: () => {},
+  getToken: async () => {
+    throw new Error("No provider");
+  },
   // Default values
   connection: undefined,
   connecting: false,

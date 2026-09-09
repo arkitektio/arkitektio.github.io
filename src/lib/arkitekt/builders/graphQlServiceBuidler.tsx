@@ -6,52 +6,73 @@ import {
   createHttpLink,
   split,
 } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
-import { getMainDefinition } from "@apollo/client/utilities";
 import { createClient } from "graphql-ws";
-import { Alias } from "../fakts/faktsSchema";
 import { aliasToHttpPath, aliasToWsPath } from "../alias/helpers";
-import { buildGraphQlWard } from "../ward";
+import { createAuthRetryLink, isSubscriptionQuery } from "../runtime/authRetryLink";
 import { Service, ServiceBuilder } from "../types";
+import { buildGraphQlWard } from "../ward";
 
 
 export const createGraphQLServiceBuilder =
   (possibleTypes: any): ServiceBuilder<Service<ApolloClient<any>>> =>
   (options) => {
-    const { alias, token } = options;
+    const { alias, getToken } = options;
 
     const httpLink = createHttpLink({
       uri: aliasToHttpPath(alias, "graphql"),
-      headers: {
-        authorization: token ? `Bearer ${token.access_token}` : "",
+    });
+
+    // The token is resolved per request, not captured at build time, so a
+    // refreshed token is picked up without rebuilding the client.
+    const queryLink = setContext(async (_, previousContext) => {
+      const token = await getToken();
+
+      return {
+        headers: {
+          ...previousContext.headers,
+          authorization: token ? `Bearer ${token.access_token}` : "",
+        },
+      };
+    }).concat(httpLink);
+
+    const wsClient = createClient({
+      url: aliasToWsPath(alias, "graphql"),
+      connectionParams: async () => {
+        // Re-evaluated on every (re)connect, so a socket that comes back for
+        // any reason authenticates with a current token.
+        const token = await getToken();
+        return {
+          token: token.access_token,
+        };
       },
     });
 
-    const queryLink = httpLink;
-
-    const wslink = new GraphQLWsLink(
-      createClient({
-        url: aliasToWsPath(alias, "graphql"),
-        connectionParams: () => ({
-          token: token.access_token,
-        }),
-      })
-    );
+    const wslink = new GraphQLWsLink(wsClient);
 
     const splitLink = split(
-      ({ query }) => {
-        const definition = getMainDefinition(query);
-        return (
-          definition.kind === "OperationDefinition" &&
-          definition.operation === "subscription"
-        );
-      },
+      ({ query }) => isSubscriptionQuery(query),
       wslink,
       queryLink as unknown as ApolloLink
     );
 
+    const authRetryLink = createAuthRetryLink({
+      getToken,
+      onReauthenticateSocket: () => {
+        // A socket carries the token it was opened with; `connectionParams`
+        // is only re-evaluated on a new socket, so the socket has to go.
+        // `terminate` reconnects, `dispose` would be permanent teardown.
+        try {
+          wsClient.terminate();
+        } catch (e) {
+          console.warn("[arkitekt] failed to terminate ws client for re-auth:", e);
+        }
+      },
+    });
+
     const client = new ApolloClient({
-      link: splitLink,
+      link: authRetryLink.concat(splitLink),
       cache: new InMemoryCache({ possibleTypes }),
     });
 
@@ -60,7 +81,7 @@ export const createGraphQLServiceBuilder =
     return {
       type: "apollo",
       client: client,
-      ward: ward, // Replace with appropriate logo component
+      ward: ward,
       alias: alias,
     }
   };

@@ -49,7 +49,21 @@ export const discover = async ({
 
   if (!fulfilled) {
     console.error("No valid Fakts endpoint found", attempts);
-    throw new Error(`No valid Fakts endpoint discovered at "${url}"`);
+    // Surface why. A deployment still speaking the pre-OAuth protocol answers
+    // discovery happily but fails schema validation, and collapsing that into
+    // "no endpoint found" reads as "server unreachable" instead of "wrong
+    // protocol version".
+    const reason = attempts
+      .flatMap((r) =>
+        r.status === "rejected"
+          ? [r.reason instanceof Error ? r.reason.message : String(r.reason)]
+          : [],
+      )
+      .join("; ");
+
+    throw new Error(
+      `No valid Fakts endpoint discovered at "${url}"${reason ? `: ${reason}` : ""}`,
+    );
   }
 
   return fulfilled.value;

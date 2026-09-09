@@ -88,6 +88,7 @@ export const buildArkitekt = <T extends ServiceBuilderMap, S extends ServiceBuil
     useAvailableServices: () => useAvailableServices(),
     useService: <K extends keyof T, >(service: K): ReturnType<T[K]["builder"]>  => useService(service as string) as ReturnType<T[K]["builder"]>,
     useToken: () => useArkitekt().connection?.token || null,
+    useGetToken: () => useArkitekt().getToken,
     useArkitekt: useArkitekt,
   };
 };

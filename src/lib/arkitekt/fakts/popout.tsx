@@ -1,22 +1,18 @@
 // @ts-nocheck
-import { FaktsEndpoint } from "./endpointSchema";
-
 export interface Closable {
   close: () => Promise<void>;
 }
 
-export const popOutWindowOpen = async ({
-  endpoint,
-  code,
-}: {
-  endpoint: FaktsEndpoint;
-  code: string;
-}): Promise<Closable> => {
-  const url = `${endpoint.frontend_url}configure/${code}`;
-
-  const win = window.api
-    ? window.api.startFakts(url)
-    : window.open(url, "Fakts Grant", "width=600,height=600");
+/**
+ * Open the deployment's configure page so a human can approve the device code.
+ * The URL is `verification_uri_complete` straight from the authorization
+ * response — the server builds it from its own configure template, so a
+ * deployment can relocate the page without us knowing.
+ */
+export const popOutWindowOpen = async (
+  verificationUri: string,
+): Promise<Closable> => {
+  const win = window.open(verificationUri, "Fakts Grant", "width=600,height=600");
 
   if (!win) throw new Error("Could not open window");
 
