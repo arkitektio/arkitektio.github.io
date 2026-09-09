@@ -1,4 +1,5 @@
-import kabinetResult from "@site/src/lib/kabinet/api/fragments";
+// @ts-nocheck
+import kabinetResult from "@/lib/kabinet/api/fragments";
 import { Database } from "lucide-react";
 import React from "react";
 import { createGraphQLServiceBuilder } from "../arkitekt/builders/graphQlServiceBuidler";

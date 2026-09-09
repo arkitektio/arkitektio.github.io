@@ -1,5 +1,0 @@
-query GlobalSearch($search: String, $pagination: OffsetPaginationInput) {
-  traces: traces(filters: { search: $search }, pagination: $pagination) {
-    ...ListTrace
-  }
-}

@@ -1,0 +1,100 @@
+---
+title: Usage
+description: How the Arkitekt client SDK is designed for declarative, functional use through the App object and context manager.
+---
+
+### Design
+
+Arkitekt's client SDK is designed to be used in a declarative and functional way, with a focus on reusable functions
+and composability. This means that a lot of functionality is provided through functions rather than through classes.
+Like this we hope that the SDK fits right in with the python ecosystem and patterns of the scientific python developer.
+
+When using Arkitekt in the classic way you will therefore mostly use functions to interact with the backend. The only
+exceptions to this are the Arkitekt `App`, which encapsulates all of the stateful logic that needs to be managed (e.g.
+authentication, waiting for assignemnts from the server, etc.). This App object is highly configurable and can be
+adjusted to fit your exact configuration need by using different builders (more on this later).
+
+```python
+from arkitekt_next import easy
+
+app = easy("your_app_name", version="your_app_version")
+
+with app:
+    # do stuff with arkitekt
+
+
+```
+
+This is the backbone for each Arkitekt app. Just like this you can use the app to interact with the backend.
+
+A few words about this setup:
+
+1. Arkitekt apps are configured through builder functions in this case through the `easy` function.
+   Depending on the builder, different services are configured. The `easy` builder configures
+   arkitekt to mostly autoconfigure itself. This means that it will try to discover and connect
+   to the backend automatically and will authenticate the user and the app through opening a browser
+   window. Depending on your user environment you can also use different builders like the `jupy`
+   builder to enhance arkitekt for use in a jupyter notebook.
+2. Arkitekt relies on the concept of an application context. This is a context manager that
+   is used to manage the lifecycle of the application (e.g setup connections to the backend
+   and tear down these connections). This is used to ensure that the
+   application is properly closed when it is no longer needed.
+3. Within this context, you can use the `app` object to access the various modules and services that
+   Arkitekt provides. These services are available as attributes on the `app` object.
+   For example, to access the `Fakts` (for example to inspect the configration) service, you can use `app.fakts`.
+4. The context manager also sets some context specific variables (contextvars).
+   This means that some functionaly within this context will automatically use the governing
+   app context. This allows for more declarative and functional code. For example, you can use simply call
+   `from_xarray` to save an xarray on the mikro instance of the governing app context, without
+   explicitly passing the app context to the function. You can always opt out of this behaviour
+   by specifically passing the desired context to the function.
+
+   ```python
+    from arkitekt_next import easy
+    from mikro_next.api.schema import from_array_like
+    import xarray as xr
+
+    app = easy()
+
+    with app:
+        image = from_array_like(xr.DataArray((100,100,1), dims=["x", "y", "z"]), name="image name") # stores the array on the mikro instance of the governing app context
+   ```
+
+   <Callout type="info">
+
+   This behaviour allows for more functional and concise code but can also lead to unexpected
+   behaviour. For example, if you have multiple app contexts running in parallel, the
+   `from_array_like` function will use the app context that is currently active. You can always opt out of this behaviour
+   by specifically passing the desired context to the function.
+
+   </Callout>
+
+5. Within the context you should avoid setting attributes on the `app`. Arkitekt was designed
+   to be configured before entering the context.
+
+6. Apps work both in async and synchronous contexts. This means that you can use the `app`
+   object in both async and sync code. The `app` object will automatically detect the context
+   and use the correct backend (check the documentation of koil for this). This means that you can use the same code in both async and
+   sync code.
+
+   ```python
+    from arkitekt_next import easy
+    import asyncio
+
+    app = easy()
+
+    async def main():
+        async with app:
+            # do stuff with arkitekt
+
+    asyncio.run(main())
+   ```
+
+   <Callout type="info">
+
+   Arkitekt always uses an `asyncio` event loop internally to manage the app context. In the non-async context, this event loop is
+   run in a separate thread. Koil ensures that this threaded event loop is properly closed when the app context is closed, and bridges
+   the calls between the threaded event loop and the main thread to ensure threadsafety. Btw: Threads started through rekuest are also
+   able to call async / syncfuntions or the governing app context.
+
+   </Callout>

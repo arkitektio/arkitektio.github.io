@@ -1,6 +1,0 @@
-
-subscription WatchAgents {
-  agents {
-    ...AgentChangeEvent
-  }
-}

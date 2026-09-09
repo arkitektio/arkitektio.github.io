@@ -1,0 +1,35 @@
+---
+title: A Platform for Humans
+description: Why every task in Arkitekt must be human-started, and how we think about agents, scientific provenance, and the risks of data access and pollution.
+---
+
+## A platform for humans
+
+**Arkitekt is a platform built for humans.** Every capability, every interface, and every design decision starts from a person who wants to understand their data and stands behind the results.
+You are the one who is in charge.
+
+We are well aware that we live in the age of agents.
+Autonomous models are increasingly capable of calling tools, and chaining analyses together, and sadly even designing experiments and writing papers.
+We do not pretend this is not happening, but we don't want to embrace a world of agents that take over the scientific process.
+
+The reason is **scientific provenance**. Science is not just about getting an answer; it is about being able to say *who* asked the question, *why*, and *how* the answer was produced. When an agent can silently spin up analyses, touch your data, and produce figures with no human in the loop, two very real dangers appear:
+
+- **Data access risk.** An unsupervised agent with broad access can read, move, or expose data it was never meant to touch. In a lab handling sensitive or unpublished results, that is not a hypothetical.
+- **Data pollution risk.** An agent that writes results back into your datastore can quietly contaminate it with low-quality, hallucinated, or unverifiable outputs. Once polluted, a scientific record is extraordinarily hard to clean.
+
+For these reasons, Arkitekt enforces a simple, non-negotiable principle: **every task in Arkitekt must be human-started and then delegated.** A human initiates the task, takes responsibility for it, and *then*, if they choose, hands it off to an agent to carry out. No task ever originates from an agent on its own. The human is always the root of the provenance chain, and the agent is always the delegate, never the instigator. This keeps a person accountable for every result, and keeps an auditable human signature on everything that touches your data.
+
+So: use agents, lean on them, let them do the heavy lifting. But know that in Arkitekt, the human pushes the first button, every single time.
+
+<Callout type="alert">
+
+I would love to live in the world of Data's from Star Trek, but capitalism will probably never allow that. Once they are here, we will of course
+embrace them. Live long and prosper! 
+
+</Callout>
+
+<Callout type="info">
+
+    Human started doesn't mean it needs to be through the UI, you can also start tasks through an API. And of course you can fake that. But that's then on you, and we will not be responsible for any data pollution or access issues that arise from that.
+
+</Callout>

@@ -1,5 +1,0 @@
-mutation CreateReagent($input: ReagentInput!) {
-  createReagent(input: $input) {
-    ...Reagent
-  }
-}

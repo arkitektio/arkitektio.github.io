@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { checkAliasHealth } from "./alias/resolve";
 import { buildAliases } from "./builder";
@@ -586,4 +587,3 @@ export const buildArkitektProvider =
 export { ArkitektContext } from "./context";
 export * from "./hooks";
 export * from "./types";
-

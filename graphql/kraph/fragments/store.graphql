@@ -1,5 +1,0 @@
-fragment MediaStore on MediaStore {
-  id
-  presignedUrl
-  key
-}

@@ -1,0 +1,71 @@
+---
+title: Performance & Real-time
+description: "How Arkitekt streams data as it is generated, keeps large bioimage data light with lazy loading, and scales horizontally."
+---
+
+Bioimage data is big, and it keeps arriving. Arkitekt is built around that reality:
+instead of waiting for an experiment to finish and then crunching everything in one
+batch, it treats analysis as something that happens **while data is being
+generated**.
+
+## Streaming over batch
+
+Arkitekt fully embraces **streaming analysis**, analysing data as it comes off the
+instrument. This is what enables "smart microscopy", where the analysis can feed
+back into the experiment in real time. The same workflows run equally well
+**post-hoc** on already-generated data, so you are never forced to choose streaming
+*or* batch. See [Everything everywhere, all at
+once](/docs/design/philosophy/realtime) for the philosophy behind this.
+
+For workflows that are sensitive to latency, you can pin a workflow to a single
+application to get **sub-millisecond** round-trips, avoiding the overhead of routing
+each step through the platform.
+
+## Real-time by default
+
+- **GraphQL subscriptions.** Arkitekt exposes its functionality through
+  [GraphQL](/docs/design/various/graphql), including subscriptions that push updates
+  to clients the moment state changes, no polling required.
+- **Websockets for task routing.** [Rekuest](/docs/design/services/rekuest) queues
+  and distributes tasks over a message broker (RabbitMQ), thinly wrapped in a
+  websocket API. The wrapper exists to add authentication, authorization and
+  health-monitoring on top of the broker, not to get in the way of throughput.
+- **Live state.** Services like [Kabinet](/docs/design/services/kabinet) let clients
+  subscribe to changes, for example pod state, in real time.
+
+## Keeping big data light
+
+Loading a whole multi-gigabyte image just to look at one plane would be wasteful.
+Arkitekt makes heavy use of **lazy loading** built on **Zarr** and **xarray** to
+keep the memory and network footprint as small as possible, only the chunks you
+actually touch are fetched. See [Lazy
+Loading](/docs/design/various/lazy-loading).
+
+## Scaling out
+
+- **Stateless services scale horizontally.** [Rekuest](/docs/design/services/rekuest)
+  and [Kluster](/docs/design/services/kluster) are designed to be stateless, so you
+  can run more replicas to handle more load. Kluster in particular is a thin,
+  stateless gateway in front of Dask (via Dask-Gateway on SLURM, PBS, Kubernetes,
+  and more) for on-demand compute clusters.
+- **No inter-service communication.** The core [services](/docs/design/services)
+  deliberately do *not* talk to each other. Each is an independent, containerized
+  web server authenticated by JWT. This keeps the failure and scaling story simple:
+  services scale on their own terms.
+- **Compute lives in the apps.** Arkitekt is the middleman; the actual computation
+  is offloaded to client-side **apps** and the hardware they run on, so heavy work
+  scales with *your* machines, not a central bottleneck.
+
+## Honest bottlenecks
+
+Performance is bounded by physics, and we would rather name the limits than pretend
+they don't exist:
+
+- The usual bottleneck is **storage throughput**, MinIO moving bytes, rather than
+  the API layer. In our showcases a 1 Gbit/s link was the practical ceiling; only in
+  rare cases is the API layer itself the limit.
+- **GPU support is limited today.** Better GPU sharing is planned via
+  [Kabinet](/docs/design/services/kabinet). In the meantime, app **Flavours** (build
+  variants with **Selectors**, e.g. CUDA vs CPU) let the platform automatically pick
+  the right build for the resources available. See the
+  [Manifest](/docs/design/terminology/manifest).

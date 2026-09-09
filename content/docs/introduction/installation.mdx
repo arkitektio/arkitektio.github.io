@@ -1,0 +1,284 @@
+---
+title: Installation
+description: How to install the Arkitekt platform using the graphical installer, Docker-Compose, or Helm charts, including system requirements.
+---
+
+import { DownloadGrid, DeploymentStrategies, MeshTunnel } from "@/components/docs";
+
+## Before we start [#before-we-start]
+
+Arkitekt is a **server-client platform**. The heavy lifting is done by **apps**: the actual
+processing, the training, and the analysis. And those apps can run *anywhere*: on a GPU box under your
+desk, on a workstation down the hall, on a node in the cloud. What they cannot do is work in a vacuum.
+They need a **central server** to register against, to authenticate through, to find one another, and
+to keep track of data and results. The server is not where the work happens. It is the **hub** that turns
+a loose scattering of apps into a single, coherent platform: the center that every app connects to and through. And before any of it can happen, the apps
+and that server first have to **find each other and meet**.
+
+That sounds like it should be trivial, and twenty years ago it would have been: give the server a
+public address, point the apps at it, done. So before you get started we want to be honest about one
+thing. **Some of the design here exists not because we wanted it to, but because the internet has
+become what it is.** Servers in labs sit behind NAT, behind institutional firewalls, on networks that
+change addresses and quietly drop inbound connections. You can rarely just "point an app at a server"
+anymore. A good part of Arkitekt's deployment story is therefore really about *solving the meeting
+problem* in a world that no longer makes meeting easy.
+
+There are three honest ways to go about it. They differ mainly in **who runs what**, and each is a
+genuine tradeoff rather than just a difficulty dial:
+
+* **Use a Kommunity partner.** The simplest possible start: let someone else run the whole platform,
+  central server and all, and just bring your apps. A *Kommunity partner* is an institution that hosts
+  an Arkitekt server and opens it up to others. The upside is that you run *nothing*: no hardware, no
+  Docker, no updates, no meeting to arrange. The honest catch is that your data and compute then live
+  on infrastructure you don't own, so you have to trust the partner with both, and this option is
+  **demo-only for now**. It's great for kicking the tires, not for sensitive or production work. If you
+  want to go this route, it's worth asking your local imaging facility whether they run (or would be
+  willing to run) a partner server; that is exactly the kind of place this model is meant for.
+
+* **Deploy locally and join the mesh using our coordination server.** Here you install and run the
+  Arkitekt server yourself, on a machine in your lab, so your data and compute never leave your
+  control. The only thing you borrow is the *meeting*: rather than standing up your own coordination
+  infrastructure, your server and apps register with Arkitekt's community-operated **coordination server**,
+  which brokers the introduction and helps endpoints find each other across NATs and networks. Once
+  they have met, traffic flows directly peer-to-peer. The coordination server never sees your workload
+  data (see [The Arkitekt Mesh](#arkitekt-mesh) for the mechanics). This is the **recommended starting
+  point for most labs**: you keep your data, you avoid running coordination infrastructure, and it
+  works across network boundaries out of the box. The tradeoff is a dependency you don't control. If
+  the coordination server is down, new connections can't be brokered until it is back, and you are
+  trusting a third party to operate the control plane (auth and discovery), even if never the data.
+
+* **Self-host everything, including your own coordination server.** The fully independent option: you run
+  the platform *and* your own coordination server, so nothing depends on anyone outside your walls: not
+  the data, not even the meeting. This is plainly the most work: you operate, update, and secure
+  the coordinator yourself, and reachability across networks becomes your problem to solve rather than
+  something you lean on shared infrastructure for. In return you get complete autonomy and the ability
+  to run fully **offline or air-gapped**. It is also the right choice for **tear-up / teardown
+  testing**. That means standing an entire self-contained platform plus coordinator up from scratch,
+  running against it, and tearing the whole thing back down again. That makes it a natural fit for CI,
+  reproducible demos, or a server that resets itself on a schedule.
+
+<Callout type="info" title="Two kinds of 'server'">
+  It is worth separating two things that both get called a "server". The **central server** is the
+  Arkitekt platform itself. It holds your data and runs the services. The **coordination server** is the
+  *coordinator*: it only handles auth and discovery so that apps and servers can meet, and it never
+  touches your workload data. The three strategies above are really just different answers to *who runs
+  the central server* and *who runs the coordination server*.
+</Callout>
+
+<DeploymentStrategies />
+
+At a glance, here is how the three strategies trade off against one another. Note that *where the apps
+run* is the same in every column. Apps power the heavy actions and run anywhere regardless of which
+strategy you pick. What really changes is **who runs the servers** and, as a result, where your data
+lives and what you depend on.
+
+| | Kommunity partner | Local + coordination server | Fully self-hosted |
+|---|---|---|---|
+| **Who runs the central server** | The partner | You, in your lab | You |
+| **Who runs the coordination server** | The partner | Arkitekt community | You |
+| **Where the apps run** | Anywhere | Anywhere | Anywhere |
+| **Where your data lives** | Partner's infrastructure | Your lab | Your lab |
+| **Setup & ops effort** | None | Low to moderate (server only) | High (server *and* coordinator) |
+| **External dependency** | Total: on the partner | Discovery & auth only | None |
+| **Works offline / air-gapped** | No | No (needs the coordination server to broker) | Yes |
+| **Data control & privacy** | Lowest: you trust the partner | High: P2P, coordinator sees no data | Highest: nothing leaves your walls |
+| **Readiness** | Demo-only for now | Recommended for most labs | Production / advanced |
+| **Best for** | A first look without any setup | Most labs that want data kept local | Air-gapped sites, CI, tear-up / teardown testing |
+
+Whichever strategy you choose, you will still install the server software itself one of a few ways:
+via the graphical installer, via docker-compose, or (soon) via Helm. Those installation *methods* are
+covered further down; the strategy above decides the *topology*, the method below decides the
+*mechanics*.
+
+<Callout type="info" title="Where to install">
+  The Arkitekt platform was designed as a multi-user platform that gets installed *once* on a **powerful** server and then
+  can be accessed by multiple users and apps, on standard hardware. However it is also possible to install the platform on your own computer and
+  use it as a `personal` platform. As long as not all safety features are implemented and audited, we recommend to use the platform
+  in the latter way. We'll keep you posted, when we think the platform is safe ready for multi-user installations!
+</Callout>
+
+## System Requirements [#system-requirements]
+
+The arkitekt platform is designed to run on a variety of different hardware and different operating systems.
+However as a quite involved platform that is at the moment not heavily optimized to run on low-end hardware,
+we recommend to not install Arkitekt on a machine with less than **16GB of RAM** and a **decent modern CPU (i7 or i9)** while
+reserving **at least 50GB of free disk space** on a **SSD drive**.
+While it is perfectly possible to run the platform on a machine with less resources (indeed it works on a Raspberry Pi 4),
+especially the transfer of large amounts of data will be slow and the platform will be sluggish.
+
+If you want to use Arkitekt with GPU enabled (deep learning modules), we also recommend to have a **CUDA 11** enabled **Nvidia GPU** with at least
+**8GB of VRAM**. If you want to use the GPU for training, we recommend to have at least **16GB of VRAM**.
+
+Also note that the platform should be installed on a machine with a good network interface (preferably a wired connection) and a good internet connection.
+As a central middleman between different services, the platform will transfer a lot of data between different services and a slow network connection
+will slow down the platform. Also note that in our tests, on equal hardware, the platform runs much faster on Linux than on Windows and Mac OS X.
+
+<Callout type="info" title="About GPU support">
+  Arkitekt makes use of the modern pattern of [Docker GPU Support](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html)
+  to enable GPU support for the platform. This means that you **do not** have to install the CUDA toolkit on your machine, but you need to make sure
+  that you are running the latest NVIDIA drivers on your machine. Arkitekt will take care of the rest. If you have troubles with GPU support, please
+  consult the [Troubleshooting section](/docs/troubleshooting/startup) for more information.
+</Callout>
+
+<Callout type="warn" title="About Apple Silicon">
+  Arkitekt is currently build for the x86-64 architecture. This means that it will run in an **emulated mode** on Apple Silicon. This emulated mode
+  while functional is not optimized for performance and will be slower than on a native x86-64 machine. We are currently in the midst of transitioning
+  our services also to other architectures and will provide native support for Apple Silicon in the future. For now we highly recommend to use a
+  Windows or Linux machine to run Arkitekt.
+</Callout>
+
+## Graphical installer (recommended) [#graphical-installer-recommended]
+
+<img src="/docs/introduction/installer.png" alt="Arkitekt graphical installer" />
+
+Arkitekts installer and admin interface (once installed) will guide you through the installation process and the deployment of the platform on your specific hardware.
+Once installed it serves a simple desktop app that additionally acts as an updater, as well as an admin interface to the platform and allows you to **start** and **stop** the platform.
+
+Go ahead and download our installer for your operating system "Konstruktor", and follow the instructions:
+
+<DownloadGrid />
+
+Konstruktor necessitates the installation of a container runtime (Docker) on the machine where you want to install arkitekt.
+If you don't have docker installed, you can download it from [here](https://www.docker.com/products/docker-desktop). Docker
+is available for Windows, Mac and Linux and is the sole outside dependency of the arkitekt platform. You do *not* need to create
+a docker account in order to use it for Arkitekt. Please check out the FAQ section for more information about the installation of
+docker especially when you are seeking to use GPU support on your machine.
+
+<video className="rounded-sm rounded-md" width="100%">
+  <source src="/docs/introduction/installation.webm" />
+</video>
+
+<div className="text-gray-400 mb-2">
+  <small>
+    A quick runthrough of the Arkitekt installation. Konstruktor needs the docker
+    runtime to be installed beforehand to properly function.
+  </small>
+</div>
+
+<Callout type="info" title="About Channels">
+  Konstruktor allows you to install different versions (termed "channels") of the platform. The default current channel is the
+  **"paper"** channel, which is the most stable version of the platform and designed to facilitate workflows of the original paper.
+  If you want to try out the latest features of the platform and the "lessons learned" from the paper, you can switch to the
+  "next" channel which is a more recent version that is only manageable by developers.
+</Callout>
+
+## Updating [#updating]
+
+Once installed, the installer will also act as an updater for the platform. Arkitekt is a rapidly evolving platform and we are constantly
+adding new features and fixing bugs. Updating of the platform is therefore a crucial part of the platform. You are encouraged to update
+your `channel` of the platform regularly to get the latest features and bugfixes. You can update the platform by clicking on the "Danger"
+button in the dashboard interface of the installer, and then selecting `Update`. The installer will then download the latest version of the
+platform images. This might take a while, depending on your internet connection. Once the download is finished, you can then apply the update
+by clicking on the `Start` button. This will cause a "rolling update" of the platform, which means that the platform should update without any
+downtime. If you encounter any problems with the update, please consult the [Troubleshooting section](/docs/troubleshooting/startup) for more information.
+
+<Callout type="info" title="About updating">
+  At this early stage of the platform, updating is a crucial part of the platform. We are constantly adding new features and fixing bugs, and
+  updating the platform is the only way to get the latest features and bugfixes. The updates in one channel should `always` be backwards compatible
+  and your data should be safe.
+</Callout>
+
+## Local-network advertising (removed) [#advertising]
+
+<Callout type="warn" title="This feature was removed">
+  Earlier versions of Arkitekt could **advertise** the platform on your local network,
+  a UDP broadcast beacon so that apps could discover it without knowing its IP address.
+  We have **removed** this feature. Local networks turned out to be too much of a mess:
+  firewalls, changing addresses, blocked broadcasts, VPNs, and machines with several
+  network interfaces meant advertising worked unreliably, and only ever within a single
+  LAN in the first place.
+
+  Discovery is now handled entirely by the [mesh](#arkitekt-mesh), which lets your
+  authenticated endpoints find and reach each other across *any* network, not just the
+  one they happen to share.
+</Callout>
+
+## The Arkitekt Mesh [#arkitekt-mesh]
+
+Reaching your platform is easy when everything lives on one trusted local network. The moment you want to reach it from
+*somewhere else*, sharing a network stops being something you can rely on. That might be your laptop on the train, a collaborator at another institute, or a GPU
+node sitting behind a different NAT. The **mesh** is the answer to that problem: a way to securely reach your platform, and let your apps reach
+it, from anywhere, without poking holes in your firewall or memorizing IP addresses.
+
+The mesh is best understood as a **personal/private mesh** in the spirit of Tailscale, rather than as a federation of independent servers.
+A small central **coordinator** keeps track of who you are and which platforms and apps belong to you, and helps two endpoints find each other and
+establish a connection. Crucially, that is *all* it does. Once the introduction is made, the actual workload traffic flows **directly
+peer-to-peer** between the endpoints. That traffic is your images, your tables, your task arguments and results. It does not pass through the coordinator.
+
+In the language we use elsewhere in these docs, the mesh separates the **control plane** from the **data plane**:
+
+* The **control plane** is the coordinator. It handles authentication, discovery, and the signaling needed to set up a connection through NAT.
+  It is the part that needs to be reachable and the part that knows *that* two endpoints want to talk.
+* The **data plane** is the direct connection between your endpoints. This is where the real data moves, and it is established peer-to-peer
+  so that large transfers stay fast and never round-trip through a central bottleneck.
+
+Under the hood the data plane is an encrypted **WireGuard** tunnel, and the coordinator is built on
+[**Ionscale**](https://github.com/jsiebens/ionscale) (a self-hostable Tailscale control plane). This part of the platform is still
+**optional and experimental**. The diagram below shows how an outside app reaches a platform that lives behind NAT:
+
+<MeshTunnel />
+
+<Callout type="info" title="The coordinator never sees your data">
+  This is the single most important thing to understand about the mesh: the coordinator handles **auth and discovery only**, and your **workload
+  traffic flows directly peer-to-peer and never passes through the central server**. The mesh is *centrally-coordinated*, but it is *not*
+  centralized in the sense that matters for privacy. The operator of the coordinator cannot see your images, your results, or any of the data
+  moving between your nodes.
+</Callout>
+
+### Joining the mesh [#joining-the-mesh]
+
+Joining a platform to the mesh is a single command on the machine you want to connect:
+
+```bash
+arkitekt mesh join
+```
+
+This authenticates the endpoint against the coordinator, registers it, and brings up its side of the connection. From that point on the platform
+is reachable to you and to your apps through the mesh, regardless of which network it happens to be sitting on. Leaving the mesh again is the
+mirror image:
+
+```bash
+arkitekt mesh leave
+```
+
+You can run `arkitekt mesh join` on as many machines as you like: your laptop, your lab workstation, a remote compute node. They will all
+be able to discover and reach one another through the same coordinator, while the heavy lifting stays peer-to-peer between them.
+
+### When a direct connection can't be made [#mesh-relay-fallback]
+
+In the great majority of cases the two endpoints will manage to establish a direct peer-to-peer connection, even across NAT, by punching through
+with the coordinator's help. Occasionally a particularly restrictive network will refuse to cooperate and a direct connection simply cannot be
+formed. When that happens the mesh can fall back to **relaying** the traffic so that the connection still works. This costs some throughput,
+since the data now takes a longer path. This fallback is the exception, not the rule, and the mesh always *prefers* a direct connection first.
+
+<Callout type="warn" title="The mesh is young">
+  The mesh is one of the newer parts of the platform and is evolving quickly. The command surface and the behavior described above may shift between
+  channels, and as with the rest of the platform we recommend staying on a recent `channel` to get fixes. If you run into trouble joining or reaching
+  endpoints through the mesh, please consult the [Troubleshooting section](/docs/troubleshooting/startup) or open an issue.
+</Callout>
+
+## Other installation strategies [#other-installation-strategies]
+
+Here we will describe other installation strategies that you can use to install the platform. These strategies are not
+recommended for beginners, but might be useful if you want to integrate the platform in a larger infrastructure or if
+you want to participate in the development of the platform.
+
+### Docker-Compose [#docker-compose]
+
+If you are familiar with docker-compose, you can use the docker-compose configuration to set up the platform. We maintain
+an active repository with the docker-compose configuration that you can find [here](https://github.com/arkitektio/arkitekt-server).
+This includes already the configuration for the most common modules of the platform, and when cloned with the submodules
+(`git clone --recurse-submodules`) will also include the source code of the platform. If you encounter any problems with
+the docker-compose configuration, please open an issue in the repository.
+
+### Helm Charts [#helm-charts]
+
+We are currently working on a helm chart that will allow you to install arkitekt on a kubernetes cluster. This will be
+available soon. You will find the repository [here](https://github.com/arkitektio/arkitekt-helm). For now, you can use the
+docker-compose configuration to set up the platform on a kubernetes cluster using the [kompose](https://kompose.io/) tool.
+
+### Custom installation [#custom-installation]
+
+From here be dragons. You can find some hints in the developer section of each module and consult each sub
+modules documentation for more information about the installation of the platform. At this point however you are on your
+own. If you encounter any problems, please open an issue in the respective repository.

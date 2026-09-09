@@ -1,4 +1,5 @@
-import mikroResult from "@site/src/lib/mikro/api/fragments";
+// @ts-nocheck
+import mikroResult from "@/lib/mikro/api/fragments";
 import { Database } from "lucide-react";
 import React from "react";
 import { createGraphQLServiceBuilder } from "../arkitekt/builders/graphQlServiceBuidler";

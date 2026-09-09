@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FaktsEndpoint } from "./endpointSchema";
 
 export interface Closable {

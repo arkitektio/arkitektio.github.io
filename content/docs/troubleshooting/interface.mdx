@@ -1,0 +1,67 @@
+---
+title: Help! Orkestrator is not working
+description: Tips for troubleshooting the Orkestrator interface, including unresponsiveness and actions or workflows that are unavailable or won't run.
+---
+
+Orkestrator is not working for you? Here are some tips to help you troubleshoot.
+
+## Reload, Restart
+
+If Orkestrator is not working, feels slughish and unresponsive, try refreshing the page in your browser or right click on an empty part of the main view, to
+bring up the context menu and select `Reload` in the Desktop App. You will be surprised how often this fixes the problem. If reloading does not help,
+try restarting Orkestrator. Sometimes, the app gets stuck in a bad state and needs to be restarted.
+
+## An action is unavailable (I can't assign to it)
+
+If an action shows up greyed out, or you can't assign a task to it, it means Arkitekt currently has no connected
+agent that implements that action. Here are some tips to help you troubleshoot.
+
+1. Reload the page:
+
+   Easy first. Try reloading the page. This might fix the problem.
+
+2. Check if the app is offline.
+
+   An action is only available while an app implementing it is connected. Can you see that app active in the
+   `Active Apps` section in the Dashboard? If it's not listed there, it is offline. Try connecting, or restarting
+   the app or the plugin.
+
+3. Bounce the App:
+
+   If it appears but the action still won't run, give it a little nudge to update its state. Select the `Bounce`
+   action in the Action Menu of the App. This will briefly disconnect the app and reconnect it, which often
+   re-registers its actions.
+
+4. Check which agents provide the action:
+
+   Open the action in the search sidebar and inspect which connected apps implement it. At least one of them needs to
+   be online for the action to be runnable. If none are connected, start the app that provides it.
+
+5. Delete the Action:
+
+   If all of this fails you can try to delete the action and re-add it. Just delete the action in its detail view, and
+   restart the app. It should re-register the action and become available again.
+
+## My Workflow won't run
+
+A workflow can only run when **every action it uses** has at least one connected agent implementing it. If a
+workflow won't start, one of its actions is usually missing a live agent.
+
+1. Reload the page:
+
+   Easy first. Try reloading the page. This might fix the problem.
+
+2. Find the action without a connected agent:
+
+   Open the workflow and look for any action flagged as unavailable (greyed out). That is the action with no
+   connected agent. Start the app that provides it and the workflow becomes runnable again.
+
+3. Check if the Scheduler is offline:
+
+   Workflows are run by the `Scheduler` app. If you can't see the Scheduler in the `Active Apps` section in the
+   Dashboard, it might be offline. If so, try restarting the app or the plugin.
+
+4. Restart the providing app:
+
+   If an app is connected but its action still won't run, restart that app (or `Bounce` it). This re-registers its
+   actions and should let the workflow run.

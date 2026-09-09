@@ -1,6 +1,7 @@
+// @ts-nocheck
 import * as React from "react"
 
-import { cn } from "@site/src/lib/utils"
+import { cn } from "@/lib/utils"
 
 const Card = React.forwardRef<
   HTMLDivElement,

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { resolveWorkingAlias } from "./alias/resolve";
 import { ActiveFakts, Alias } from "./fakts/faktsSchema";
 import {
@@ -61,4 +62,3 @@ export const buildAliases = async ({
     functional: functional,
   }
 };
-

@@ -1,0 +1,148 @@
+---
+title: Smart Microscopy
+description: A no-code Smart Microscopy workflow that performs 3D live monitoring of cell clusters by combining segmentation, clustering and adaptive acquisition.
+---
+
+import { ShowWorkflow } from "@/components/arkitekt";
+import { DisplayWorkflow } from "@/components/arkitekt";
+import { InstallRepoButton } from "@/components/arkitekt";
+import { UploadModelButton } from "@/components/arkitekt";
+import { Guard } from "@/components/arkitekt";
+
+Arkitekt was designed for the increasingly complex real-time microscopy workflows of today.
+To illustrate Arkitekt readiness for `Smart Microscopy`, we deviced this simply no-code example
+of a `Smart Microscopy` workflow to perform the 3D live monitoring of cell
+clusters with a 40X objective, while scanning a large field of view with a 20X objective.
+
+In this workflow, the Micro-Manager open-source software (Edelstein et al. 2014) is setup for a
+multidimensional acquisition. The user then interactively sets up a grid of positions on large sample
+area (2.61mm x 2.61mm, corresponding to 4\*4 stage positions) containing living fluorescent
+cells.
+
+During the workflow defined positions are then acquired at 20X magnification every 30 minutes for 24 hours.
+For every acquired 20X magnification image, nuclei are then automatically segmented on a remote
+computer using the Stardist (Weigert et al. 2020) algorithm, and cell clusters are computed with the help of
+DBSCAN (Ester et al. 1996).
+When one or more of such identified clusters are detected, the ROIs central coordinates and
+dimensions are translated back to stage coordinates and sent back to the microscope. 3D stacks
+of these positions (25 planes, 0.5µm step size) are then collected at higher magnification
+(40X) on a well-adjusted cameroa ROI fitting the cell clusters size. After all the positive events are
+detected, acquired in 3D high-resolution and displayed on the web-interface, the next image
+is acquired at 20X magnification
+
+<div className="mt-2">
+<img src="/docs/showcases/paper/smart.png" alt="The Smart Microscopy Workflow" />
+
+<div className="text-gray-400 mb-2">
+<small>The Smart Microscopy Workflow</small>
+</div>
+</div>
+
+### Prerequisites
+
+<Callout type="info" title="Please read">
+
+
+We **strongly** suggest to go through the [Getting Started](/docs/introduction/first-steps) guide before attempting to run this workflow.
+It will guide you through the installation of the Arkitekt platform and the setup of your first workflow, as well as how to install plugins
+and apps.
+
+</Callout>
+
+This workflow is designed to run on a microscope computer running Windows 10 as well as on a remote analysis computer
+that will power the Arkitekt platform and the image analysis. To enable GPU acceleration for the Stardist
+segmentation, the analysis computer needs to have access to a CUDA 11 enabled GPU (tested on Nvidia GeforceRTX 2080Ti).
+The microscope computer will need to be connected to the same network as the remote computer.
+
+#### Acquisition Computer
+
+Additionally to run this workflow you will need to have the following installed on your microscope computer:
+
+- [Micro-Manager](https://micro-manager.org/) (version 2.0.1 2023.05.23 (later versions might work as well))
+- [MikroManager](https://github.com/arkitektio-apps/mikro-manager) (version 0.0.1) [Download here](https://github.com/arkitektio-apps/mikro-manager/releases/latest)
+
+As well as the following plugins installed on your Arkitekt computer:
+
+- Reaktor Plugin (>=0.0.3) from the repository [https://github.com/arkitektio-apps/reaktor](https://github.com/arkitektio-apps/reaktor)
+- Stdlib Plugin (>=version 0.3.10) from the repository [https://github.com/arkitektio-apps/stdlib](https://github.com/arkitektio-apps/stdlib)
+- Segmentor Plugin (>version 0.3.4 ) from the repository [https://github.com/arkitektio-apps/segmentor](https://github.com/arkitektio-apps/segmentor)
+
+<div className="flex flex-row gap-2">
+
+<InstallRepoButton repo="stdlib" user="arkitektio-apps" branch="master" />
+<InstallRepoButton repo="segmentor" user="arkitektio-apps" branch="master" />
+<InstallRepoButton repo="reaktor" user="arkitektio-apps" branch="master" />
+
+</div>
+
+## Installing the Workflows
+
+This Smart Microscopy workflow is composed of two smaller workflows, the `Acquire Clusters` workflow and the `Multi Dimensional` workflow.
+In Which the `Acquire Clusters` workflow will be nested in the `Multi Dimensional` workflow.
+
+### Acquire Clusters Workflow
+
+The `Acquire Clusters` workflow is the workflow that will acquire a 20X Image, segment it, detect cluster and send the coordinates
+to the microscope to acquire all clusters with a 40X objective. To install this workflow connect this website to you Arkitekt instance and click on the Import buttom below:
+
+<DisplayWorkflow />
+
+A few things to note about this workflow:
+
+1. This workflow utilizes a pretrained Stardist model to segment the nuclei in the image. This model comes preinstalled with the Segmentor plugin, by changing this action
+   with a `Predict Stardist` action you can use your own Stardist model.
+
+2. The parameters to the Cell Cluster Detection are Global Variables of the Workflow
+
+### Deploying the Workflow
+
+During the Deployment of the smaller workflow it is imperative that you name the workflow `Acquire Clusters` as this and the parameters of the workflow will be used by the `Multi Dimensional` workflow,
+to adequately detect the workflow. If you choose to name the workflow differently you will need to change the respective `Acquire Clusters` node in the `Multi Dimensional` workflow.
+You do not need to run this workflow directly, as it will be called by the `Multi Dimensional` workflow.
+
+<Callout type="info">
+
+
+This imperative naming need is a current bug and will be fixed in a future release of Arkitekt.
+
+
+</Callout>
+
+### Multi Dimensional Workflow
+
+The `Multi Dimensional` workflow is the workflow that will run the above workflow in a multidimensional acquistions for all position every X minutes for X hours.
+
+<DisplayWorkflow />
+
+<div className="text-gray-400 mb-2">
+  <small>
+    Once connected this pane will also give you an overview over the apps that
+    still need to be installed, nodes in green have been installed, nodes in
+    yellow still lack an implementation. Of course feel free to explore this
+    graph more interactively in your orkestrator interface
+  </small>
+</div>
+
+<details>
+  <summary>Test Environment</summary>
+  <div>
+    This workflow was tested on the following environments:
+    <br/>
+
+    Acquisition Computer:
+        - Intel Xeon CPU E5-2620 v4 @ 2.10GHz
+        - 128GB RAM
+        - Nikon Ti2-E Microscope
+        - Windows 10
+        - Micro-Manager 2.0.1 2023.05.23
+        - MikroManager 0.0.1
+
+    Analysis Computer
+        - Intel(R) Core(TM) i9-10900KF CPU @ 3.70GHz
+        - Ubuntu 22.04
+        - Arkitekt Paper Channel
+        - Segmentor Plugin 0.3.4
+        - Stdlib Plugin 0.3.9
+
+  </div>
+</details>

@@ -1,0 +1,147 @@
+---
+title: Kraph
+description: A graph-database backend that connects all data entities in the platform into a queryable knowledge graph, enforcing an evidence-first model where every value is backed by its proof.
+---
+
+import { GithubRepo } from "@/components/docs";
+
+<GithubRepo url="https://github.com/arkitektio/kraph-server" title="Kraph"/>
+
+## The Evidence Graph
+
+Kraph is built around one central idea: **no data without proof**. Traditional databases store answers
+("this cell is an AIS", "the length is 45µm"), but in science an answer without context is just an
+opinion. Kraph instead stores *how* you know something, treating every value not as a static fact but
+as a scientific assertion backed by evidence.
+
+Every value in the graph (the shape of a cell, the connection between two neurons) is built from a
+chain of three layers:
+
+- **Structure**: *the raw evidence.* What did we actually observe? A region of interest (ROI) on an
+  image, a manual annotation, or the output of an AI model. Structures are inspectable links back to the
+  data that was analysed.
+
+- **Metric**: *the quantification.* What value did we extract from that evidence? Not just
+  "length", but "this specific ROI has a `vector_length` of 45.2µm, measured with a confidence of 0.99
+
+- **Entity**: *the scientific conclusion.* What is it, biologically? An *Entity* (an AIS, a Soma, a
+  Synapse) is just a shell with an identity. It holds no values of its own. It aggregates the evidence
+  attached to it.
+
+This produces the canonical path through the graph:
+
+```
+(Metric) -[describes]-> (Structure) -[measures]-> (Entity)
+```
+
+### The "lazy" entity
+
+The power of this model is that an Entity is *lazy*: it does not hard-code its values. It computes them
+on the fly from whatever evidence is currently attached, according to the rules in its
+[schema](#graphs-and-schemas).
+
+For example, to define an Axon Initial Segment you first assert the Entity exists ("there is an AIS
+here"). It has no length yet. You then add a Structure (a hand-drawn ROI) and a Measurement ("this line
+is 120µm"). The AIS now reports `length = 120µm`. If a colleague later finds you missed a segment, they
+do not overwrite your data. They simply add a second piece of evidence, and the Entity transparently
+recalculates. You cannot change the biological reality directly; you can only provide new evidence.
+
+## Provenance: who said that?
+
+In science, *who* made a claim matters as much as the claim itself. Every time data enters Kraph it is
+wrapped in an **Assertion** that records the subject (the user or algorithm that made it), the app they
+were using, and a timestamp. Kraph builds on [koherent](/docs/design/architecture/provenance) for this
+complete audit log, so when you ask the graph for a value you do not just get `45.2`. You get
+"45.2µm (confidence 98%), derived from ROI #555, asserted by `AI_Model_X` on Jan 15th".
+
+## Graphs and Schemas
+
+- **Graph**: A collection of entities grouped for a purpose, for example all the entities belonging to
+  a sample or an experiment. Within a graph, entities are unique by name. Kraph supports **multiple
+  graphs** for different use cases in parallel.
+
+- **GraphSchema**: A versioned schema definition for a graph. The schema declares which categories of
+  nodes and edges are allowed and how derived values (like the "average length" above) are computed.
+
+- **Ontologies**: A graph can reference an **ontology** to give its categories well-defined, shared
+  meaning, which makes the data easier to query and to interoperate with external standards.
+
+## Categories
+
+The schema is expressed through **categories**, the types that nodes and edges in the graph can take.
+They divide into node categories and edge categories.
+
+### Node categories
+
+- **StructureCategory**: A datapoint linking back to analysed data (e.g. an ROI on an image). It is the
+  `Structure` in the evidence chain.
+
+- **EntityCategory**: A biological entity (a cell, a tissue, …). Entities are the basic building block
+  and are designed to be "immortal" within the graph. Rather than being deleted, they simply stop having
+  supporting evidence.
+
+- **MetricCategory**: An analytical statement that describes a structure, such as intensity or area. A
+  metric always *describes* a structure, which in turn *measures* an entity.
+
+- **ReagentCategory**: A node representing a reagent without biological meaning of its own (e.g. 4%
+  formaldehyde, 10% DMSO), used as context in protocols.
+
+- **NaturalEventCategory**: A natural event that happens *to* entities (a cell division, a cell death).
+  Natural events are always justified by a supporting measurement.
+
+- **ProtocolEventCategory**: A protocol step that entities were subjected to, creating or altering them
+  (for example an extraction that consumes an animal and produces a hippocampus). Protocol events are
+  grouped under [Protocols](#protocols).
+
+### Edge categories
+
+- **MeasurementCategory**: An edge that carries a value, connecting a structure to the entity it
+  measures.
+
+- **RelationCategory**: A valueless relationship between two entities (e.g. `CONNECTED_TO`), itself
+  backed by its own evidence.
+
+- **StructureRelationCategory**: A relationship defined between structures.
+
+### Protocols
+
+A **Protocol** groups protocol-event categories into a reproducible procedure, capturing how a set of
+entities and reagents were processed to produce new entities.
+
+## Querying the graph
+
+Because Kraph is a real graph database, you query it with Cypher, exposed through a set of saved,
+typed query objects. Queries come in two scopes:
+
+- **GraphQuery**: runs against an entire graph. Variants materialize different shapes of result:
+  `GraphNodesQuery` (a list of nodes), `GraphPathQuery` (paths), `GraphPairsQuery` (node pairs) and
+  `GraphTableQuery` (a table).
+
+- **NodeQuery** / **EdgeQuery**: run relative to a specific node or edge, with the same
+  path / pairs / table result variants.
+
+### Materialized views
+
+Expensive queries can be persisted as a **MaterializedView**, a precomputed view of a graph backed by
+materialized edges (`MaterializedRelationEdge`, `MaterializedMeasurementEdge`,
+`MaterializedStructureRelationEdge`). Views can drive analyses such as **ScatterPlots** directly from
+graph data.
+
+## Features
+
+- **Graph database**: Connect every data entity in your project into one knowledge graph.
+- **Evidence-first**: Every value is backed by the structure, measurement and assertion that produced it.
+- **Knowledge queries**: Query your data in Cypher, with saved, typed graph/node/edge queries.
+- **Multiple graphs**: Maintain independent graphs for different experiments or use cases.
+- **Ontologies**: Define ontologies for your entities to make queries clearer and interoperable.
+- **Data integration**: Integrates with the other Arkitekt services, such as [Mikro](/docs/design/services/mikro).
+- **Complete audit logging**: Full provenance for every assertion via [koherent](/docs/design/architecture/provenance).
+
+<Callout type="info">
+
+
+Kraph is built on the current Arkitekt stack (Django, Strawberry GraphQL) and is under active
+development. Its API may still change as the graph model is refined.
+
+
+</Callout>

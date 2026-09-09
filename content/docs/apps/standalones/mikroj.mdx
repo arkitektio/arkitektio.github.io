@@ -1,0 +1,56 @@
+---
+title: Mikro J
+description: Fiji (ImageJ) enabled as an Arkitekt App, letting you run Fiji plugins from within Arkitekt workflows.
+---
+
+import { ShowWorkflow } from "@/components/arkitekt";
+import { FijiGrid } from "@/components/docs";
+
+## Design
+
+MikroJ is designed as a small wrapper around Fiji and utilizes the awesome [pyimagej](https://imagej.net/scripting/pyimagej) library to connect to Fiji. This allows us to use the same python code base to connect to Fiji. While we are planning
+to add some point bring native support for Fiji into Arkitekt, MikroJ is a great way to get started with Fiji in Arkitekt.
+
+## Installation
+
+To install MikroJ, you need to have Fiji installed on your computer. You can download Fiji from [here](https://imagej.net/Fiji/Downloads).
+After you have installed Fiji, you can install MikroJ from the GitHub repository. You can find the repository [here](https://github.com/arkitektio-apps/mikroj)
+
+<FijiGrid/>
+
+<Callout type="info" title="On Mac support">
+
+
+Due to a quirk of the PyImageJ event loop handling, MikroJ currently only works on Windows and Linux. We are working on a fix for this.
+Also for now we recommend installing "MikroJ" from pip when using Linux. You can track the process of the PyImageJ issue [here](https://github.com/imagej/pyimagej/issues/298)
+
+
+</Callout>
+
+## Usage
+
+After downloading the MikroJ app, you can unpack it to a folder of your choice and run the MikroJ executable directly from its folder through
+a double click.
+
+When you start MikroJ, you will see a window like this and you will be prompted to select your
+Fiji installation folder and to connect to your Arkitekt server.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/apps/standalones/setup_mikroj.webm" />
+</video>
+
+<Callout type="info">
+
+
+If you are using MikroJ for the first time, you will be prompted to select your Fiji installation folder. You can do this by clicking the "Select Fiji" button and navigating to your Fiji installation folder.
+In some cases this might cause the program to crash. If this happens just restart MikroJ. We don't really know why that is happening but we are working on a fix, so please bear with us.
+
+
+</Callout>

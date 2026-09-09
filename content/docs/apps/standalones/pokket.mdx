@@ -1,0 +1,54 @@
+---
+title: Pokket - your mobile gateway to Arkitekt
+description: A mobile companion app for managing your Arkitekt services, tasks, and connected devices directly from your phone.
+---
+
+![Pokket App](/docs/apps/standalones/pokket.png)
+
+**Pokket** is your mobile gateway to the [Arkitekt](https://arkitekt.live) ecosystem. It serves as a companion app for managing your Arkitekt services, tasks, and connected devices directly from your phone.
+
+## Features
+
+### 🔗 Arkitekt Connection
+Seamlessly connect to your Arkitekt instance. Pokket handles authentication via `lok` and provides a secure connection to your services.
+
+### 📋 Task Management
+Stay on top of your workflows. View and manage your latest tasks through the `rekuest` service integration, ensuring you never miss an important action.
+
+### 📡 Device Provisioning
+Easily provision ESP32-based devices for your lab or home. Pokket uses the **Improv Wi-Fi** protocol over BLE to configure devices with:
+- Wi-Fi Credentials (Standard & Eduroam support)
+- Arkitekt Connection Tokens
+
+### 📶 Wi-Fi Profile Management
+Manage your Wi-Fi configurations in one place. Save standard and Eduroam profiles to quickly provision multiple devices without re-entering credentials.
+
+## Get Started
+
+Currently available for Android devices with BLE support. Just download the APK from the [Releases](https://github.com/jhnnsrs/pokket/releases) page and install it on your device.
+
+## Devlopment Setup
+
+1. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+2. **Start the app**
+
+   ```bash
+   npx expo start
+   ```
+
+## Tech Stack
+
+- **Framework**: React Native (Expo)
+- **Styling**: NativeWind (Tailwind CSS)
+- **Navigation**: Expo Router
+- **Data**: Apollo Client (GraphQL)
+- **BLE**: `react-native-ble-plx`
+
+## License
+
+MIT

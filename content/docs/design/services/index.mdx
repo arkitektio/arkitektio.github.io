@@ -1,0 +1,78 @@
+---
+title: Services
+description: An overview of the modular, containerized (micro)-service architecture that forms the backbone of the Arkitekt platform.
+---
+
+## Services in Arkitekt
+
+The following are the core services that are installed in a default Arkitekt platform:
+
+- [Lok](services/lok): Authorization and Authentication service
+- [Rekuest](services/rekuest): Node Repository and Task-Assignment
+- [Kabinet](services/kabinet): App Store and Plugin Management
+- [Mikro](services/mikro): Microscopy Data Management
+- [Kraph](services/kraph): Knowledge graph and provenance
+- [Fluss](services/fluss): Workflow management
+
+Other services can be added to the platform as needed. These **Next Generation** services are
+a set of emerging services that are currently in development and might replace existing services
+in the future. While you can definitely use them, be aware that they are not yet fully supported
+and might change in the future.
+
+- [OmeroArk](services/omeroark): OMERO integration
+- [Kluster](services/kluster): Dask-Cluster management
+
+
+## Technical Design of the Services
+
+#### Design Principles
+
+While the Services in Arkitekt can be designed in a variety of ways, the following are some of the key design principles that are followed in the design of the services:
+
+- **Containerized**: Each service is designed to be a containerized web-server that can be deployed in a containerized environment (e.g. Docker, Kubernetes).
+
+- **GraphQL API**: Each service provides a GraphQL API that can be used to interact with the service. This allows for a flexible and powerful way to interact with the service.
+
+- **No inter-service communication**: While Arkitekt adopts a clear seperation of concerns and modularity in its design, the services are designed to act completely independently and do not
+communicate with each other (as opposed to some micro-service architectures where services communicate with each other). This is to ensure that the services
+can develop and evolve independently and can be used in a variety of combinations.
+
+- ** JWT Authentication and Authorization**: Each service can be configured to use a variety of authentication and authorization mechanisms. However, In order to ensure a consistent and distibributed authentication 
+each service accepts JWT tokens that are used to authenticate.
+
+- **Database**: Each service can be configured to use a variety of databases. However, the default database used in the Arkitekt platform is a PostgreSQL database.
+
+- **Configuration**: Each service should be configurable using a configuration file and environment variables. This configuration is generated when installaling the platform
+through the Arkitekt CLI or Konstruktor.
+
+- **Logging and Monitoring**: Each service logs its activity to standard output. 
+
+#### Current Tech Stack
+
+The following are the current base technologies that are used in the design of the services:
+
+- **Language**: Python
+- **Web Framework**: Django
+- **GraphQL**: Graphene
+- **Database**: PostgreSQL
+
+While the above technologies are used as the base, the services can be designed using a variety of technologies and frameworks as needed.
+
+<Callout type="info">
+
+
+In an effort to standardize and make the backend services more testable and type-safe, we are currently in the process of migrating the services
+to use `Strawberry` a wildely used Python GraphQL library that is designed to be more type-safe and testable.
+
+
+</Callout>
+
+<Callout type="info">
+
+
+While Django might not be the most performant web-framework, it is chosen as the base web-framework for the services due to its flexibility,
+modularity and the wide variety of libraries and tools that are available for it. If you are designing a service that requires high-performance
+or has specific requirements, you can choose to use a different web-framework.
+
+
+</Callout>

@@ -1,0 +1,38 @@
+---
+title: What is an Implementation?
+description: An Implementation is a concrete implementation of an abstract Action within a specific application, defining how a bioimage task actually runs.
+---
+
+## Example
+
+Let's say you have want to do a bioimage task that is called "Project Maximum Intensity". This tasks has exactly on input, such as an image, and a single output, the segmented image Thats the abstract description of the task, and is represented by an action in Arkitekt. 
+Now this tasks could run on a variety of different applications, such as on ImageJ, Stardist or Napari. 
+Each of these applications would have a different way of running the task, but the abstract idea including the inputs and outputs would be the same.
+ These different ways of running the task are represented by implementations in Arkitekt.
+
+
+<div className="mt-2">
+<img src="/docs/design/terminology/node-template.png" alt="Actions and Implementations" />
+
+<div className="text-gray-400 mb-2">
+<small>Actions and Implementations</small>
+</div>
+</div>
+
+Actions are never attached to an application, implementations always are. 
+
+<Callout type="info">
+
+
+Importantly implementations are not created only on the app level, but for each user that runs the app. This allows us to find the best fitting
+implementation for each bioimage task based on the user's preferences and the available resources.
+
+
+</Callout>
+
+## Developer Side 
+
+When developing an app, you will never really interact with actions and implementations, as they are abstract concepts that are abstracted away by our SDKs. 
+Once you register a python function, that function will be automatically inspected to infer inputs and outputs and the documentaiton of the function.
+This information is now send to the Arkitekt server, and if no action with the parameters of the function exists, a new action is automatically created and
+associated with the app.

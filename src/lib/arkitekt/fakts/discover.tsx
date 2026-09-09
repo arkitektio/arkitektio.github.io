@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { fetchWithTimeout } from "../utils";
 import { FaktsEndpoint, FaktsEndpointSchema } from "./endpointSchema";
 

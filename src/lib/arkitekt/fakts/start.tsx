@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { FaktsEndpoint } from "./endpointSchema";
 
 export const start = async ({

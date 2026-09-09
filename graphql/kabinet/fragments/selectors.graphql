@@ -1,9 +1,0 @@
-fragment CudaSelector on CudaSelector {
-  cudaVersion
-  cudaCores
-}
-
-fragment RocmSelector on RocmSelector {
-  apiVersion
-  apiThing
-}

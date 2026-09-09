@@ -1,0 +1,143 @@
+---
+title: Coordinate Systems
+description: How the next generation of Mikro keeps track of space, from pixel grids to the physical slide, and how attribute plans tell you everything the platform knows about the cell under your cursor.
+---
+
+import { GithubRepo, MikroSpaces } from "@/components/docs";
+
+<GithubRepo url="https://github.com/arkitektio/mikro-server-next" title="Mikro Next"/>
+
+## Every image is secretly a bookkeeping problem
+
+Think about a normal day at the microscope. You take a quick overview scan of the whole slide, find
+the interesting region, and acquire a high-resolution tile of it. Later, an analysis segments that
+tile into cells and measures each one. Now try to answer some very ordinary questions: *Where on the
+slide is this pixel? Is this the same cell I saw in the overview? How big is it, in µm rather than
+pixels?*
+
+Every answer depends on relationships between things: the tile relates to the slide through the
+stage position and pixel size, the mask relates to the tile because it was computed from it, and
+each cell in the mask relates to a row in a measurement table. Most tools scatter these
+relationships across file names, metadata fields and people's memories. When a calibration turns out
+to be slightly wrong, someone has to find every place it was copied to.
+
+Earlier versions of Mikro were no exception: physical placement lived in an affine matrix attached
+to each image (a *stage view*), so two views of the same data could quietly disagree, and a
+corrected pixel size had to be chased through every copy. Mikro now takes a different approach,
+built on one central idea: **every spatial fact is stored exactly once**. Coordinate systems are the
+*places* data can live, transformations are the *maps* between those places, and together they form
+a graph the whole platform shares.
+
+## Spaces: places where data lives
+
+A **coordinate system** in Mikro is deliberately simple: a name and a list of axes. Each axis has a
+name, a type (space, time, channel, ...) and optionally a unit. That is enough to describe very
+different kinds of places:
+
+- **A pixel grid.** Your tile's own coordinate system: axes `y` and `x`, counted in pixels, no
+  units. This space exists the moment the image is written, before anyone calibrates anything.
+- **A physical space.** "The slide", with axes in millimetres. Micrometres and millimetres are an
+  *interpretation* that is added on top of pixel data, never a built-in property of it.
+- **A shared reference frame.** A space that no image owns, like a common slide space that a whole
+  set of tiles is placed into, or an atlas that several experiments share.
+
+Every piece of data, whether it is an image, a segmentation mask, a measurement table, a mesh or a
+collection of annotations, lives in **exactly one** space and says so explicitly. Anything you draw
+on an image, an ROI, an arrow, a scale bar, lives in that image's pixel grid and therefore can never
+drift out of register with the pixels.
+
+## Transformations: maps between places
+
+Spaces on their own would just be islands. **Transformations** connect them: each one is a directed
+edge from one space to another, with a *kind* that says what sort of map it is:
+
+- **scale** relates a pyramid level to the full-resolution grid (level 1 is exactly 2× coarser).
+- **affine** places pixels in a physical space: the pixel size, rotation and stage position of a
+  tile on the slide, or the registration of one round of imaging onto another.
+- **derived** edges record processing: a segmentation is spatially an identity (no pixel moved) but
+  its *values* changed meaning, from intensities to cell ids.
+- **field** is the special crossing from geometry into records: it says that a mask pixel's value
+  *is* a row number in a table of objects.
+- **unmappable** honestly records that no correspondence exists anymore, for example after an
+  analysis that collapsed an axis entirely. Without it, the only way to record such a step would be
+  to lie with an identity.
+
+Each edge also remembers *how it is known* (drawn by hand, inferred by an algorithm, or validated)
+and carries a **version** that increases every time it is refined.
+
+## One fact, stored once
+
+The rule that makes this graph powerful: **edges are facts, paths are queries**. The server stores
+each individual map and never merges them into one combined answer. When a viewer wants to show your
+tile on the slide, it asks for the chain of edges and composes them itself.
+
+This sounds like a technical detail, but it is exactly what makes the everyday problems disappear:
+
+- **Fix a calibration once, fix it everywhere.** If the stage position of a tile was slightly off,
+  you refine one affine edge. Every ROI, overlay and scene that looks through that edge is corrected
+  at the same moment, because none of them ever had their own copy.
+- **Nothing you drew ever moves.** Your annotations live in pixel space. Refining the physical
+  placement changes how pixel space maps to the slide, not the pixels, so drawings stay perfectly
+  registered with the image forever.
+- **The same image can be placed twice.** In a comparison scene your tile might be registered onto a
+  different reference than in the acquisition scene. Both placements are just edges, and neither has
+  to be "the" truth.
+
+Explore all of this in the figure below. Click any space or arrow to inspect it, press **refine
+calibration** to watch a single edge move the tile (while its contents stay put), and hover the
+cells on the right, which brings us to the second half of this page.
+
+<MikroSpaces />
+
+## Attribute plans: what is under my cursor?
+
+You are looking at a segmentation mask over your image, the pointer resting on a cell. The question
+you actually care about is: *which cell is this, and what do we know about it?* The answer is spread
+over two places: the mask (whose pixel values are cell ids) and one or more measurement tables (one
+row per cell). Following that trail for every mouse movement would mean a server round-trip per
+hover, which is exactly the kind of sluggishness you know from remote viewers.
+
+Mikro's answer is an **attribute plan**. Instead of answering the question itself, the server hands
+your viewer a *recipe*:
+
+1. **Sample.** Read the mask at the cursor, that gives you the cell id `i`. If your data has a time
+   axis, the current timepoint is carried along automatically.
+2. **Look up.** Run this ready-made query against the measurement table:
+
+```sql
+SELECT area, mean_intensity FROM cells.parquet WHERE t = ? AND i = ?
+```
+
+The crucial property: **the plan contains no coordinates**. It is the same recipe for every pixel,
+so your viewer fetches it once and then executes it locally, on data it already has, for every
+single hover. No round-trips, no lag, and the server never has to open your images or tables at all.
+
+Plans are discovered from the coordinate graph. If your mask was measured twice, once for
+morphology and once for intensity, probing it returns two plans, one per table. And because every
+plan remembers which edges (and which edge *versions*) it was built from, your viewer knows exactly
+when a refined segmentation makes a cached plan stale.
+
+## What this means for you
+
+- **Calibrations are corrigible.** A wrong pixel size or stage offset is one edge to fix, not a
+  metadata field copied into a hundred files.
+- **Your annotations are safe.** ROIs and drawings are anchored to the space you drew them in and
+  survive any later re-registration untouched.
+- **Measurements at your cursor.** Viewers like Orkestrator can show you everything the platform
+  knows about a cell the instant you hover it.
+- **Honest provenance.** Every map records how it is known and what changed, and even "there is no
+  map anymore" is a recordable fact. Combined with [Kraph](/docs/design/services/kraph), your
+  results stay traceable back to the pixels that produced them.
+
+<Callout type="info" title="One thing to remember">
+
+Spaces are places, transformations are maps, and every spatial fact lives exactly once. If a number
+describes *where* something is, it is an edge in the graph, and fixing the edge fixes everyone who
+uses it.
+
+</Callout>
+
+If you want to put data into Mikro from your own analysis scripts, the
+[Python guide on reading and writing data](/docs/developers/python/read-write) is the natural next
+step. Prefer slides? This page also exists as a
+[presentation](/presentations/mikro-coordinate-system) you can use in lab meetings and teaching.

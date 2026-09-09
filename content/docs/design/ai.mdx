@@ -1,0 +1,63 @@
+---
+title: AI?
+description: How AI is used in building Arkitekt. We use it heavily, but never without supervision. Nothing here is vibe-coded.
+---
+
+<Callout type="info" title="TLDR">
+We don't hate AI, but we don't trust it either. 
+</Callout>
+
+## Looks are deceiving
+
+The current state of AI annoys us, and looking at Arkitekt you might just feel, well you
+look like any other AI-generated content yourself, so why do you complain?
+The reality is that the look of Arkitekt was designed around established modern
+ui frameworks like Shadcn and Tailwind, way before they became the standard of UI
+design that every 500 millionth copy of a dashbard now looks like.
+
+Arkitekt is a product that was first conecptualized in 2018 and has been torn down
+and rebuilt multiple times since then. Our original build of Arkitekt that this
+one inherited almost everything from was built without any AI assistance. This
+one was built with AI, but look at the code yourself, and you will find our
+stupidness all over..
+
+## What we don't do
+
+We don't *vibe-code*. We don't generate a feature, watch it compile, and merge it
+because the demo looked fine. Every line that lands in Arkitekt is read,
+understood, and owned by a human who could have written it themselves and can
+explain why it is there.
+
+<Callout type="warn" title="No unsupervised code">
+AI never merges to Arkitekt on its own. There is always a human in the loop who
+reviews, questions, and takes responsibility for the result. If we can't explain
+a piece of code, it doesn't ship.
+</Callout>
+
+Scientific software is justdiffenrent. People make decisions about real
+experiments and real data based on what it does. "The model probably got it
+right" is not an acceptable standard for us and a platform that sits between a
+microscope and a theory.
+
+## Where we use it
+
+We use AI where it genuinely makes us faster without making us dumber:
+
+- **Drafting.** First passes of components, migrations, and boilerplate that we
+  then rewrite, tighten, and review.
+- **Refactoring.** Large mechanical changes across the codebase, always checked
+  diff by diff.
+- **Exploration.** Trying three approaches quickly to find the one worth keeping.
+
+In every case the AI is an accelerator, not an author of record. The judgment,
+the architecture, and the responsibility stay with the people building Arkitekt.
+
+## Why this matters for you
+
+If you build on Arkitekt, you are trusting it with data and decisions. You should
+know that its polished look is not a shortcut. It is the result of using powerful
+tools *under supervision*, the same way we would expect any careful engineer to
+use them.
+
+We think that is the honest place to stand on AI. We neither pretend it away, nor
+let it run unattended. Use it heavily. Supervise it always.

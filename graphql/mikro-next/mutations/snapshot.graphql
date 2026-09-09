@@ -1,5 +1,0 @@
-mutation CreateSnapshot($image: ID!, $file: ImageFileLike!) {
-  createSnapshot(input: { file: $file, image: $image }) {
-    ...Snapshot
-  }
-}

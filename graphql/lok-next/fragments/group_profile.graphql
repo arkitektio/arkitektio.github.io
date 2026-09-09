@@ -1,7 +1,0 @@
-fragment GroupProfile on GroupProfile {
-  id
-  name
-  avatar {
-    presignedUrl
-  }
-}

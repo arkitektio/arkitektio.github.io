@@ -1,0 +1,97 @@
+---
+title: Gucker - your file watcher
+description: A file watcher that streams new files from directories to the Arkitekt Server to start processing in a workflow.
+---
+
+import { GuckerGrid } from "@/components/docs";
+
+## Idea
+
+Gucker was developed to enable directly streaming files that are being produced (by your microscope) to the Arkitekt Server and to directly start the processing
+of the files in a workflow.
+
+## Installation
+
+Gucker comes as a bundled application installable from its Github Releases [page](https://github.com/arkitektio-apps/gucker/releases/latest).
+
+<GuckerGrid/>
+Additionally you can install it via `pip`:
+
+```bash
+pip install gucker
+```
+
+<Callout type="info" title="On Mac support">
+
+
+Currently we provide no build for the Mac platform, but you can install it via pip on your Mac. We will add a Mac build in the future.
+
+</Callout>
+
+## Usage
+
+Currently gucker is only available as a GUI while we are working on also enabling
+it as a command line tool. To start the GUI simply run the binary in the extracted folder or run the following command, 
+if you installed it via pip:
+
+```bash
+gucker
+```
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/apps/standalones/connect_gucker.webm" />
+</video>
+
+
+
+## Configuration
+
+Gucker requires you to set two directories, the "Import" directory and the "Export" directory.
+The "Import" directory is the directory that will be watched for changes 
+while the "Target" directory is the directory where the files will be copied to when you explicitly export them.
+
+## Usage in Arkitekt Workflows
+
+Guckers main purpose is to establish a "Streaming Action" in Arkitekt workflows, and allows
+you to directly stream files to the Arkitekt Server and start the processing of the files in a workflow.
+For this just add the `Stream Files` action to your workflow and configure it to use the Gucker instance,
+that points to the Folder you want to watch.
+
+Additionally you can also specify some filters to only stream files that match a certain file pattern
+in regexp. Here are some common patterns:
+
+- `.*` - matches all files
+- `.*.tif` - matches all tif files
+- `.*.czi` - matches all czi files
+- `.*.nd2` - matches all nd2 files
+- `.*[.tif|.tiff]` - matches all jpg and png files
+
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/apps/standalones/stream_files.webm" />
+</video>
+
+
+<Callout type="info">
+
+
+Regular expressions are a powerful tool to match file patterns, but can also be quite complex.
+We are recommending to use a tool like [regex101](https://regex101.com/) to test your regular expressions. 
+Against the files you want to match, if it gets too complex.
+
+
+</Callout>

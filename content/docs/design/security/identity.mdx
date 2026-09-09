@@ -1,0 +1,80 @@
+---
+title: Identity & Access
+description: "How you and your apps prove who they are: OAuth2, OpenID Connect and JWT via Lok, app discovery through Fakts, and scope-based permissions."
+---
+
+Before anything in Arkitekt can read or write data, it has to prove who it is.
+Arkitekt handles this with well-established standards rather than anything
+bespoke, OAuth2, OpenID Connect and signed JWT tokens, so that the same identity
+works consistently across every service.
+
+## Lok, the coordinator
+
+[**Lok**](/docs/design/services/lok) is the service responsible for authentication
+and authorization. Conceptually it is the **coordinator**: arguably the single
+most important part of the platform, because everything else trusts the identities
+it issues.
+
+The coordinator's job is two things that go hand in hand: **auth** (proving who you
+and your apps are) and **discovery** (helping apps and servers find and trust each
+other). Lok handles the auth; the discovery side shows up as the [Fakts
+protocol](/docs/design/architecture/service-discovery) on a local network, and as
+the [mesh](/docs/design/security/mesh) across networks, where the same coordinator
+role is run as a *coordination server*. It is one control plane wearing two hats,
+not two unrelated systems.
+
+Lok issues **JWT tokens**, cryptographically signed claims about a user and the
+application acting on their behalf. Because the signature can be verified by any
+service on its own, there is **no central session store** to consult on every
+request: each service independently checks the token it is handed. This is what
+lets Arkitekt's services stay independent and scale without a shared bottleneck.
+
+## Two-step authentication: users *and* apps
+
+Logging in to Arkitekt authenticates **two** parties at once: **you**, and the
+**app** acting for you.
+
+The first time a new app connects, you are asked to approve the connection and the
+permissions it requests, exactly like pressing "Log in with Google" on a website.
+This double-authentication is central to how Arkitekt keeps you in control: the
+app never impersonates you, it acts *as itself, on your authority*. You can read
+more in [Apps](/docs/design/terminology/app).
+
+## Fakts: discovery and app authorization
+
+Apps also need to *find* a deployment and get their configuration. That is the job
+of the **Fakts** protocol, described in [Service
+Discovery](/docs/design/architecture/service-discovery).
+
+Fakts uses a device-code-style flow, similar in spirit to OAuth2:
+
+1. The app presents its **Manifest** (identifier, version, requested scopes).
+2. It receives a user-validation code.
+3. You approve the app in the browser.
+4. The app receives a token and fetches the deployment configuration it needs.
+
+On the client side, two small libraries pair up to do this: **Fakts** retrieves
+configuration, and **Herre** is the asynchronous OAuth2 client that manages the
+tokens. (Note that *Herre* is a client library, not a server, the server is Lok.)
+
+## Scopes
+
+An app declares the access rights it needs as **scopes** in its
+[Manifest](/docs/design/terminology/manifest), for example `openid` and `email`.
+Scopes are how you reason about "what can this app actually do with my data" before
+you approve it.
+
+<Callout type="warn" title="Scopes are still being enforced">
+Scope-based access control is **not yet fully enforced** by the platform. Enforcing
+it too strictly today would hinder the development of new apps, so we are
+introducing it gradually. Treat scopes as the intended model, not yet a hard
+guarantee.
+</Callout>
+
+## Social login
+
+You can sign in with an external provider such as **GitHub, Google or ORCID**. When
+you do, the provider hands Arkitekt a minimal identity token, typically just your
+email address and name, purely so we can create or match your login. Arkitekt does
+**not** gain access to your provider account. See the [Privacy
+Policy](/docs/privacy) for exactly what is exchanged.

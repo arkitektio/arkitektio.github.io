@@ -1,0 +1,84 @@
+---
+title: Task
+description: A Task is the process of running an action in Arkitekt, assigned directly to an action and able to stream results over time.
+---
+
+### Whats is a Task
+
+A Task is the process of running an action in Arkitekt, and happens everytime
+you want to instruct an App to do something with your data. You assign a task
+**directly** to an action; Arkitekt then takes care of "where" and "how"
+it runs by routing it to a connected agent that implements that action.
+
+Also a Task is an ongoing process, and can be `cancelled` at any time. Cancellation
+is again an integral part of the Arkitekt design (and seperates it from a lot other message
+broker based systems). This is because we want to be able to cancel tasks at any time, and
+interupt critical processes if needed.
+
+Because we establish a streaming network where actions can produce data over time, Tasks
+are also a way to establish data streams and will not onyl execute once, but can return 
+continouelsy new data over time. (See below for more on this).
+
+
+## The path of a Task
+
+
+
+<Callout type="info">
+
+
+Understanding the inner workings of a Task is rather an "implementation detail" of Arkitekt,
+and we are abstracting it more and more away, so you do not need to crasp it to use Arkitekt.
+Just think of a Task as a way to run a Bioimage analysis in Arkitekt.
+
+
+</Callout>
+
+<div className="mt-2">
+<img src="/docs/design/terminology/assignment.png" alt="The stages of a task" />
+
+<div className="text-gray-400 mb-2">
+<small>The stages of a task</small>
+</div>
+</div>
+
+When you create a Task in Akriekt you are essential creating a docket, a list of workitems
+that need to be done. Lets say you want to run a task like `segmentation` on a dataset.
+
+You search the action "Segment Cells" and simply assign your data to it. You do not care
+where it runs, so Arkitekt decides for you, routing the task to any connected agent that
+implements the action.
+
+When you assign the task and enter the data you want to segment, you
+create a Task with the parameters you provided. This Task is now a "workorder"
+that is being sent through a pipeline of tasks.
+
+
+First Arkitekt acknoledges that you assigned the task (you had the permissions, and your parameters
+made sense), it entered the "Assigned" state. Now Arikitekt will put it through the rabbitmq
+based message broker, where it will be routed to the correct action. This is the process of
+"routing", once the task is routed to a desired implementation, the tasks is now "bound" to this
+implementation, and the implementation is responsible
+for running the tasks. Binding is an important concept in Arkitekt, as it allows us
+to keep track where exactly tasks are being executed so that we can always cancel them
+if needed.
+
+Once the task is running, the implementation will send back results to Arkitekt, which
+will then be sent back to the user. This is the process of "yielding" results from a task.
+Once the task is done, Arkiekt will mark the task as "done" and the Task is
+completed.
+
+At every step of the way, the task can be cancelled, by giving the Task ID to
+Arkitekt, and Arkitekt will then cancel the task, sending the request to cancel to the
+implementation, and then marking the task as "cancelled".
+
+<Callout type="warn" title="On Cancellation">
+
+
+Cancellation is not as trivial as it sounds, as computers are not always able to stop
+a process at any time. We have put a lot of care in our SDKs to make sure that
+cancellation is as smooth as possible, but some tasks might not be able to be cancelled
+at any time. Please be aware of this when you are running critical tasks.
+
+
+</Callout>

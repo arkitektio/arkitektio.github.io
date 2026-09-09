@@ -1,8 +1,0 @@
-query Me {
-  me {
-    omeroUser {
-      id
-      omeroUsername
-    }
-  }
-}

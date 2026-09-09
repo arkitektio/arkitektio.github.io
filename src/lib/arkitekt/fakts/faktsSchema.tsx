@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { report } from "process";
 import { z } from "zod";
 

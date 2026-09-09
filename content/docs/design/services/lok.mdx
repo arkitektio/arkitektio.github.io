@@ -1,0 +1,58 @@
+---
+title: Lok
+description: A central, distributed backend for managing and authorizing users and applications using OAuth2, OpenID Connect, and JWT tokens.
+---
+
+import { GithubRepo } from "@/components/docs";
+
+<GithubRepo url="https://github.com/arkitektio/lok-server" title="Lok"/>
+
+## Design
+
+Lok employs patterns for distributed authentication and authorization, through the use of JWT tokens. These tokens
+represent cryptographically signed claims about the user and the application issued by the Lok server. They can be
+verified by any service, and do not require a central session store.
+
+<div className="mt-2 p-6 w-full">
+<img src="/docs/design/services/lok.png" alt="Lok" />
+
+<div className="text-gray-400 mb-2">
+  <small>
+    An excerpt of the Arkitekt Schema with some Metadata models that are
+    attached to the images.
+  </small>
+</div>
+</div>
+
+
+
+
+
+
+## Features
+
+- [x] Application Registration (Authentication of apps based on various Flows)
+- [x] App Configuration (apps can retrieve their configuration from the server)
+- [x] User Authentication and Authorization
+- [x] User and Application Management
+- [x] Distibuted Authentication
+- [x] Social Features (Comments) 
+- [x] User Profiles
+
+All features are exposed through a GraphQL API, which can be used to interact with the system.
+
+
+## Next Features
+
+Lok is currently undergoing a major rewrite, to make it more modular and easier to extend. This rewrite
+will transition the system to a more modular architecture based on modern [Django](https://www.djangoproject.com/) and
+the awesome [Strawberry GraphQL](https://strawberry.rocks/) library.
+
+Additionally to the listed
+features above, the following features are planned:
+
+- [ ] More diverse App Registration Flows (e.g. for Websites)
+- [ ] Social Login (Login with Orcid, Github, Google,... )
+- [ ] User Profiles with social account information
+- [ ] Notificaition Backend (with Mobile Push Notifications)
+- [ ] More Security Features (e.g. 2FA)

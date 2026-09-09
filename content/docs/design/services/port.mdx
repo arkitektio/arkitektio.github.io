@@ -1,0 +1,31 @@
+---
+title: Port
+description: Arkitekt's "App Store" for installing and managing containerized PluginApps and executing them directly on the platform server.
+---
+
+import { GithubRepo } from "@/components/docs";
+
+
+<GithubRepo url="https://github.com/arkitektio/port-server" title="Port"/>
+
+## Port Design
+
+<div className="mt-2 p-6 w-full">
+<img src="/docs/design/services/port.png" alt="Port" />
+
+<div className="text-gray-400 mb-2">
+  <small>
+    An Architectural Overview of the Port Service
+  </small>
+</div>
+</div>
+
+<Callout type="info">
+
+
+Port has been superseded by the [Kabinet](/docs/design/services/kabinet) service, which is now
+responsible for installing and executing PluginApps in the standard deployment. Port remains
+available and the two systems can coexist, but for most users Kabinet is the recommended option.
+
+
+</Callout>

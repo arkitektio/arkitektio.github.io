@@ -1,5 +1,0 @@
-query GetInstrument($id: ID!) {
-  instrument(id: $id) {
-    ...Instrument
-  }
-}

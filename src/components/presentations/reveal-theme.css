@@ -1,0 +1,129 @@
+/* Arkitekt theme for reveal.js decks.
+
+   The themes bundled with reveal.js inline megabytes of webfonts and hard-code
+   their own palette, so we skip them entirely and style the deck chrome from
+   the site's `--color-fd-*` tokens instead. A deck therefore flips with
+   light/dark mode and re-tints with the brand hue like every other surface.
+   Slide *content* is plain Tailwind: reveal scales `.slides` with a transform,
+   so pixel sizes authored against the 1280x720 canvas scale with the frame. */
+
+/* reveal tags the deck's parent as the viewport and paints it opaque white with
+   black text. The frame already has the right surface, so hand it back. */
+.reveal-viewport {
+  color: var(--color-fd-foreground);
+  background-color: transparent;
+  /* Consumed as rgba(...) by the `?` help overlay, which no bundled theme is
+     defining for us. */
+  --r-overlay-element-bg-color: 120, 120, 130;
+  --r-overlay-element-fg-color: 245, 245, 250;
+}
+
+.reveal {
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: normal;
+  color: var(--color-fd-foreground);
+}
+
+.reveal ::selection {
+  background: var(--color-fd-primary);
+  color: var(--color-fd-primary-foreground);
+}
+
+/* Slides are documents, not posters: left-aligned by default. */
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides section,
+.reveal .slides section > section {
+  line-height: 1.4;
+  font-weight: inherit;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4 {
+  color: var(--color-fd-foreground);
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+  text-transform: none;
+  text-shadow: none;
+  margin: 0;
+}
+
+.reveal p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.reveal ul,
+.reveal ol {
+  display: block;
+  margin: 0;
+  list-style-position: outside;
+}
+
+.reveal li {
+  margin: 0;
+}
+
+.reveal a {
+  color: var(--color-fd-primary);
+  text-decoration: none;
+  transition: none;
+}
+
+.reveal a:hover {
+  color: var(--color-fd-primary);
+  text-decoration: underline;
+}
+
+.reveal code,
+.reveal pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* --- deck chrome ---------------------------------------------------------- */
+
+.reveal .controls {
+  color: var(--color-fd-primary);
+  bottom: 8px;
+  right: 8px;
+}
+
+.reveal .progress {
+  height: 3px;
+  color: var(--color-fd-primary);
+  background: color-mix(in oklch, var(--color-fd-border) 60%, transparent);
+}
+
+.reveal .slide-number {
+  right: auto;
+  left: 12px;
+  bottom: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--color-fd-card) 80%, transparent);
+  color: var(--color-fd-muted-foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+/* The `?` help overlay and the jump-to-slide field. */
+.reveal .overlay,
+.reveal .jump-to-slide {
+  color: var(--color-fd-foreground);
+}
+
+.reveal .jump-to-slide-input {
+  color: var(--color-fd-foreground);
+}
+
+/* Overview mode: keep the thumbnails on the page background, not reveal's. */
+.reveal.overview .slides section {
+  outline-color: var(--color-fd-border);
+}

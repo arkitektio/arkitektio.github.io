@@ -1,0 +1,59 @@
+---
+title: Rekuest
+description: A core, stateless Arkitekt service that acts as a central repository of connected apps and routes tasks between callers and apps.
+---
+
+import { GithubRepo } from "@/components/docs";
+
+
+<GithubRepo url="https://github.com/arkitektio/rekuest-server" title="Rekuest"/>
+
+## Rekuest Design
+
+Rekuest itself is designed as a stateless service (in order to be able to scale horizontally), and
+interfaces with proven open-source technologies, such as [Redis](https://redis.io/) and [RabbitMQ](https://www.rabbitmq.com/).
+to route tasks to the appropriate apps. The following diagram shows the high-level design of Rekuest:
+
+<div className="mt-2">
+<img src="/docs/design/services/rekuest.png" alt="Rekuest" />
+
+<div className="text-gray-400 mb-2 mt-4">
+<small> The Rekuest stack with its supporting libraries. The RabbitMQ backend is replacable by various ofter
+message brokers   </small>
+</div>
+</div>
+
+
+<Callout type="info">
+
+
+Rekuest is currently being rewritten to support other message brokers, such as [Kafka](https://kafka.apache.org/). This will
+however remain an opt-in feature, and RabbitMQ will remain the default message broker. To learn more about this design decision,
+please refer to the [Why Not?](/docs/design/comparisons/why-not) section.
+
+
+</Callout>
+
+
+
+### Challenges as a Distributed System
+
+Rekuest is our backbone service for the distributed task execution in Arkitekt. As such it has to be highly available and
+fault-tolerant. This is a huge undertaking and we are still in the process of refining the design and implementation of Rekuest.
+
+But luckily we are not alone in this. And we are standing on the shoulders of giants, and we relying heavily on proven open-source technologies
+to build Rekuest. This allows us to focus on the business logic and the integration with other Arkitekt services, and not have to worry
+about the low-level details of distributed systems.
+
+We tried to achieved this by using a message broker (RabbitMQ) to queue and distribute tasks to the appropriate apps,
+and only thinly wrapping it in a websocket-based API. The sole purpose of this wrapping is to establish authentication and authorization
+and to monitor the health of the system and the state of all connected apps.
+
+
+<div className="mt-2">
+<img src="/docs/design/services/distributed.png" alt="Distributed" />
+
+<div className="text-gray-400 mb-2 mt-4">
+<small> Elements of recovery facilitated by Rekuest and its corresponding SDKs. </small>
+</div>
+</div>

@@ -1,0 +1,185 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* Tint Fumadocs' neutral palette with the Arkitekt brand hue.
+   We override the `--color-fd-*` source variables (not the mapped aliases below) so
+   that both Fumadocs UI and the migrated Arkitekt components stay in sync.
+   Lightness values mirror Fumadocs' neutral theme to keep the "fuma" feel; a faint
+   chroma is mixed into the neutrals and the full brand chroma drives primary/ring.
+   Re-tint the whole site by editing `--brand-hue` / `--brand-chroma`. */
+:root {
+  /* Master controls */
+  --brand-hue: 267.256;
+  --brand-chroma: 0.19;
+
+  /* Neutrals: Fumadocs lightness + faint brand tint */
+  --color-fd-background: oklch(0.97 0.004 var(--brand-hue));
+  --color-fd-foreground: oklch(0.21 0.01 var(--brand-hue));
+  --color-fd-muted: oklch(0.97 0.004 var(--brand-hue));
+  --color-fd-muted-foreground: oklch(0.55 0.02 var(--brand-hue));
+  --color-fd-popover: oklch(0.985 0.004 var(--brand-hue));
+  --color-fd-popover-foreground: oklch(0.28 0.01 var(--brand-hue));
+  --color-fd-card: oklch(0.96 0.005 var(--brand-hue));
+  --color-fd-card-foreground: oklch(0.21 0.01 var(--brand-hue));
+  --color-fd-border: oklch(0.87 0.008 var(--brand-hue) / 0.5);
+  --color-fd-secondary: oklch(0.95 0.006 var(--brand-hue));
+  --color-fd-secondary-foreground: oklch(0.25 0.01 var(--brand-hue));
+  --color-fd-accent: oklch(0.87 0.01 var(--brand-hue) / 0.5);
+  --color-fd-accent-foreground: oklch(0.25 0.01 var(--brand-hue));
+
+  /* Brand accents */
+  --color-fd-primary: oklch(0.48 var(--brand-chroma) var(--brand-hue));
+  --color-fd-primary-foreground: oklch(0.98 0.01 var(--brand-hue));
+  --color-fd-ring: oklch(0.55 calc(var(--brand-chroma) * 0.6) var(--brand-hue));
+
+  /* Logo cube faces. Derived from the brand hue so the mark re-tints with the theme */
+  --brand-logo-light: oklch(0.6 calc(var(--brand-chroma) * 0.9) var(--brand-hue));
+  --brand-logo-mid: oklch(0.52 var(--brand-chroma) var(--brand-hue));
+  --brand-logo-dark: oklch(0.46 var(--brand-chroma) var(--brand-hue));
+
+  /* Ecosystem-orbit figure tokens. Light theme (see ecosystem-orbit.tsx) */
+  --orbit-surface: oklch(0.985 0.004 var(--brand-hue));
+  --orbit-grid: rgba(0, 0, 0, 0.06);
+  --orbit-guide: rgba(0, 0, 0, 0.1);
+  --orbit-spoke: rgba(0, 0, 0, 0.16);
+  --orbit-seg: rgba(0, 0, 0, 0.04);
+  --orbit-seg-hot: rgba(0, 0, 0, 0.12);
+  --orbit-seg-stroke: rgba(0, 0, 0, 0.18);
+  --orbit-seg-stroke-hot: rgba(0, 0, 0, 0.5);
+  --orbit-hole: oklch(0.985 0.004 var(--brand-hue));
+  --orbit-icon: rgba(0, 0, 0, 0.7);
+  --orbit-bubble-bg: rgba(255, 255, 255, 0.96);
+  --orbit-flow-l: 0.55;
+  --orbit-flow-c: 0.18;
+  --orbit-card-l1: 0.97;
+  --orbit-card-l2: 0.92;
+  --orbit-card-c: 0.05;
+  --orbit-card-border-l: 0.74;
+  --orbit-card-border-hot-l: 0.58;
+  --orbit-card-iconbg-l: 0.88;
+  --orbit-card-fg-l: 0.48;
+}
+
+.dark {
+  /* Single brand hue: violet in dark too */
+  --brand-hue: 267.256;
+  --brand-chroma: 0.16;
+
+  --color-fd-background: oklch(0.16 0.008 var(--brand-hue));
+  --color-fd-foreground: oklch(0.94 0.005 var(--brand-hue));
+  --color-fd-muted: oklch(0.22 0.008 var(--brand-hue));
+  --color-fd-muted-foreground: oklch(0.71 0.01 var(--brand-hue) / 0.85);
+  --color-fd-popover: oklch(0.20 0.008 var(--brand-hue));
+  --color-fd-popover-foreground: oklch(0.90 0.005 var(--brand-hue));
+  --color-fd-card: oklch(0.19 0.008 var(--brand-hue));
+  --color-fd-card-foreground: oklch(0.98 0.005 var(--brand-hue));
+  --color-fd-border: oklch(0.55 0.01 var(--brand-hue) / 0.2);
+  --color-fd-secondary: oklch(0.22 0.008 var(--brand-hue));
+  --color-fd-secondary-foreground: oklch(0.94 0.005 var(--brand-hue));
+  --color-fd-accent: oklch(0.45 0.01 var(--brand-hue) / 0.3);
+  --color-fd-accent-foreground: oklch(0.92 0.005 var(--brand-hue));
+
+  --color-fd-primary: oklch(0.70 var(--brand-chroma) var(--brand-hue));
+  --color-fd-primary-foreground: oklch(0.16 0.02 var(--brand-hue));
+  --color-fd-ring: oklch(0.60 calc(var(--brand-chroma) * 0.6) var(--brand-hue));
+
+  /* Logo cube faces. Slightly brighter so the mark reads on dark surfaces */
+  --brand-logo-light: oklch(0.72 calc(var(--brand-chroma) * 0.9) var(--brand-hue));
+  --brand-logo-mid: oklch(0.64 var(--brand-chroma) var(--brand-hue));
+  --brand-logo-dark: oklch(0.56 var(--brand-chroma) var(--brand-hue));
+
+  /* Ecosystem-orbit figure tokens. Dark theme */
+  --orbit-surface: #08080c;
+  --orbit-grid: rgba(255, 255, 255, 0.04);
+  --orbit-guide: rgba(255, 255, 255, 0.07);
+  --orbit-spoke: rgba(255, 255, 255, 0.1);
+  --orbit-seg: rgba(255, 255, 255, 0.05);
+  --orbit-seg-hot: rgba(255, 255, 255, 0.15);
+  --orbit-seg-stroke: rgba(255, 255, 255, 0.16);
+  --orbit-seg-stroke-hot: rgba(255, 255, 255, 0.55);
+  --orbit-hole: #0b0b14;
+  --orbit-icon: rgba(255, 255, 255, 0.85);
+  --orbit-bubble-bg: rgba(11, 11, 20, 0.95);
+  --orbit-flow-l: 0.84;
+  --orbit-flow-c: 0.16;
+  --orbit-card-l1: 0.3;
+  --orbit-card-l2: 0.24;
+  --orbit-card-c: 0.05;
+  --orbit-card-border-l: 0.52;
+  --orbit-card-border-hot-l: 0.72;
+  --orbit-card-iconbg-l: 0.42;
+  --orbit-card-fg-l: 0.86;
+}
+
+/* Map the ported shadcn/Arkitekt design tokens onto Fumadocs' theme variables
+   so the migrated login UI + components inherit the docs theme. */
+@theme inline {
+  --color-background: var(--color-fd-background);
+  --color-foreground: var(--color-fd-foreground);
+  --color-primary: var(--color-fd-primary);
+  --color-primary-foreground: var(--color-fd-primary-foreground);
+  --color-secondary: var(--color-fd-secondary);
+  --color-secondary-foreground: var(--color-fd-secondary-foreground);
+  --color-accent: var(--color-fd-accent);
+  --color-accent-foreground: var(--color-fd-accent-foreground);
+  --color-muted: var(--color-fd-muted);
+  --color-muted-foreground: var(--color-fd-muted-foreground);
+  --color-destructive: var(--color-fd-error);
+  --color-destructive-foreground: var(--color-fd-primary-foreground);
+  --color-border: var(--color-fd-border);
+  --color-input: var(--color-fd-border);
+  --color-ring: var(--color-fd-ring);
+  --color-popover: var(--color-fd-popover);
+  --color-popover-foreground: var(--color-fd-popover-foreground);
+  --color-card: var(--color-fd-card);
+  --color-card-foreground: var(--color-fd-card-foreground);
+  /* custom palette used by the Connector popovers */
+  --color-back-800: var(--color-fd-card);
+  --color-primary-100: var(--color-fd-primary);
+  --color-primary-300: var(--color-fd-primary);
+  --color-primary-400: var(--color-fd-primary);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* Pop-in used by the (async) API card when an action yields an image. */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-pop-in {
+  animation: pop-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Gentle pulse for the "add your own" placeholder nodes in the ecosystem orbit. */
+@keyframes orbit-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.92;
+  }
+}
+.orbit-pulse {
+  animation: orbit-pulse 2.6s ease-in-out infinite;
+}
+
+/* Fractal-noise grain used by the landing hero overlay. */
+.bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}

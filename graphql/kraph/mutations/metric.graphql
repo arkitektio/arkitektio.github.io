@@ -1,5 +1,0 @@
-mutation CreateMetric($input: MetricInput!) {
-  createMetric(input: $input) {
-    ...Metric
-  }
-}

@@ -1,5 +1,0 @@
-fragment Objective on Objective {
-  na
-  name
-  serialNumber
-}

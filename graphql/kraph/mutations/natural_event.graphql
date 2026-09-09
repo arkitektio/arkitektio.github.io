@@ -1,5 +1,0 @@
-mutation RecordNaturalEvent($input: RecordNaturalEventInput!) {
-  recordNaturalEvent(input: $input) {
-    ...NaturalEvent
-  }
-}

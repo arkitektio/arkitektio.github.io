@@ -1,5 +1,0 @@
-mutation RecordProtocolEvent($input: RecordProtocolEventInput!) {
-  recordProtocolEvent(input: $input) {
-    ...ProtocolEvent
-  }
-}

@@ -1,5 +1,0 @@
-subscription WatchStateEvents($stateID: ID!) {
-  stateUpdateEvents(stateId: $stateID) {
-    ...StateEvent
-  }
-}

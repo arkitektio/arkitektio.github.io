@@ -1,0 +1,57 @@
+---
+title: Organization
+description: An Organization is the top-level tenant in Arkitekt, a self-contained world of users, data and configuration that never silently leaks into another.
+---
+
+## What is an Organization
+
+An **Organization** is the top-level container that everything else in an Arkitekt
+deployment lives inside. It is a self-contained world of **users, data, and
+configuration**. Think of it as "who this data belongs to" at the broadest level:
+a lab, a department, a core facility, or a whole institute.
+
+Every Arkitekt server ships with **multi-tenancy** at its core, which
+means a single deployment is never limited to one lab or one project. One server
+can host **many** organizations side by side, each fully isolated from the others.
+A core facility can run a single Arkitekt instance and still keep every group that
+uses it in its own separate world.
+
+<Callout type="info">
+
+An Organization is a logical boundary, not a physical one. Just like a
+[Server](/docs/design/index) can span multiple machines, one deployment can host
+many organizations, and one organization's work is spread across whatever machines
+and services that deployment happens to run on.
+
+</Callout>
+
+## The hard boundary
+
+The organization is the one boundary in Arkitekt that **always holds**. Data never
+silently crosses from one organization to another. Whatever else you configure, you
+can rely on this line staying sharp, which is exactly what makes it safe to run
+many independent groups on the same server.
+
+## Open by default, within your organization
+
+Inside an organization the defaults are deliberately **collaborative**. By default,
+every human user in an organization *can* look at the data of their colleagues in
+the same organization. Science is collaborative, and forcing people to explicitly
+share every dataset before anyone can build on it tends to grind real work to a
+halt.
+
+That openness is a starting point, not a straitjacket. On top of it sits
+**role-based access control**, which lets administrators define who may read,
+write, run, or administrate which resources. Sensitive datasets, restricted
+instruments, or work-in-progress projects can be locked down to specific people or
+teams, while the rest of the organization keeps the frictionless default. You can
+read more in [Security Measures](/docs/design/security/measures).
+
+## Organizations in attribution
+
+Organizations are not just an access-control concept, they are part of how Arkitekt
+records **who did what**. Every tracked action resolves an acting *user*, a
+*client* (the app acting on their behalf), and the *organization* it happened in.
+So the audit trail always knows not only which person and which app made a change,
+but which organization owns it. See [Provenance & Audit
+Logging](/docs/design/architecture/provenance).

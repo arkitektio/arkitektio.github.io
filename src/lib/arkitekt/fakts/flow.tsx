@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { EnhancedManifest } from "../provider";
 import { challenge } from "./challenge";
 import { claim } from "./claim";

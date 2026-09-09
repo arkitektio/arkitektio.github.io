@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 
 export const buildGraphQlWard = (

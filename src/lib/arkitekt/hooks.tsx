@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useContext, useMemo } from "react";
 import { ArkitektContext } from "./context";
 import { ArkitektContextType, Service, ServiceMap } from "./types";

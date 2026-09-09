@@ -1,0 +1,15 @@
+{
+  "title": "Terminology",
+  "pages": [
+    "app",
+    "manifest",
+    "action",
+    "scheduler",
+    "structure",
+    "implementation",
+    "apps-vs-services",
+    "organization",
+    "task",
+    "port"
+  ]
+}

@@ -1,7 +1,0 @@
-
-
-mutation Chat($input: ChatInput!) {
-  chat(input: $input) {
-    ...ChatResponse
-  }
-}

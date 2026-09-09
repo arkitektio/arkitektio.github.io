@@ -1,0 +1,19 @@
+{
+  "title": "Arkitekt",
+  "pages": [
+    "index",
+    "ai",
+    "---Getting Started---",
+    "...introduction",
+    "---Concepts & Design---",
+    "...design",
+    "---Building---",
+    "developers",
+    "apps",
+    "---Resources---",
+    "showcases",
+    "roadmap",
+    "troubleshooting",
+    "privacy"
+  ]
+}

@@ -1,5 +1,0 @@
-query Dependency($id: ID!) {
-  dependency(id: $id) {
-    ...DetailDependency
-  }
-}

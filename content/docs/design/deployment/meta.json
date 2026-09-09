@@ -1,0 +1,10 @@
+{
+  "title": "Deployment",
+  "pages": [
+    "---On Premise---",
+    "on-premise",
+    "cli",
+    "gui",
+    "testing"
+  ]
+}

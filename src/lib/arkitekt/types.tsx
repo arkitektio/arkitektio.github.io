@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { ApolloClient } from "@apollo/client";
 import { FaktsEndpoint } from "./fakts/endpointSchema";

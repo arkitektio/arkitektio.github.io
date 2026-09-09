@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Alias } from "../fakts/faktsSchema";
 
 export const aliasToHttpPath = (alias: Alias, append: string): string => {

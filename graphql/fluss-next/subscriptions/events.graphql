@@ -1,5 +1,0 @@
-subscription Events($id: ID!) {
-  events(run: $id) {
-    ...RunEvent
-  }
-}

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AuthFakt } from "../fakts/faktsSchema";
 import { TokenResponse, TokenResponseSchema } from "../fakts/tokenSchema";
 

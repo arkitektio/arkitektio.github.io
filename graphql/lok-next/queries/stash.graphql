@@ -1,5 +1,0 @@
-query MyStashes($pagination: OffsetPaginationInput) {
-  stashes(pagination: $pagination) {
-    ...ListStash
-  }
-}

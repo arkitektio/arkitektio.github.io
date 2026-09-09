@@ -1,5 +1,0 @@
-mutation CreateModel($input: CreateModelInput!) {
-  createModel(input: $input) {
-    ...Model
-  }
-}

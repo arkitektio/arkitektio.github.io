@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Manifest, Requirement } from "./fakts/manifestSchema";
 import {
   AppContext,

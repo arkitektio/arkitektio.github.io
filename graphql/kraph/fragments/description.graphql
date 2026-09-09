@@ -1,4 +1,0 @@
-fragment PathDescription on Description {
-  leftId
-  rightId
-}

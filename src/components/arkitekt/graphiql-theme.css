@@ -1,0 +1,227 @@
+/* Retint GraphiQL (CodeMirror-based v4) so it blends into the Arkitekt theme
+   instead of GraphiQL's stock saturated purple-on-slate look.
+
+   GraphiQL composes every surface from a handful of HSL-triple custom properties
+   (`hsl(var(--color-base))`, `hsl(var(--color-neutral))`, …). Its dark rules are
+   scoped to `body.graphiql-dark .graphiql-container`. That is higher specificity
+   than a plain `.dark .graphiql-container`, so our overrides match or beat that:
+   container rules are nested under our own `.arkitekt-graphiql` wrapper, and dark
+   rules are prefixed with `html.dark` so they tie/win against GraphiQL's body
+   scope (and win on source order, since this file is imported last).
+
+   The surface (`--color-base`), text (`--color-neutral`) and accent
+   (`--color-primary`/`--color-secondary`) triples are injected at runtime from
+   the site's real `--color-fd-*` tokens (see `useGraphiqlThemeSync` in
+   Graph.tsx), so the explorer is the *same* near-neutral palette and dynamic
+   brand hue as the page. The near-neutral triples below are the fallback until
+   that runs / if it can't resolve. They are deliberately low-saturation, never purple. */
+
+.arkitekt-graphiql .graphiql-container,
+.graphiql-dialog,
+.graphiql-dialog-overlay,
+.graphiql-tooltip,
+.CodeMirror-info,
+.CodeMirror-lint-tooltip,
+[data-radix-popper-content-wrapper] {
+  --color-primary: var(--ark-gql-primary, 222, 80%, 52%);
+  --color-secondary: var(--ark-gql-secondary, 222, 68%, 62%);
+  --color-tertiary: 190, 75%, 40%;
+  --color-base: var(--ark-gql-base, 240, 6%, 97%);
+  --color-neutral: var(--ark-gql-neutral, 240, 6%, 20%);
+
+  --color-info: 222, 80%, 52%;
+  --color-success: 150, 58%, 40%;
+  --color-warning: 38, 90%, 48%;
+  --color-error: 0, 70%, 52%;
+
+  --font-family: inherit;
+  --font-family-mono: var(--font-mono, ui-monospace, SFMono-Regular, "SF Mono",
+      Menlo, Consolas, monospace);
+  --border-radius-4: 8px;
+  --border-radius-8: 12px;
+  --border-radius-12: 16px;
+}
+
+html.dark .arkitekt-graphiql .graphiql-container,
+html.dark .graphiql-dialog,
+html.dark .graphiql-dialog-overlay,
+html.dark .graphiql-tooltip,
+html.dark .CodeMirror-info,
+html.dark .CodeMirror-lint-tooltip,
+html.dark [data-radix-popper-content-wrapper] {
+  --color-primary: var(--ark-gql-primary, 222, 90%, 72%);
+  --color-secondary: var(--ark-gql-secondary, 222, 80%, 78%);
+  --color-tertiary: 190, 80%, 58%;
+  --color-base: var(--ark-gql-base, 240, 6%, 11%);
+  --color-neutral: var(--ark-gql-neutral, 240, 6%, 92%);
+
+  --color-info: 222, 90%, 72%;
+  --color-success: 150, 55%, 62%;
+  --color-warning: 40, 90%, 64%;
+  --color-error: 0, 75%, 68%;
+}
+
+/* ── Surfaces ───────────────────────────────────────────────────────────────
+   Let the explorer sit flush inside our own card chrome, transparent so the
+   page texture/glow behind it reads through the gaps. The editor + session
+   panels take the site's `card` token directly (one shade above the page) so
+   the explorer layers exactly like every other surface on the site. */
+.arkitekt-graphiql .graphiql-container {
+  height: 100%;
+  background: transparent;
+  color: hsl(var(--color-neutral));
+}
+
+.arkitekt-graphiql .graphiql-sessions {
+  background: var(--color-fd-card);
+  border-radius: 0;
+}
+
+.arkitekt-graphiql .graphiql-editors {
+  background: color-mix(in oklab, var(--color-fd-card) 70%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: none;
+}
+
+/* Plugin rail / response toolbar / tab bar share the page background so they
+   recede behind the editor card rather than reading as separate purple bars. */
+.arkitekt-graphiql .graphiql-sidebar,
+.arkitekt-graphiql .graphiql-session-header,
+.arkitekt-graphiql .graphiql-editor-tools {
+  background: transparent;
+}
+
+/* Dividers follow the site border token instead of a hard saturated line. */
+.arkitekt-graphiql .graphiql-horizontal-drag-bar,
+.arkitekt-graphiql .graphiql-session-header,
+.arkitekt-graphiql .graphiql-editor-tools {
+  border-color: var(--color-fd-border);
+}
+
+/* We supply our own header + service switcher, so hide GraphiQL's wordmark. */
+.arkitekt-graphiql .graphiql-logo {
+  display: none;
+}
+
+/* ── Editor syntax ───────────────────────────────────────────────────────────
+   The accent hues (`--ark-cm-*`) are injected at runtime from the brand hue with
+   complementary/triadic offsets (see `useGraphiqlThemeSync`), so the editor is a
+   cohesive brand-tinted scheme that re-tints with the brand. It is not flat white.
+   The fallbacks below keep it colourful before hydration; punctuation/comments
+   stay quiet neutrals derived from the foreground token. NB: we deliberately do
+   NOT redefine the `--ark-cm-*` vars on this wrapper. That would shadow the
+   injected ones, since a value set on a closer ancestor wins. */
+.arkitekt-graphiql .CodeMirror {
+  background: transparent;
+  color: var(--ark-cm-field, hsl(var(--color-neutral)));
+}
+.arkitekt-graphiql .CodeMirror .cm-keyword {
+  color: var(--ark-cm-keyword, hsl(var(--color-primary)));
+  font-weight: 600;
+}
+.arkitekt-graphiql .CodeMirror .cm-def,
+.arkitekt-graphiql .CodeMirror .cm-property,
+.arkitekt-graphiql .CodeMirror .cm-variable,
+.arkitekt-graphiql .CodeMirror .cm-variable-2 {
+  color: var(--ark-cm-field, hsl(var(--color-secondary)));
+}
+.arkitekt-graphiql .CodeMirror .cm-attribute,
+.arkitekt-graphiql .CodeMirror .cm-qualifier {
+  color: var(--ark-cm-arg, hsl(var(--color-tertiary)));
+}
+.arkitekt-graphiql .CodeMirror .cm-string,
+.arkitekt-graphiql .CodeMirror .cm-string-2 {
+  color: var(--ark-cm-string, hsl(var(--color-tertiary)));
+}
+.arkitekt-graphiql .CodeMirror .cm-number,
+.arkitekt-graphiql .CodeMirror .cm-atom,
+.arkitekt-graphiql .CodeMirror .cm-builtin {
+  color: var(--ark-cm-number, hsl(var(--color-secondary)));
+}
+.arkitekt-graphiql .CodeMirror .cm-punctuation,
+.arkitekt-graphiql .CodeMirror .cm-ws {
+  color: hsla(var(--color-neutral), 0.55);
+}
+.arkitekt-graphiql .CodeMirror .cm-comment {
+  color: hsla(var(--color-neutral), 0.45);
+  font-style: italic;
+}
+
+/* Gutter blends into the editor; line numbers stay quiet, cursor takes brand. */
+.arkitekt-graphiql .CodeMirror-gutters {
+  background: transparent;
+  border: none;
+}
+.arkitekt-graphiql .CodeMirror-linenumber {
+  color: hsla(var(--color-neutral), 0.3);
+}
+.arkitekt-graphiql .CodeMirror-cursor {
+  border-left-color: hsl(var(--color-primary));
+}
+.arkitekt-graphiql .CodeMirror-selected,
+.arkitekt-graphiql .CodeMirror-focused .CodeMirror-selected {
+  background: hsla(var(--color-primary), 0.18);
+}
+.arkitekt-graphiql .CodeMirror-activeline-background {
+  background: hsla(var(--color-neutral), 0.04);
+}
+
+/* ── Controls: tabs, toolbar + buttons ───────────────────────────────────────
+   Rounder and calmer than GraphiQL's stock chrome. We drop the hard shadows and
+   stray highlight edges on tabs/buttons, and give hovers a soft brand tint. */
+.arkitekt-graphiql .graphiql-tabs {
+  gap: 6px;
+}
+.arkitekt-graphiql .graphiql-tab {
+  border-radius: var(--border-radius-8);
+  border: 1px solid transparent;
+  background: hsla(var(--color-neutral), 0.05);
+  box-shadow: none;
+  overflow: hidden;
+}
+.arkitekt-graphiql .graphiql-tab::before,
+.arkitekt-graphiql .graphiql-tab::after {
+  display: none; /* kill the stock active-tab highlight bar / divider */
+}
+.arkitekt-graphiql .graphiql-tab.graphiql-tab-active,
+.arkitekt-graphiql .graphiql-tab[aria-selected="true"] {
+  background: var(--color-fd-card);
+  border-color: var(--color-fd-border);
+  color: hsl(var(--color-neutral));
+  box-shadow: none;
+}
+.arkitekt-graphiql .graphiql-tab-button {
+  color: inherit;
+}
+
+/* Run button → soft round pill, no harsh shadow. */
+.arkitekt-graphiql .graphiql-execute-button {
+  border-radius: 9999px;
+  box-shadow: none;
+}
+.arkitekt-graphiql .graphiql-execute-button:hover {
+  filter: brightness(1.05);
+}
+
+/* Toolbar + generic buttons: consistent rounding, flat, soft brand-tint hover. */
+.arkitekt-graphiql .graphiql-toolbar-button,
+.arkitekt-graphiql .graphiql-button,
+.arkitekt-graphiql .graphiql-un-styled,
+.arkitekt-graphiql .graphiql-sidebar button,
+.arkitekt-graphiql .graphiql-tab-add {
+  border-radius: var(--border-radius-8);
+  box-shadow: none;
+}
+.arkitekt-graphiql .graphiql-toolbar-button:hover,
+.arkitekt-graphiql .graphiql-un-styled:hover,
+.arkitekt-graphiql .graphiql-sidebar button:hover,
+.arkitekt-graphiql .graphiql-tab-add:hover {
+  background: hsla(var(--color-primary), 0.12);
+  color: hsl(var(--color-primary));
+}
+
+/* The Variables / Headers toggles + secondary panes inherit the same rounding. */
+.arkitekt-graphiql .graphiql-editor-tools button,
+.arkitekt-graphiql .graphiql-editor-tool {
+  border-radius: var(--border-radius-8);
+}

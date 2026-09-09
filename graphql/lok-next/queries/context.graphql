@@ -1,5 +1,0 @@
-query MyContext {
-  mycontext {
-    ...Context
-  }
-}

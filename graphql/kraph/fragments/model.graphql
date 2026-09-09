@@ -1,7 +1,0 @@
-fragment Model on Model {
-  id
-  name
-  store {
-    ...MediaStore
-  }
-}

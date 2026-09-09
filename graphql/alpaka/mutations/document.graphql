@@ -1,5 +1,0 @@
-mutation AddDocumentsToCollection($input: AddDocumentsToCollectionInput!) {
-  addDocumentsToCollection(input: $input) {
-    ...Document
-  }
-}

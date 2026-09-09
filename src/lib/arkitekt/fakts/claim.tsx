@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ActiveFakts, ClaimAnswerSchema } from "./faktsSchema";
 
 export const claim = async (

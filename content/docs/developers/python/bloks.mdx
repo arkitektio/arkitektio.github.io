@@ -1,0 +1,70 @@
+---
+title: "Bloks: UIs from JSX"
+description: Contribute declarative dashboard panels to the platform, composed from a component catalog and wired straight to your app's actions and state.
+---
+
+A **blok** is a declarative UI panel your app contributes to the platform. It is a small
+dashboard built from a component tree and wired directly to your actions and state.
+You write it as a JSX/XML string and `jsx(...)` parses it into a component tree (with
+helpful line/column errors when it can't).
+
+```python
+from rekuest_next import jsx
+
+panel = jsx(
+    """
+    <Page>
+      <Label text="Camera" />
+      <Text value="$state.camera.connected" />
+      <Button title="Snap" onClick="@camera.snap(exposure_ms=10)" />
+    </Page>
+    """
+)
+
+app.register_blok(name="camera_panel", component=panel, description="Camera dashboard")
+```
+
+## The component catalog
+
+Bloks are composed from a catalog of components the platform ships. These are layout and
+display primitives you nest to build a panel:
+
+| Component  | Purpose                                              |
+| ---------- | ---------------------------------------------------- |
+| `Page`     | The root container of a blok.                        |
+| `Stack`    | Lays its children out vertically or horizontally.    |
+| `Label`    | A static text label.                                 |
+| `Text`     | Displays a (usually bound) value.                    |
+| `Button`   | Triggers an action callback when clicked.            |
+| `Image`    | Renders an image structure.                          |
+
+## Wiring props to your app
+
+Props follow three conventions, which is what ties a blok to the rest of your app:
+
+| Prop value                               | Meaning                                                                                                   |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `text="Camera"`                          | A **static** value.                                                                                       |
+| `value="$state.camera.connected"`        | A **dynamic binding** to a dependency's state (`$state.<dependency>.<path>`).                              |
+| `onClick="@camera.snap(exposure_ms=10)"` | An **action callback** that calls a dependency's action (`@<dependency>.<operation>(...)`). Use `@utils.<op>(...)` for built-in utilities. |
+
+Bloks derive their action and state dependencies automatically from the paths they
+reference, so the platform knows exactly what each panel needs to run. The `$state`
+and `@action` paths resolve against the dependencies you
+[declared](/docs/developers/python/plugin-usage) for your app.
+
+## Registering a blok
+
+Register the parsed component on your app, giving it a name and a description so it can
+be discovered and mounted on the platform:
+
+```python
+app.register_blok(
+    name="camera_panel",
+    component=panel,
+    description="Camera dashboard",
+)
+```
+
+The panel is now available on the platform, watching your app's state live and calling
+its actions on demand.

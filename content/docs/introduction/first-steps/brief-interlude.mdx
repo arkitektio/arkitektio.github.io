@@ -1,0 +1,98 @@
+---
+title: Brief Interlude
+description: A reflection on Arkitekt's separation of concerns and how this documentation website itself acts as an app to install plugins and workflows.
+---
+
+import { Guard } from "@/components/arkitekt";
+import { InstallRepoButton } from "@/components/arkitekt";
+
+We now have a basic understanding of how to call an conversion action on your data, we can visualize the results, now before we continue, lets address a few things.
+
+### 😭 So many steps...
+
+You may have noticed that we have to do a lot of steps to get to the point where we can visualize our data on an app. You might think that's to much hassle for nothing (and
+you might be right). But let us briefly explain we think its actually a good thing.
+
+- **Seperation of Concerns**: We already installed 3 Apps to our Arkitekt instance. Omero, Napari and Fiji. Their provided functionality would
+  have been easily possible to implement in a single App (actually Fiji would have been able to do that easily) But we think that seperating the functionality into multiple Apps has a few advantages.
+  First of all, it allows these tools to concentrate on what they are really good at. Napari is first and foremost a visualization tool, it does not need to know anything about how to convert
+  data from one format to another. Secondly it allows App developers to easily update their Apps without having to worry about breaking other Apps.
+
+- **Reusability**: The concept of Actions might seem alien at the start, but it allows for a more worry free design of your workflows. You can easily use actions from different apps
+  in your workflow, and not worry about how they are implemented.
+
+- **Customizability**: The concept of Actions and Plugins allows you to easily extend the functionality of your Arkitekt instance, without having to worry about breaking anything. Arkitekt
+  only provides very little functionality out of the box, but you can easily extend and customize your installtion with the functionality you need.
+
+That being said..
+
+We understand that their might be alot of installation of tools or management of plugins involved and for a platform that is supposed to be used for automation, this is a bit
+ironic. But don't you worry. ..
+
+### We have an App for that!
+
+Yes. Apps to the rescue. But this one is especially sweet because there is no installation. And you have been using it all along.
+What? It's actually **this** documentation website.
+
+You see, a lot of things can be an Arkitekt app and that includes this website. So we can actually use this website to install repositories or workflows to our Arkitekt instance.
+
+You might have noticed the `Connect` button in the top right corner of this website. And if you click on it and you run this website on the same machine as your Arkitekt instance,
+you will see a familiar connect screen that will prompt you to connect to your Arkitekt instance.
+
+So just connect. We will wait here.
+
+<div className="bg-back-800 p-3 text-center rounded-sm rounded-md mb-2">
+ 😊 Just one connection away... 
+</div>
+
+<Callout type="warn" title="Not able to connect?">
+
+If you are not able to connect to your Arkitekt instance (because you cannot have a webbrowser where you installed arkitekt). You can always install the plugins manually through the same interface we saw before. We just can't give you
+to much interactive help about it.
+
+</Callout>
+
+<Guard>
+
+<div className="bg-green-300 text-center text-black p-3 rounded-sm rounded-md ">
+  You did it 🥰! We are connected
+</div>
+
+### What that means for you
+
+Well now that we are connected, we can actually install repositories and workflows directly from this website. So lets do that before we start with the next chapter.
+Because we will need two more `PluginApps` for our first workflow for that.
+
+#### First plugin: Standard Library
+
+Finally you will be able to do some proper image analysis work, this is the Arkitekt Standard Library, which comes with an ever increasing number of actions that you can use
+to analyze your data. They are not as fancy as the ones we have seen so far, but they are very useful. So lets install it.
+
+Look at this button. It will install the Standard Library to your Arkitekt instance. Just click it.
+
+<InstallRepoButton repo={"std"} user={"arkitektio-apps"} branch={"main"} />
+
+Turned green? Great! You now have the Standard Library Repository installed. We will do that in the next chapter.
+
+#### Second plugin: Reaktor
+
+The second plugin we will install is called Reaktor. This is a weird one, because it is not really a plugin that does anything. It is a plugin that will allow use to run
+(schedule) your workflows directly on the Arkitekt server. You might not understand what that means right now, but you will later. So lets install it.
+
+Same procedure as before, just click the button.
+
+<InstallRepoButton repo={"scheduler"} user={"arkitektio-apps"} branch={"main"} />
+
+Turned green? Great! You now have the Reaktor Repository installed. Next chapter.
+
+<Callout type="info" title="We love this feature">
+
+
+We love this feature, as it allows us to provide you with increaingly more and more interactive documentation. You can look at and install plugins and workflows directly from the documentation.
+But most importantly, we love it because everyone can do that. You can create your own documentation website and use it to install your own plugins and workflows. Just check out the github repo for
+this documentatoin. Its not that complicated.
+
+
+</Callout>
+
+</Guard>

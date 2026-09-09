@@ -1,0 +1,19 @@
+{
+  "title": "Python",
+  "pages": [
+    "installation",
+    "graphql",
+    "---Classic Style---",
+    "classic",
+    "classic-usage",
+    "read-write",
+    "---Plugin Style---",
+    "plugin",
+    "plugin-usage",
+    "more",
+    "bloks",
+    "build",
+    "---Tooling---",
+    "agent-skill"
+  ]
+}

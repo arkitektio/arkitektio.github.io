@@ -1,4 +1,5 @@
-import lokReust from "@site/src/lib/lok/api/fragments";
+// @ts-nocheck
+import lokReust from "@/lib/lok/api/fragments";
 import { Database } from "lucide-react";
 import React from "react";
 import { createGraphQLServiceBuilder } from "../arkitekt/builders/graphQlServiceBuidler";

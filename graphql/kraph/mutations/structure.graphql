@@ -1,5 +1,0 @@
-mutation CreateStructure($input: StructureInput!) {
-  createStructure(input: $input) {
-    ...Structure
-  }
-}

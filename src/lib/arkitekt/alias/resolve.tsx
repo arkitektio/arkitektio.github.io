@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Alias, Instance } from "../fakts/faktsSchema";
 import { fetchWithTimeout } from "../utils";
 import { aliasToHttpPath } from "./helpers";

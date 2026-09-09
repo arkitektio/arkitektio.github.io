@@ -1,5 +1,0 @@
-fragment Organization on Organization {
-  id
-  name
-  slug
-}

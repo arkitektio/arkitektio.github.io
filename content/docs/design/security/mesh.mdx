@@ -1,0 +1,108 @@
+---
+title: The Mesh
+description: "How Arkitekt reaches your platform from anywhere without exposing it: a centrally-coordinated, peer-to-peer mesh where the coordinator never sees your data, and which you can always replace or turn off."
+---
+
+import { MeshTunnel } from "@/components/docs";
+
+Reaching your platform from the same local network is easy. Reaching it from *the
+train*, *a collaborator's institute*, or *a GPU node behind a different NAT* is
+where most systems force an ugly trade-off: expose ports to the internet, or route
+everything through a central server that then sees all your data. The **mesh** is
+designed to avoid both.
+
+The mesh is best understood as a **personal, private mesh** in the spirit of
+Tailscale, not a federation of public servers. It lets your authenticated
+endpoints, your laptop, your lab workstation, a remote compute node, find and
+reach each other from anywhere, without poking holes in your firewall.
+
+## Control plane vs. data plane
+
+The "coordinator" here is the same **coordinator** role described in [Identity &
+Access](/docs/design/security/identity), the control plane that handles auth and
+discovery, now doing its discovery job across networks. It is not a separate,
+mysterious box: it is the coordination side of the platform, run as a dedicated
+*coordination server* so that endpoints on different networks can still meet. (The
+community-operated coordination server is a shared instance of that same role.)
+
+The security of the mesh rests on one clean separation:
+
+- **Control plane (the coordinator).** A small central service keeps track of who
+  you are and which platforms and apps belong to you, and helps two endpoints find
+  each other and punch through NAT. It handles **authentication, discovery, and
+  signaling only**. It knows *that* two endpoints want to talk.
+- **Data plane (the direct connection).** Once the introduction is made, the actual
+  workload traffic, your images, your tables, your task arguments and results,
+  flows **directly peer-to-peer** between endpoints over an encrypted **WireGuard**
+  tunnel. It never round-trips through the coordinator.
+
+<MeshTunnel />
+
+<Callout type="info" title="The coordinator never sees your data">
+This is the single most important privacy property of the mesh: the coordinator
+handles **auth and discovery only**, and your **workload traffic flows directly
+peer-to-peer and never passes through the central server**. The mesh is
+*centrally-coordinated*, but it is *not* centralized in the way that matters for
+privacy. The operator of the coordinator cannot see your images, your results, or
+any of the data moving between your nodes.
+</Callout>
+
+## Why this is the secure default
+
+- **Nothing is exposed to the open internet.** Endpoints reach each other through
+  authenticated mesh connections, so you don't publish your platform on a public IP
+  or open inbound firewall ports.
+- **Traffic is encrypted end to end.** The data plane is a WireGuard tunnel between
+  your own machines; even the relay fallback (below) carries already-encrypted
+  traffic.
+- **Access follows identity.** Joining the mesh authenticates the endpoint against
+  the coordinator, so only *your* authenticated machines can discover and reach one
+  another. This is the same identity model described in [Identity &
+  Access](/docs/design/security/identity).
+
+Under the hood the coordinator is built on
+[**Ionscale**](https://github.com/jsiebens/ionscale), a self-hostable Tailscale
+control plane, so you can run the control plane yourself rather than trusting a
+third party with it.
+
+## Relay fallback
+
+In the great majority of cases two endpoints establish a direct peer-to-peer
+connection, even across NAT. Occasionally a particularly restrictive network
+refuses to cooperate and no direct path can be formed. When that happens the mesh
+falls back to **relaying** the traffic so the connection still works, at some cost
+to throughput. Importantly, the relayed traffic is still the same encrypted
+WireGuard traffic, the relay moves bytes it cannot read. This fallback is the
+exception, and the mesh always prefers a direct connection first.
+
+## The mesh is optional: bring your own connectivity
+
+The mesh is a convenience, not a requirement. Arkitekt is just a set of services
+speaking over the network, so **any** way of connecting your endpoints works
+equally well. You are never locked into ours. In particular, you can:
+
+- **Bring your own Tailscale client.** If your group already runs Tailscale (or
+  another WireGuard-based network), point your endpoints at that instead. The mesh
+  is Tailscale-flavoured precisely so this feels familiar, but there is nothing
+  stopping you from using your existing tailnet.
+- **Use your institution's VPN.** If your university or institute already provides a
+  VPN that puts your machines on the same virtual network, that is often all you
+  need to reach your platform, no mesh involved. See
+  [Using a VPN](/docs/design/various/vpn).
+- **Turn it off entirely.** On a single trusted LAN you may not need any of this.
+  You can simply **not join the mesh** (or leave it) and reach your platform over
+  your local network like any other service.
+
+The point is that the security boundary lives in Arkitekt's
+[authentication and authorization](/docs/design/security/identity), not in the
+transport. However you choose to move the bytes between your machines, the platform
+still authenticates every request.
+
+<Callout type="warn" title="The mesh is optional and still young">
+The mesh is one of the newer, **optional and experimental** parts of the platform
+and is evolving quickly. It is now the only built-in way to discover a deployment
+across networks (local-network advertising has been removed). For the commands to
+actually join a platform to the mesh (`arkitekt mesh join` / `arkitekt mesh leave`),
+see [the mesh](/docs/introduction/installation#arkitekt-mesh) in the installation
+guide.
+</Callout>

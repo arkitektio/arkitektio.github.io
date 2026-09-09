@@ -1,0 +1,168 @@
+---
+title: Kabinet
+description: The AppStore for the platform, delegating container management to Container Backend Apps and introducing App Flavours and unified container visualization.
+---
+
+import { GithubRepo } from "@/components/docs";
+
+<Callout type="info">
+
+
+Kabinet is the AppStore in the standard deployment, but you can still use Port if you
+prefer its approach. The two systems coexist, and you can use both in parallel. For most
+users, however, Kabinet provides the better experience.
+
+
+</Callout>
+
+<GithubRepo url="https://github.com/arkitektio/kabinet-server" title="Kabinet"/>
+
+## Core concepts
+
+
+Kabinet is the "AppStore" for the platform. It provides a way to install applications
+from common repositories ("Repos"), as well as to explore and find the correct application to install for a given bioimage task.
+It also provides a way to visualize and query the status of plugins and their containers that are running anywhere
+on connected apps.
+
+Here are the core features of the system:
+
+## Container Backend Apps
+
+As opposed to Port, Kabinet does not manage Containers directly inside its service, but instead delegates
+this task to "Container Backend" Apps. It is these Apps that are responsible for managing their containers and the 
+resources they use. Kabinet only provides a central "State" store for the containers, and a way to query and visualize
+them.
+
+This approach has several advantages over the "service powered" approach of Port:
+
+- It fully aligns with the "Everything is an App" philosophy of the platform. Container Backends are just another
+  type of App, and can be installed and managed like any other App.
+
+- It allows for a more flexible architecture, where the Container Backend can be deployed anywhere, including resources
+  that do not allow incoming connections, such as for example HPC cluster.
+
+- Developers can easily come up with more personalized Container Backends, that can be tailored to their specific
+  needs. For example, a developer could create a Container Backend that is requiring more specific settings when trying
+  to install a container, or that is using a different container runtime than Docker.
+
+- It allows for a more stable system. If a Container Backend crashes, it will not affect the service, and the containers
+  will continue to run. The Container Backend can then be restarted, and will be able to recover the state of the containers
+  it was managing.
+
+## App Flavours
+
+Kabinet is built around the concept of "App Flavours". An App Flavour is a way to describe a specific
+configuration of an App. For example, a developer can create a "CUDA" App Flavour, configured
+to run on a GPU, alongside a "CPU" App Flavour, configured to run on a CPU. The user can then
+choose which App Flavour to install, depending on the resources they have available. Kabinet further streamlines
+this into an automatic process, where the user does not have to choose the App Flavour, but where the system
+automatically chooses the correct App Flavour depending on the environment of the container backend.
+
+
+## Unified Container Visualization
+
+Kabinet provides a unified way to visualize the containers that are running on any container backend in the system.
+This allows users to easily see which containers are running, and to query them. This is a big improvement over
+Port, where the containers were only visible in the context of the service they were running on.
+
+## Definition based Container Search
+
+Kabinet not only provides a way to search for Apps, but also to find the correct container to use for a given
+bioimage task. 
+
+
+<div className="mt-2 p-6 w-full">
+<img src="/docs/design/services/kabinet.png" alt="Kabinet" />
+
+<div className="text-gray-400 mb-2">
+  <small>
+    The Container Backend App is responsible for managing the containers, and can run anywhere.
+
+  </small>
+</div>
+</div>
+
+
+## Domain Model
+
+Kabinet exposes a GraphQL API (see the [interactive explorer](/explorer)) built around a small set of
+entities. They split cleanly into two halves: the **catalogue** (what _can_ be installed) and the
+**runtime** (what is _actually_ installed and running on a backend).
+
+### The Catalogue
+
+These entities describe the apps that are available to install, independent of where or whether they
+are running.
+
+- **Repo**: A collection of versioned releases of apps. A Repo provides the means to discover and keep
+  apps up to date. The most common kind is a `GithubRepo`, which points at a specific `user`, `repo` and
+  `branch` on GitHub and is scanned to extract the apps it contains.
+
+- **App**: A piece of software that implements a certain functionality, identified by a unique
+  `identifier`. Think _Napari_, _Fiji_ or _Stardist_. An App is essentially a stable name under which
+  many versioned releases live.
+
+- **Release**: A specific version of an App, following [Semantic Versioning](https://semver.org/), for
+  example _Napari 0.4.10_ or _Stardist 0.1.0_. A Release captures the functionality of an App at a point
+  in time and carries metadata such as its logo and entrypoint.
+
+- **Flavour**: A specific build configuration of a Release. The core functionality is the same, but the
+  environment differs: _Stardist 0.1.0 with CUDA 10.2_ versus _Stardist 0.1.0 on the CPU_, or different
+  Python/JDK versions. Each Flavour is tied to a `DockerImage` and the Repo it was built from. Flavours
+  are how Kabinet realises the [App Flavours](#app-flavours) concept above: the system can pick the right
+  Flavour automatically based on the resources a backend offers.
+
+- **Definition**: The description of an [Action](/docs/design/terminology/node) (and its associated
+  state) that a Flavour provides. Definitions are hashed and can be grouped into `Collection`s and
+  `Protocol`s, which powers the [definition-based container search](#definition-based-container-search).
+  This finds the right container for a given bioimage task rather than just by name.
+
+### The Runtime
+
+These entities track what is actually deployed on connected [Container Backends](#container-backend-apps).
+
+- **Backend**: A registered Container Backend App. Each Backend belongs to an organization and a `client`,
+  declares a `kind`, and sends a `last_heartbeat` so Kabinet can monitor its health. Backends are the only
+  actors allowed to mutate the runtime state of their own pods.
+
+- **Resource**: A unit of compute a Backend exposes (for instance a particular GPU or node), identified
+  by a `resource_id` and described by free-form `qualifiers`. Resources let Kabinet reason about where a
+  Flavour can run.
+
+- **Deployment**: The _intent_ to run a specific Flavour on a specific Backend, with its parameters and
+  access rights. A Deployment records whether the image has been `pulled` and holds both typed and secret
+  parameters.
+
+- **Pod**: A running instance of a Deployment, the actual container providing the app's functionality.
+  Pods carry a `status` (e.g. `PENDING`), are tied to a Backend (and optionally a Resource), and accumulate
+  `LogDump`s. They are the only model actively maintained by the Backend, and clients can subscribe to
+  changes in pod state in real time.
+
+<Callout type="info">
+
+
+The relationship reads top-to-bottom: a **Repo** holds **Apps**, each App has versioned **Releases**, each
+Release ships in one or more **Flavours**. A **Deployment** is the intent to run one Flavour on a
+**Backend**, and a **Pod** is the live container that results from it.
+
+
+</Callout>
+
+### Challenges
+
+While this approach has many advantages, it also comes with some challenges:
+
+- Completely detaching the container management from the service means we have to face the challenge of
+  synchronizing the state of the containers between the service and the Container Backend. This is not a trivial
+  task and requires careful design, to ensure that the state is always consistent between the two. Luckily
+  we can leverage the fact that backends can only modify the state of their own containers.
+
+- Scale is another challenge. If one container backend is managing a massive amount of containers, then
+  it can become the bottleneck of the system (as only one worker queue is used to assign managing tasks to the
+  backends).
+
+- Stability. While the above approach allows for a more stable system, it also means that the
+  system is more distributed, and that we have to deal with more moving parts. This requires
+  careful design to ensure that the system is stable and reliable, especially as Rekuest is used
+  to communicate between the different parts of the system.
