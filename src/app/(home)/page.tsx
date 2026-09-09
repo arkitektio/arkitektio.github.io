@@ -7,6 +7,7 @@ import {
   Network,
   ShieldCheck,
   Sparkles,
+  TriangleAlert,
   Workflow,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,24 @@ import { CoreBento, HomeBento } from '@/components/bento';
 import { asset } from '@/lib/base-path';
 import { Ecosystem, EcosystemOrbit, NotArkitekt } from '@/components/marketing';
 import { gitConfig } from '@/lib/shared';
+
+function UnderConstruction() {
+  return (
+    <div
+      role="status"
+      className="relative z-20 border-b border-amber-400/40 bg-amber-400/15 px-6 py-3 text-sm text-amber-100 backdrop-blur sm:px-12 lg:px-16"
+    >
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <TriangleAlert className="size-4 shrink-0 text-amber-300" />
+        <span className="font-semibold text-amber-200">Under construction.</span>
+        <span className="text-amber-100/80">
+          This site is being rebuilt for the next release of Arkitekt. Pages may be incomplete or
+          change without notice. Please check back soon!
+        </span>
+      </div>
+    </div>
+  );
+}
 
 const features = [
   {
@@ -61,6 +80,8 @@ export default function HomePage() {
           aria-hidden
           className="bg-grain pointer-events-none absolute inset-0 -z-10 opacity-[0.12] mix-blend-overlay"
         />
+
+        <UnderConstruction />
 
         <div className="relative z-10 max-w-2xl px-6 pt-14 sm:px-12 sm:pt-20 lg:px-16 lg:pb-28">
           {/* badge */}
