@@ -1,0 +1,156 @@
+---
+title: Where Arkitekt runs
+description: "Why a platform of apps still needs a central hub, why apps and hub have to meet, the three ways to arrange that meeting, and how the mesh reaches your platform from anywhere."
+---
+
+import { DeploymentStrategies, MeshTunnel } from "@/components/docs";
+
+Arkitekt is a **server-client platform**. The heavy lifting is done by **apps**: the actual
+processing, the training, and the analysis. And those apps can run *anywhere*: on a GPU box under your
+desk, on a workstation down the hall, on a node in the cloud. What they cannot do is work in a vacuum.
+They need a **central server** to register against, to authenticate through, to find one another, and
+to keep track of data and results. The server is not where the work happens. It is the
+[**hub**](/docs/design#the-hub) that turns a loose scattering of apps into a single, coherent platform:
+the center that every app connects to and through. And before any of it can happen, the apps
+and that server first have to **find each other and meet**.
+
+That sounds like it should be trivial, and twenty years ago it would have been: give the server a
+public address, point the apps at it, done. So we want to be honest about one
+thing. **Some of the design here exists not because we wanted it to, but because the internet has
+become what it is.** Servers in labs sit behind NAT, behind institutional firewalls, on networks that
+change addresses and quietly drop inbound connections. You can rarely just "point an app at a server"
+anymore. A good part of Arkitekt's deployment story is therefore really about *solving the meeting
+problem* in a world that no longer makes meeting easy.
+
+## Three ways to meet [#three-ways-to-meet]
+
+There are three honest ways to go about it. They differ mainly in **who runs what**, and each is a
+genuine tradeoff rather than just a difficulty dial:
+
+* **Use a Kommunity partner.** The simplest possible start: let someone else run the whole platform,
+  central server and all, and just bring your apps. A *Kommunity partner* is an institution that hosts
+  an Arkitekt server and opens it up to others. The upside is that you run *nothing*: no hardware, no
+  Docker, no updates, no meeting to arrange. The honest catch is that your data and compute then live
+  on infrastructure you don't own, so you have to trust the partner with both, and this option is
+  **demo-only for now**. It's great for kicking the tires, not for sensitive or production work. If you
+  want to go this route, it's worth asking your local imaging facility whether they run (or would be
+  willing to run) a partner server; that is exactly the kind of place this model is meant for.
+
+* **Deploy locally and join the mesh using our coordination server.** Here you install and run the
+  Arkitekt server yourself, on a machine in your lab, so your data and compute never leave your
+  control. The only thing you borrow is the *meeting*: rather than standing up your own coordination
+  infrastructure, your server and apps register with Arkitekt's community-operated **coordination server**,
+  which brokers the introduction and helps endpoints find each other across NATs and networks. Once
+  they have met, traffic flows directly peer-to-peer. The coordination server never sees your workload
+  data (see [The Arkitekt Mesh](#arkitekt-mesh) for the mechanics). This is the **recommended starting
+  point for most labs**: you keep your data, you avoid running coordination infrastructure, and it
+  works across network boundaries out of the box. The tradeoff is a dependency you don't control. If
+  the coordination server is down, new connections can't be brokered until it is back, and you are
+  trusting a third party to operate the control plane (auth and discovery), even if never the data.
+
+* **Self-host everything, including your own coordination server.** The fully independent option: you run
+  the platform *and* your own coordination server, so nothing depends on anyone outside your walls: not
+  the data, not even the meeting. This is plainly the most work: you operate, update, and secure
+  the coordinator yourself, and reachability across networks becomes your problem to solve rather than
+  something you lean on shared infrastructure for. In return you get complete autonomy and the ability
+  to run fully **offline or air-gapped**. It is also the right choice for **tear-up / teardown
+  testing**. That means standing an entire self-contained platform plus coordinator up from scratch,
+  running against it, and tearing the whole thing back down again. That makes it a natural fit for CI,
+  reproducible demos, or a server that resets itself on a schedule.
+
+<Callout type="info" title="Two kinds of 'server'">
+  It is worth separating two things that both get called a "server". The **central server** is the
+  Arkitekt platform itself. It holds your data and runs the services. The **coordination server** is the
+  *coordinator*: it only handles auth and discovery so that apps and servers can meet, and it never
+  touches your workload data. The three strategies above are really just different answers to *who runs
+  the central server* and *who runs the coordination server*.
+</Callout>
+
+<DeploymentStrategies />
+
+At a glance, here is how the three strategies trade off against one another. Note that *where the apps
+run* is the same in every column. Apps power the heavy actions and run anywhere regardless of which
+strategy you pick. What really changes is **who runs the servers** and, as a result, where your data
+lives and what you depend on.
+
+| | Kommunity partner | Local + coordination server | Fully self-hosted |
+|---|---|---|---|
+| **Who runs the central server** | The partner | You, in your lab | You |
+| **Who runs the coordination server** | The partner | Arkitekt community | You |
+| **Where the apps run** | Anywhere | Anywhere | Anywhere |
+| **Where your data lives** | Partner's infrastructure | Your lab | Your lab |
+| **Setup & ops effort** | None | Low to moderate (server only) | High (server *and* coordinator) |
+| **External dependency** | Total: on the partner | Discovery & auth only | None |
+| **Works offline / air-gapped** | No | No (needs the coordination server to broker) | Yes |
+| **Data control & privacy** | Lowest: you trust the partner | High: P2P, coordinator sees no data | Highest: nothing leaves your walls |
+| **Readiness** | Demo-only for now | Recommended for most labs | Production / advanced |
+| **Best for** | A first look without any setup | Most labs that want data kept local | Air-gapped sites, CI, tear-up / teardown testing |
+
+The strategy decides the *topology*: who runs which server. The mechanics of actually installing the
+server software are the same in every case and are covered in the
+[installation guide](/docs/introduction/installation).
+
+## The Arkitekt Mesh [#arkitekt-mesh]
+
+Reaching your platform is easy when everything lives on one trusted local network. The moment you want to reach it from
+*somewhere else*, sharing a network stops being something you can rely on. That might be your laptop on the train, a collaborator at another institute, or a GPU
+node sitting behind a different NAT. The **mesh** is the answer to that problem: a way to securely reach your platform, and let your apps reach
+it, from anywhere, without poking holes in your firewall or memorizing IP addresses.
+
+The mesh is best understood as a **personal/private mesh** in the spirit of Tailscale, rather than as a federation of independent servers.
+A small central **coordinator** keeps track of who you are and which platforms and apps belong to you, and helps two endpoints find each other and
+establish a connection. Crucially, that is *all* it does. Once the introduction is made, the actual workload traffic flows **directly
+peer-to-peer** between the endpoints. That traffic is your images, your tables, your task arguments and results. It does not pass through the coordinator.
+
+In the language we use elsewhere in these docs, the mesh separates the **control plane** from the **data plane**:
+
+* The **control plane** is the coordinator. It handles authentication, discovery, and the signaling needed to set up a connection through NAT.
+  It is the part that needs to be reachable and the part that knows *that* two endpoints want to talk.
+* The **data plane** is the direct connection between your endpoints. This is where the real data moves, and it is established peer-to-peer
+  so that large transfers stay fast and never round-trip through a central bottleneck.
+
+Under the hood the data plane is an encrypted **WireGuard** tunnel, and the coordinator is built on
+[**Ionscale**](https://github.com/jsiebens/ionscale) (a self-hostable Tailscale control plane). This part of the platform is still
+**optional and experimental**. The diagram below shows how an outside app reaches a platform that lives behind NAT:
+
+<MeshTunnel />
+
+<Callout type="info" title="The coordinator never sees your data">
+  This is the single most important thing to understand about the mesh: the coordinator handles **auth and discovery only**, and your **workload
+  traffic flows directly peer-to-peer and never passes through the central server**. The mesh is *centrally-coordinated*, but it is *not*
+  centralized in the sense that matters for privacy. The operator of the coordinator cannot see your images, your results, or any of the data
+  moving between your nodes.
+</Callout>
+
+The same mechanics are described from the security angle, including why the mesh is the secure
+default and how to replace it with your own connectivity, in [The Mesh](/docs/design/security/mesh).
+
+### How a hub joins [#joining-the-mesh]
+
+Joining is a choice you make when you create a hub with [Konstruktor](/docs/introduction/installation#mesh).
+Its **Mesh** step offers three options:
+
+* **No mesh.** The hub stays on the addresses you picked and is reachable only where those addresses are.
+* **Join the organization's mesh.** Konstruktor asks the coordination server for a mesh key while it
+  authorizes the hub, and runs a small mesh sidecar next to the hub's gateway.
+* **Use a key I already have.** For a coordinator you run yourself: paste a pre-authorized key and
+  the control server URL.
+
+Joining is not the same as being *advertised*. Once the hub is up and has its mesh address, you add
+that address to the hub's advertised addresses on the dashboard and authorize the hub again, so that
+apps coming in over the mesh are told where to find it. Apps such as Orkestrator join the same mesh
+through the same coordinator, and from then on hub and apps can reach one another regardless of
+which network each happens to be sitting on.
+
+### When a direct connection can't be made [#mesh-relay-fallback]
+
+In the great majority of cases the two endpoints will manage to establish a direct peer-to-peer connection, even across NAT, by punching through
+with the coordinator's help. Occasionally a particularly restrictive network will refuse to cooperate and a direct connection simply cannot be
+formed. When that happens the mesh can fall back to **relaying** the traffic so that the connection still works. This costs some throughput,
+since the data now takes a longer path. This fallback is the exception, not the rule, and the mesh always *prefers* a direct connection first.
+
+<Callout type="warn" title="The mesh is young">
+  The mesh is one of the newer parts of the platform and is evolving quickly. The options described above may shift between
+  releases, and as with the rest of the platform we recommend staying on a recent version to get fixes. If you run into trouble joining or reaching
+  endpoints through the mesh, please consult the [Troubleshooting section](/docs/troubleshooting/startup) or open an issue.
+</Callout>

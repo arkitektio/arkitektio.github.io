@@ -1,94 +1,73 @@
 ---
 title: Installation
-description: How to install the Arkitekt platform using the graphical installer, Docker-Compose, or Helm charts, including system requirements.
+description: How to install an Arkitekt hub with Konstruktor, either through the desktop app or from the command line, and how to keep it updated.
 ---
 
-import { DownloadGrid, DeploymentStrategies, MeshTunnel } from "@/components/docs";
+import { DownloadGrid, GithubRepo } from "@/components/docs";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-## Before we start [#before-we-start]
+<Callout type="info" title="The standard install">
+  For a standard installation we advise the following path, and the rest of this page assumes it:
 
-Arkitekt is a **server-client platform**. The heavy lifting is done by **apps**: the actual
-processing, the training, and the analysis. And those apps can run *anywhere*: on a GPU box under your
-desk, on a workstation down the hall, on a node in the cloud. What they cannot do is work in a vacuum.
-They need a **central server** to register against, to authenticate through, to find one another, and
-to keep track of data and results. The server is not where the work happens. It is the **hub** that turns
-a loose scattering of apps into a single, coherent platform: the center that every app connects to and through. And before any of it can happen, the apps
-and that server first have to **find each other and meet**.
+  1. **Create an account** on [go.arkitekt.live](https://go.arkitekt.live), our hosted coordination
+     server. It stores only what a login needs, see the [privacy policy](/docs/privacy#tier-2-an-account-on-goarkitektlive).
+  2. **Install Konstruktor** on the machine that will run the platform.
+  3. In Konstruktor choose the **Hub** path and keep **go.arkitekt.live** as the coordination server.
+  4. **Authorize** the hub in your browser with that account and press **Start**.
 
-That sounds like it should be trivial, and twenty years ago it would have been: give the server a
-public address, point the apps at it, done. So before you get started we want to be honest about one
-thing. **Some of the design here exists not because we wanted it to, but because the internet has
-become what it is.** Servers in labs sit behind NAT, behind institutional firewalls, on networks that
-change addresses and quietly drop inbound connections. You can rarely just "point an app at a server"
-anymore. A good part of Arkitekt's deployment story is therefore really about *solving the meeting
-problem* in a world that no longer makes meeting easy.
-
-There are three honest ways to go about it. They differ mainly in **who runs what**, and each is a
-genuine tradeoff rather than just a difficulty dial:
-
-* **Use a Kommunity partner.** The simplest possible start: let someone else run the whole platform,
-  central server and all, and just bring your apps. A *Kommunity partner* is an institution that hosts
-  an Arkitekt server and opens it up to others. The upside is that you run *nothing*: no hardware, no
-  Docker, no updates, no meeting to arrange. The honest catch is that your data and compute then live
-  on infrastructure you don't own, so you have to trust the partner with both, and this option is
-  **demo-only for now**. It's great for kicking the tires, not for sensitive or production work. If you
-  want to go this route, it's worth asking your local imaging facility whether they run (or would be
-  willing to run) a partner server; that is exactly the kind of place this model is meant for.
-
-* **Deploy locally and join the mesh using our coordination server.** Here you install and run the
-  Arkitekt server yourself, on a machine in your lab, so your data and compute never leave your
-  control. The only thing you borrow is the *meeting*: rather than standing up your own coordination
-  infrastructure, your server and apps register with Arkitekt's community-operated **coordination server**,
-  which brokers the introduction and helps endpoints find each other across NATs and networks. Once
-  they have met, traffic flows directly peer-to-peer. The coordination server never sees your workload
-  data (see [The Arkitekt Mesh](#arkitekt-mesh) for the mechanics). This is the **recommended starting
-  point for most labs**: you keep your data, you avoid running coordination infrastructure, and it
-  works across network boundaries out of the box. The tradeoff is a dependency you don't control. If
-  the coordination server is down, new connections can't be brokered until it is back, and you are
-  trusting a third party to operate the control plane (auth and discovery), even if never the data.
-
-* **Self-host everything, including your own coordination server.** The fully independent option: you run
-  the platform *and* your own coordination server, so nothing depends on anyone outside your walls: not
-  the data, not even the meeting. This is plainly the most work: you operate, update, and secure
-  the coordinator yourself, and reachability across networks becomes your problem to solve rather than
-  something you lean on shared infrastructure for. In return you get complete autonomy and the ability
-  to run fully **offline or air-gapped**. It is also the right choice for **tear-up / teardown
-  testing**. That means standing an entire self-contained platform plus coordinator up from scratch,
-  running against it, and tearing the whole thing back down again. That makes it a natural fit for CI,
-  reproducible demos, or a server that resets itself on a schedule.
-
-<Callout type="info" title="Two kinds of 'server'">
-  It is worth separating two things that both get called a "server". The **central server** is the
-  Arkitekt platform itself. It holds your data and runs the services. The **coordination server** is the
-  *coordinator*: it only handles auth and discovery so that apps and servers can meet, and it never
-  touches your workload data. The three strategies above are really just different answers to *who runs
-  the central server* and *who runs the coordination server*.
+  Your data and compute stay on your machine. The account is only used so that you, your apps and
+  your hub can find and trust each other. The command line, your own coordination server, raw
+  docker-compose and Helm are all covered further down, but they are for advanced setups. If you
+  want to understand *why* it is arranged this way, read [Where Arkitekt runs](/docs/design/philosophy/topology).
 </Callout>
 
-<DeploymentStrategies />
+## What Konstruktor is [#konstruktor]
 
-At a glance, here is how the three strategies trade off against one another. Note that *where the apps
-run* is the same in every column. Apps power the heavy actions and run anywhere regardless of which
-strategy you pick. What really changes is **who runs the servers** and, as a result, where your data
-lives and what you depend on.
+Konstruktor is the installer and admin tool for the Arkitekt platform. It is **one product with two
+front ends**: a desktop app and a `konstruktor` command line tool. Both do exactly the same things,
+authoring a hub, generating its Docker Compose project, authorizing it against a coordination server,
+and driving Docker, because both are thin layers over the same core. They also share the same list
+of known deployments, so a hub created in the app shows up in the CLI and the other way round.
 
-| | Kommunity partner | Local + coordination server | Fully self-hosted |
-|---|---|---|---|
-| **Who runs the central server** | The partner | You, in your lab | You |
-| **Who runs the coordination server** | The partner | Arkitekt community | You |
-| **Where the apps run** | Anywhere | Anywhere | Anywhere |
-| **Where your data lives** | Partner's infrastructure | Your lab | Your lab |
-| **Setup & ops effort** | None | Low to moderate (server only) | High (server *and* coordinator) |
-| **External dependency** | Total: on the partner | Discovery & auth only | None |
-| **Works offline / air-gapped** | No | No (needs the coordination server to broker) | Yes |
-| **Data control & privacy** | Lowest: you trust the partner | High: P2P, coordinator sees no data | Highest: nothing leaves your walls |
-| **Readiness** | Demo-only for now | Recommended for most labs | Production / advanced |
-| **Best for** | A first look without any setup | Most labs that want data kept local | Air-gapped sites, CI, tear-up / teardown testing |
+Konstruktor creates two kinds of deployment:
 
-Whichever strategy you choose, you will still install the server software itself one of a few ways:
-via the graphical installer, via docker-compose, or (soon) via Helm. Those installation *methods* are
-covered further down; the strategy above decides the *topology*, the method below decides the
-*mechanics*.
+- A **hub**: the data and compute services of Arkitekt, behind one gateway. This is what "installing
+  Arkitekt" means, and what the rest of this page is about.
+- A **plugin engine**: a single container that runs the plugins an organization installs, on this
+  machine. See [Plugin engines](#plugin-engine).
+
+Whatever it creates is an **ordinary Docker Compose project in a folder you choose**. There is no
+Python, no helper container and nothing hidden: you can open the folder, read the compose file, and
+run `docker compose` against it yourself if you ever want to.
+
+<GithubRepo url="https://github.com/arkitektio/konstruktor" title="Konstruktor" />
+
+## Requirements [#system-requirements]
+
+**Docker, or a Docker-compatible engine, is the only dependency.** Konstruktor needs Docker Compose
+**2.20** or newer and an Engine API of **1.41** or newer (Docker 20.10). Konstruktor checks this when it
+starts and, if something is missing, tells you which of four things is wrong (no Docker binary, no
+Compose, the daemon is not running, or the version is too old) and how to fix it. On the command line
+`konstruktor doctor` prints the same advice.
+
+| Operating system | Recommended engine | Also works |
+|---|---|---|
+| macOS | [Colima](https://github.com/abiosoft/colima): `brew install colima docker docker-compose` | OrbStack, Podman Desktop, Docker Desktop |
+| Windows | [Rancher Desktop](https://rancherdesktop.io/): `winget install SUSE.RancherDesktop` | Podman Desktop, Docker Desktop |
+| Linux | Docker Engine from your distribution | Podman with `podman-docker` and `podman-compose` |
+
+On macOS and Windows the desktop app can install the recommended engine for you with one click. On
+Linux the commands need `sudo`, so the app prints them for you to paste. If a machine has both Docker
+and Podman, `KONSTRUKTOR_ENGINE=podman` picks Podman. You do **not** need a Docker account. Git is only
+needed if you want to run a service from source.
+
+**Hardware.** The platform is not yet optimized for low-end machines. We recommend at least **16 GB
+of RAM**, a decent modern CPU, and **50 GB of free space on an SSD**. It runs on less (it works on a
+Raspberry Pi 4), but transferring large amounts of data will be slow. As the hub moves a lot of data
+between services and apps, a wired network connection helps a great deal, and on equal hardware the
+platform runs noticeably faster on Linux than on Windows or macOS. GPUs are used by the **apps** that
+do the heavy lifting, not by the hub, so the hub machine does not need one.
 
 <Callout type="info" title="Where to install">
   The Arkitekt platform was designed as a multi-user platform that gets installed *once* on a **powerful** server and then
@@ -97,188 +76,265 @@ covered further down; the strategy above decides the *topology*, the method belo
   in the latter way. We'll keep you posted, when we think the platform is safe ready for multi-user installations!
 </Callout>
 
-## System Requirements [#system-requirements]
+## Graphical installation (recommended) [#graphical-installer-recommended]
 
-The arkitekt platform is designed to run on a variety of different hardware and different operating systems.
-However as a quite involved platform that is at the moment not heavily optimized to run on low-end hardware,
-we recommend to not install Arkitekt on a machine with less than **16GB of RAM** and a **decent modern CPU (i7 or i9)** while
-reserving **at least 50GB of free disk space** on a **SSD drive**.
-While it is perfectly possible to run the platform on a machine with less resources (indeed it works on a Raspberry Pi 4),
-especially the transfer of large amounts of data will be slow and the platform will be sluggish.
+<Steps>
+<Step>
 
-If you want to use Arkitekt with GPU enabled (deep learning modules), we also recommend to have a **CUDA 11** enabled **Nvidia GPU** with at least
-**8GB of VRAM**. If you want to use the GPU for training, we recommend to have at least **16GB of VRAM**.
+### Download and install Konstruktor
 
-Also note that the platform should be installed on a machine with a good network interface (preferably a wired connection) and a good internet connection.
-As a central middleman between different services, the platform will transfer a lot of data between different services and a slow network connection
-will slow down the platform. Also note that in our tests, on equal hardware, the platform runs much faster on Linux than on Windows and Mac OS X.
-
-<Callout type="info" title="About GPU support">
-  Arkitekt makes use of the modern pattern of [Docker GPU Support](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html)
-  to enable GPU support for the platform. This means that you **do not** have to install the CUDA toolkit on your machine, but you need to make sure
-  that you are running the latest NVIDIA drivers on your machine. Arkitekt will take care of the rest. If you have troubles with GPU support, please
-  consult the [Troubleshooting section](/docs/troubleshooting/startup) for more information.
-</Callout>
-
-<Callout type="warn" title="About Apple Silicon">
-  Arkitekt is currently build for the x86-64 architecture. This means that it will run in an **emulated mode** on Apple Silicon. This emulated mode
-  while functional is not optimized for performance and will be slower than on a native x86-64 machine. We are currently in the midst of transitioning
-  our services also to other architectures and will provide native support for Apple Silicon in the future. For now we highly recommend to use a
-  Windows or Linux machine to run Arkitekt.
-</Callout>
-
-## Graphical installer (recommended) [#graphical-installer-recommended]
-
-<img src="/docs/introduction/installer.png" alt="Arkitekt graphical installer" />
-
-Arkitekts installer and admin interface (once installed) will guide you through the installation process and the deployment of the platform on your specific hardware.
-Once installed it serves a simple desktop app that additionally acts as an updater, as well as an admin interface to the platform and allows you to **start** and **stop** the platform.
-
-Go ahead and download our installer for your operating system "Konstruktor", and follow the instructions:
+Konstruktor is available for Windows, macOS (one universal build for Intel and Apple Silicon) and
+Linux (`.deb`, `.rpm` and AppImage). Pick your platform and install it like any other desktop app.
 
 <DownloadGrid />
 
-Konstruktor necessitates the installation of a container runtime (Docker) on the machine where you want to install arkitekt.
-If you don't have docker installed, you can download it from [here](https://www.docker.com/products/docker-desktop). Docker
-is available for Windows, Mac and Linux and is the sole outside dependency of the arkitekt platform. You do *not* need to create
-a docker account in order to use it for Arkitekt. Please check out the FAQ section for more information about the installation of
-docker especially when you are seeking to use GPU support on your machine.
+</Step>
+<Step>
 
-<video className="rounded-sm rounded-md" width="100%">
-  <source src="/docs/introduction/installation.webm" />
-</video>
+### Let it check Docker
 
-<div className="text-gray-400 mb-2">
-  <small>
-    A quick runthrough of the Arkitekt installation. Konstruktor needs the docker
-    runtime to be installed beforehand to properly function.
-  </small>
-</div>
+When Konstruktor opens it checks for a container engine. If Docker is ready you are through to the
+home screen. If not, it tells you what is missing and offers to install the recommended engine
+(macOS, Windows) or shows the commands to run (Linux). The check repeats until Docker is ready.
 
-<Callout type="info" title="About Channels">
-  Konstruktor allows you to install different versions (termed "channels") of the platform. The default current channel is the
-  **"paper"** channel, which is the most stable version of the platform and designed to facilitate workflows of the original paper.
-  If you want to try out the latest features of the platform and the "lessons learned" from the paper, you can switch to the
-  "next" channel which is a more recent version that is only manageable by developers.
-</Callout>
+</Step>
+<Step>
+
+### Create a hub
+
+Choose **New deployment** and then **Hub**. The wizard walks you through the following steps. For
+the standard install you can accept the defaults everywhere except the folder and the identifier.
+
+| Step | What you decide | Default |
+|---|---|---|
+| **Docker** | Nothing, this is the engine check again. | |
+| **Folder** | Where the deployment lives, and its display name. The folder name seeds the identifier. | `~/MyHub` |
+| **Coordination** | Which coordination server the hub trusts for accounts, and the hub's **identifier** (2 to 60 characters, letters, digits, `.`, `_`, `-`). Pick **go.arkitekt.live** (marked *Recommended*) or **Another server** for your institute's own. | go.arkitekt.live |
+| **Services** | Which services the hub runs, and whether Rekuest runs here or on a remote host. Per service you can opt to run from source. | rekuest, mikro, fluss, kabinet, kraph |
+| **Ports** | The HTTP and HTTPS ports the gateway publishes. Every service is routed behind them (`/rekuest`, `/mikro`, and so on). | 7080 / 7443 |
+| **Storage** | Docker volumes (recommended) or the deployment folder for the database and uploaded files. | Docker volumes |
+| **Addresses** | How far the hub is reachable (local only, this network, public) and which addresses it advertises to apps. At least one is required. | This network |
+| **Mesh** | Whether the hub joins a mesh. See [Mesh](#mesh). | No mesh |
+| **Review** | A summary of every choice and a preview of the files that will be written. | |
+
+</Step>
+<Step>
+
+### Authorize the hub
+
+A hub manages no accounts of its own. Users, organizations and permissions live on the coordination
+server, and the hub has to be accepted there before it exists on disk. Konstruktor shows a short code
+and a link. Open the link, sign in with your **go.arkitekt.live** account, pick the organization the
+hub should belong to, and accept. Only when that grant comes back does Konstruktor write the
+deployment. This is the same device-code flow apps use to connect, described in
+[Service Discovery](/docs/design/architecture/service-discovery).
+
+</Step>
+<Step>
+
+### Start it
+
+The wizard writes the deployment and hands you over to the hub's **dashboard**. Press **Start**.
+Docker pulls the images on first start, which takes a while depending on your connection. The
+dashboard also lets you stop the hub, read logs, open the folder, edit the compose file, pull
+updates, back up and restore data, and re-authorize.
+
+The hub is seeded with an `admin` account whose password Konstruktor generated for you; **Copy
+admin password** in the dashboard menu puts it on the clipboard. To create your own user, use the
+**superuser** dialog on the dashboard once the hub is running, it creates the account in each
+service.
+
+Konstruktor also lives in the system tray, listing every hub and engine with its run state. Closing
+the window does not stop anything.
+
+</Step>
+</Steps>
+
+## Non-graphical installation [#cli]
+
+Everything above can be done from a terminal with the `konstruktor` CLI, which is what you want on a
+headless server, in a script, or in CI.
+
+<Steps>
+<Step>
+
+### Install the CLI
+
+<Tabs items={["Linux / macOS", "Windows"]}>
+<Tab value="Linux / macOS">
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/arkitektio/konstruktor/master/install.sh | sh
+```
+
+The script downloads the latest release for your architecture into `~/.local/bin`, verifies it
+against the release's `SHA256SUMS`, and refuses to install if it cannot. With a terminal attached it
+then asks for a hub identifier and creates a hub for you right away. Useful flags, passed after
+`sh -s --`:
+
+| Flag | Effect |
+|---|---|
+| `--no-run` | Install only, do not create a hub |
+| `--hub-dir <path>` | Where to create the hub (default `~/MyHubs/<identifier>`) |
+| `--version <tag>` | Install a specific release, for example `konstruktor-v0.4.1` |
+| `--dir <path>` | Install the binary somewhere other than `~/.local/bin` |
+
+`KONSTRUKTOR_INSTALL_DIR` and `KONSTRUKTOR_HUB_PARENT` do the same as `--dir` and `--hub-dir`.
+
+</Tab>
+<Tab value="Windows">
+
+Download `konstruktor-x86_64-pc-windows-msvc.exe` from the
+[releases page](https://github.com/arkitektio/konstruktor/releases/latest), rename it to
+`konstruktor.exe` and put it somewhere on your `PATH`.
+
+</Tab>
+</Tabs>
+
+</Step>
+<Step>
+
+### Create a hub
+
+Interactively, the CLI asks the same questions as the wizard:
+
+```bash
+konstruktor hub create ~/MyHubs/lab-hub
+```
+
+Unattended, pass every answer as a flag. Without a terminal, a missing answer is an error naming
+the flag that would have supplied it, so a script never hangs on a prompt:
+
+```bash
+konstruktor hub create ~/MyHubs/lab-hub \
+  --server go.arkitekt.live \
+  --identifier lab-hub \
+  --services rekuest,mikro,fluss \
+  --yes
+```
+
+The flags mirror the wizard steps: `--server`, `--identifier`, `--name`, `--services`,
+`--rekuest local|<host>`, `--http-port`, `--https-port`, `--ssl`, `--storage volumes|folder`,
+`--reach local-only|this-network|public`, `--host <addr>` (repeatable), `--mesh none|coordination|manual`,
+`--dev`, `--no-start`, `--no-open`. Run `konstruktor hub create --help` for the full list.
+
+The one step that stays interactive is the **authorization**: the CLI prints the link and the code,
+and someone with an account accepts the hub in a browser. If that fails the command exits with
+code `4`. On success the hub's path is printed on standard output and, unless you passed
+`--no-start`, the hub is started.
+
+</Step>
+<Step>
+
+### Run it
+
+```bash
+konstruktor status lab-hub      # what is running
+konstruktor up lab-hub          # start
+konstruktor stop lab-hub        # stop
+konstruktor logs lab-hub --service mikro --tail 200
+konstruktor superuser mikro --in lab-hub   # create a user in a service
+konstruktor backup ./backup --in lab-hub
+konstruktor restore ./backup --in lab-hub
+konstruktor list                # every hub and engine this machine knows
+```
+
+A target can be a path or the name of a registered deployment, and defaults to the current
+directory.
+
+</Step>
+</Steps>
+
+Inside the deployment folder you will find `hub_config.yaml` (the hub profile: coordination server,
+services, ports, image tags), the generated `docker-compose.yaml`, a `configs/` folder with one file
+per service plus the gateway's `Caddyfile`, and `hub_credentials.json` holding the secrets. Edit the
+compose file if you need to; Konstruktor keeps a `.bak` on every save.
+
+## Plugin engines [#plugin-engine]
+
+A **plugin engine** is the second thing Konstruktor can create: one container that runs the plugins
+an organization has installed, on the machine where the engine lives. It is how a lab adds compute
+to a hub without touching the hub itself. Choose **Plugin engine** in the app, or run:
+
+```bash
+konstruktor engine create ~/MyEngines/gpu-box --server go.arkitekt.live --identifier gpu-box
+```
+
+Engines are authorized against the coordination server the same way hubs are.
 
 ## Updating [#updating]
 
-Once installed, the installer will also act as an updater for the platform. Arkitekt is a rapidly evolving platform and we are constantly
-adding new features and fixing bugs. Updating of the platform is therefore a crucial part of the platform. You are encouraged to update
-your `channel` of the platform regularly to get the latest features and bugfixes. You can update the platform by clicking on the "Danger"
-button in the dashboard interface of the installer, and then selecting `Update`. The installer will then download the latest version of the
-platform images. This might take a while, depending on your internet connection. Once the download is finished, you can then apply the update
-by clicking on the `Start` button. This will cause a "rolling update" of the platform, which means that the platform should update without any
-downtime. If you encounter any problems with the update, please consult the [Troubleshooting section](/docs/troubleshooting/startup) for more information.
+Arkitekt is a rapidly evolving platform, and updating regularly is the only way to get fixes and new
+features. Two things update separately:
 
-<Callout type="info" title="About updating">
-  At this early stage of the platform, updating is a crucial part of the platform. We are constantly adding new features and fixing bugs, and
-  updating the platform is the only way to get the latest features and bugfixes. The updates in one channel should `always` be backwards compatible
-  and your data should be safe.
+- **The platform images.** The dashboard checks the registries for newer images and shows, per
+  service, whether the running image is current, whether a newer one exists, or whether a newer one
+  has been pulled but is not running yet. **Pull images** and then **Start** applies an update; on
+  the command line that is `konstruktor pull lab-hub` followed by `konstruktor up lab-hub`. Updates
+  within a channel are meant to be backwards compatible and to keep your data intact.
+- **Konstruktor itself.** There is no auto-updater. Re-run the install script, which always resolves
+  the latest release, or download the new desktop installer.
+
+<Callout type="info" title="About channels">
+  Konstruktor no longer has a channel picker. A hub's channel is simply the set of image tags in its
+  `hub_config.yaml`; a stock hub ships on the `next` tag (with Kraph on `dev`). To move a service to
+  another channel, change its tag there and pull. How the channels relate is described in
+  [How we version Arkitekt](/docs/design/philosophy/version).
 </Callout>
+
+## Mesh [#mesh]
+
+The **Mesh** step of the wizard (or `--mesh` on the command line) decides whether the hub can be
+reached across networks through the [Arkitekt mesh](/docs/design/philosophy/topology#arkitekt-mesh):
+
+- **No mesh** (`none`): the hub stays on the addresses you picked.
+- **Join the organization's mesh** (`coordination`): Konstruktor asks the coordination server for a
+  mesh key while it authorizes the hub, and runs a mesh sidecar next to the gateway.
+- **Use a key I already have** (`manual`): paste a pre-authorized key and the control server URL,
+  for a coordinator you run yourself (`--mesh-key`, or better `KONSTRUKTOR_MESH_KEY`, and `--mesh-coord-url`).
+
+Joining is not the same as being advertised. Once the hub is up and has its mesh address, add that
+address on the dashboard's address list and **Authorize** again, so apps arriving over the mesh are
+told where to find the hub. What the mesh does and why it is the secure default is explained in
+[The Mesh](/docs/design/security/mesh).
 
 ## Local-network advertising (removed) [#advertising]
 
 <Callout type="warn" title="This feature was removed">
-  Earlier versions of Arkitekt could **advertise** the platform on your local network,
-  a UDP broadcast beacon so that apps could discover it without knowing its IP address.
-  We have **removed** this feature. Local networks turned out to be too much of a mess:
-  firewalls, changing addresses, blocked broadcasts, VPNs, and machines with several
-  network interfaces meant advertising worked unreliably, and only ever within a single
-  LAN in the first place.
-
-  Discovery is now handled entirely by the [mesh](#arkitekt-mesh), which lets your
-  authenticated endpoints find and reach each other across *any* network, not just the
-  one they happen to share.
-</Callout>
-
-## The Arkitekt Mesh [#arkitekt-mesh]
-
-Reaching your platform is easy when everything lives on one trusted local network. The moment you want to reach it from
-*somewhere else*, sharing a network stops being something you can rely on. That might be your laptop on the train, a collaborator at another institute, or a GPU
-node sitting behind a different NAT. The **mesh** is the answer to that problem: a way to securely reach your platform, and let your apps reach
-it, from anywhere, without poking holes in your firewall or memorizing IP addresses.
-
-The mesh is best understood as a **personal/private mesh** in the spirit of Tailscale, rather than as a federation of independent servers.
-A small central **coordinator** keeps track of who you are and which platforms and apps belong to you, and helps two endpoints find each other and
-establish a connection. Crucially, that is *all* it does. Once the introduction is made, the actual workload traffic flows **directly
-peer-to-peer** between the endpoints. That traffic is your images, your tables, your task arguments and results. It does not pass through the coordinator.
-
-In the language we use elsewhere in these docs, the mesh separates the **control plane** from the **data plane**:
-
-* The **control plane** is the coordinator. It handles authentication, discovery, and the signaling needed to set up a connection through NAT.
-  It is the part that needs to be reachable and the part that knows *that* two endpoints want to talk.
-* The **data plane** is the direct connection between your endpoints. This is where the real data moves, and it is established peer-to-peer
-  so that large transfers stay fast and never round-trip through a central bottleneck.
-
-Under the hood the data plane is an encrypted **WireGuard** tunnel, and the coordinator is built on
-[**Ionscale**](https://github.com/jsiebens/ionscale) (a self-hostable Tailscale control plane). This part of the platform is still
-**optional and experimental**. The diagram below shows how an outside app reaches a platform that lives behind NAT:
-
-<MeshTunnel />
-
-<Callout type="info" title="The coordinator never sees your data">
-  This is the single most important thing to understand about the mesh: the coordinator handles **auth and discovery only**, and your **workload
-  traffic flows directly peer-to-peer and never passes through the central server**. The mesh is *centrally-coordinated*, but it is *not*
-  centralized in the sense that matters for privacy. The operator of the coordinator cannot see your images, your results, or any of the data
-  moving between your nodes.
-</Callout>
-
-### Joining the mesh [#joining-the-mesh]
-
-Joining a platform to the mesh is a single command on the machine you want to connect:
-
-```bash
-arkitekt mesh join
-```
-
-This authenticates the endpoint against the coordinator, registers it, and brings up its side of the connection. From that point on the platform
-is reachable to you and to your apps through the mesh, regardless of which network it happens to be sitting on. Leaving the mesh again is the
-mirror image:
-
-```bash
-arkitekt mesh leave
-```
-
-You can run `arkitekt mesh join` on as many machines as you like: your laptop, your lab workstation, a remote compute node. They will all
-be able to discover and reach one another through the same coordinator, while the heavy lifting stays peer-to-peer between them.
-
-### When a direct connection can't be made [#mesh-relay-fallback]
-
-In the great majority of cases the two endpoints will manage to establish a direct peer-to-peer connection, even across NAT, by punching through
-with the coordinator's help. Occasionally a particularly restrictive network will refuse to cooperate and a direct connection simply cannot be
-formed. When that happens the mesh can fall back to **relaying** the traffic so that the connection still works. This costs some throughput,
-since the data now takes a longer path. This fallback is the exception, not the rule, and the mesh always *prefers* a direct connection first.
-
-<Callout type="warn" title="The mesh is young">
-  The mesh is one of the newer parts of the platform and is evolving quickly. The command surface and the behavior described above may shift between
-  channels, and as with the rest of the platform we recommend staying on a recent `channel` to get fixes. If you run into trouble joining or reaching
-  endpoints through the mesh, please consult the [Troubleshooting section](/docs/troubleshooting/startup) or open an issue.
+  Earlier versions of Arkitekt could **advertise** the platform on your local network with a UDP
+  broadcast so that apps could discover it without knowing its IP address. Local networks turned out
+  to be too much of a mess (firewalls, changing addresses, blocked broadcasts, VPNs) for that to be
+  reliable, and it only ever worked within a single LAN. Apps now discover a hub by the addresses it
+  advertises, and across networks through the [mesh](/docs/design/philosophy/topology#arkitekt-mesh).
 </Callout>
 
 ## Other installation strategies [#other-installation-strategies]
 
-Here we will describe other installation strategies that you can use to install the platform. These strategies are not
-recommended for beginners, but might be useful if you want to integrate the platform in a larger infrastructure or if
-you want to participate in the development of the platform.
+These are not recommended for beginners, but are useful if you want to integrate the platform into a
+larger infrastructure or take part in its development.
+
+### Edit what Konstruktor generated [#custom-compose]
+
+Because a hub is a plain Docker Compose project, the simplest customization is to let Konstruktor
+generate it and then edit `docker-compose.yaml` and the files in `configs/` yourself, from the
+dashboard's **Edit compose file** or with any editor. Konstruktor keeps a backup of the previous
+version on each save.
 
 ### Docker-Compose [#docker-compose]
 
-If you are familiar with docker-compose, you can use the docker-compose configuration to set up the platform. We maintain
-an active repository with the docker-compose configuration that you can find [here](https://github.com/arkitektio/arkitekt-server).
-This includes already the configuration for the most common modules of the platform, and when cloned with the submodules
-(`git clone --recurse-submodules`) will also include the source code of the platform. If you encounter any problems with
-the docker-compose configuration, please open an issue in the repository.
+If you prefer to start from a maintained compose configuration rather than a generated one, we keep
+one at [arkitektio/arkitekt-server](https://github.com/arkitektio/arkitekt-server). It includes the
+most common services and, when cloned with `git clone --recurse-submodules`, their source code. If you
+run into problems with it, please open an issue in that repository.
 
 ### Helm Charts [#helm-charts]
 
-We are currently working on a helm chart that will allow you to install arkitekt on a kubernetes cluster. This will be
-available soon. You will find the repository [here](https://github.com/arkitektio/arkitekt-helm). For now, you can use the
-docker-compose configuration to set up the platform on a kubernetes cluster using the [kompose](https://kompose.io/) tool.
+We are working on a Helm chart for installing Arkitekt on a Kubernetes cluster; it will live at
+[arkitektio/arkitekt-helm](https://github.com/arkitektio/arkitekt-helm). Until then the compose
+configuration can be converted with [kompose](https://kompose.io/).
 
 ### Custom installation [#custom-installation]
 
-From here be dragons. You can find some hints in the developer section of each module and consult each sub
-modules documentation for more information about the installation of the platform. At this point however you are on your
-own. If you encounter any problems, please open an issue in the respective repository.
+From here be dragons. You can find hints in the developer section of each service and in each
+service's own documentation. At this point you are on your own. If you encounter problems, please
+open an issue in the respective repository.

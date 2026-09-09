@@ -1,4 +1,11 @@
 {
   "title": "Philosophy",
-  "pages": ["humans-first", "api", "middleman", "realtime", "version"]
+  "pages": [
+    "humans-first",
+    "api",
+    "middleman",
+    "topology",
+    "realtime",
+    "version"
+  ]
 }
