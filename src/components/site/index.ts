@@ -3,6 +3,8 @@ export {
   BrandColorScript,
   BrandColorPicker,
   BrandColorControls,
+  applyBrandHueFromContent,
+  hasSavedBrandHue,
 } from './brand-color';
 export { Logo } from './logo';
 export { getMDXComponents, useMDXComponents } from './mdx';

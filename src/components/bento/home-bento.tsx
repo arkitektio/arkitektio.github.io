@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Terminal } from '@/components/docs/terminal';
-import { BentoCard, BentoGrid, ScreenshotSlot } from './primitives';
+import { RandomClip } from '@/components/marketing/random-clip';
+import { BentoCard, BentoGrid } from './primitives';
 import { AsyncApiCard } from './async-api-card';
 import { ProvenanceCard } from './provenance-card';
 import { StateCard } from './state-card';
@@ -20,14 +21,10 @@ export function HomeBento() {
         {/* observable state. A robot whose state updates live */}
         <StateCard />
 
-        {/* wide media. The Orkestrator managing microscopy data */}
+        {/* wide media. A random clip from the volume-viewer talk, captioned
+            (pin with ?demo=<slug>) */}
         <BentoCard className="p-2 sm:col-span-2">
-          <ScreenshotSlot
-            src="/img/image.png"
-            alt="The Orkestrator app managing uploaded microscopy data"
-            className="min-h-52 sm:min-h-60"
-            imgClassName="rounded-2xl"
-          />
+          <RandomClip slot="demo" caption className="rounded-2xl" />
         </BentoCard>
 
         {/* facilities statement + showcase CTA */}

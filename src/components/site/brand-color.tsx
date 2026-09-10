@@ -13,8 +13,33 @@ function swatch(hue: number) {
   return `oklch(0.62 0.19 ${hue})`;
 }
 
+/** Fired on `document` whenever the hue is applied, so open controls can
+    mirror a change they did not make (e.g. a clip tinting the page). */
+export const BRAND_HUE_EVENT = 'arkitekt:brand-hue';
+
 function applyHue(hue: number) {
   document.documentElement.style.setProperty('--brand-hue', String(hue));
+  document.dispatchEvent(new CustomEvent(BRAND_HUE_EVENT, { detail: hue }));
+}
+
+/** Whether the visitor saved a hue: a saved hue is a choice, and nothing on the
+    page should override it. */
+export function hasSavedBrandHue() {
+  try {
+    return localStorage.getItem(STORAGE_KEY) != null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Tint the site to a hue derived from content (the hero clip's poster, the
+ * way orkestrator-next tints itself after the open scene). Skipped when the
+ * visitor has saved a hue of their own.
+ */
+export function applyBrandHueFromContent(hue: number) {
+  if (hasSavedBrandHue()) return;
+  applyHue(Math.round(hue));
 }
 
 /**
@@ -47,7 +72,8 @@ export function BrandColorControls({
     onHueChange?.(next);
   }
 
-  // Sync from whatever the early script already applied.
+  // Sync from whatever the early script already applied, and follow any
+  // later content-derived tint.
   useEffect(() => {
     const current = getComputedStyle(document.documentElement).getPropertyValue(
       '--brand-hue',
@@ -59,6 +85,12 @@ export function BrandColorControls({
     } catch {
       /* ignore */
     }
+    const onHue = (event: Event) => {
+      const next = (event as CustomEvent<number>).detail;
+      if (typeof next === 'number') setHue(next);
+    };
+    document.addEventListener(BRAND_HUE_EVENT, onHue);
+    return () => document.removeEventListener(BRAND_HUE_EVENT, onHue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

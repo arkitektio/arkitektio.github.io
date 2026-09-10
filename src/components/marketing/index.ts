@@ -5,3 +5,5 @@ export { RobotScene } from './robot-scene';
 export { RobotStateScene } from './robot-state-scene';
 export { SectionBackground } from './section-background';
 export { useInView, revealClass } from './reveal';
+export { DemoClip } from './demo-clip';
+export { RandomClip } from './random-clip';

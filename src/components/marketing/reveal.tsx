@@ -3,11 +3,17 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Fires once when the element first scrolls into view. Used to drive the
- * sequenced (staggered) card reveals on the home page. Pair the returned
- * `inView` flag with a per-item `transitionDelay` to play cards in order.
+ * Tracks whether an element is in the viewport. By default it fires once
+ * (the first time the element scrolls into view) and then stops observing,
+ * which is what the sequenced (staggered) card reveals on the home page want.
+ * Pass `once: false` to keep following the element in and out, e.g. to pause
+ * a video while it is off-screen. `rootMargin` grows the viewport so work can
+ * start shortly before the element is actually visible.
  */
-export function useInView<T extends HTMLElement>(threshold = 0.2) {
+export function useInView<T extends HTMLElement>(
+  threshold = 0.2,
+  { once = true, rootMargin = '0px' }: { once?: boolean; rootMargin?: string } = {},
+) {
   const ref = useRef<T>(null);
   const [inView, setInView] = useState(false);
 
@@ -18,14 +24,16 @@ export function useInView<T extends HTMLElement>(threshold = 0.2) {
       ([entry]) => {
         if (entry.isIntersecting) {
           setInView(true);
-          io.disconnect();
+          if (once) io.disconnect();
+        } else if (!once) {
+          setInView(false);
         }
       },
-      { threshold },
+      { threshold, rootMargin },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [threshold]);
+  }, [threshold, once, rootMargin]);
 
   return { ref, inView };
 }

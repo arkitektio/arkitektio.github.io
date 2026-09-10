@@ -12,8 +12,12 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CoreBento, HomeBento } from '@/components/bento';
-import { asset } from '@/lib/base-path';
-import { Ecosystem, EcosystemOrbit, NotArkitekt } from '@/components/marketing';
+import {
+  Ecosystem,
+  EcosystemOrbit,
+  NotArkitekt,
+  RandomClip,
+} from '@/components/marketing';
 import { gitConfig } from '@/lib/shared';
 
 function UnderConstruction() {
@@ -103,15 +107,13 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* product screenshot. Anchored into the lower-right corner and oversized
-            so it bleeds off the edge, clipped by the hero's overflow-hidden */}
-        <div className="relative z-0 mt-10 px-6 sm:px-12 lg:absolute lg:bottom-0 lg:right-0 lg:mt-0 lg:w-[64%] lg:translate-x-[12%] lg:translate-y-[16%] lg:px-0">
-          <div className="overflow-hidden rounded-xl  lg:rounded-none lg:rounded-tl-2xl lg:border-b-0 lg:border-r-0">
-            <img
-              src={asset('/img/image.png')}
-              alt="The Orkestrator app managing uploaded microscopy data"
-              className="w-full"
-            />
+        {/* product clip, picked at random per page load (pin with ?hero=<slug>).
+            Its poster's majority hue becomes the brand hue for this visit.
+            Anchored into the lower-right corner and oversized so it bleeds off
+            the edge, clipped by the hero's overflow-hidden */}
+        <div className="relative z-0 mt-10 px-6 sm:px-12 lg:absolute lg:bottom-0 lg:right-0 lg:mt-0 lg:w-[64%] lg:translate-x-[10%] lg:translate-y-[10%] lg:px-0">
+          <div className="overflow-hidden rounded-xl border border-white/10 lg:rounded-none lg:rounded-tl-2xl lg:border-b-0 lg:border-r-0">
+            <RandomClip slot="hero" priority tintBrand />
           </div>
         </div>
       </section>
