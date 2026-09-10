@@ -71,7 +71,7 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-6 max-w-xl text-lg text-white/60">
-            Arkitekt is a real-time middleman between between you and your tools.It turns scattered scripts and messy multi-folder data tombs into a single, reactive datahub that orchestrates your analysis and lets you share your data with your team.
+            Arkitekt is a real-time middleman between you and your tools. It turns scattered scripts and messy multi-folder data sinkholes into a single, analysis tracking datahub that orchestrates your workflows and lets you share your data with your team securely.
           </p>
 
           {/* CTAs */}
