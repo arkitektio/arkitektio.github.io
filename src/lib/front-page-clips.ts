@@ -32,35 +32,35 @@ export const clipsDeckHref = '/presentations/volume-viewer';
 export const frontPageClips: FrontPageClip[] = [
   {
     slug: 'open-a-volume',
-    title: 'Open a volume',
+    title: 'Open large datasets',
     tagline: 'but from home.',
     hue: 185,
     caption:
-      'Open gigabytes, quickly, from home. A dataset straight off the microscope, streamed chunk by chunk into the Orkestrator desktop app.',
+      'Open gigabytes, quickly, from home, streamed chunk by chunk into the Orkestrator desktop app.',
   },
   {
     slug: 'annotate-by-probing',
-    title: 'Annotate by probing',
+    title: 'Annotate & Explore',
     tagline: 'but in 3D.',
     hue: 115,
     caption:
-      'The readout follows the cursor through the volume, and the mark lands where the ray hits. The ray is marched on your own machine, inside Orkestrator.',
+      'Annotate structures in 3D, right in Orkestrator.',
   },
   {
     slug: 'example-meshes',
-    title: 'Meshes in the viewer',
+    title: 'Data is not just volumes',
     tagline: 'and not just volumes.',
     hue: 327,
     caption:
-      'Traced surfaces at scale. Level of detail tightens near the camera with no popping at cell boundaries, because the boundary vertices are shared.',
+      'Large meshes, point clouds, and other data types can be visualised in the same viewer.',
   },
   {
     slug: 'flim-data',
-    title: 'FLIM data',
+    title: 'More than just flourescence',
     tagline: 'not just confocal.',
     hue: 300,
     caption:
-      'Not just confocal. Lifetime imaging in the same viewer, with the renderer switched on the fly.',
+      'Orkestrator can visualise more the just channels. Hyperspectral, FLIM, and other data types can be explored in the same viewer.',
   },
   {
     slug: 'whole-slide-imaging',
@@ -68,7 +68,7 @@ export const frontPageClips: FrontPageClip[] = [
     tagline: 'zooming in and out.',
     hue: 334,
     caption:
-      'Thousands of tiles, acquired over hours, placed into one slide space. Pan across the section, then zoom to a nucleus without leaving the viewer.',
+      'Of course, we also allow you to overlay spatial transcriptomics data on top of whole-slide images...',
   },
 ];
 
