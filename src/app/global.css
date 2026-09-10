@@ -179,6 +179,37 @@ html > body[data-scroll-locked] {
   animation: orbit-pulse 2.6s ease-in-out infinite;
 }
 
+/* `--brand-hue` is registered so it can be transitioned. The transition is
+   only on while <html> carries data-brand-hue-animate, which the hero carousel
+   sets for the moment it re-tints the site from the clip on screen. */
+@property --brand-hue {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 267.256;
+}
+html[data-brand-hue-animate] {
+  transition: --brand-hue 3s ease-in-out;
+}
+
+/* Caption under the hero carousel and the headline's second line, fading in
+   with each clip. */
+@keyframes hero-caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.hero-caption-in {
+  animation: hero-caption-in 0.5s ease-out both;
+}
+.hero-tagline-in {
+  animation: hero-caption-in 1s ease-out both;
+}
+
 /* Fractal-noise grain used by the landing hero overlay. */
 .bg-grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");

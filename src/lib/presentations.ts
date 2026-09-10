@@ -35,7 +35,7 @@ export const presentations: Presentation[] = [
     slug: 'volume-viewer',
     title: 'Large scale volume viewing',
     description:
-      'A dataset that fits in neither memory nor a screen, opened in a browser tab. Chunks instead of files, a resolution per frame, and bytes that never pass through the platform.',
+      'A dataset that fits in neither memory nor a screen, opened in the Orkestrator desktop app. Chunks instead of files, a resolution per frame, and bytes that never pass through the platform.',
     topic: 'Orkestrator',
     tags: ['Viewing', 'Performance', 'Microscopy'],
     slides: 34,

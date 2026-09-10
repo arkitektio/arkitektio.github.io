@@ -256,16 +256,12 @@ If your Deployment is running, but it doesn't appear in Orkestrator, it means th
 
 1. Check if your Deployment is really running (i.e. all services are green). If your Deployment is not running, Orkestrator will not be able to discover it.
 
-2. Restart Discovery. Depending if your are using the Desktop App or the Webrowser:
-
-   - Desktop App: Restart the whole App.
-   - Webbrowser: Reload the webpage.
+2. Restart Discovery: restart the whole Orkestrator app.
 
 3. Make sure you can reach your deployment, either on the same machine, or across networks through the [mesh](/docs/design/security/mesh). (Local-network advertising has been removed, see the [installation guide](/docs/introduction/installation/starting-new#advertising).)
 
 4. For automatic detection: Make sure that:
 
-   - You are on the same machine as your deployment when using Webbrowser. (e.g you are able to access localhost:8000)
    - Your deployment and the Desktop App have both [joined the mesh](/docs/introduction/installation/starting-new#mesh), so they can discover each other.
 
 5. For manual connection. If the automatic steps fail, you can always try to manually connect

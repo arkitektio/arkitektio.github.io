@@ -15,8 +15,10 @@ import { CoreBento, HomeBento } from "@/components/bento";
 import {
   Ecosystem,
   EcosystemOrbit,
+  HeroCarousel,
+  HeroClipsProvider,
+  HeroTagline,
   NotArkitekt,
-  RandomClip,
 } from "@/components/marketing";
 import { gitConfig } from "@/lib/shared";
 
@@ -61,63 +63,72 @@ export default function HomePage() {
 
         {/* Two columns from lg: the copy keeps its width, the clip takes the
             rest and sits vertically centred beside it, so the two can never
-            overlap whatever the screen width. */}
-        <div className="relative flex flex-col lg:flex-row lg:items-center">
-          <div className="relative z-10 max-w-2xl shrink-0 px-6 pt-14 sm:px-12 sm:pt-20 lg:w-[52%] lg:px-16 lg:py-24 xl:w-auto">
-            {/* badge */}
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3.5 py-1.5 text-sm font-medium text-primary backdrop-blur">
-              Take the K pill
-            </span>
+            overlap whatever the screen width. The provider shares which clip
+            is playing with the headline. */}
+        <HeroClipsProvider>
+          <div className="relative flex flex-col lg:flex-row lg:items-center">
+            <div className="relative z-10 max-w-2xl shrink-0 px-6 pt-14 sm:px-12 sm:pt-20 lg:w-[52%] lg:px-16 lg:py-24 xl:w-auto">
+              {/* badge */}
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3.5 py-1.5 text-sm font-medium text-primary backdrop-blur">
+                Take the K pill
+              </span>
 
-            {/* headline */}
-            <h1 className="mt-7 max-w-3xl text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl xl:text-7xl">
-              Bioimage analysis,
-              <br />
-              <span className="text-primary">a bit more fun.</span>
-            </h1>
+              {/* headline */}
+              <h1 className="mt-7 max-w-3xl text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl xl:text-7xl">
+                Bioimage analysis,
+                <br />
+                <HeroTagline
+                  fallback="a bit more fun."
+                  className="text-primary"
+                />
+              </h1>
 
-            <p className="mt-6 max-w-xl text-lg text-white/60">
-              Arkitekt is a real-time middleman between you and your tools. It
-              turns scattered scripts and messy multi-folder data sinkholes into
-              a single, analysis tracking datahub that orchestrates your
-              workflows and lets you share your data with your team securely.
-            </p>
+              <p className="mt-6 max-w-xl text-lg text-white/60">
+                Arkitekt is a real-time middleman between you and your tools. It
+                turns scattered scripts and messy multi-folder data sinkholes
+                into a single, analysis tracking datahub that orchestrates your
+                workflows and lets you share your data with your team securely.
+              </p>
 
-            {/* CTAs */}
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button asChild size="lg" className="rounded-full px-7 text-base">
-                <Link href="/docs/introduction/installation">
-                  Lets gooo!
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                className="rounded-full border border-white/10 bg-white/10 px-7 text-base text-white hover:bg-white/20"
-              >
-                <a
-                  href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
-                  target="_blank"
-                  rel="noreferrer noopener"
+              {/* CTAs */}
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-full px-7 text-base"
                 >
-                  <GitFork className="size-4" />
-                  Show me code
-                </a>
-              </Button>
+                  <Link href="/docs/introduction/installation">
+                    Lets gooo!
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-full border border-white/10 bg-white/10 px-7 text-base text-white hover:bg-white/20"
+                >
+                  <a
+                    href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <GitFork className="size-4" />
+                    Show me code
+                  </a>
+                </Button>
+              </div>
             </div>
-          </div>
 
-          {/* product clip, picked at random per page load (pin with ?hero=<slug>).
-            Its poster's majority hue becomes the brand hue for this visit.
-            Fills its column up to a cap (so a wide screen does not get a wall
-            of video), centred vertically beside the copy. */}
-          <div className="relative z-0 mt-10 px-6 pb-10 sm:px-12 lg:my-0 lg:flex lg:min-w-0 lg:flex-1 lg:justify-center lg:px-10 lg:py-16">
-            <div className="w-full overflow-hidden rounded-xl border border-white/10 shadow-2xl shadow-black/40 lg:max-w-[920px]">
-              <RandomClip slot="hero" priority tintBrand />
+            {/* product clips, played one after another (start with a random one,
+            or pin with ?hero=<slug>). Each clip's poster tints the brand hue
+            while it plays. Fills its column up to a cap (so a
+            wide screen does not get a wall of video), centred vertically
+            beside the copy, with a caption underneath saying what is playing. */}
+            <div className="relative z-0 mt-10 px-6 pb-10 sm:px-12 lg:my-0 lg:flex lg:min-w-0 lg:flex-1 lg:justify-center lg:px-10 lg:py-16">
+              <HeroCarousel className="lg:max-w-[920px]" />
             </div>
           </div>
-        </div>
+        </HeroClipsProvider>
       </section>
 
       {/* ─────────────────── Ecosystem orbit map ────────────────── */}

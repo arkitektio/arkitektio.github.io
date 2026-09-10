@@ -112,7 +112,7 @@ that the connection is active and listening for requests / red means recordings.
 
 To visualize your data in Napari, you can simply search for the `Show on Napari` action and run it directly from the image pane,
 where it will appear in the bottom right corner. If you leave the "show roi layer" on, you should even see
-the ROIs that you have created in the browser.
+the ROIs that you have created in Orkestrator.
 
 <video
   autoPlay
@@ -132,8 +132,8 @@ A few words about this process:
    Arkitekt and Napari to only show you the visible parts.
 
 2. _ROIs_:
-   If you have created ROIs in the browser, you can also visualize them in Napari. Just make sure that you have the "Show ROI Layer" option enabled, when
-   assigning the action. Importantly you will notice that if you mark rois on the ROI layer they are _live syncing_ with your server and the browser, and
+   If you have created ROIs in Orkestrator, you can also visualize them in Napari. Just make sure that you have the "Show ROI Layer" option enabled, when
+   assigning the action. Importantly you will notice that if you mark rois on the ROI layer they are _live syncing_ with your server and Orkestrator, and
    potentially other napari instances that are connected to the same server. Neat right?
 
 3. _Alterations_:
@@ -193,10 +193,10 @@ A few words about this process:
 
 1. _Cross Talk_:
    When calling the `Show on Imagej` action, the plugin will download the whole image into Fiji's memory. This means that you can
-   close the browser and the image will still be available in Fiji.
+   close Orkestrator and the image will still be available in Fiji.
 
 2. _ROIs_:
-   ROIs are synced between Fiji's ROI manager and the Arkitekt instance, so regions you draw in Fiji become available in the browser and in other apps.
+   ROIs are synced between Fiji's ROI manager and the Arkitekt instance, so regions you draw in Fiji become available in Orkestrator and in other apps.
 
 3. _Alterations_:
    Whatever alterations you make to the image in Fiji, will stay in Fiji. So if you want to save your alterations back to the server, you need to

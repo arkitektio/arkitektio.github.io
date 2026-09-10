@@ -10,6 +10,8 @@
 #   <slug>.jpg   poster, the in-point frame
 #
 # Run from the repo root: bash scripts/make-clips.sh
+# Then refresh the poster hues in src/lib/front-page-clips.ts:
+#   python3 scripts/clip-hues.py
 set -euo pipefail
 
 cd "$(dirname "$0")/.."

@@ -1,19 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { majorityHueFromImage } from '@/lib/majority-hue';
-import { applyBrandHueFromContent } from '@/components/site/brand-color';
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { applyBrandHueFromContent } from "@/components/site/brand-color";
 import {
   clipHeight,
   clipSources,
   clipWidth,
   clipsDeckHref,
   type FrontPageClip,
-} from '@/lib/front-page-clips';
-import { useInView } from './reveal';
+} from "@/lib/front-page-clips";
+import { useInView } from "./reveal";
 
 /**
  * A muted, looping product clip that costs nothing until it is needed.
@@ -24,8 +23,8 @@ import { useInView } from './reveal';
  * - The <video> is only mounted once the box is near the viewport (or right
  *   away with `priority`, for the hero), and it pauses while scrolled away.
  * - Users who asked for reduced motion or Save-Data only ever get the poster.
- * - With `tintBrand`, the poster's majority hue becomes the site's brand hue
- *   (the way orkestrator-next tints itself after the open scene).
+ * - With `tintBrand`, the clip's (precomputed) poster hue becomes the site's
+ *   brand hue, the way orkestrator-next tints itself after the open scene.
  */
 export function DemoClip({
   clip,
@@ -43,24 +42,12 @@ export function DemoClip({
   tintBrand?: boolean;
   className?: string;
 }) {
-  const posterRef = useRef<HTMLImageElement>(null);
-
-  const tintFromPoster = () => {
-    const poster = posterRef.current;
-    if (!tintBrand || !poster || !poster.complete || poster.naturalWidth === 0) return;
-    const hue = majorityHueFromImage(poster);
-    if (hue !== null) applyBrandHueFromContent(hue);
-  };
-
-  // A cached poster can be complete before hydration, in which case onLoad
-  // never fires; catch that case here. The clip changes with the pick.
   useEffect(() => {
-    tintFromPoster();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clip?.slug, tintBrand]);
+    if (tintBrand && clip) applyBrandHueFromContent(clip.hue);
+  }, [clip, tintBrand]);
   const { ref, inView } = useInView<HTMLDivElement>(0, {
     once: false,
-    rootMargin: '200px',
+    rootMargin: "200px",
   });
   const videoRef = useRef<HTMLVideoElement>(null);
   const motionOk = useMotionAllowed();
@@ -88,21 +75,19 @@ export function DemoClip({
   return (
     <div
       ref={ref}
-      className={cn('relative w-full overflow-hidden bg-[#0a0a0c]', className)}
+      className={cn("relative w-full overflow-hidden bg-[#0a0a0c]", className)}
       style={{ aspectRatio: `${clipWidth} / ${clipHeight}` }}
     >
       {clip && sources && (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized images */}
           <img
-            ref={posterRef}
             src={sources.poster}
             alt=""
-            onLoad={tintFromPoster}
             width={clipWidth}
             height={clipHeight}
-            fetchPriority={priority ? 'high' : 'auto'}
-            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? "high" : "auto"}
+            loading={priority ? "eager" : "lazy"}
             decoding="async"
             className="absolute inset-0 size-full object-cover"
           />
@@ -115,7 +100,7 @@ export function DemoClip({
               autoPlay
               playsInline
               disablePictureInPicture
-              preload={priority ? 'auto' : 'metadata'}
+              preload={priority ? "auto" : "metadata"}
               aria-label={clip.title}
               className="absolute inset-0 size-full object-cover"
             >
@@ -149,21 +134,22 @@ export function DemoClip({
 /* prefers-reduced-motion + Save-Data, read as an external store so the server
    render (no motion) and the first client frame agree, then the real answer
    takes over without a hydration mismatch. */
-const reduceMotionQuery = '(prefers-reduced-motion: reduce)';
+const reduceMotionQuery = "(prefers-reduced-motion: reduce)";
 
 function subscribeMotion(onChange: () => void) {
   const mql = window.matchMedia(reduceMotionQuery);
-  mql.addEventListener('change', onChange);
-  return () => mql.removeEventListener('change', onChange);
+  mql.addEventListener("change", onChange);
+  return () => mql.removeEventListener("change", onChange);
 }
 
 function getMotionAllowed() {
   if (window.matchMedia(reduceMotionQuery).matches) return false;
-  const connection = (navigator as Navigator & { connection?: { saveData?: boolean } })
-    .connection;
+  const connection = (
+    navigator as Navigator & { connection?: { saveData?: boolean } }
+  ).connection;
   return !connection?.saveData;
 }
 
-function useMotionAllowed() {
+export function useMotionAllowed() {
   return useSyncExternalStore(subscribeMotion, getMotionAllowed, () => false);
 }

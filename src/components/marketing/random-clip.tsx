@@ -12,7 +12,10 @@ export type ClipSlot = 'hero' | 'demo';
  * a slot, anything else is random, and the two slots never get the same clip.
  * Cached per query string so both slots agree and re-renders do not reshuffle.
  */
-type Picks = Record<ClipSlot, FrontPageClip>;
+export type Picks = Record<ClipSlot, FrontPageClip> & {
+  /** `?hero=<slug>` named a real clip, so the hero should stay on it. */
+  heroPinned: boolean;
+};
 
 let cachedSearch: string | undefined;
 let cachedPicks: Picks | undefined;
@@ -24,7 +27,7 @@ function getPicks(): Picks {
     const hero = pickClip(params.get('hero'));
     const demo = pickClip(params.get('demo'), hero.slug);
     cachedSearch = search;
-    cachedPicks = { hero, demo };
+    cachedPicks = { hero, demo, heroPinned: params.get('hero') === hero.slug };
   }
   return cachedPicks;
 }
@@ -32,7 +35,7 @@ function getPicks(): Picks {
 const noPicks = undefined;
 const subscribe = () => () => {};
 
-function usePicks(): Picks | undefined {
+export function usePicks(): Picks | undefined {
   return useSyncExternalStore(subscribe, getPicks, () => noPicks);
 }
 

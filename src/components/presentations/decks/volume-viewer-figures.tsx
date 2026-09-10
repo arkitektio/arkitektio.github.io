@@ -6,7 +6,7 @@
 
    They illustrate how Orkestrator shows a volume nobody can hold in memory:
    chunks instead of files, a pyramid level chosen per frame, and bytes that
-   travel from storage to the browser without passing through the API. See
+   travel from storage to the Orkestrator desktop app without passing through the API. See
    `volume-viewer.tsx` for the deck itself. */
 
 import { useState } from 'react';
@@ -547,10 +547,10 @@ export function OctreeFigure() {
 /** Slide 13: the API answers questions about chunks; storage serves them. */
 export function StreamFigure() {
   return (
-    <svg viewBox="0 0 620 240" className="w-full" role="img" aria-label="The browser asks the API where chunks are and then reads the bytes straight from object storage">
+    <svg viewBox="0 0 620 240" className="w-full" role="img" aria-label="Orkestrator asks the API where chunks are and then reads the bytes straight from object storage">
       <rect x={24} y={82} width={150} height={70} rx={10} fill={PRIMARY} fillOpacity={0.1} stroke={PRIMARY} strokeWidth={1.8} strokeOpacity={0.6} />
       <Label x={99} y={112} fill={FG} size={14} weight={700}>Orkestrator</Label>
-      <Label x={99} y={132} size={12} fill={PRIMARY}>in your browser</Label>
+      <Label x={99} y={132} size={12} fill={PRIMARY}>the desktop app on your machine</Label>
 
       <rect x={236} y={22} width={150} height={70} rx={10} fill={SURFACE} stroke={BORDER} strokeWidth={1.8} />
       <Label x={311} y={52} fill={FG} size={14} weight={700}>the API</Label>

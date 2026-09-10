@@ -22,6 +22,30 @@ function applyHue(hue: number) {
   document.dispatchEvent(new CustomEvent(BRAND_HUE_EVENT, { detail: hue }));
 }
 
+const ANIMATE_ATTR = 'data-brand-hue-animate';
+const ANIMATE_MS = 3200;
+let animateTimer: ReturnType<typeof setTimeout> | undefined;
+
+/**
+ * Like `applyHue`, but glides there: `--brand-hue` is a registered property
+ * (see global.css) so it can transition while `data-brand-hue-animate` is on
+ * <html>. The attribute is dropped again afterwards so the colour picker stays
+ * instant. The hue is written as the nearest equivalent angle (e.g. 370 for 10
+ * when coming from 350), so the transition takes the short way round.
+ */
+function animateHue(hue: number) {
+  const root = document.documentElement;
+  const current = parseFloat(getComputedStyle(root).getPropertyValue('--brand-hue'));
+  const nearest = Number.isFinite(current)
+    ? hue + 360 * Math.round((current - hue) / 360)
+    : hue;
+  root.setAttribute(ANIMATE_ATTR, '');
+  root.style.setProperty('--brand-hue', String(nearest));
+  document.dispatchEvent(new CustomEvent(BRAND_HUE_EVENT, { detail: hue }));
+  if (animateTimer) clearTimeout(animateTimer);
+  animateTimer = setTimeout(() => root.removeAttribute(ANIMATE_ATTR), ANIMATE_MS);
+}
+
 /** Whether the visitor saved a hue: a saved hue is a choice, and nothing on the
     page should override it. */
 export function hasSavedBrandHue() {
@@ -37,9 +61,14 @@ export function hasSavedBrandHue() {
  * way orkestrator-next tints itself after the open scene). Skipped when the
  * visitor has saved a hue of their own.
  */
-export function applyBrandHueFromContent(hue: number) {
+export function applyBrandHueFromContent(
+  hue: number,
+  { animate = false }: { animate?: boolean } = {},
+) {
   if (hasSavedBrandHue()) return;
-  applyHue(Math.round(hue));
+  const rounded = Math.round(hue);
+  if (animate) animateHue(rounded);
+  else applyHue(rounded);
 }
 
 /**

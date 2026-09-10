@@ -7,3 +7,5 @@ export { SectionBackground } from './section-background';
 export { useInView, revealClass } from './reveal';
 export { DemoClip } from './demo-clip';
 export { RandomClip } from './random-clip';
+export { HeroCarousel } from './hero-carousel';
+export { HeroClipsProvider, HeroTagline } from './hero-clips';

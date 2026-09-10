@@ -1,6 +1,6 @@
 ---
 title: Orkestrator
-description: The primary user interface for the Arkitekt platform, available as a desktop and web application for creating and managing workflows.
+description: The primary user interface for the Arkitekt platform, a desktop app for creating and managing workflows, inspecting data and running analyses.
 ---
 
 import { OrkestratorGrid } from "@/components/docs";
@@ -11,52 +11,49 @@ to create and manage workflows, inspect and comment on your data, ... etc.
 
 ## Getting Started
 
-Orkestrator comes in two different flavors, a [desktop application](#desktop-application) and a [web application](#web-application) (that comes deployed
-with the platform). While most of the functionality is shared between the two, there are some differences in the way they are used.
+Orkestrator is a **desktop application**, built on Electron. It is not a website and there is no browser version: you
+download it once, install it, and it connects to any Arkitekt hub you have access to, on your own machine, in your lab
+network, or across the internet through the [mesh](/docs/design/security/mesh).
 
 ### Desktop Application
 
-The desktop application is the recommended way to use Orkestrator. It is a standalone application that can be downloaded just below, and will install
-itself on your computer. It is available for Windows, MacOS and Linux. The desktop application adds in a few features that are not available in the
-web application, such as:
+Orkestrator is available for Windows, MacOS and Linux. Because it runs as a native app rather than inside a browser, it
+can do a few things a web page never could:
 
-- **Automatic Network Configuration**: The desktop application is able to automatically find Arkitekt instances you have connected through the
-  [mesh](/docs/design/security/mesh) and connect to them. This means that you don't have to manually enter the address of the Arkitekt instance you want to connect
-  to, and that you can easily switch between different instances.
+- **Automatic Network Configuration**: Orkestrator finds Arkitekt instances you have connected through the
+  [mesh](/docs/design/security/mesh) and connects to them. You do not have to enter the address of the instance you want
+  to talk to, and you can switch between instances at any time.
 
-- **Connect to unsecure instances**: The desktop application is able to connect to Arkitekt instances that are not using HTTPS. This is useful when
+- **Connect to unsecure instances**: Orkestrator can connect to Arkitekt instances that are not using HTTPS. This is useful when
   you are planning to use Arkitekt only in a local network, where certificates are not available. Note that you should not connect to unsecure instances
   that are exposed to the internet. Please refer to the [security](/docs/design/security/measures) section for more information.
 
-Additionally to these features, the desktop application will gain some additional features in the future, such as:
+- **Local GPU and memory**: the volume viewer and the other heavy views render on your machine, with your GPU and your
+  memory budget, rather than inside a browser sandbox.
 
-- **Automatic Updates**: The desktop application will in the future automatically check for updates and install them when available. This means that you will always
-  have the latest version of Orkestrator without having to manually download and install it.
+Features on the way:
 
-- **Export and Import of Data**: While you can use the Orkestrator app to export and import data manually at this point, we are planning to bridge the [Gucker](./gucker)
-  functionality directly into the desktop application. This will allow you to export and import data directly from the desktop application, without having to use
-  the gucker application.
+- **Automatic Updates**: Orkestrator will in the future automatically check for updates and install them when available, so you always
+  have the latest version without downloading it by hand.
 
-- **Deep Linking**: The desktop application will in the future support deep linking, which means that you will be able to share links to specific workflows, comments, ... etc.
-  with other users. This will allow you to easily share your work with others, and to link to specific parts of the application from other applications.
+- **Export and Import of Data**: While you can use Orkestrator to export and import data manually at this point, we are planning to bridge the [Gucker](./gucker)
+  functionality directly into the desktop app, so you can export and import data without a separate application.
 
-You can download the desktop application for your operating system below:
+- **Deep Linking**: Orkestrator will in the future support deep linking, so you can share links to specific workflows, comments, ... etc.
+  with other users and link to specific parts of the app from other applications.
+
+You can download Orkestrator for your operating system below:
 
 <OrkestratorGrid />
 
-### Web Application
-
-Depending on your Arkitekt installation, you might also have access to the web application directly (it is deployed with the platform in the `paper` channel). The web application
-should be accessible [here](http://localhost:8010), and can be used to interact with the platform, on the same computer. While you can use the web application also from other
-computers in your network, we recommend using the desktop application for that, as it will provide a better experience.
-
-<Callout type="info" title="Why these limitations?">
+<Callout type="info" title="Why a desktop app and not a website?">
 
 
-One of the biggest limitations in developing modern distributed applications that are browser based are security restrictions. Browsers are very restrictive in what they allow
-web applications to do, and this is especially true when it comes to networking. While a lot of these security concerns are valid, major companies like Google and Microsoft are
-puhsing more and more for standards that are harmful to the open web. With no alternative in sight, we are forced to use the desktop application to provide the best possible
-experience. If you want to learn more about this, we recommend reading [just the latest articles](https://www.eff.org/search/site/browser) by the EFF.
+Browsers are very restrictive in what they allow a web page to do, and this is especially true when it comes to networking:
+a page served from the internet is not allowed to talk to a server in your lab network, to an instance without a valid
+certificate, or to hardware on your machine. Those are exactly the things a bioimage analysis frontend needs. A desktop app
+has none of these restrictions, so Orkestrator has always been one. If you want to learn more about the state of the open
+web, we recommend reading [just the latest articles](https://www.eff.org/search/site/browser) by the EFF.
 
 
 </Callout>

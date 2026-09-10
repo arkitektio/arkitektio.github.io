@@ -1,7 +1,7 @@
 'use client';
 
 /* "Large scale volume viewing in Orkestrator" — how a volume nobody can hold in
-   memory ends up on screen, scrollable, in a browser tab.
+   memory ends up on screen, scrollable, in the Orkestrator desktop app.
 
    The arc mirrors the Mikro coordinate-system deck: the problem, the wish, the
    thing itself, then the background behind it. Several slides are drafts that
@@ -459,7 +459,7 @@ export function VolumeViewerDeck() {
           <div className={`${CONTENDER_COLS} px-5 pb-1`}>
             {[
               ['tool', false],
-              ['in a browser', false],
+              ['runs anywhere', false],
               ['volume render', false],
               ['LOD 2D', false],
               ['LOD 3D', false],
@@ -545,7 +545,7 @@ export function VolumeViewerDeck() {
         <div className="flex flex-1 items-center">
           <ul className="mx-auto flex w-full max-w-[820px] flex-col gap-6">
             <WishRow icon={Globe} label="From anywhere.">
-              A browser tab, on any laptop.
+              The Orkestrator desktop app, on any laptop.
             </WishRow>
             <WishRow icon={Boxes} label="The whole thing.">
               Not a region, not a projection.
@@ -579,7 +579,7 @@ export function VolumeViewerDeck() {
                 height={278}
               />
               <span className="text-center text-[15px] text-fd-muted-foreground">
-                the tab you are looking at
+                the desktop app you are looking at
               </span>
             </div>
 
@@ -727,7 +727,7 @@ export function VolumeViewerDeck() {
       <DeckSlide
         eyebrow="The payoff"
         title="Annotate by probing"
-        notes="Play it twice — once watching the readout follow the cursor, once watching the mark land. The probe costs nothing: the plan was fetched when the layer loaded, and the ray is marched in the browser."
+        notes="Play it twice — once watching the readout follow the cursor, once watching the mark land. The probe costs nothing: the plan was fetched when the layer loaded, and the ray is marched on the GPU, inside Orkestrator."
       >
         <div className="flex flex-1 items-center justify-center">
           <DemoVideo
@@ -752,7 +752,7 @@ export function VolumeViewerDeck() {
             array has a grid to ask along, a mesh is irregular geometry with
             nothing to slice by. Games solved this — Nanite virtualises geometry
             down to the triangle — but that is an engine team and years of work.
-            We are not going to reinvent it in a browser tab.
+            We are not going to reinvent it inside Orkestrator.
           </Caption>
         </div>
       </DeckSlide>
@@ -810,7 +810,7 @@ export function VolumeViewerDeck() {
       <DeckSlide
         eyebrow="Example 02"
         title="Large scale whole-slide imaging"
-        lead="Thousands of tiles, acquired over hours, placed into one slide space. Pan across the whole section, then zoom to a nucleus without ever leaving the page."
+        lead="Thousands of tiles, acquired over hours, placed into one slide space. Pan across the whole section, then zoom to a nucleus without ever leaving the viewer."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
           <DemoVideo
@@ -841,7 +841,7 @@ export function VolumeViewerDeck() {
               through unvisited regions is where you feel the network.
             </span>
           </Panel>
-          <Panel title="the browser has a budget too">
+          <Panel title="your machine has a budget too">
             <span className="text-[18px] leading-snug">
               GPU memory is finite and if your computer is old its not goign to be fun.
             </span>
