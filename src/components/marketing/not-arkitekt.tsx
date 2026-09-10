@@ -57,17 +57,16 @@ export function NotArkitekt() {
     <section className="w-full pb-10">
       <div
         ref={ref}
-        className="relative isolate overflow-hidden rounded-3xl px-6 py-12 text-white sm:px-10 lg:px-14"
+        className="relative isolate overflow-hidden rounded-3xl px-6 py-12  sm:px-10 lg:px-14"
       >
         {/* heading */}
         <div className="mb-10 max-w-2xl">
-          <div className=" text-[15px]  text-white/40">
+          <div className=" text-[15px]">
              First things first
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-white/60">
+          <p className="mt-3 text-sm leading-relaxed">
             Arkitekt is a reactive platform for live, stateful workflows. It is not
             a replacement for the tools we admire. 
-            <span className="text-white/80"> So let's see how it differs</span> 
           </p>
         </div>
 
