@@ -1,26 +1,23 @@
 ---
-title: Installation
-description: How to install an Arkitekt hub with Konstruktor, either through the desktop app or from the command line, and how to keep it updated.
+title: I am starting new
+description: Set up your own Arkitekt hub with Konstruktor, in one line from a terminal or with the desktop app, and keep it updated.
 ---
 
 import { DownloadGrid, GithubRepo } from "@/components/docs";
 import { Step, Steps } from "fumadocs-ui/components/steps";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-<Callout type="info" title="The standard install">
-  For a standard installation we advise the following path, and the rest of this page assumes it:
+You will run an Arkitekt **hub** yourself, on a machine with Docker. The fastest way, on Linux or
+macOS, is one line in a terminal:
 
-  1. **Create an account** on [go.arkitekt.live](https://go.arkitekt.live), our hosted coordination
-     server. It stores only what a login needs, see the [privacy policy](/docs/privacy#tier-2-an-account-on-goarkitektlive).
-  2. **Install Konstruktor** on the machine that will run the platform.
-  3. In Konstruktor choose the **Hub** path and keep **go.arkitekt.live** as the coordination server.
-  4. **Authorize** the hub in your browser with that account and press **Start**.
+```bash
+curl -fsSL https://raw.githubusercontent.com/arkitektio/konstruktor/master/install.sh | sh
+```
 
-  Your data and compute stay on your machine. The account is only used so that you, your apps and
-  your hub can find and trust each other. The command line, your own coordination server, raw
-  docker-compose and Helm are all covered further down, but they are for advanced setups. If you
-  want to understand *why* it is arranged this way, read [Where Arkitekt runs](/docs/design/philosophy/topology).
-</Callout>
+It installs Konstruktor, asks for a name, and creates and starts a hub. When it shows you a code,
+approve it in your browser with your account. Prefer clicking, or on Windows? Use the
+[desktop app](#graphical-installer-recommended). The rest of this page walks through both in
+detail, plus updating, the mesh and the advanced options.
 
 ## What Konstruktor is [#konstruktor]
 
@@ -76,7 +73,7 @@ do the heavy lifting, not by the hub, so the hub machine does not need one.
   in the latter way. We'll keep you posted, when we think the platform is safe ready for multi-user installations!
 </Callout>
 
-## Graphical installation (recommended) [#graphical-installer-recommended]
+## Graphical installation [#graphical-installer-recommended]
 
 <Steps>
 <Step>

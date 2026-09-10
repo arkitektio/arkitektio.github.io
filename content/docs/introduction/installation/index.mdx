@@ -1,0 +1,32 @@
+---
+title: Installation
+description: Two ways to get started with Arkitekt, depending on whether somebody already runs a server for you or you are setting one up yourself.
+---
+
+Which of these are you?
+
+<Cards>
+  <Card
+    title="Joining somebody's server?"
+    description="Your lab or facility already runs Arkitekt. You install nothing but the Orkestrator app."
+    href="/docs/introduction/installation/joining"
+  />
+  <Card
+    title="I am starting new"
+    description="Nobody runs Arkitekt for you yet. Set up your own server with Konstruktor, in one line or with a desktop app."
+    href="/docs/introduction/installation/starting-new"
+  />
+</Cards>
+
+Both paths start with an **account on [go.arkitekt.live](https://go.arkitekt.live)**, our hosted
+coordination server. It stores only what a login needs (see the
+[privacy policy](/docs/privacy#tier-2-an-account-on-goarkitektlive)) and is what lets you, your
+apps and a server find and trust each other. Your data and compute never go through it. To
+understand *why* it is arranged this way, read [Where Arkitekt runs](/docs/design/philosophy/topology).
+
+<Callout type="info" title="Not sure?">
+  If you work at an institute with an imaging facility, ask them first: if they run Arkitekt, you
+  are joining. If nobody around you does, you are starting new, and a single machine with Docker is
+  all it takes. You can always add a server of your own later and switch between servers in
+  Orkestrator.
+</Callout>
