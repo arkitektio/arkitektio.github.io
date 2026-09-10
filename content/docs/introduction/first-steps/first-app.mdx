@@ -143,63 +143,35 @@ A few words about this process:
 ### Fiji
 
 Fiji is a great tool for image analysis and has a huge community of developers and users. So we want to make sure that you can use Fiji with Arkitekt as well.
-However Fiji is a Java tool and our core team is not very familiar with Java. So we have not yet developed a Fiji plugin. But because of the great community
-efforts in providing [PyimageJ](https://github.com/imagej/pyimagej), we have something that could potentally work arguably even better than a plugin. The only downside is that
-you need to install 🙄 another app on your computer.
+For this we provide a native Fiji plugin, the [ImageJ Arkitekt plugin](https://github.com/arkitektio/imagej-arkitekt-plugin), which runs directly inside Fiji.
+No extra app needs to be installed, and it works on Windows, Linux and Mac alike.
 
-<Callout type="warn" title="On Mac compability">
+<Callout type="info" title="Previously MikroJ">
 
 
-Arkitekt thrives to be a cross-platform solution. However as of now, we cannot provide a Fiji bridge for Mac. This is due to the fact that the PyimageJ package
-does not support Mac. We are working on a solution, but for now, you need to use Napari on Mac. If you are a Java developer and want to help us, please reach out.
+Earlier versions of these docs used MikroJ, a Python app that wrapped Fiji through PyImageJ. MikroJ has been replaced by the ImageJ plugin and is no longer maintained.
+If you still have MikroJ installed, you can remove it and start Fiji directly.
 
 
 </Callout>
 
 #### Installation
 
-To connect Fiji to Arkitekt you need to install [MikroJ](https://github.com/arkitektio-apps/mikroj), our Fiji wrapping app. MikroJ is a small installable python app, that
-will interface with your Fiji installation and allows us to connect Fiji to Arkitekt. You can find more about the design of MikroJ [here](/docs/apps/standalones/mikroj).
+To connect Fiji to Arkitekt you need to install the plugin into your Fiji installation. You can find more about the design of the plugin [here](/docs/apps/standalones/imagej-plugin).
 
-<video
-  autoPlay
-  muted
-  loop
-  controls
-  className="rounded-sm rounded-md"
-  width={"100%"}
->
-  <source src="/docs/introduction/first_steps/connect_imagej.webm" />
-</video>
+1.  Download the latest `arkitekt-plugin-<version>.jar` from the [releases page](https://github.com/arkitektio/imagej-arkitekt-plugin/releases/latest).
 
-1.  Just download MikroJ from our [Github page](https://github.com/arkitektio-apps/mikroj) and extract it to a folder of your choice.
-    Then double click on the `MikroJ.exe`file to start the app. Please do \**NOT*Ü start your FIJI installation. MikroJ will start Fiji for you.
-    The initial setup can take a few seconds, but once it is done, you should the app screen.
+2.  Copy the jar into the `plugins/` folder of your Fiji installation (`Fiji.app/plugins/`). If you have an older `arkitekt-plugin-*.jar` in there, delete it first.
 
-2.  You will see a screen that allows you to both connect to your local Fiji instance and to your Arkitekt instance. Acting as a Bridge.
+3.  Restart Fiji. You should now find a new entry under `Plugins › Arkitekt`.
 
-3.  Click on `Initialize ImageJ`. This will open a dialog and prompt you to navigate to your "Fiji.App" folder that contains your ImageJ installation.
-    Once you have selected the folder, MikroJ will start Fiji for you and you should see it popping. It it is important that you do not move your Fiji installation after you have connected it to MikroJ. If you do, you need to reconnect it
-    to MikroJ.
-
-    <Callout type="warn" title="Important">
-
-
-    This initial setup is only required once. MikroJ will remember your Fiji installation and will start it automatically for you in the future.
-    However this step might take a few seconds and cause an UI freeze (on our buglist). This is normal, and should resolve in a few seconds to a minute, while MikroJ
-    and maven (the Java packaging tool that PyImageJ uses) are resolving some dependencies.
-
-
-    </Callout>
-
-4.  Optional: Create a shortcut to MikroJ on your desktop. This will allow you to start MikroJ directly from the shortcut.
-
-If nothing happens after you click on `Initialize ImageJ`, please refer to the [troubleshooting section](/docs/troubleshooting/app).
+If the entry does not show up after a restart, please refer to the [troubleshooting section](/docs/troubleshooting/app).
 
 ### Connecting Fiji to Arkitekt
 
-Once you have installed MikroJ and configured MikroJ, you can connect it to your Arkitekt instance. This process is similar
-to the process explained in the Napari section. So we will not go into too much detail here.
+Open `Plugins › Arkitekt` in Fiji and enter the URL of your Arkitekt instance. Click `Login` and approve the connection in the browser that opens up.
+This process is similar to the process explained in the Napari section. So we will not go into too much detail here. The login is remembered, so the next
+time you open the plugin, Fiji will connect right away.
 
 #### Visualizing your data in ImageJ
 
@@ -220,12 +192,11 @@ where it will appear in the bottom right corner.
 A few words about this process:
 
 1. _Cross Talk_:
-   When calling the `Show on Imagej` action, MikroJ will download the whole image into memory and share this image with Fiji. This means that you can
+   When calling the `Show on Imagej` action, the plugin will download the whole image into Fiji's memory. This means that you can
    close the browser and the image will still be available in Fiji.
 
 2. _ROIs_:
-   We currently do not support syncing ROIS between Fiji and the Arkitekt Instance automatically. This is defintely on our roadmap, but we have not
-   yet found a good solution. If you have any ideas, please reach out. You can however extract the ROIS on an Image in Fiji through an `Action`.
+   ROIs are synced between Fiji's ROI manager and the Arkitekt instance, so regions you draw in Fiji become available in the browser and in other apps.
 
 3. _Alterations_:
    Whatever alterations you make to the image in Fiji, will stay in Fiji. So if you want to save your alterations back to the server, you need to

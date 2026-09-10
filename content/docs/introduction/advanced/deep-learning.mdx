@@ -19,7 +19,7 @@ To get started with deep learning and Arkitekt you should:
 - Have gone through the [basics of Arkitekt](/docs/introduction/first-steps).
 - Have a CUDA capable GPU. If you don't have a GPU, you should still be able to follow along, but the prediction
   will be very slow.
-- Either Mikro-Napari or Fiji with MikroJ installed. If you don't have either of these, you can still follow along, but you won't be able to run the workflow.
+- Either Mikro-Napari or Fiji with the [ImageJ Arkitekt plugin](/docs/apps/standalones/imagej-plugin) installed. If you don't have either of these, you can still follow along, but you won't be able to run the workflow.
 
 ## Our task
 
@@ -78,7 +78,7 @@ You can run the prediction on your image by utilizing the `Segment Fluo2` action
 
 ### Integrate with ImageJ
 
-Now that we have tested our plugin, we would like to integrate it with our favourite bioimage analysis app. In this case we will be using Fiji through MikroJ, but you can use any other app that is supported by Arkitekt.
+Now that we have tested our plugin, we would like to integrate it with our favourite bioimage analysis app. In this case we will be using Fiji through the ImageJ Arkitekt plugin, but you can use any other app that is supported by Arkitekt.
 For this we will be using two actions provided by Fiji, the `Upload Image` action and the `Show Image` action. The `Upload Image` action will take the image from Fiji and upload it to the Arkitekt server,
 where it will be processed by the `Segment Fluo2` action of the `segmentor` plugin. The result will then be piped back to Fiji, where it will be shown using the `Show Image` action.
 
@@ -107,7 +107,7 @@ Once it is deployed, you can run the workflow directly from the `Dashboard` of O
   <source src="/docs/introduction/advanced/fiji_segmentation.webm" />
 </video>
 <div className="text-gray-400 mb-2">
-  <small> The workflow in action utilizing MikroJ</small>
+  <small> The workflow in action utilizing Fiji</small>
 </div>
 
 ### Integrate with Napari

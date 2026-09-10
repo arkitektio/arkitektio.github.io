@@ -1,6 +1,6 @@
 ---
-title: Mikro J
-description: Fiji (ImageJ) enabled as an Arkitekt App, letting you run Fiji plugins from within Arkitekt workflows.
+title: ImageJ Plugin
+description: A native Fiji (ImageJ2) plugin that connects your Fiji installation to Arkitekt, letting you run Fiji from within Arkitekt workflows.
 ---
 
 import { ShowWorkflow } from "@/components/arkitekt";
@@ -8,49 +8,67 @@ import { FijiGrid } from "@/components/docs";
 
 ## Design
 
-MikroJ is designed as a small wrapper around Fiji and utilizes the awesome [pyimagej](https://imagej.net/scripting/pyimagej) library to connect to Fiji. This allows us to use the same python code base to connect to Fiji. While we are planning
-to add some point bring native support for Fiji into Arkitekt, MikroJ is a great way to get started with Fiji in Arkitekt.
+The [ImageJ Arkitekt plugin](https://github.com/arkitektio/imagej-arkitekt-plugin) is a native ImageJ2/Fiji plugin, written in
+Kotlin and running directly inside Fiji's own JVM. It replaces the earlier MikroJ app, which wrapped Fiji from Python through PyImageJ and required a separate installation.
+
+Once installed, the plugin logs you in to your Arkitekt server, registers the running Fiji instance as an agent, and exposes a set of ImageJ actions
+that Arkitekt can invoke remotely: upload the active image, load an image or dataset back into the viewer, sync ROIs, and run image-to-image macros.
+Images are transferred as Zarr arrays through the Arkitekt data layer, so no data has to pass through a third process anymore.
+
+Because the plugin lives inside Fiji, it works wherever Fiji works: Windows, Linux and Mac.
 
 ## Installation
 
-To install MikroJ, you need to have Fiji installed on your computer. You can download Fiji from [here](https://imagej.net/Fiji/Downloads).
-After you have installed Fiji, you can install MikroJ from the GitHub repository. You can find the repository [here](https://github.com/arkitektio-apps/mikroj)
+You need a working Fiji installation. You can download Fiji from [here](https://imagej.net/software/fiji/downloads).
+The plugin is tested against the JRE that ships with Fiji, so no separate Java installation is needed.
+
+Each release of the plugin ships in two forms:
 
 <FijiGrid/>
 
-<Callout type="info" title="On Mac support">
+- **Jar (simplest)**: download `arkitekt-plugin-<version>.jar` and drop it into the `plugins/` folder of your Fiji installation (`Fiji.app/plugins/`).
+  Delete any older `arkitekt-plugin-*.jar` first. With two versions on the classpath Fiji picks one at random.
+
+- **Zip**: the archive unpacks to a single `arkitekt/` folder inside `plugins/`. Remove a previous install before unpacking:
+
+  ```bash
+  rm -rf /path/to/Fiji.app/plugins/arkitekt
+  unzip arkitekt-plugin-*.zip -d /path/to/Fiji.app/plugins/
+  ```
+
+Restart Fiji afterwards. The plugin shows up in the menu under **Plugins › Arkitekt**.
+
+<Callout type="info" title="Coming from MikroJ?">
 
 
-Due to a quirk of the PyImageJ event loop handling, MikroJ currently only works on Windows and Linux. We are working on a fix for this.
-Also for now we recommend installing "MikroJ" from pip when using Linux. You can track the process of the PyImageJ issue [here](https://github.com/imagej/pyimagej/issues/298)
+MikroJ is no longer maintained. You can uninstall it, and simply start Fiji directly as you normally would. The plugin takes over
+the connection to Arkitekt from inside Fiji, so there is no bridge app to start first anymore.
 
 
 </Callout>
 
 ## Usage
 
-After downloading the MikroJ app, you can unpack it to a folder of your choice and run the MikroJ executable directly from its folder through
-a double click.
+Open **Plugins › Arkitekt** in Fiji. You will be asked for the URL of your Arkitekt server (the default is `https://go.arkitekt.live`).
+Enter the address of your instance and click **Login**. This opens your browser, where you approve the device login and grant the requested permissions, just
+like with any other Arkitekt app.
 
-When you start MikroJ, you will see a window like this and you will be prompted to select your
-Fiji installation folder and to connect to your Arkitekt server.
+The login is cached in `~/.arkitekt/fakts_cache.json`, so subsequent starts connect silently. Delete that file to log out and connect to a different server.
 
-<video
-  autoPlay
-  muted
-  loop
-  controls
-  className="rounded-sm rounded-md"
-  width={"100%"}
->
-  <source src="/docs/apps/standalones/setup_mikroj.webm" />
-</video>
+Once connected, Fiji appears as an app in Orkestrator and its actions become available to your workflows:
 
-<Callout type="info">
+1. _Uploading_:
+   The `Upload Image` action takes the currently active image in Fiji and stores it on your Arkitekt server, including the metadata needed to trace its origin.
 
+2. _Showing_:
+   The `Show Image` action loads an image stored on the server into the Fiji viewer. The whole image is transferred into Fiji's memory, so you can
+   close the browser and keep working on the image.
 
-If you are using MikroJ for the first time, you will be prompted to select your Fiji installation folder. You can do this by clicking the "Select Fiji" button and navigating to your Fiji installation folder.
-In some cases this might cause the program to crash. If this happens just restart MikroJ. We don't really know why that is happening but we are working on a fix, so please bear with us.
+3. _ROIs_:
+   ROIs are synced between Fiji's ROI manager and the Arkitekt server, so regions you draw in Fiji are available in the browser and in other apps.
 
+4. _Macros_:
+   Image-to-image ImageJ macros can be exposed as actions, so any existing macro can become a step in an Arkitekt workflow. See the
+   [Fiji workflow showcase](/showcases/fiji-workflow) for an example.
 
-</Callout>
+Whatever alterations you make to an image in Fiji stay in Fiji until you upload it again. Nothing is written back to the server automatically.
