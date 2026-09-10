@@ -50,7 +50,7 @@ export function ProvenanceCard() {
         <span className="text-sm text-fd-muted-foreground">
           Cryptographic signing
         </span>
-        <Link href="/docs/provenance" className="ml-auto rounded-full border border-fd-primary/40 bg-fd-primary/10 px-2.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-fd-primary">
+        <Link href="/docs/design/architecture/provenance" className="ml-auto rounded-full border border-fd-primary/40 bg-fd-primary/10 px-2.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-fd-primary">
           ?
         </Link>
       </div>

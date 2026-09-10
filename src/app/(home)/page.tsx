@@ -129,7 +129,7 @@ export default function HomePage() {
 
         <section className="w-full my-auto flex flex-col items-center gap-4  px-8 py-12 text-center backdrop-blur">
            Let us dump some features on you, like every weird marketing site. If you care more about what Arkitekt stands
-           for check out <Link href="/docs/introduction/philosophy" className="text-primary underline inline font-medium">Why we exists?</Link> 
+           for check out <Link href="/docs/design/philosophy" className="text-primary underline inline font-medium">Why we exists?</Link> 
            
         </section>
       {/* ───────────────────────── Bento ──────────────────────── */}
@@ -162,7 +162,7 @@ export default function HomePage() {
               </p>
             </div>
             <Button asChild size="lg" className="shrink-0 rounded-md" variant={"outline"}>
-              <Link href="/docs/ai">
+              <Link href="/docs/design/ai">
                 What we do care about with regards to AI
                 <ArrowRight className="size-4" />
               </Link>

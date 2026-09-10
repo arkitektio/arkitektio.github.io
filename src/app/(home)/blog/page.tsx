@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Newspaper } from 'lucide-react';
+import { Newspaper } from 'lucide-react';
 import { SectionBackground } from '@/components/marketing';
 import { appName } from '@/lib/shared';
 
@@ -8,53 +8,6 @@ export const metadata: Metadata = {
   title: 'Blog',
   description: `News, release notes and deep dives from the ${appName} team.`,
 };
-
-type Post = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  readingTime: string;
-  tag: string;
-};
-
-const posts: Post[] = [
-  {
-    slug: 'introducing-arkitekt',
-    title: 'Introducing Arkitekt',
-    excerpt:
-      'Why we built a datahub for microscopy, and how it turns scattered analysis scripts into shareable, reactive apps.',
-    date: '2026-05-28',
-    readingTime: '6 min read',
-    tag: 'Announcement',
-  },
-  {
-    slug: 'streaming-bioimage-pipelines',
-    title: 'Streaming bioimage pipelines without the glue code',
-    excerpt:
-      'A look at how reactive nodes let you compose acquisition, processing and visualisation into a single live pipeline.',
-    date: '2026-04-15',
-    readingTime: '8 min read',
-    tag: 'Engineering',
-  },
-  {
-    slug: 'apps-not-scripts',
-    title: 'Apps, not scripts: packaging analysis for your lab',
-    excerpt:
-      'How packaging tools as installable apps changes the way research groups discover, run and share their methods.',
-    date: '2026-03-02',
-    readingTime: '5 min read',
-    tag: 'Product',
-  },
-];
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
 
 export default function BlogPage() {
   return (
@@ -76,31 +29,15 @@ export default function BlogPage() {
           </p>
         </div>
 
-        <div className="mt-12 flex flex-col gap-4">
-          {posts.map((post) => (
-            <Link
-              key={post.slug}
-              href={`/blog/${post.slug}`}
-              className="group relative flex flex-col gap-3 rounded-xl border border-fd-border bg-fd-card/50 p-6 backdrop-blur transition-colors hover:border-fd-primary/50"
-            >
-              <div className="flex items-center gap-3 text-xs text-fd-muted-foreground">
-                <span className="rounded-full bg-fd-primary/10 px-2.5 py-0.5 font-medium text-fd-primary">
-                  {post.tag}
-                </span>
-                <time dateTime={post.date}>{formatDate(post.date)}</time>
-                <span aria-hidden>·</span>
-                <span>{post.readingTime}</span>
-              </div>
-              <h2 className="text-xl font-semibold tracking-tight">
-                {post.title}
-              </h2>
-              <p className="text-sm text-fd-muted-foreground">{post.excerpt}</p>
-              <span className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-fd-primary">
-                Read more
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </Link>
-          ))}
+        <div className="mt-12 flex flex-col items-center gap-3 rounded-2xl border border-dashed border-fd-border bg-fd-card/40 px-8 py-16 text-center backdrop-blur">
+          <h2 className="text-xl font-semibold tracking-tight">Nothing here yet</h2>
+          <p className="max-w-md text-sm text-fd-muted-foreground">
+            We have not published any posts. Until we do, the{' '}
+            <Link href="/docs/design/whats-changed" className="text-fd-primary underline underline-offset-4">
+              What&apos;s changed
+            </Link>{' '}
+            section is the closest thing to release notes.
+          </p>
         </div>
       </section>
     </main>
