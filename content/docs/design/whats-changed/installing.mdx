@@ -1,0 +1,69 @@
+---
+title: Installing and running
+description: What changed between Paper and Next in how you install a deployment, where accounts live, how channels work, and how apps find the platform.
+---
+
+## Konstruktor
+
+In Paper, Konstruktor was a desktop installer that asked you to pick a **channel** (`paper` or
+`next`), fill in an **admin user**, and then drove the `arkitekt-next` command line tool to bring
+the platform up. Updating meant a "Danger" button in its dashboard.
+
+In Next, Konstruktor is **one product with two front ends**: a desktop app and a `konstruktor`
+CLI, sharing one core. Both write an ordinary Docker Compose project into a folder you choose and
+hand it to Docker; there is no Python and no helper container. A hub created in one front end shows
+up in the other. The wizard asks about the folder, the coordination server, services, ports,
+storage, addresses and the mesh, and nothing else. See the
+[installation guide](/docs/introduction/installation).
+
+| | Paper | Next |
+|---|---|---|
+| Front ends | Desktop app | Desktop app and `konstruktor` CLI |
+| Channel | Picked in the installer | Not asked; see [Channels](#channels) |
+| Admin user | Form in the installer | Not asked; see [Accounts](#accounts) |
+| What it writes | Driven through `arkitekt-next` | A plain `docker-compose.yaml`, `hub_config.yaml` and `configs/` |
+| Headless install | No | `install.sh` and `konstruktor hub create --yes` |
+| Updating the platform | "Danger" then Update | **Pull images** then Start, or `konstruktor pull` and `konstruktor up` |
+| Updating Konstruktor | Built-in updater | Re-run the install script or download the new installer |
+
+## Accounts
+
+In Paper, every deployment kept its own users. The installer created an admin account, and users
+were made on that deployment. Signing in to an app meant signing in to that one deployment.
+
+In Next, **a hub keeps no accounts of its own**. Users, organizations and permissions live on a
+**coordination server**, by default our hosted one at [go.arkitekt.live](https://go.arkitekt.live),
+or your institute's own. A hub is authorized against that server before it exists on disk: the
+installer shows a device code, you sign in with your account in a browser and pick the organization
+the hub belongs to. Service-level superusers are still created per service from the dashboard when
+you need them. Why the coordinator is a separate piece is explained in
+[Identity & Access](/docs/design/security/identity) and
+[Where Arkitekt runs](/docs/design/philosophy/topology).
+
+## Channels
+
+In Paper, a channel was something you chose in the installer, and the whole deployment ran on it.
+
+In Next, **the channel is the set of image tags** in a hub's `hub_config.yaml`, per service. A
+stock hub ships on `next` (with Kraph on `dev`); to move a service, change its tag and pull. A hub
+can even be mixed. The Paper channel itself is frozen and stays available for reproducibility. How
+channels relate is described in [How we version Arkitekt](/docs/design/philosophy/version).
+
+## Finding the platform
+
+In Paper, a deployment could **advertise** itself on the local network with a UDP broadcast so
+apps could discover it without knowing its address. That feature has been **removed**: firewalls,
+changing addresses, blocked broadcasts and VPNs made it unreliable, and it only ever worked within
+one LAN.
+
+In Next, a hub **advertises a list of addresses** you choose at install time (local only, this
+network, or public), and apps are handed those addresses when they connect. Across networks the
+hub can join the **mesh**, a peer-to-peer overlay brokered by the coordination server, which did
+not exist in Paper. See [The Mesh](/docs/design/security/mesh) and the
+[Mesh step](/docs/introduction/installation#mesh) of the installation guide.
+
+## Web application
+
+In Paper, a web version of Orkestrator was deployed alongside the platform and reachable on the
+deployment itself. In Next, Orkestrator is the desktop app, and connects to any hub through the
+coordination server. See [Orkestrator](/docs/apps/standalones/orkestrator).

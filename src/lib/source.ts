@@ -1,12 +1,18 @@
-import { docs } from 'collections/server';
+import { docs, showcases } from 'collections/server';
 import { loader } from 'fumadocs-core/source';
 import { asset } from './base-path';
-import { docsContentRoute, docsImageRoute, docsRoute } from './shared';
+import { docsContentRoute, docsImageRoute, docsRoute, showcaseRoute } from './shared';
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
   baseUrl: docsRoute,
   source: docs.toFumadocsSource(),
+  plugins: [],
+});
+
+export const showcaseSource = loader({
+  baseUrl: showcaseRoute,
+  source: showcases.toFumadocsSource(),
   plugins: [],
 });
 

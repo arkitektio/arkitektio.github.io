@@ -5,6 +5,8 @@
     "gpu",
     "lazy-loading",
     "vpn",
-    "graphql"
+    "graphql",
+    "nextflow",
+    "uc2"
   ]
 }

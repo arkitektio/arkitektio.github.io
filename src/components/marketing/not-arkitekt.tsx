@@ -54,20 +54,20 @@ export function NotArkitekt() {
   const { ref, inView } = useInView<HTMLDivElement>(0.15);
 
   return (
-    <section className="w-full pb-16">
+    <section className="w-full pb-10">
       <div
         ref={ref}
         className="relative isolate overflow-hidden rounded-3xl px-6 py-12 text-white sm:px-10 lg:px-14"
       >
         {/* heading */}
         <div className="mb-10 max-w-2xl">
-          <div className="font-mono text-[11px] tracking-[0.18em] text-white/40">
-             WHAT ARKITEKT IS NOT
+          <div className=" text-[15px]  text-white/40">
+             First things first
           </div>
           <p className="mt-3 text-sm leading-relaxed text-white/60">
             Arkitekt is a reactive platform for live, stateful workflows. It is not
-            a replacement for the tools we admire. We integrate {" "}
-            <span className="text-white/80">we dont compete</span> 
+            a replacement for the tools we admire. 
+            <span className="text-white/80"> So let's see how it differs</span> 
           </p>
         </div>
 
@@ -96,10 +96,10 @@ export function NotArkitekt() {
                 />
               </div>
               <div
-                className="mb-3 font-mono text-[11px] tracking-[0.12em]"
+                className="mb-3 "
                 style={{ color: `oklch(0.84 0.1 ${t.hue})` }}
               >
-                {t.tag}
+                We are {t.tag}
               </div>
               <div className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
                 {t.tool}
@@ -113,7 +113,7 @@ export function NotArkitekt() {
               </p>
               <Link
                 href={t.link}
-                className="group mt-auto inline-flex items-center gap-1.5 pt-6 font-mono text-xs tracking-[0.08em] transition-colors"
+                className="group mt-auto inline-flex items-center gap-1.5 pt-6  text-xs tracking-[0.08em] transition-colors"
                 style={{ color: `oklch(0.84 0.1 ${t.hue})` }}
               >
                 {t.linkLabel}

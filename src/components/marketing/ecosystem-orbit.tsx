@@ -481,7 +481,7 @@ export function EcosystemOrbit() {
   }, [inView, steps.length]);
 
   return (
-    <section className="w-full pb-16">
+    <section className="w-full pb-10">
       <div
         ref={revealRef}
         className="relative isolate overflow-hidden  px-6 py-12 text-fd-foreground sm:px-10 lg:px-14"
@@ -493,9 +493,8 @@ export function EcosystemOrbit() {
 
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <div className="font-mono text-[11px] tracking-[0.2em] text-primary/80">We need your apps</div>
             <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">
-              You bring your apps, Arkitekt brings the orchestration.
+              You bring your apps and robots, Arkitekt ties them together.
             </h2>
           </div>
         </div>

@@ -40,9 +40,8 @@ This page describes the current Fakts protocol, as implemented by the Orkestrato
 client. The previous protocol (a custom `start`, `challenge` and `claim` sequence
 with its own `auth` block) is retired. A deployment that still speaks it answers
 discovery but fails the endpoint check in step 0, so clients can tell "wrong
-protocol version" apart from "server unreachable". See
-[What's changed from Paper to Next](#whats-changed-from-paper-to-next) at the
-end.
+protocol version" apart from "server unreachable". The differences are laid out
+in [What's changed: Connecting apps](/docs/design/whats-changed/connecting).
 </Callout>
 
 ## The flow
@@ -378,55 +377,9 @@ lab network and a browser on the other side of the internet.
 - Across networks, the same coordinator role is played by the coordination server
   of the [mesh](/docs/design/security/mesh).
 
-## What's changed from Paper to Next
+## Coming from the Paper version
 
-The Fakts protocol described on this page is the **Next** version. The **Paper**
-version (the frozen channel of the original publication) used a custom
-sequence that was *inspired by* OAuth2 but not OAuth2. If you are coming from a
-Paper deployment or a Paper-era client, this is what moved.
-
-### One protocol instead of two packages
-
-In Paper, connecting an app was two separate concerns handled by two separate
-client packages:
-
-- **Fakts** retrieved the configuration. It ran a custom `start`, `challenge`
-  and `claim` sequence against the Fakts server and came back with a config that
-  included an `auth` block holding a `client_id`, a `client_secret` and a token
-  URL.
-- **Herre** was an asynchronous OAuth2 client. It took that `auth` block and ran
-  a second, ordinary OAuth2 grant (usually client credentials) against Lok to
-  obtain the tokens the app actually used, and refreshed them from then on.
-
-In Next these collapse into one flow. The device authorization grant *is* the
-app's login, and the token response carries the configuration as its envelope.
-There is no `auth` block to hand from one library to the other, no client
-secret to store, and no second grant. The Python and TypeScript packages still
-carry the `fakts` name, but they now do what Fakts and Herre did together.
-
-### Step by step
-
-| Paper                                                                    | Next                                                                                                              |
-| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `.well-known/fakts` listed `base_url`, `frontend_url` and a `claim` URL  | `.well-known/fakts` lists `configure`, `device_authorization_endpoint`, `token_endpoint` and OAuth2 server metadata |
-| `POST {base_url}start/` with the manifest, returned a single `code`      | `POST device_authorization_endpoint` with the manifest, returns `device_code`, `user_code` and a minted `client_id` |
-| User opened `{frontend_url}configure/{code}`                             | User opens `verification_uri_complete`, built by the server from its own template                                  |
-| `POST {base_url}challenge/` polled; "still waiting" was HTTP 200 `pending` | `POST token_endpoint` with the device-code grant; "still waiting" is HTTP 400 `authorization_pending`             |
-| `POST {base_url}claim/` with the challenge token to fetch the config     | Gone. The configuration is appended to the token response                                                         |
-| Config carried an `auth` block: `client_id`, `client_secret`, `token_url`, `client_token` | Gone. `access_token`, `refresh_token` and `client_id` are the standard token-response members          |
-| Second grant through Herre (`client_credentials`) to get usable tokens   | Gone. The device-code grant already returns the tokens                                                            |
-| Confidential client with a secret                                        | Public client, `client_id` only                                                                                   |
-| Refresh handled by Herre against `token_url`                             | Same `token_endpoint`, `grant_type=refresh_token`, refresh token rotates, envelope re-rendered                     |
-| Alias health reported with the opaque `client_token` to `report_url`     | Reported to `{base_url}report/` with the Bearer access token                                                      |
-| Manifest listed `name`, `version`, `scopes`                              | Manifest also lists `requirements` with `key`, `service` and `optional`, which the user sees and approves per instance |
-| Envelope had `instances` and `self`                                      | Envelope adds `statuses` per requirement and an optional `challenge_key` per instance                             |
-
-### Telling the two apart
-
-The best signal that a deployment is still on Paper is the well-known document:
-if it lacks `configure`, `device_authorization_endpoint` and `token_endpoint`,
-stop there and report a protocol mismatch rather than a connection failure. A
-Next client cannot talk to a Paper deployment, and a Paper client cannot talk to
-a Next deployment. A stored Paper session (a token without `client_id`, an
-endpoint without `token_endpoint`) fails to load under a Next client, which is
-intended: the user approves the app once more under the new grant.
+The Paper version used a custom `start`, `challenge` and `claim` sequence and a separate OAuth2
+client (Herre) for tokens. Every step of that sequence has a counterpart in the flow above, and the
+mapping, including how to tell a Paper deployment apart from a Next one, is laid out in
+[What's changed: Connecting apps](/docs/design/whats-changed/connecting).

@@ -1,6 +1,9 @@
 ---
 title: Streaming Analysis
 description: A streaming Arkitekt workflow that performs real-time StarDist segmentation on 3D microscopy data as it is being acquired.
+group: paper
+tags: ["Streaming", "StarDist", "Real-time"]
+version: paper
 ---
 
 import { DownloadGrid } from "@/components/docs";
@@ -13,7 +16,7 @@ Here we used Arkitekt to perform real-time quantitative monitoring of soSPIM 21,
 As the deep learning-based segmentation steps can be highly time-consuming, several processes were run in parallel and distributed on 3 different available hardware. Visualization of both the 3D acquisition and the results were performed in Napari 7 on a remote and mobile computer, as well as through the web-interface, where results (here the number of nuclei and the average volume) were plotted on a live-dashboard, accessible to other remote members of the lab. (see Supp. Video 5)
 
 <div className="mt-2">
-<img src="/docs/showcases/paper/streaming.png" alt="The Streaming Microscopy Workflow" />
+<img src="/showcase/streaming.png" alt="The Streaming Microscopy Workflow" />
 
 <div className="text-gray-400 mb-2">
 <small>The Streaming Microscopy Workflow</small>
@@ -129,7 +132,7 @@ You can also follow the following steps to install the workflow manually:
   className="rounded-sm rounded-md my-3"
   width={"100%"}
 >
-  <source src="/docs/showcases/paper/organoid_workflow_creation.webm" />
+  <source src="/showcase/organoid_workflow_creation.webm" />
 </video>
 
 A few notes on this workflow:

@@ -1,0 +1,53 @@
+---
+title: What's changed
+description: "What is different between the Paper version of Arkitekt, frozen for the publication, and the Next version these docs describe: installing, accounts, connecting apps, and what stayed the same."
+---
+
+Arkitekt exists in two versions you will run into. The **Paper** version is the platform as it was
+for the original publication. It is a frozen channel that will stay available so the results can
+be reproduced. The **Next** version is what these docs describe and what you get when you install
+Arkitekt today. Most of what you know from Paper still applies: the hub, apps, workflows, and the
+data model are the same ideas. What changed is mostly *how the pieces find and trust each other*,
+and *how you install and run them*. This section collects those changes in one place.
+
+<Callout type="info" title="About the Paper showcases">
+  The examples in the [Showcase](/showcase) that carry a **Paper** badge were run with the Paper
+  version of the platform. The workflows and apps they describe still apply, but the installer,
+  the login and the connection flow they show are the Paper ones described on these pages.
+</Callout>
+
+## At a glance
+
+| Area | Paper | Next |
+|---|---|---|
+| **Accounts** | Every deployment kept its own users and an admin account created at install time | Users, organizations and permissions live on a coordination server (go.arkitekt.live by default); a hub keeps no accounts of its own |
+| **Installing** | Konstruktor with a channel picker and an admin-user form; `arkitekt-next` CLI underneath | Konstruktor as a desktop app *and* a `konstruktor` CLI writing a plain Docker Compose project; no channel picker, no admin form |
+| **Channels** | Chosen in the installer (`paper`, `next`) | The set of image tags in `hub_config.yaml`; edit and pull to move |
+| **Finding a deployment** | Local-network advertising (UDP broadcast) | Addresses the hub advertises, and the mesh across networks |
+| **Connecting an app** | Custom `start`, `challenge`, `claim` sequence, then a second OAuth2 grant through Herre | One OAuth2 device-authorization grant; the token response carries the configuration |
+| **Client libraries** | `fakts` for configuration and `herre` for tokens, as two packages | One flow; the packages keep the `fakts` name |
+| **App manifest** | Name, version, scopes | Also declares service `requirements`, which the user approves per instance |
+| **Reaching across networks** | Not built in | The mesh, optional and experimental |
+
+The pages in this section go through each of these:
+
+- [Installing and running](/docs/design/whats-changed/installing): Konstruktor, accounts,
+  channels, advertising and the mesh.
+- [Connecting apps](/docs/design/whats-changed/connecting): the Fakts protocol, step by step,
+  and how to tell a Paper deployment apart from a Next one.
+- [New in Next](/docs/design/whats-changed/features): the features that arrived with Next.
+
+## What stayed the same
+
+- **The shape of the platform.** A central hub made of services, apps that connect only to the hub,
+  and workflows that span apps. See [Concepts & Design](/docs/design).
+- **Your data.** Updates within a channel are meant to keep your data intact, and the Paper
+  channel itself is frozen, so a Paper deployment keeps working as it is.
+- **Reproducibility.** The Paper version remains installable so that the publication's results can
+  be reproduced. New work should start on Next.
+
+## And the features
+
+The pages above are about plumbing: how things are installed, found and trusted. What you can do
+differently on Next, such as direct task assignment, the knowledge graph, views and protocols, is on
+[New in Next](/docs/design/whats-changed/features).

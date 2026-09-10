@@ -1,0 +1,125 @@
+---
+title: New in Next
+description: The features that arrived with the Next version of Arkitekt, from a redesigned Orkestrator and direct task assignment to the knowledge graph, views, protocols and a sturdier backend.
+---
+
+The other pages in this section cover the plumbing: how a deployment is installed, how accounts
+work, and how apps connect. This page is about what you can *do* differently on Next. It grew out
+of the roadmap we published while Next was in development; now that Next is what you install, the
+roadmap has become this list. Where something is still a work in progress we say so.
+
+## Using the platform
+
+### A redesigned Orkestrator
+
+Orkestrator, the desktop control app, was rebuilt for Next. The Paper version boasted a lot of
+functionality but was not very friendly; the new interface streamlines the layout and the flows
+around it. It is a Tauri desktop app now, and connects to any hub through the coordination server
+rather than to one deployment. See [Orkestrator](/docs/apps/standalones/orkestrator).
+
+### Assign tasks directly
+
+Next lets you assign a task to an action directly: point your data at an action and an available
+agent runs it immediately. In Paper, starting a task went through several dialogs and had a whole
+class of confusing edge cases; those went away with the direct path.
+
+### Reworked workflow design
+
+Designing visual workflows in the Paper Orkestrator was complex and not very intuitive. The
+workflow editor was reworked with patterns users know from tools like Blender or Unreal Engine,
+and includes automatic node suggestion and automatic repair of broken workflows. It continues to
+be iterated on.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/roadmap/workflow.mp4" />
+</video>
+
+## Data management
+
+### The knowledge graph and ontologies
+
+A vision of Arkitekt was to capture the reality of biological systems in a database that lets you
+create arbitrary measurements and link them to each other. Paper could not capture those
+relationships intuitively. Next introduces the **knowledge graph**, backed by a graph database
+(Apache AGE) in the [Kraph](/docs/design/services/kraph) service, which lets you assign meaning to
+analyzed data in your own vocabulary ("this ROI delineates an axon") and link it to other data
+("this axon is connected to this dendrite"). Programmers and database-savvy users can query it with
+standard graph query languages; everyone else gets an interactive interface for exploring the
+relationships.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/roadmap/knowledge.mp4" />
+</video>
+
+The video shows a very manual way of labelling ROIs and assigning meaning to them. Ideally that is
+automated, but it gives an idea of what the graph is for.
+
+<Callout type="info" title="On ontologies">
+  Ontologies and knowledge graphs are a huge topic and are not coverable here. The knowledge graph
+  is still evolving, and we are working on integrating it tightly with views and protocols.
+</Callout>
+
+### Views
+
+Metadata gets lost when the metadata system is too rigid for what users need. Next introduces
+**views**: flexible descriptions attached to your data. The first channel of an image should be
+shown in a certain colour? Add an RGB view to that channel. You want to record acquisition
+parameters? Add an acquisition view. The pixel values are labels of a segmentation? Add a pixel
+view and map the labels to entities in the knowledge graph. The image data never changes; how you
+describe it can be as flexible as you need.
+
+### Protocols
+
+**Protocols** describe the steps of sample preparation, image acquisition and analysis in a
+structured way, and link specific steps to your image data. If the antibody used in the primary
+staining is part of the protocol, you can filter all images by it through their protocol views.
+
+## Stability
+
+### Failures cascade on the server
+
+Apps can run code that depends on other apps: a workflow on one app calls a plugin on another, or a
+plugin calls a plugin. In Paper, when an app failed, propagating that failure to the tasks that
+depended on it was done on the client side, and was not as reliable as it should have been. Next
+handles the cascading failure of tasks on the server.
+
+### Apps declare what they need
+
+Arkitekt is modular by design: do not care about Mikro? Do not install it. But Paper apps had no
+way to say which services and versions they needed before connecting, so an app could be installed
+against a deployment that could not serve it. In Next the app [manifest](/docs/design/terminology/manifest)
+declares **requirements**, one per service the app needs, and the user sees and approves them per
+instance when the app connects. This was the biggest breaking change for Paper-era apps; see
+[Connecting apps](/docs/design/whats-changed/connecting).
+
+## Under the hood
+
+- **Backend stack.** Paper services were built on Graphene, Django and Postgres. Next keeps Django
+  and Postgres and replaces Graphene with Strawberry, a more type-safe GraphQL library. Everything
+  you see on Next already runs on it.
+- **API design.** The Next APIs follow GraphQL best practices more consistently than the Paper ones
+  did. See [GraphQL](/docs/design/various/graphql).
+- **Security.** Paper was secure by design but enforced little. Next enforces more by default; scope
+  enforcement is still being rolled out, see [Identity & Access](/docs/design/security/identity).
+- **Performance.** Task assignment in Rekuest is being tuned. Ephemeral tasks, which would skip the
+  database and go straight to a worker, are planned but do not exist yet.
+
+## Ideas, not features
+
+Some things we have thought about but not built live under [Various](/docs/design/various):
+[Nextflow integration strategies](/docs/design/various/nextflow) and
+[UC2 open-source microscopes](/docs/design/various/uc2).

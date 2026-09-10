@@ -1,58 +1,56 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, ExternalLink, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react';
 import { SectionBackground } from '@/components/marketing';
-import { appName } from '@/lib/shared';
+import { showcaseSource } from '@/lib/source';
+import { appName, gitConfig } from '@/lib/shared';
+import { PaperBadge, WHATS_CHANGED_URL } from './paper-badge';
 
 export const metadata: Metadata = {
   title: 'Showcase',
-  description: `Real-world projects and labs building on ${appName}.`,
+  description: `Worked examples of ${appName} solving real bioimage analysis problems.`,
 };
 
-type Showcase = {
-  title: string;
-  org: string;
-  description: string;
-  href: string;
-  tags: string[];
-};
+type Group = 'paper' | 'advanced';
 
-const showcases: Showcase[] = [
+const GROUPS: { key: Group; title: string; blurb: React.ReactNode }[] = [
   {
-    title: 'Live smart microscopy',
-    org: 'Imaging Core Facility',
-    description:
-      'Closed-loop acquisition that adapts imaging in real time based on streaming segmentation results.',
-    href: '/docs/showcases',
-    tags: ['Smart microscopy', 'Real-time'],
+    key: 'paper',
+    title: 'From the paper',
+    blurb: (
+      <>
+        The workflows described in the Arkitekt publication, as interactive guides you can
+        import into your own deployment. They were run with the <em>Paper</em> version of the
+        platform; what has changed since is summarised in{' '}
+        <Link href={WHATS_CHANGED_URL} className="text-fd-primary underline underline-offset-4">
+          What&apos;s changed from Paper to Next
+        </Link>
+        .
+      </>
+    ),
   },
   {
-    title: 'High-throughput screening',
-    org: 'Cell Biology Lab',
-    description:
-      'Thousands of wells analysed through a single reactive pipeline, with results shared as installable apps.',
-    href: '/docs/showcases',
-    tags: ['Screening', 'Apps'],
-  },
-  {
-    title: 'Connectomics at scale',
-    org: 'Neuroscience Institute',
-    description:
-      'Petabyte-scale volumes brokered through the datahub and visualised collaboratively across the group.',
-    href: '/docs/showcases',
-    tags: ['Big data', 'Collaboration'],
-  },
-  {
-    title: 'Reproducible analysis pipelines',
-    org: 'Bioimage Analysis Group',
-    description:
-      'Versioned, shareable workflows that let any team member reproduce a published result end to end.',
-    href: '/docs/showcases',
-    tags: ['Reproducibility', 'Workflows'],
+    key: 'advanced',
+    title: 'Advanced',
+    blurb: (
+      <>
+        Single-app and cross-app automation that assumes you know your way around Arkitekt. If
+        you are new, start with the{' '}
+        <Link
+          href="/docs/introduction/first-steps"
+          className="text-fd-primary underline underline-offset-4"
+        >
+          Getting Started
+        </Link>{' '}
+        guide first.
+      </>
+    ),
   },
 ];
 
 export default function ShowcasePage() {
+  const pages = showcaseSource.getPages();
+
   return (
     <main className="relative flex flex-1 flex-col overflow-hidden">
       <SectionBackground />
@@ -63,64 +61,78 @@ export default function ShowcasePage() {
             <Sparkles className="size-3.5 text-fd-primary" />
             Built with Arkitekt
           </span>
-          <h1 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl">
-            Showcase
-          </h1>
+          <h1 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl">Showcase</h1>
           <p className="mt-4 max-w-xl text-lg text-fd-muted-foreground">
-            A collection of projects and labs using Arkitekt to solve real
-            bioimage analysis problems.
+            Worked examples of Arkitekt solving real bioimage analysis problems, from the
+            publication and beyond.
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {showcases.map((item) => (
-            <Link
-              key={item.title}
-              href={item.href}
-              className="group relative flex flex-col gap-3 rounded-xl border border-fd-border bg-fd-card/50 p-6 backdrop-blur transition-colors hover:border-fd-primary/50"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-semibold tracking-tight">
-                    {item.title}
-                  </h2>
-                  <p className="mt-0.5 text-sm text-fd-muted-foreground">
-                    {item.org}
-                  </p>
-                </div>
-                <ExternalLink className="size-4 shrink-0 text-fd-muted-foreground transition-colors group-hover:text-fd-primary" />
-              </div>
-              <p className="text-sm text-fd-muted-foreground">
-                {item.description}
-              </p>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {item.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-fd-primary/10 px-2.5 py-0.5 text-xs font-medium text-fd-primary"
+        {GROUPS.map((group) => {
+          const items = pages.filter((page) => page.data.group === group.key);
+          if (items.length === 0) return null;
+
+          return (
+            <div key={group.key} className="mt-16">
+              <h2 className="text-2xl font-bold tracking-tight">{group.title}</h2>
+              <p className="mt-2 max-w-2xl text-sm text-fd-muted-foreground">{group.blurb}</p>
+
+              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {items.map((page) => (
+                  // The title link is stretched over the whole card with a
+                  // pseudo-element, so the card is clickable without nesting
+                  // the Paper badge (itself a link) inside another <a>.
+                  <div
+                    key={page.url}
+                    className="group relative flex flex-col gap-3 rounded-xl border border-fd-border bg-fd-card/50 p-6 backdrop-blur transition-colors hover:border-fd-primary/50"
                   >
-                    {tag}
-                  </span>
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-lg font-semibold tracking-tight">
+                        <Link href={page.url} className="after:absolute after:inset-0">
+                          {page.data.title}
+                        </Link>
+                      </h3>
+                      <ArrowUpRight className="size-4 shrink-0 text-fd-muted-foreground transition-colors group-hover:text-fd-primary" />
+                    </div>
+                    <p className="text-sm text-fd-muted-foreground">{page.data.description}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      {page.data.version === 'paper' && (
+                        <span className="relative z-10">
+                          <PaperBadge />
+                        </span>
+                      )}
+                      {page.data.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full bg-fd-primary/10 px-2.5 py-0.5 text-xs font-medium text-fd-primary"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
-            </Link>
-          ))}
-        </div>
+            </div>
+          );
+        })}
 
-        <div className="mt-12 flex flex-col items-center gap-4 rounded-2xl border border-fd-border bg-fd-card/50 px-8 py-12 text-center backdrop-blur">
+        <div className="mt-16 flex flex-col items-center gap-4 rounded-2xl border border-fd-border bg-fd-card/50 px-8 py-12 text-center backdrop-blur">
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
             Using Arkitekt in your lab?
           </h2>
           <p className="max-w-xl text-fd-muted-foreground">
             Share what you&apos;ve built and we&apos;ll add it here.
           </p>
-          <Link
-            href="/docs/showcases"
+          <a
+            href={`https://github.com/${gitConfig.user}/${gitConfig.repo}/issues/new?title=Showcase%3A%20`}
+            target="_blank"
+            rel="noreferrer"
             className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-fd-primary"
           >
             Submit your showcase
             <ArrowRight className="size-4" />
-          </Link>
+          </a>
         </div>
       </section>
     </main>

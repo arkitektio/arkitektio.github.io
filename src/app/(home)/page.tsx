@@ -34,33 +34,6 @@ function UnderConstruction() {
   );
 }
 
-const features = [
-  {
-    icon: Network,
-    title: 'The middleman',
-    description:
-      'A central datahub that sits between you and your analysis tools, brokering data and compute across your lab.',
-  },
-  {
-    icon: Workflow,
-    title: 'Visual workflows',
-    description:
-      'Compose nodes into reactive pipelines and orchestrate complex analysis without writing glue code.',
-  },
-  {
-    icon: Microscope,
-    title: 'Built for microscopy',
-    description:
-      'First-class support for bioimage data, metadata and the formats your instruments already produce.',
-  },
-  {
-    icon: Boxes,
-    title: 'Apps, not scripts',
-    description:
-      'Package tools as installable apps that anyone in your group can discover, run and share.',
-  },
-];
-
 export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col px-6 pb-24 pt-6 sm:px-6 lg:px-8">
@@ -86,8 +59,8 @@ export default function HomePage() {
         <div className="relative z-10 max-w-2xl px-6 pt-14 sm:px-12 sm:pt-20 lg:px-16 lg:pb-28">
           {/* badge */}
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3.5 py-1.5 text-sm font-medium text-primary backdrop-blur">
-            <Sparkles className="size-3.5" />
-            An open platform for bioimage analysis.
+            
+           Take the K pill
           </span>
 
           {/* headline */}
@@ -98,9 +71,7 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-6 max-w-xl text-lg text-white/60">
-            Arkitekt is a real-time middleman between your data, your tools and your
-            team. It turns scattered scripts and messy glue-code into shareable, reactive analysis
-            workflows.
+            Arkitekt is a real-time middleman between between you and your tools.It turns scattered scripts and messy multi-folder data tombs into a single, reactive datahub that orchestrates your analysis and lets you share your data with your team.
           </p>
 
           {/* CTAs */}
@@ -111,7 +82,7 @@ export default function HomePage() {
               className="rounded-full px-7 text-base"
             >
               <Link href="/docs/introduction/installation">
-                Get started
+                Lets gooo!
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
@@ -126,7 +97,7 @@ export default function HomePage() {
                 rel="noreferrer noopener"
               >
                 <GitFork className="size-4" />
-                GitHub
+                Show me code
               </a>
             </Button>
           </div>
@@ -145,17 +116,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─────────────────────── Statement ─────────────────────── */}
-      <section className="w-full my-16 flex flex-col items-center gap-6 text-center">
-        <p className="max-w-5xl text-3xl font-medium leading-snug tracking-tight text-fd-muted-foreground sm:text-4xl">
-          Ohhh I wish my lab had a <span className="text-fd-foreground">reactive datahub</span> that
-          could <span className="text-fd-foreground">orchestrate my analysis</span> and{' '} where i can
-          <span className="text-fd-foreground">share my data</span> with the team.
-        </p>
-        <p className="max-w-md text-md text-fd-muted-foreground">
-          No Scientist ever.
-        </p>
-      </section>
 
 
       {/* ─────────────────── Ecosystem orbit map ────────────────── */}
@@ -165,7 +125,13 @@ export default function HomePage() {
 
       {/* ─────────────────── What Arkitekt is not ──────────────── */}
       <NotArkitekt />
+        
 
+        <section className="w-full my-auto flex flex-col items-center gap-4  px-8 py-12 text-center backdrop-blur">
+           Let us dump some features on you, like every weird marketing site. If you care more about what Arkitekt stands
+           for check out <Link href="/docs/introduction/philosophy" className="text-primary underline inline font-medium">Why we exists?</Link> 
+           
+        </section>
       {/* ───────────────────────── Bento ──────────────────────── */}
       <HomeBento />
 
@@ -183,11 +149,11 @@ export default function HomePage() {
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <span className="inline-flex items-center gap-2 rounded-full border border-fd-primary/40 bg-fd-primary/10 px-3.5 py-1.5 text-sm font-medium text-fd-primary">
-                <Sparkles className="size-3.5" />
-                AI?
+                
+                This shit looks like AI...
               </span>
               <h2 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">
-                Yes, we use AI <i>sometimes</i>. No, nothing here is vibe-coded.
+                We dont vibe code here, but we use AI <i>sometimes</i>. 
               </h2>
               <p className="mt-4 text-lg text-fd-muted-foreground">
                 Arkitekt is older than AI and the core of the platform has been
@@ -197,7 +163,7 @@ export default function HomePage() {
             </div>
             <Button asChild size="lg" className="shrink-0 rounded-md" variant={"outline"}>
               <Link href="/docs/ai">
-                Our AI mantra
+                What we do care about with regards to AI
                 <ArrowRight className="size-4" />
               </Link>
             </Button>

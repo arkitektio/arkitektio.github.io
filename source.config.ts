@@ -1,5 +1,6 @@
 import { defineConfig, defineDocs } from 'fumadocs-mdx/config';
 import { metaSchema, pageSchema } from 'fumadocs-core/source/schema';
+import { z } from 'zod';
 
 // Prefix absolute asset paths in RAW HTML written inside MDX (e.g.
 // <img src="/docs/x.png">, <video><source src="/x.webm">) with the deploy
@@ -71,6 +72,24 @@ export const docs = defineDocs({
     postprocess: {
       includeProcessedMarkdown: true,
     },
+  },
+  meta: {
+    schema: metaSchema,
+  },
+});
+
+// Showcases live outside the docs tree and render under /showcase. The extra
+// frontmatter drives the cards on the index page: `group` sorts them, `tags`
+// are the chips, and `version: paper` marks examples that were run with the
+// Paper version of the platform.
+export const showcases = defineDocs({
+  dir: 'content/showcases',
+  docs: {
+    schema: pageSchema.extend({
+      group: z.enum(['paper', 'advanced']).default('advanced'),
+      tags: z.array(z.string()).default([]),
+      version: z.enum(['paper', 'next']).optional(),
+    }),
   },
   meta: {
     schema: metaSchema,
