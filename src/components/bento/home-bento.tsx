@@ -22,9 +22,14 @@ export function HomeBento() {
         <StateCard />
 
         {/* wide media. A random clip from the volume-viewer talk, captioned
-            (pin with ?demo=<slug>) */}
+            (pin with ?demo=<slug>). Width-capped and centred so a wide page
+            does not turn the card into a wall of video. */}
         <BentoCard className="p-2 sm:col-span-2">
-          <RandomClip slot="demo" caption className="rounded-2xl" />
+          <RandomClip
+            slot="demo"
+            caption
+            className="mx-auto max-w-[1100px] rounded-2xl"
+          />
         </BentoCard>
 
         {/* facilities statement + showcase CTA */}
