@@ -124,7 +124,7 @@ export default function HomePage() {
             while it plays. Fills its column up to a cap (so a
             wide screen does not get a wall of video), centred vertically
             beside the copy, with a caption underneath saying what is playing. */}
-            <div className="relative z-0 mt-10 px-6 pb-10 sm:px-12 lg:my-0 lg:flex lg:min-w-0 lg:flex-1 lg:justify-center lg:px-10 lg:py-16">
+            <div className="relative z-0 mt-10 px-3 pb-3 sm:px-10 lg:my-0 lg:flex lg:min-w-0 lg:flex-1 lg:justify-center lg:px-10 lg:py-12">
               <HeroCarousel className="lg:max-w-[920px]" />
             </div>
           </div>

@@ -161,13 +161,6 @@ export function HeroCarousel({ className }: { className?: string }) {
                 {current.title}.
               </span>{" "}
               {current.caption}{" "}
-              <Link
-                href={clipsDeckHref}
-                className="inline-flex items-center gap-0.5 whitespace-nowrap font-medium text-white/70 transition-colors hover:text-white"
-              >
-                From the volume viewer talk
-                <ArrowUpRight className="size-3" />
-              </Link>
             </span>
           )}
         </figcaption>

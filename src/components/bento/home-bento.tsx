@@ -21,18 +21,15 @@ export function HomeBento() {
         {/* observable state. A robot whose state updates live */}
         <StateCard />
 
-        {/* wide media. A random clip from the volume-viewer talk, captioned
-            (pin with ?demo=<slug>). Width-capped and centred so a wide page
-            does not turn the card into a wall of video. */}
-        <BentoCard className="p-2 sm:col-span-2">
-          <RandomClip
-            slot="demo"
-            caption
-            className="mx-auto max-w-[1100px] rounded-2xl"
-          />
+        {/* media. A random clip from the volume-viewer talk, captioned
+            (pin with ?demo=<slug>), filling its cell edge to edge like any
+            other card. The card is a flex row so the clip stretches to the
+            row's height, with the showcase CTA sitting beside it. */}
+        <BentoCard className="flex">
+          <RandomClip slot="demo" caption />
         </BentoCard>
 
-        {/* facilities statement + showcase CTA */}
+        {/* facilities statement + showcase CTA, to the right of the clip */}
         <BentoCard className="flex flex-col justify-between gap-6 p-6 sm:p-8">
           <div>
             <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -53,36 +50,18 @@ export function HomeBento() {
         {/* provenance. Everything is audited & recorded */}
         <ProvenanceCard />
 
+        {/* live install recording, beside provenance. No card around it: the
+            terminal brings its own window chrome and sits straight on the
+            page background. */}
+        <div className="flex">
+          <Terminal src="/casts/arkitekt-init.cast" autoPlay loop speed={1.5} />
+        </div>
+
         {/* declare. Programmatic workflows resolved across remote agents */}
         <DeclareCard />
 
         {/* bloks. Dashboards declared in JSX from the component catalog */}
         <BlokCard />
-
-        {/* customizability copy + install CTA */}
-        <BentoCard className="flex flex-col justify-between gap-6 p-6 sm:p-8">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Composable from top to bottom.
-            </h2>
-            <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
-              Open-source and modular. Swap the pieces you need and connect the
-              tools you already use. Spin up the whole platform with a single
-              command.
-            </p>
-          </div>
-          <Button asChild className="w-fit rounded-full">
-            <Link href="/docs/introduction/installation">
-              Install Arkitekt
-              <ArrowRight className="size-4" />
-            </Link>
-          </Button>
-        </BentoCard>
-
-        {/* live install recording */}
-        <BentoCard className="flex flex-col gap-5 p-6 sm:p-8">
-          <Terminal src="/casts/arkitekt-init.cast" autoPlay loop speed={1.5} />
-        </BentoCard>
       </BentoGrid>
     </section>
   );
