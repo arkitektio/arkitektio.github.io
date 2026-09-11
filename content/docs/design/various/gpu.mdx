@@ -13,14 +13,12 @@ The second way is to use the GPU support built into Arkitekt itself. This is the
 in the [developer](/docs/developers) section on how to build an Arkitekt plugin. Here Arkitekt uses the docker support system to run the plugin in a docker container
 within the Arkitekt server.
 
-<div className="mt-2 w-20">
-<img src="/docs/design/various/docker_gpu.png" alt="How the Arkitekt server can manage GPU access" />
+<figure className="my-6 w-full">
 
-<div className="text-gray-400 mb-2">
-<small>How the Arkitekt server can manage GPU access. (Adapted from the NVIDIA Container Toolkit Documentatoin) . Containers run in a sandbodex environment
-and request GPU access from the underlying service (docker engine). This </small>
-</div>
-</div>
+![How the Arkitekt server can manage GPU access](/docs/design/various/docker_gpu.png)
+
+<figcaption className="mt-2 text-sm text-fd-muted-foreground">How the Arkitekt server can manage GPU access. (Adapted from the NVIDIA Container Toolkit Documentatoin) . Containers run in a sandbodex environment and request GPU access from the underlying service (docker engine). This</figcaption>
+</figure>
 
 ## GPU Support on Windows
 

@@ -27,7 +27,7 @@ We would like to create a workflow that can take an image of nuclei in a cell cu
 We will be using a deep learning model based on [Stardist](https://github.com/stardist/stardist) to do the prediction.
 We will be using the same dataset that we have used in the [basics of Arkitekt](/docs/introduction/first-steps).
 
-<img src="/docs/introduction/advanced/segmentation.png" alt="Nuclei segmentation" />
+![Nuclei segmentation](/docs/introduction/advanced/segmentation.png)
 
 ### The problems we are trying to solve
 
@@ -83,7 +83,7 @@ For this we will be using two actions provided by Fiji, the `Upload Image` actio
 where it will be processed by the `Segment Fluo2` action of the `segmentor` plugin. The result will then be piped back to Fiji, where it will be shown using the `Show Image` action.
 
 <DisplayWorkflow />
-<div className="text-gray-400 mb-2">
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
   <small>
     {" "}
     This is the workflow we would like to create. Upload our active image, segment
@@ -106,7 +106,7 @@ Once it is deployed, you can run the workflow directly from the `Dashboard` of O
 >
   <source src="/docs/introduction/advanced/fiji_segmentation.webm" />
 </video>
-<div className="text-gray-400 mb-2">
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
   <small> The workflow in action utilizing Fiji</small>
 </div>
 
@@ -115,7 +115,7 @@ Once it is deployed, you can run the workflow directly from the `Dashboard` of O
 Now that we have seen how to integrate with ImageJ, let's try to do the same with Napari. Its quite similar to the ImageJ integration, but this time we will be using the `Upload Layer` action and the `Show on Napari` action provided by Napari.
 
 <DisplayWorkflow />
-<div className="text-gray-400 mb-2">
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
   <small>
     {" "}
     This is the workflow we would like to create. Upload our active image, segment

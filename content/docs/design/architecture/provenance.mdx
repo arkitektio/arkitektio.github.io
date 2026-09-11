@@ -5,23 +5,18 @@ description: How Arkitekt records who changed what, under whose authority, and d
 
 import { GithubRepo, ProvenanceFlow } from "@/components/docs";
 
-The [Security](/docs/design/security/measures) page makes a promise: that Arkitekt keeps a
-sharp line between **you** and **the machine**, and that every change to your data is honestly
-attributed. This page explains how that promise is kept.
+Arkitekt keeps a sharp line between **you** and **the machine that run the analysis**, and ensures that every change to your data 
+is honestly attributed and accounted for.
 
-The answer is **provenance-aware audit logging**. Every create, update, and delete on a tracked
-record is captured as a history row, and each row is attributed to *who* made the change,
-*which app* they used, and, crucially, the verified **task** it happened under. This lets an
-administrator ask, after the fact, questions like:
+For this we ensure **provenance-aware audit logging**. Every create, update, and delete on a tracked
+record inside one of Arktiekt services is captured as a history update and each updates is attributed to *who* made the change,
+*which app* they used, and, crucially, the verified **task** it happened under. This lets anyone ask
 
-> *"Which automated run touched this record, on whose authority, and what exactly did it change?"*
-
-and get a precise, reliable answer.
+> *"Which automated run touched this record, on whose authority, and what exactly did it change? And by the way what else did it touch?"*
 
 <Callout type="info" title="Where this lives">
-The provenance layer is implemented by a small Django library called **Koherent**, which the
-Arkitekt services build on. If you are building or operating a backend service and want the
-hands-on setup, see the [Koherent integration guide](/docs/developers/backend/koherent).
+The task provenance layer is  cryptopgraphically signed by the task-server and verified by the platform's identity layer. While this is not
+bulletproof, it is a strong guarantee that the audit trail is not forged or tampered with. 
 </Callout>
 
 ## What gets recorded
@@ -43,18 +38,23 @@ that it was **carried out by a machine**. It never collapses one into the other.
 
 ## What is a task?
 
-A **task** groups together every change made during one
-logical run. In Arkitekt, when a user calls an app through [Rekuest](/docs/design/services/rekuest),
-all of that app's changes carry the same task identity. So you can later find, audit, or revert
-**every** change a single run produced, as one coherent unit.
+A **task** groups together every change made during one logical run. In Arkitekt a task and a workflow are ALWAYS first
+initiated by a human user, and are always attributed to them. If the task is delegated to an agent,
+the agent still carry the trail of the user's authority and the original task identity.
 
-Long-running tasks can span many separate requests over time; because a task is keyed by its
-identity rather than by request, all of those changes still collapse onto the same task.
+<ProvenanceFlow />
 
-## How it fits together
+When a user calls a registered function on an agent, the agent receives a single, server-signed
+**provenance token** for that one run. While the function executes, every outgoing operation it
+makes, every mutation no matter how many, is transparently stamped with that **same** token.
+The application code does nothing special; the token is set once and propagates to everything the
+function does.
 
-Provenance is not bolted on at the end. It falls out of how the platform's layers stack. Each
-layer has one job, and provenance is what you get when they are composed in order:
+
+
+## Tech details, for who wants to know
+
+The Provenance layer for each service is built on three cooperating components, each with a single responsibility:
 
 ```
         Rekuest provenance token (signed, EdDSA)
@@ -65,12 +65,12 @@ layer has one job, and provenance is what you get when they are composed in orde
                        │
         ┌──────────────▼───────────────┐
  authn. │  authentikate                 │   ← verifies the token, resolves the
-        │  → user, client, organization │     acting user / client / organization
+        │  → user, client, organization │     acting user / client / organization and the task it ran under
         └──────────────┬───────────────┘
                        │
         ┌──────────────▼───────────────┐
  koher. │  koherent                     │   ← stamps every change with user, client,
-        │  → attributed history rows    │     and the verified task it ran under
+        │  → attributed history rows    │     and the verified task it ran under (based on django-simple-history)
         └───────────────────────────────┘
 ```
 
@@ -82,36 +82,3 @@ layer has one job, and provenance is what you get when they are composed in orde
 - **[koherent](https://github.com/jhnnsrs/koherent)** consumes that verified context and turns
   each data change into a durable, attributed history row, building a `Task` from the token's
   claims.
-
-Because each layer depends on the one above it, the audit trail is only ever written from a
-*verified* request. There is no path that records an unattributed or unsigned change.
-
-## One token, many changes
-
-The reason a task can group many changes is worth spelling out, because it is the heart of *why*
-provenance is trustworthy. It is not something the audit layer does by force. It falls out
-of how a [rekuest-next](https://github.com/jhnnsrs/rekuest-next) agent runs a task.
-
-<ProvenanceFlow />
-
-When a user calls a registered function on an agent, the agent receives a single, server-signed
-**provenance token** for that one run. While the function executes, every outgoing operation it
-makes, every mutation no matter how many, is transparently stamped with that **same** token.
-The application code does nothing special; the token is set once and propagates to everything the
-function does.
-
-On the server side, the first change under that token creates the task, and every later change
-with the same token reuses it. The result: every history row produced anywhere in that one run
-links back to a single task, and you can later query *"show me everything this run changed."*
-
-## Querying and reverting
-
-Because provenance is recorded as first-class data, it is exposed directly in each service's
-GraphQL API as a queryable, filterable `provenance` field on the records that carry it. You can
-ask a record for its full history, filter records by the task or user that changed them, and,
-for most actions, revert a change to restore the previous state.
-
-<GithubRepo url="https://github.com/jhnnsrs/koherent" title="Koherent" />
-
-For the concrete API, setup, and integration details, continue to the
-[Koherent integration guide](/docs/developers/backend/koherent).

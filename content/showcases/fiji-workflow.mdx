@@ -54,9 +54,10 @@ workflow on a centrally stored image and store the final result centrally, we wo
 gains of only working with in memory items.
 
 <div className="mt-2">
-<img src="/docs/showcases/advanced/mikroj.png" alt="In app Workflow design" />
 
-<div className="text-gray-400 mb-2">
+![In app Workflow design](/docs/showcases/advanced/mikroj.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
 <small>The in app Workflow design where a globally scoped Image (backed by micro) is bridged to the ImageJ data type of an ImagePlus, that then gets
 parsed via an imagej macro (which code is a constant paramter of the workflow). The output is then bridged again back to the central server, here also ensuring
 the propagration of the metadata of the original image as an origin to the new image. </small>

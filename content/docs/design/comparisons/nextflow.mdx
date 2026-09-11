@@ -179,13 +179,12 @@ This core difference in the execution model of the two tools, has some important
 for big batch jobs, where you want to process a large number of images, and start up time is not a problem. In Arkitekt, it is more common to use workflows where you want to process single
 fast arriving messages and you want to minimze your time to feedback (as it might be important to get the results of your workflow as fast as possible, e.g in a smart microscopy setting).
 
-<div className="mt-2 w-20">
-<img src="/docs/design/comparisons/batch-stream.png" alt="The time to feedback (results of a single time of your workflow)" />
+<figure className="my-6 w-full">
 
-<div className="text-gray-400 mb-2">
-<small> The time to feedback (results of a single time of your worklfow) </small>
-</div>
-</div>
+![The time to feedback (results of a single time of your workflow)](/docs/design/vs/batch-stream.png)
+
+<figcaption className="mt-2 text-sm text-fd-muted-foreground">The time to feedback (results of a single run of your workflow)</figcaption>
+</figure>
 
 Of course you can easily *emulate* the execution model of Nextflow in Arkitekt by making your apps run a command in the shell, and then exit. 
 
