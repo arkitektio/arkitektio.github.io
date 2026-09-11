@@ -22,9 +22,10 @@ yeah quantification). In the course of this tutorial you will get to understand:
 You are familiar with this by now.. There are a few things we need to do before we can start.
 First what do we mean with `Workflow`?
 
-A workflow in the arkitekt sense is a processing pipeline, that uses a series of `Nodes` to process your data in a stream. Nodes just like
-our previously mentioned `Show on Napari` or `Convert File` nodes. You can either stitch them together in the GUI or you can import them from a file or
-even this website. We will do the first. Hopefully this will help you in familiarizing yourself a bit more with the UI .
+A workflow is a processing pipeline: a graph of `Nodes`, just like the `Show on Napari` or `Convert File` nodes you have
+used, wired together so that data streams from one to the next. The concept is explained in
+[Workflow](/docs/design/terminology/workflow); here we build one. You can stitch nodes together in the GUI or import a
+workflow from a file or even from this website. We will do the first, to get more familiar with the UI.
 
 Lets look first at the workflow we would like to create, and then we will go through the steps to create it.
 
@@ -46,39 +47,23 @@ This is probably the most basic workflow you can create, but it will teach you a
 
 - About the `Nodes`.
 
-  Nodes in Arkitekt Workflows are front and center. They are the building blocks of your workflow, and thusly the building blocks of your analysis. As you have seen
-  in the previous section every `Node` has inputs and outputs that you can connect to other nodes. This connection then defines the **flow of data** through your workflow. Importantly you will
-  notice the nodes termed `Input` and `Output`. These are special nodes that are part of every workflow, and are the entry and exit points to your analysis.
-  When you connect a node to the `Input` node, you are telling Arkitekt that your workflow will expect the input type of that node as a parameter when you run it.
-  Equally you connect a node to the `Output` node, you are telling Arkitekt that your workflow will return the output type of that node when you run it.
-
-  <Callout type="info" title="Workflows are Just Nodes">
-
-
-  This abstraction of `Input` and `Output` nodes is core to the concept of a workflow in Arkitekt. Each workflow has exactly one `Input` and one `Output` node.
-  And as our workflows are just nodes, these inputs and outputs will then be the inputs and outputs of the workflow node. This means that you can use workflows
-  in workflows, and you can use workflows just as nodes on your data. But we will get to that later.
-
-
-  </Callout>
+  Every `Node` has inputs and outputs that you connect to other nodes; the connections define the **flow of data**. The special
+  `Input` and `Output` nodes are the entry and exit points of the workflow, which is why a workflow is itself just a node
+  (see [Workflows are just nodes](/docs/design/terminology/workflow#workflows-are-just-nodes)).
 
 - About their colors:
 
-  If you have connected the website and followed the tutorial until now, you might notice that the color of the nodes is yellow. This is because
-  we have not yet installed apps that provide the functionality for the nodes in this workflow. This illustrates another core feature of Arkitekt. The separation
-  of the workflow design and the workflow execution. You can design and share a workflow, irrespective of the apps that provide the functionality for the nodes in the workflow.
-  This means that you can design a workflow, and potentially share it with others, even though they might run in on completely different apps. This makes workflows
-  a great way to share analysis pipelines, and to make them reproducible and **universal**
+  If you have connected the website and followed the tutorial until now, the nodes are yellow: we have not yet installed apps
+  that provide their functionality. Workflow design is separate from execution, so you can design and share a workflow
+  regardless of which apps end up running it.
 
 - About the data as a stream:
 
-  Arkitekt workflows are adapted to process your data as a [stream](/docs/design/real-time), rather than as a batch. This means that each node will process your data as it comes in, and then
-  pass it on to the next node. Nodes will not wait for all data to be processed, but will process it autonomously as it comes in. This means that you can process data ridicously fast,
-  and importantly you can process data that is still being generated. This is a core feature of Arkitekt, and we will get to it later. You will also
-  note that the edges are labeled with `@mikro/representatoin` and `@mikro/metric`. These labels correspond to the data types that are passed between the nodes. The `@` symbol
-  indicates that these are [mikro](/docs/design/services/mikro) data types and the `representation` and `metric` indicate the type of data.
-  The first two nodes will manipulate an image to an image (images are represented as `representation`), and the last node will return a `metric` (metrics are scalar values attached
-  to an image (here the fraction)). This `metric` will also be the output of our node.
+  Nodes process each item as it arrives and pass it on, rather than waiting for a batch (see
+  [Data flows as a stream](/docs/design/terminology/workflow#data-flows-as-a-stream)). The edges are labeled
+  `@mikro/representation` and `@mikro/metric`: the data types passed between nodes, where `@` marks a
+  [mikro](/docs/design/services/mikro) type. The first two nodes turn an image into an image, the last one returns a
+  `metric` (a scalar attached to an image, here the fraction), which is also the output of our workflow.
 
 ## Enough talking
 
@@ -96,7 +81,7 @@ the classic way by adding these Repositories to your plugin store.
 
 
 <div className="flex flex-row gap-2">
-  <InstallRepoButton repo={"stdlib"} user={"arkitektio-apps"} branch={"master"} />
+  <InstallRepoButton repo={"stdlib"} user={"arkitektio-apps"} branch={"main"} />
   <InstallRepoButton repo={"reaktor"} user={"arkitektio-apps"} branch={"master"} />
 </div>
 

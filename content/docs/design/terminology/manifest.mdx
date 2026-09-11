@@ -66,15 +66,15 @@ and inform the user before installation which functionality your apps will provi
 
 
 This feature describes a feature of Arkitekt that is currently in development, and is not yet
-available in the `paper` and `stable` channels. This feature is currently only available in the
-"beta" channel. It is however already part of the CLI.
+available in the `stable` channel. It is currently only available in the `beta` and `next`
+channels (see [How we version Arkitekt](/docs/design/philosophy/version)). It is however already part of the CLI.
 
 
 </Callout>
 
 ### Flavours and Selectors
 
-Flavours and Selectors are a way of describing the different ways an app can be deployed. For example,
+Flavours and Selectors are a way of describing the different ways an app can be deployed (for example a CUDA build and a CPU-only build of the same app). How the platform picks a flavour at deploy time is described in [App Flavours](/docs/design/services/kabinet#app-flavours).
 
 When you develop an app for Arkitekt, your manifest will be slightly different, as it will contain
 additional information about your app, such as its prefered hardware and software environments. This
@@ -123,8 +123,8 @@ resources on the machine, and the user's preferences.
 
 
 The flavour based deployment is currently highly experimental and is not yet supported by the
-the `paper` and `beta` channels, and the api is subject to change. This feature is currently only
-available in the `alpha` channel.
+`stable` and `beta` channels, and the api is subject to change. This feature is currently only
+available in the `next` channel (see [How we version Arkitekt](/docs/design/philosophy/version)).
 
 
 </Callout>

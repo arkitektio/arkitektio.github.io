@@ -4,7 +4,12 @@ description: An introduction to the classical Arkitekt app style, the App contex
 ---
 
 
-Lets's create an Arkitekt App, as it is the connection layer between your code and the arkitet server. If you don't know what we mean by an App, check out the [App](/docs/design/terminology/app) section of the terminology page.
+Arkitekt's client SDK is designed to be used in a declarative and functional way, with a focus on reusable functions
+and composability: most functionality is provided through functions rather than classes, so it fits the patterns of
+the scientific Python developer. The one stateful exception is the Arkitekt `App`, which encapsulates everything that
+needs managing (authentication, waiting for assignments from the server, ...). Let's create one, as it is the connection
+layer between your code and the Arkitekt server. If you don't know what we mean by an App, check out the
+[App](/docs/design/terminology/app) section of the terminology page.
 
 ```python
 from arkitekt_next import easy
@@ -21,8 +26,9 @@ with app:
 Before we start exploring what you can do with this app a few general words about this
 setup:
 
-1. You might notice that we are creating an arkitekt app through calling the easy function, specifying only the name of the app, without having to explicitly
+1. You might notice that we are creating an arkitekt app through calling the `easy` builder function, specifying only the name of the app, without having to explicitly
    pointing the app to an arkitekt instance. This is by design. Your code should not be aware of the backend it is connecting to, as this allows easy installation of your code anywhere. Arkitekt uses the fakt service to discover the backend, and will retrieve its configuration from the backend, before connecting to it, on the first call within the context (a useful feature for system admins to configure apps after deployment). Of course you can opt out of this behaviours by passing an explicity url of the arkitekt server or by changing the fakts attributes before entering the context.
+   On the first connection a browser opens and you approve the device login, just as you did in [Almost there](/docs/introduction/first-steps/interface#almost-there).
 
    ```python
     from arkitekt_next import easy
@@ -34,7 +40,7 @@ setup:
     with app:
         # do stuff with arkitekt
    ```
-
+ Depending on your environment you can also use other builders, like the `jupy` builder for use inside a Jupyter notebook.
 2. Arkitekt relies on the concept of an context manager (that `with` statement). We use
    this to manage the lifecycle of the application (e.g setup connections to the backend
    and tear down these connections). With this pattern we can ensure a graceful shutdown

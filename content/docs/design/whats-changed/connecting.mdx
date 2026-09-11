@@ -6,9 +6,8 @@ description: What changed in how apps discover, authenticate to and configure th
 The [Fakts protocol](/docs/design/architecture/service-discovery) is how an app finds a deployment,
 proves who it is, and learns where the services are. In the **Next** version it is a standard
 OAuth2 device-authorization flow. In the **Paper** version it was a custom sequence that was
-*inspired by* OAuth2 but not OAuth2. If you are coming from a Paper deployment or a Paper-era
-client, this is what moved.
-
+*inspired by* OAuth2 but not OAuth2. This page only covers what moved; the current protocol itself
+is described in [Service Discovery](/docs/design/architecture/service-discovery).
 
 ## One protocol instead of two packages
 
@@ -30,6 +29,14 @@ secret to store, and no second grant. The Python and TypeScript packages still
 carry the `fakts` name, but they now do what Fakts and Herre did together.
 
 ## Step by step
+
+Each row maps one Paper step to its Next counterpart. The Next column is the flow described in
+Service Discovery, from [discovery](/docs/design/architecture/service-discovery#step-0-discover-the-deployment)
+through [registration](/docs/design/architecture/service-discovery#step-1-register-and-request-device-authorization),
+[approval](/docs/design/architecture/service-discovery#step-2-the-user-approves-the-app),
+[polling](/docs/design/architecture/service-discovery#step-3-poll-the-token-endpoint) and
+[refresh](/docs/design/architecture/service-discovery#step-4-refresh-and-pick-up-configuration-changes),
+plus [the envelope](/docs/design/architecture/service-discovery#the-envelope).
 
 | Paper                                                                    | Next                                                                                                              |
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |

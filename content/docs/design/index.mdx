@@ -36,7 +36,9 @@ every app connects to. It is a **middleman** and a **datahub** in one, it broker
 communication between apps, and it stores the data they produce so the whole lab
 can build on it. On its own the hub does very little "analysis"; its job is to
 broker and to remember. The heavy lifting is left to the apps, and identity is left
-to the coordinator.
+to the coordinator. Why we built Arkitekt around a middleman in the first place, and
+how that answers the fragmented landscape of bioimage tools, is the subject of
+[Arkitekt the Middleman](/docs/design/philosophy/middleman).
 
 The hub is modular. It is built from a set of [**Services**](/docs/design/services)
 (like Mikro for data, or Rekuest for tasks), and when you deploy Arkitekt you choose
@@ -54,16 +56,15 @@ cluster, or an adapting set of virtual machines in the cloud. Whichever it is, t
 
 ## Apps
 
-Apps are the **spokes**, and the true stars of any work done on Arkitekt. While the
-hub only connects and remembers, apps are the entities that actually *do* something
-with your data, from a desktop app that visualizes results to a machine-learning model
-running in a container.
+Apps are the **spokes**. While the hub only connects and remembers, apps are the
+entities that actually *do* something with your data, from a desktop app that
+visualizes results to a machine-learning model running in a container.
 
 Crucially, apps connect only to the hub, never directly to one another. An app
 exposes part of its functionality to the hub, and the hub makes that functionality
-available to *other* apps, to you, and to workflows. This is how a net of
-capabilities grows across your lab without any two tools ever needing to know about
-each other. To read more, see [Apps vs Services](/docs/design/terminology/apps-vs-services).
+available to *other* apps, to you, and to workflows. What an app is, and how it
+differs from the services the hub is built from, is explained in
+[Apps vs Services](/docs/design/terminology/apps-vs-services).
 
 ## The Coordinator
 

@@ -8,9 +8,11 @@ import { GithubRepo } from "@/components/docs";
 <GithubRepo url="https://github.com/jhnnsrs/koherent" title="Koherent" />
 
 <Callout type="info" title="Concepts first?">
+
 This page is the hands-on integration guide. For the *why*, read
 [Provenance & Audit Logging](/docs/design/architecture/provenance) first. It covers what
-provenance is, how the layers stack, and how a single task groups many changes.
+provenance is and how a single task groups many changes.
+
 </Callout>
 
 ## Installation
@@ -44,14 +46,16 @@ Koherent is responsible for three things and nothing else:
 3. **Exposing**: Strawberry types (`ProvenanceEntry`, `Task`) and a flat, semantic filter
    (`ProvenanceFilterMixin`) surface that history in your GraphQL API.
 
-It does **not** authenticate requests, mint tokens, or define the transport. Those belong to
-[authentikate](https://github.com/jhnnsrs/authentikate) and
-[kante](https://github.com/jhnnsrs/kante) respectively. Koherent is the piece that sits between
-them and turns an authenticated, context-carrying request into a durable, queryable audit trail.
+It does **not** authenticate requests, mint tokens, or define the transport; how those jobs are
+split between `authentikate`, `kante` and Koherent is laid out in
+[Backend Libraries](/docs/developers/backend). Koherent is the piece that turns an authenticated,
+context-carrying request into a durable, queryable audit trail.
 
 <Callout type="info">
+
 Koherent is built for the Arkitekt / Rekuest ecosystem. The "task" it tracks is a Rekuest
 task, attested by a signed provenance token.
+
 </Callout>
 
 ## Model setup

@@ -15,6 +15,13 @@ retrieval and manipulation of data with a high level of relationships, such as t
 graph. It was designed to overcome issues in other API protocols such as REST, where when trying to explore highly relational data,
 dedicated and separately orchestrated requests to the backend needed to be performed.
 
+<Callout type="info" title="Why not REST?">
+
+REST is widely used and well understood, but it has limitations for highly relational bioimage data.
+Read [Why Not REST](/docs/design/comparisons/rest) for the trade-offs.
+
+</Callout>
+
 ## Why we like GraphQL
 
 1. **Flexibility**: With GraphQL, clients can specify exactly what data they need, reducing over-fetching or under-fetching of data.
@@ -61,9 +68,9 @@ You can just change the query to fetch any data you want.
 
 ```jsx
 function Display(props) {
-  const { data } = useMikroQuery(gql`
+  const { data, error } = useMikroQuery(gql`
     query {
-      representations(limit: 3) {
+      images(pagination: {limit: 3}) {
         id
         name
       }
@@ -73,9 +80,11 @@ function Display(props) {
   return (
     <div className="flex flex-col gap-2">
       {data &&
-        data.representations.map((image) => (
+        data.images.map((image) => (
           <div className="bg-back-800 px-2">{image.name} </div>
         ))}
+
+      {error && <div className="text-red-500">Error: {error.message}</div>}
     </div>
   );
 }
@@ -85,17 +94,17 @@ By changing the query, you can fetch any data you want. For example, here we fet
 
 ```jsx
 function Display(props) {
-  const { data } = useMikroQuery(gql`
+  const { data, error } = useMikroQuery(gql`
     query {
-      representations(limit: 3) {
+      images(pagination: {limit: 3}) {
         id
         name
         rois {
           id
-          label
         }
-        store
-        shape
+        store {
+          shape
+          }
       }
     }
   `);
@@ -103,23 +112,25 @@ function Display(props) {
   return (
     <div className="flex flex-col gap-2">
       {data &&
-        data.representations.map((image) => (
+        data.images.map((image) => (
           <>
             <div className="bg-back-800 px-2 rounded-sm rounded-md">
               {image.name}{" "}
             </div>
             <div className="bg-green-200">
               {image.rois.map((roi) => (
-                <div className="bg-back-800 px-2">{roi.label} </div>
+                <div className="bg-back-800 px-2">{roi.id} </div>
               ))}
             </div>
             <div>
-              {image.shape.map((i) => (
+              {image.store?.shape.map((i) => (
                 <i>{i} </i>
               ))}
             </div>
           </>
         ))}
+
+      {error && <div className="text-red-500">Error: {error.message}</div>}
     </div>
   );
 }

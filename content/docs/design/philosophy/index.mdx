@@ -21,11 +21,6 @@ acquistion techniques powered by the insights we gain through our analysis. For 
 we can now use deep learning to guide our microscopes to acquire only the most relevant data, saving us time and allowing
 us to feedback on our increasingly challenging microscopic setups.
 
-Deep learning has revolutionized the field of computer vision and
-especially image segmentation. Long standing problems such as cell segmentation are now
-solved with unprecedented accuracy and speed. We now have microscopes, such as light sheet microscopy. that can acquire image data at an unprecedented
-rate and resolution, letting us image entire organisms at the cellular level.
-
 However with these advances, we also face new challenges.
 
 Long gone are the days, where a single image analysis software like ImageJ could do it all.
@@ -62,10 +57,9 @@ that offloads computation to these apps and the hardware they run on.
 
 2. _We need a fast and reliable Middleman_
 
-Orchestrating tools in Workflows is hard. This is especially true, if these tools are not designed to work together. Letting tools communicate directly with each other, trying to figure this out is probably (and arguably)
-not the best idea. We therefore designed Arkitekt as a middleman between the tools, a central authority that tools can talk to, and that ensures that they can rely on each other and the analysis they provide. As a middleman, Arkitekt also tries to
-interact with another central part of the workflow: the user. It was designed to let user design workflows in a graphical user interface, spanning multiple
-apps. It then also turns into A workflow scheduler, that takes tehese workflows and schedules them in real-time. No more batch processing, no more waiting for the results.
+Orchestrating tools in Workflows is hard. This is especially true, if these tools are not designed to work together, and letting them communicate directly with each other, trying to figure this out, is probably (and arguably)
+not the best idea. We therefore designed Arkitekt as a [middleman](/docs/design/philosophy/middleman) between the tools and the user: a central [hub](/docs/design#the-hub) that tools talk to, and that lets you design workflows spanning multiple
+apps in a graphical user interface. It then also turns into a workflow scheduler that runs these workflows in [real-time](/docs/design/philosophy/realtime) rather than in batches.
 
 3. _Data is king_
 

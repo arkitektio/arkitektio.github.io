@@ -3,9 +3,12 @@ title: Konstruktor
 description: The desktop admin interface for installing and inspecting the services of your Arkitekt deployment.
 ---
 
-import { ShowWorkflow } from "@/components/arkitekt";
 import { DownloadGrid } from "@/components/docs";
 
+Konstruktor is the installer and admin tool for the Arkitekt platform. It creates a hub (or a plugin
+engine) as an ordinary Docker Compose project, authorizes it against a coordination server, and then
+lets you start, stop, update, back up and inspect it from a dashboard. It comes as a desktop app and
+as a `konstruktor` command line tool that do the same things.
 
 <video
   autoPlay
@@ -18,26 +21,19 @@ import { DownloadGrid } from "@/components/docs";
   <source src="/docs/apps/standalones/konstruktor.webm" />
 </video>
 
-## Installation
+## Download
 
-Konstruktor needs a working and recent installation of Docker to run.
-Please make sure you have Docker installed before you proceed.
+Konstruktor is available for Windows, macOS and Linux. Docker, or a Docker-compatible engine, is its
+only dependency. Pick your platform below, or grab a build from the
+[releases page](https://github.com/arkitektio/konstruktor/releases) on GitHub.
 
-You can download the latest version of Konstruktor from the [releases page](https://github.com/arkitektio/konstruktor/releases) on GitHub or right here by clicking the button below.
+<DownloadGrid />
 
-<DownloadGrid/>
+## Usage
 
-## Usage 
-
-Please check our [Installation Guide](/docs/introduction/installation) for
-instructions on how to install Arkitekt through Konstruktor.
-
-## Design
-
-Konstruktor is designed to be a simple and easy to use tool for managing your Arkitekt deployment, 
-but can also be used to manage other software packages that need a more complex docker-compose setup.
-We are working on making it more user friendly and adding more features to it, especially to make it
-easier to install other open-source software packages like OMERO / Jupyterhub / Nextcloud / etc.
+How to install and run a hub with Konstruktor, in the app or from the terminal, is described step by
+step in [I am starting new](/docs/introduction/installation/starting-new). If something does not
+work, see [Troubleshooting the startup](/docs/troubleshooting/startup).
 
 ## Support
 

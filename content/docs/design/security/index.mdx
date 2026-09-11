@@ -8,27 +8,25 @@ three faces of the same design goal: keeping you in control of your data while
 still letting you move fast. This section pulls that story together.
 
 <Callout type="info" title="We don't want your data">
+
 Arkitekt is a **middleman**, not a data silo. When you run your own instance, the
 data stays on infrastructure *you* control and we never see it. The parts of the
 platform that *do* touch personal data are kept to the bare minimum, and are
 described in full in the [Privacy Policy](/docs/privacy).
+
 </Callout>
 
 ## The trust model in brief
 
-- **Everything is authenticated and authorized.** There is no way to reach the API
-  without a valid identity and the right permissions. See [Security
+- **Everything is authenticated and authorized.** See [Security
   Measures](/docs/design/security/measures).
-- **The organization is the hard boundary.** A single deployment can host many
-  organizations, each fully isolated. Data never silently crosses from one
-  organization to another.
-- **Open by default, *within* your organization.** Science is collaborative, so
-  colleagues in the same organization can build on each other's data by default,
-  with role-based access control to tighten things where you need to.
-- **You and the machine stay distinct.** When an agent acts on your behalf, the
-  audit trail records both facts at once: that a human authorized the work, and
-  that a machine carried it out. This attribution is recorded through
-  [Provenance & Audit Logging](/docs/design/architecture/provenance).
+- **The organization is the hard boundary.** See
+  [Organizations](/docs/design/terminology/organization#the-hard-boundary).
+- **Open by default, *within* your organization**, with role-based access control
+  on top. See [Open by
+  default](/docs/design/terminology/organization#open-by-default-within-your-organization).
+- **You and the machine stay distinct.** How an agent's work is attributed is
+  described in [Provenance & Audit Logging](/docs/design/architecture/provenance).
 
 ## What's in this section
 
@@ -56,15 +54,13 @@ young, and a few things are still works in progress:
 
 <Callout type="warn" title="Arkitekt is early-stage software">
 
-- We currently **discourage multi-user production deployments** while we finish
-  hardening the platform. See the [deployment
-  guide](/docs/design/deployment).
+- We currently **discourage multi-user production deployments**; see [the
+  production readiness of Arkitekt](/docs/design/deployment).
 - Some of the more powerful remote features (online monitoring, remote control)
   are best run behind a **VPN** for now. See [Using a VPN](/docs/design/various/vpn).
-- **Scope-based access control is not yet fully enforced** across the platform, we
-  are rolling it out gradually so as not to break app development.
-- Data you upload to the public **`demo.arkitekt.live`** instance is currently
-  stored **unencrypted**, treat it as public. See the [Privacy
-  Policy](/docs/privacy).
+- **Scope-based access control is not yet fully enforced**; see
+  [Scopes](/docs/design/security/identity#scopes).
+- Data on the public **`demo.arkitekt.live`** instance is stored **unencrypted**,
+  treat it as public; see the [Privacy Policy](/docs/privacy#tier-4-demoarkitektlive).
 
 </Callout>

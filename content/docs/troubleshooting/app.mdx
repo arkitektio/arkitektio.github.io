@@ -6,15 +6,12 @@ description: Troubleshooting connected apps and plugins, covering repositories, 
 So you wnat to connect your favourite app to Arkitekt but it doesn't work? Or you can't install the plugin, and have no idea why it doesn work?
 Don't worry, we are here to help you.
 
-### General Troubleshooting
-
-First, we are sorry to hear that you are having issue. As an open source project in an early developmental stage, we are aware that there are still many bugs and issues to be fixed.
-We are working hard to improve the stability of the platform and to fix bugs as soon as possible. Lets get started with some basic troubleshooting if you encounter any
-issues setting your app up.
+Start with the [general tips](/docs/troubleshooting/general) if you haven't.
 
 ### Plugin
 
-Lets start with the basics. Where did you get stuck? We will guide you through a few checkpoints.
+The install steps themselves (Add repository, Appify, Deploy) are walked through in
+[Installing our first App](/docs/introduction/first-steps/first-tool#installing-our-first-app). Where did you get stuck? We will guide you through a few checkpoints.
 
 - [I cannot add a repository](#plugin-repository)
 - [I cannot appify a plugin or my repository is empty](#plugin-appify)
@@ -23,8 +20,8 @@ Lets start with the basics. Where did you get stuck? We will guide you through a
 #### Plugin Repository
 
 If you cannot add a repository, please make sure that you have entered the correct parameters of the repository. The URL should point to a valid git repository. Importantly
-also make sure that the repository is public. Currently we do not support private repositories. Currently the default branch is set to `main`. If you
-are using a different branch, please make sure to enter the branch name in the `Branch` field (e.g. `develop` or the legacy `master`).
+also make sure that the repository is public. Currently we do not support private repositories. Use the repository's default branch in the `Branch` field:
+`main` for newer repos and `master` for older ones (e.g. `arkitektio-apps/stdlib` uses `main`, `arkitektio-apps/reaktor` and `arkitektio-apps/omero` use `master`).
 
 #### Plugin Appify
 

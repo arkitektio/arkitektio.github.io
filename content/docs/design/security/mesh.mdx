@@ -18,8 +18,8 @@ reach each other from anywhere, without poking holes in your firewall.
 
 ## Control plane vs. data plane
 
-The "coordinator" here is the same **coordinator** role described in [Identity &
-Access](/docs/design/security/identity), the control plane that handles auth and
+The "coordinator" here is the same **coordinator** role described in [The
+Coordinator](/docs/design#the-coordinator), the control plane that handles auth and
 discovery, now doing its discovery job across networks. It is not a separate,
 mysterious box: it is the coordination side of the platform, run as a dedicated
 *coordination server* so that endpoints on different networks can still meet. (The
@@ -39,12 +39,14 @@ The security of the mesh rests on one clean separation:
 <MeshTunnel />
 
 <Callout type="info" title="The coordinator never sees your data">
+
 This is the single most important privacy property of the mesh: the coordinator
 handles **auth and discovery only**, and your **workload traffic flows directly
 peer-to-peer and never passes through the central server**. The mesh is
 *centrally-coordinated*, but it is *not* centralized in the way that matters for
 privacy. The operator of the coordinator cannot see your images, your results, or
 any of the data moving between your nodes.
+
 </Callout>
 
 ## Why this is the secure default
@@ -99,9 +101,12 @@ transport. However you choose to move the bytes between your machines, the platf
 still authenticates every request.
 
 <Callout type="warn" title="The mesh is optional and still young">
+
 The mesh is one of the newer, **optional and experimental** parts of the platform
 and is evolving quickly. It is now the only built-in way to discover a deployment
-across networks (local-network advertising has been removed). For how a hub actually
-joins the mesh, see [How a hub joins](/docs/design/philosophy/topology#joining-the-mesh)
-and the [Mesh step](/docs/introduction/installation/starting-new#mesh) of the installation guide.
+across networks, since [local-network advertising was
+removed](/docs/introduction/installation/starting-new#advertising). For how a hub
+actually joins, see the [Mesh step](/docs/introduction/installation/starting-new#mesh)
+of the installation guide.
+
 </Callout>

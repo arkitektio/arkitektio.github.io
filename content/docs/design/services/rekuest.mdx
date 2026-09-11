@@ -30,7 +30,7 @@ message brokers   </small>
 
 Rekuest is currently being rewritten to support other message brokers, such as [Kafka](https://kafka.apache.org/). This will
 however remain an opt-in feature, and RabbitMQ will remain the default message broker. To learn more about this design decision,
-please refer to the [Why Not?](/docs/design/comparisons/why-not) section.
+please refer to the [Comparisons](/docs/design/comparisons) section.
 
 
 </Callout>
@@ -46,9 +46,10 @@ But luckily we are not alone in this. And we are standing on the shoulders of gi
 to build Rekuest. This allows us to focus on the business logic and the integration with other Arkitekt services, and not have to worry
 about the low-level details of distributed systems.
 
-We tried to achieved this by using a message broker (RabbitMQ) to queue and distribute tasks to the appropriate apps,
+We tried to achieve this by using a message broker (RabbitMQ) to queue and distribute tasks to the appropriate apps,
 and only thinly wrapping it in a websocket-based API. The sole purpose of this wrapping is to establish authentication and authorization
-and to monitor the health of the system and the state of all connected apps.
+and to monitor the health of the system and the state of all connected apps. What this means for throughput and real-time
+behaviour is discussed in [Performance & Real-time](/docs/design/security/performance).
 
 
 <div className="mt-2">

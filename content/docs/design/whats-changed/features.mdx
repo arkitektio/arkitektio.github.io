@@ -14,8 +14,9 @@ roadmap has become this list. Where something is still a work in progress we say
 
 Orkestrator, the desktop control app, was rebuilt for Next. The Paper version boasted a lot of
 functionality but was not very friendly; the new interface streamlines the layout and the flows
-around it. It is a Tauri desktop app now, and connects to any hub through the coordination server
-rather than to one deployment. See [Orkestrator](/docs/apps/standalones/orkestrator).
+around it. It is an Electron desktop app, and connects to any hub through the coordination server
+rather than to one deployment. Why it is a desktop app and not a website is explained on the
+[Orkestrator](/docs/apps/standalones/orkestrator) page.
 
 ### Assign tasks directly
 
@@ -69,8 +70,10 @@ The video shows a very manual way of labelling ROIs and assigning meaning to the
 automated, but it gives an idea of what the graph is for.
 
 <Callout type="info" title="On ontologies">
+
   Ontologies and knowledge graphs are a huge topic and are not coverable here. The knowledge graph
   is still evolving, and we are working on integrating it tightly with views and protocols.
+
 </Callout>
 
 ### Views
@@ -114,7 +117,7 @@ instance when the app connects. This was the biggest breaking change for Paper-e
 - **API design.** The Next APIs follow GraphQL best practices more consistently than the Paper ones
   did. See [GraphQL](/docs/design/various/graphql).
 - **Security.** Paper was secure by design but enforced little. Next enforces more by default; scope
-  enforcement is still being rolled out, see [Identity & Access](/docs/design/security/identity).
+  enforcement is still being rolled out, see [Scopes](/docs/design/security/identity#scopes).
 - **Performance.** Task assignment in Rekuest is being tuned. Ephemeral tasks, which would skip the
   database and go straight to a worker, are planned but do not exist yet.
 

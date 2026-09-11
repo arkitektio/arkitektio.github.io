@@ -14,7 +14,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 </div>
 </div>
 
-How apps fit into the Arkitekt ecoystem is best examplified by the interplay between the Orkestrator _App_ and the Fiji _App_. While Arkitekt only stands as the connection layer it is these two apps that actually manage and do the work. Orkestrator assigns work and Fiji does the actually work. Arkitekt only acts as the Middleman, so that they don't have to interact directly with each other (which would be a lot more complicated than you might think).
+How apps fit into the Arkitekt ecosystem is best exemplified by the interplay between the Orkestrator _App_ and the Fiji _App_: Orkestrator assigns work and Fiji does the actual work, while Arkitekt only acts as the [middleman](/docs/design#the-hub) so that the two never have to interact directly with each other (which would be a lot more complicated than you might think). Apps are the "spokes" of that hub; how they differ from the Services the hub itself is built from is explained in [Apps vs Services](/docs/design/terminology/apps-vs-services).
 
 
 ## The type of Apps
@@ -24,7 +24,7 @@ You already saw that Orkestrator and Fiji are apps, but Arkitekts definition of 
  This means that you can use a website as an app, or your own code, or even your robot or Iot device. 
  What _unifies_ all of these apps is that they all follow some common principles of **authentication** when connecting with the platform.
 This is an important feature, because it not only that you are in control of your data, but Arkitekt can use the provided information of the app to _version_ the app. 
-This versioning ensures that if you want to use the functionality of this app in a workflows or just directly in tasks you can be sure that the app will behave the same way every time.
+This versioning ensures that if you want to use the functionality of this app in a workflows or just directly in tasks you can be sure that the app will behave the same way every time. Note that apps are versioned independently of the Arkitekt server itself, which follows its own release channels; see [How we version Arkitekt](/docs/design/philosophy/version).
 
 This means that the first time a new app decides to connect to Arkitekt, you will be asked to approve the connection 
 and the permissions that the app is asking for (this is done through Oauth2 Standard, the same principle that is used when you press "login with google",
@@ -61,7 +61,7 @@ Also a website can be an an arkitekt app. Indeed this website is an arkitekt app
   </Tab>
   <Tab value="Robot">
     
-Now this is where it gets interesting. Your robot or Iot device can also become an arkitekt app. Most of the time, these machines do not need access to your data, but can provide functionality like taking pictures, or measuring temperature. In this case you can use the [Orkestrator](/docs/intro) to connect to your robot or Iot device, and call the functionality that it provides. This is a very powerful feature, and we will go into more detail about it in the [Actions and Implementations](./action) section.
+Now this is where it gets interesting. Your robot or Iot device can also become an arkitekt app. Most of the time, these machines do not need access to your data, but can provide functionality like taking pictures, or measuring temperature. In this case you can use the [Orkestrator](/docs/introduction/basics) to connect to your robot or Iot device, and call the functionality that it provides. This is a very powerful feature, and we will go into more detail about it in the [Actions and Implementations](./action) section.
   </Tab>
   <Tab value="Code">
 

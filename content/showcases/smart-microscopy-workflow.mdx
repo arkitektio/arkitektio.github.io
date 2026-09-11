@@ -6,6 +6,7 @@ tags: ["Smart microscopy", "Real-time", "No-code"]
 version: paper
 ---
 
+import { ShowcasePrerequisites } from "@/components/docs";
 import { ShowWorkflow } from "@/components/arkitekt";
 import { DisplayWorkflow } from "@/components/arkitekt";
 import { InstallRepoButton } from "@/components/arkitekt";
@@ -44,19 +45,7 @@ is acquired at 20X magnification
 
 ### Prerequisites
 
-<Callout type="info" title="Please read">
-
-
-We **strongly** suggest to go through the [Getting Started](/docs/introduction/first-steps) guide before attempting to run this workflow.
-It will guide you through the installation of the Arkitekt platform and the setup of your first workflow, as well as how to install plugins
-and apps.
-
-</Callout>
-
-This workflow is designed to run on a microscope computer running Windows 10 as well as on a remote analysis computer
-that will power the Arkitekt platform and the image analysis. To enable GPU acceleration for the Stardist
-segmentation, the analysis computer needs to have access to a CUDA 11 enabled GPU (tested on Nvidia GeforceRTX 2080Ti).
-The microscope computer will need to be connected to the same network as the remote computer.
+<ShowcasePrerequisites />
 
 #### Acquisition Computer
 
@@ -87,7 +76,7 @@ In Which the `Acquire Clusters` workflow will be nested in the `Multi Dimensiona
 ### Acquire Clusters Workflow
 
 The `Acquire Clusters` workflow is the workflow that will acquire a 20X Image, segment it, detect cluster and send the coordinates
-to the microscope to acquire all clusters with a 40X objective. To install this workflow connect this website to you Arkitekt instance and click on the Import buttom below:
+to the microscope to acquire all clusters with a 40X objective. To install this workflow [connect this website](/docs/introduction/first-steps/brief-interlude#we-have-an-app-for-that) to your Arkitekt instance and click on the Import button below:
 
 <DisplayWorkflow />
 
@@ -120,10 +109,7 @@ The `Multi Dimensional` workflow is the workflow that will run the above workflo
 
 <div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
   <small>
-    Once connected this pane will also give you an overview over the apps that
-    still need to be installed, nodes in green have been installed, nodes in
-    yellow still lack an implementation. Of course feel free to explore this
-    graph more interactively in your orkestrator interface
+    Once connected, green nodes are installed and yellow ones still lack an implementation.
   </small>
 </div>
 

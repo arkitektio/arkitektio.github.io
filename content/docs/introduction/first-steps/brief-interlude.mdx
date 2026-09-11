@@ -65,35 +65,32 @@ to much interactive help about it.
 Well now that we are connected, we can actually install repositories and workflows directly from this website. So lets do that before we start with the next chapter.
 Because we will need two more `PluginApps` for our first workflow for that.
 
-#### First plugin: Standard Library
+#### First plugin: `stdlib`
 
-Finally you will be able to do some proper image analysis work, this is the Arkitekt Standard Library, which comes with an ever increasing number of actions that you can use
-to analyze your data. They are not as fancy as the ones we have seen so far, but they are very useful. So lets install it.
-
-Look at this button. It will install the Standard Library to your Arkitekt instance. Just click it.
-
-<Guard fallback={<Callout type="warn" title="Not connected yet">Connect this website to your Arkitekt instance (see above) and the install button appears here.</Callout>}>
-
-<InstallRepoButton repo={"std"} user={"arkitektio-apps"} branch={"main"} />
-
-</Guard>
-
-Turned green? Great! You now have the Standard Library Repository installed. We will do that in the next chapter.
-
-#### Second plugin: Reaktor
-
-The second plugin we will install is called Reaktor. This is a weird one, because it is not really a plugin that does anything. It is a plugin that will allow use to run
-(schedule) your workflows directly on the Arkitekt server. You might not understand what that means right now, but you will later. So lets install it.
-
-Same procedure as before, just click the button.
+Finally you will be able to do some proper image analysis work, this is the Arkitekt Standard Library (`stdlib`), which comes with an ever increasing number of actions that you can use
+to analyze your data. They are not as fancy as the ones we have seen so far, but they are very useful. The button below adds the repository to your Arkitekt instance; then
+install it like before (`Appify` the latest version and `Deploy` it, see [Installing our first App](/docs/introduction/first-steps/first-tool#installing-our-first-app)).
 
 <Guard fallback={<Callout type="warn" title="Not connected yet">Connect this website to your Arkitekt instance (see above) and the install button appears here.</Callout>}>
 
-<InstallRepoButton repo={"scheduler"} user={"arkitektio-apps"} branch={"main"} />
+<InstallRepoButton repo={"stdlib"} user={"arkitektio-apps"} branch={"main"} />
 
 </Guard>
 
-Turned green? Great! You now have the Reaktor Repository installed. Next chapter.
+Turned green? Great! You now have the `stdlib` repository installed. We will use it in the next chapter.
+
+#### Second plugin: `reaktor`
+
+The second plugin we will install is called `reaktor`. This is a weird one, because it is not really a plugin that does anything. It is a plugin that will allow us to run
+(schedule) your workflows directly on the Arkitekt server. You might not understand what that means right now, but you will later. Same procedure as before: click the button, then appify and deploy.
+
+<Guard fallback={<Callout type="warn" title="Not connected yet">Connect this website to your Arkitekt instance (see above) and the install button appears here.</Callout>}>
+
+<InstallRepoButton repo={"reaktor"} user={"arkitektio-apps"} branch={"master"} />
+
+</Guard>
+
+Turned green? Great! You now have the `reaktor` repository installed. Next chapter.
 
 <Callout type="info" title="We love this feature">
 

@@ -14,15 +14,12 @@ So let's draw those boundaries clearly. But first, the important part:
 
 Dask, Nextflow and ROS are some of the best engineering the scientific-computing
 community has ever produced. We use them, we learn from them, and Arkitekt is
-better *because* they exist. Nothing on this page is a knock on them. It is a
-map of where each of them shines and where Arkitekt picks up.
+better *because* they exist. Nothing on this page is a knock on them (see
+[what the Vs series is not](/docs/design/comparisons)). It is a map of where each
+of them shines and where Arkitekt picks up, and the right answer is almost always
+to run Arkitekt **with** them, not instead of them.
 
 </Callout>
-
-In the spirit of the rest of the [Vs series](/docs/design/comparisons), this is not about
-Arkitekt being *better* than these tools. It is the opposite: each is superb at
-its job, and the right answer is almost always to run Arkitekt **with** them, not
-instead of them.
 
 So what *is* Arkitekt? It is a **reactive platform** that sits between your data,
 your tools and your team. It is a stateful middleman that turns scattered scripts and
@@ -37,11 +34,9 @@ task-graph computation across many cores and machines. You hand it a big
 computation, it splits the work, schedules it, and hands you the result.
 
 Arkitekt is **not a pure parallelization library**. It never wants to be. We
-are a *reactive platform built on a concurrency model*. The unit of work in
-Arkitekt is not a transient task in a graph you submit and forget; it is a
-long-lived, stateful **app** that stays alive, holds context (a loaded model, an
-open instrument connection, a running viewer) and brokers data and compute
-between other apps and your team.
+are a *reactive platform built on a concurrency model*: the unit of work is not a
+transient task in a graph you submit and forget, but a long-lived, stateful
+**app** (more on that [below](#not-just-stateless-execution-nextflow)).
 
 That is a different problem from "split this computation across a cluster". And
 when you *do* need raw parallel compute, the last thing we want is to reinvent

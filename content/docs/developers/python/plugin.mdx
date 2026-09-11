@@ -53,8 +53,31 @@ These are the main files that make your app. Lets inspect them both.
 ## The .arkitekt folder
 
 The `.arkitekt` folder contains all the configuration files for your app. It will grow some more files once you build and publish your app,
-but for now it should only contain a file called `manifest.yaml`, the [Manifest](/docs/design/terminology/manifest) of your app. Once you delete your
-`.arkitekt` folder, your app will be gone. So make sure you don't do that !
+but for now it mainly contains `manifest.yaml`, the [Manifest](/docs/design/terminology/manifest) of your app: its name, version and entrypoint,
+but also which rights it needs and how it should be built and deployed. Once you delete your `.arkitekt` folder, your app will be gone.
+So make sure you don't do that !
+
+```yaml
+author: jhnnsrs
+entrypoint: app
+identifier: demo
+requirements: []
+scopes:
+  - read
+version: 0.0.1
+```
+
+So far the app only asks for very basic access rights (it can read data from the platform, but not write to it) and declares no
+requirements. Requirements let you declare hardware and software needs for when the app is deployed as a PluginApp; we will
+change both later. The folder also contains a `.gitignore` and a `.dockerignore`, which keep cached secrets (such as access tokens)
+out of your git repository and docker image. Do not delete them.
+
+<Callout type="info" title="I don't see the .arkitekt folder">
+
+The `.` prefix hides the folder in most file explorers, just like `.git`. Most IDEs show hidden files by default, and you
+can always use the terminal to navigate into it.
+
+</Callout>
 
 ## The app.py file
 
@@ -92,7 +115,17 @@ This import is what makes this Python code an Arkitekt app. `register` is a deco
 You can have as many Actions as you want in your app, and once you run your app, they will become available on the Arkitekt Server and 
 can be used by others.
 
-Lets do just that, lets run our app. 
+<Callout type="info" title="A few things to note">
+
+- `app.py` should **not** contain code that runs when the file is imported, only functions to register. Anything at module
+  level runs every time a user runs your app (or every time you save the file in dev mode). Guard one-off code with
+  `if __name__ == "__main__":`.
+- `app.py` should **not** create an app instance itself (no `easy("app", "version")`); the CLI creates it when it runs your app.
+
+</Callout>
+
+Lets do just that, lets run our app. Once it runs, head over to [Adapting our real App](/docs/developers/python/more) for a first
+real Action working on an image.
 
 ## Interlude
 

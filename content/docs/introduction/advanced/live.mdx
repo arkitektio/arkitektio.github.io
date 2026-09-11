@@ -12,7 +12,8 @@ most of the tools we use are designed around this workflow. However, this is not
 cases, you might (need to) consider doing analysis in a live mode, where your results are generated as your images are acquired, in
 a continous stream-like fashion.
 
-In this tutorial we will show you how to build a [Streaming Analysis Workflow](/docs/design/real-time) in Arkitekt, and how to run it on live data.
+In this tutorial we will show you how to build a [Streaming Analysis Workflow](/docs/design/philosophy/realtime) in Arkitekt, and how to run it on live data.
+For a full example on a real microscope, see the [Streaming Analysis showcase](/showcase/streaming-workflow).
 This tutorial will cover:
 
 - Why streaming analysis?
@@ -22,28 +23,26 @@ This tutorial will cover:
 
 ### Why Streaming Analysis?
 
-There are manifold reasons why you might want to consider doing live analysis. Here are some of the most common ones:
-
-- **Real-Time Monitoring**: For live cell imaging where immediate feedback is necessary, such as adjusting experimental conditions based on cell behavior, streaming analysis is crucial.
-- **High-Content Screening**: In high-throughput assays, streaming analysis can quickly identify hits or interesting events, which may be critical in pharmaceutical research.
-- **Adaptive Experiments**: Streaming analysis allows researchers to modify experiments on the fly in response to the data being collected, which can be advantageous for exploratory research or complex biological systems.
+Live cell imaging that needs immediate feedback, high-content screens that should flag hits as they appear, and adaptive experiments that change course
+based on the data being collected all benefit from results arriving while the acquisition is still running. We lay out the reasoning in
+[Real-time](/docs/design/philosophy/realtime).
 
 ### Streaming Analysis in Arkitekt
 
-Arkitekt was conceptualized and specifically build around the idea of [Streaming Analysis](/docs/design/real-time). We wanted to make it easy to build analysis workflows that can
+Arkitekt was conceptualized and specifically build around the idea of [Streaming Analysis](/docs/design/philosophy/realtime). We wanted to make it easy to build analysis workflows that can
 be adapted from batch to streaming analysis. To do this, we needed to make sure that the analysis workflows are compatible and manageable in both modes, and that the platform can handle the multifold challenges of streaming analysis.
 
-Inherently when you build a workflow in Arkitekt you _always_ build a streaming analysis workflow. Just a very simple one, where the real-time functionality does not matter. In a basic workflow
-that just pipes images from one node to the next, the data will still stream through the workflow and the results will be generated as the images are processed.
-However Workflows can be designed to take advantage of the streaming nature of the data, and to do this we need to understand how Arkitekt handles streaming data.
+Every Arkitekt [workflow](/docs/design/terminology/workflow#data-flows-as-a-stream) is a streaming workflow: data flows node to node as it
+arrives, even in a basic pipeline where the real-time aspect does not matter. To take real advantage of that, we need to understand how
+Arkitekt handles streaming data.
 
 ### Stream Actions
 
-As discussed in the first steps tutorial, Arkitekt is build around the concept of actions, that define a procedure that can happen on a specific item, and are defined by their input and outputs.
 So far we got to know `Functional Actions`, that get their name from programming function that take item(s) and return item(s) _once_. There is however another type of action, that is called a `Stream Action` or `Generator Action`,
-and which is an action that can take an item and returns (yields) item(s) _multiple times_ and importantly **over time**
+and which is an action that can take an item and returns (yields) item(s) _multiple times_ and importantly **over time** (see
+[Action can establish Streams](/docs/design/terminology/action#action-can-establish-streams)).
 
-![Functional Actions vs Stream Actions](/docs/introduction/advanced/node-stream.png)
+![Functional Actions vs Stream Actions](/docs/design/terminology/node-stream.png)
 
 <div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
   <small>

@@ -117,14 +117,9 @@ in the next few steps.
   <source src="/docs/introduction/first_steps/roi_mark.webm" />
 </video>
 
-A few words about the `Data Graph` in Arkitekt:
-
-1. The `Data Graph` is a graph that describes the relationship between different data elements within Arkitekt and their metadata. As Arkitekt is designed as a modular system
-   you are currently exploring the `Data Graph` of the `Mikro` Service. Mikro is the service that stores our microscopy data, and metadata centrally in a database and provides
-   a unified interface to access it. You could also explore the `Data Graph` of the `Fluss` Service. This would show you how your workflows relate to each other.
-
-2. The `Data Graph` lives from interlinking data points. Here we created already a few points of interest. We have our original file, our converted file and our ROI.
-   Currently they are linked in the following way
+A few words about the `Data Graph` in Arkitekt: it is the graph of relationships between data elements and their metadata, here the one kept by the `Mikro` service
+that stores our microscopy data. We explain it properly, and how it differs from the provenance graph, in [Your first Workflow Run](/docs/introduction/first-steps/first-run).
+For now it lives from interlinking data points, and we have already created a few: our original file, our converted image and our ROI, linked in the following way
 
 ```mermaid
 flowchart TB

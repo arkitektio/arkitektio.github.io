@@ -5,18 +5,21 @@ description: How Arkitekt records who changed what, under whose authority, and d
 
 import { GithubRepo, ProvenanceFlow } from "@/components/docs";
 
-Arkitekt keeps a sharp line between **you** and **the machine that run the analysis**, and ensures that every change to your data 
-is honestly attributed and accounted for.
+Arkitekt keeps a sharp line between **you** and **the machine that runs the analysis**, and ensures that every change to your data 
+is honestly attributed and accounted for. Why we consider this non-negotiable is argued in
+[You and the Machine](/docs/design/security/measures#you-and-the-machine); this page is about how it is done.
 
 For this we ensure **provenance-aware audit logging**. Every create, update, and delete on a tracked
-record inside one of Arktiekt services is captured as a history update and each updates is attributed to *who* made the change,
-*which app* they used, and, crucially, the verified **task** it happened under. This lets anyone ask
+record inside one of Arkitekt's services is captured as a history update and each update is attributed to *who* made the change,
+*which app* they used, the [organization](/docs/design/terminology/organization) it happened in, and, crucially, the verified **task** it happened under. This lets anyone ask
 
 > *"Which automated run touched this record, on whose authority, and what exactly did it change? And by the way what else did it touch?"*
 
 <Callout type="info" title="Where this lives">
-The task provenance layer is  cryptopgraphically signed by the task-server and verified by the platform's identity layer. While this is not
+
+The task provenance layer is cryptographically signed by the task-server and verified by the platform's identity layer. While this is not
 bulletproof, it is a strong guarantee that the audit trail is not forged or tampered with. 
+
 </Callout>
 
 ## What gets recorded
@@ -54,31 +57,9 @@ function does.
 
 ## Tech details, for who wants to know
 
-The Provenance layer for each service is built on three cooperating components, each with a single responsibility:
-
-```
-        Rekuest provenance token (signed, EdDSA)
-                       │
-        ┌──────────────▼───────────────┐
- kante  │  GraphQL transport + context  │   ← carries the request + its context
-        └──────────────┬───────────────┘
-                       │
-        ┌──────────────▼───────────────┐
- authn. │  authentikate                 │   ← verifies the token, resolves the
-        │  → user, client, organization │     acting user / client / organization and the task it ran under
-        └──────────────┬───────────────┘
-                       │
-        ┌──────────────▼───────────────┐
- koher. │  koherent                     │   ← stamps every change with user, client,
-        │  → attributed history rows    │     and the verified task it ran under (based on django-simple-history)
-        └───────────────────────────────┘
-```
-
-- **[kante](https://github.com/jhnnsrs/kante)** provides the GraphQL transport and the request
-  context the upper layers build on.
-- **[authentikate](https://github.com/jhnnsrs/authentikate)** owns identity. It verifies the
-  signed provenance token and resolves the acting *user*, *client*, and *organization*. There is
-  no bypass for provenance. The signature is always checked.
-- **[koherent](https://github.com/jhnnsrs/koherent)** consumes that verified context and turns
-  each data change into a durable, attributed history row, building a `Task` from the token's
-  claims.
+The provenance layer of each service is built from three cooperating libraries, each with a single
+responsibility: **kante** carries the request and its context, **authentikate** verifies the signed
+provenance token and resolves the acting user, client and organization, and **koherent** turns each
+data change into an attributed history row. How the three stack, and how to wire them into a service,
+is described in [Backend Libraries](/docs/developers/backend); the hands-on integration guide for the
+audit log itself is [Koherent](/docs/developers/backend/koherent).

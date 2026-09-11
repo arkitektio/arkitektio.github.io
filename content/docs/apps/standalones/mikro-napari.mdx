@@ -58,6 +58,8 @@ use the unbundled version of napari (the "pip" install version.) This recommenda
 
 ### Usage
 
+Walk through this in [Your first app](/docs/introduction/first-steps/first-app), where we open a converted image in Napari.
+
 Mikro-Napari is designed to not interfere with your exisiting Napari installation, until you explicitly connect it to
 your Arkitekt server. This happens through interacticting through the MagicBar (see below).
 
@@ -77,14 +79,13 @@ A few words about this connection process:
 1. **The Magic Bar**:
    What you see in the bottom left corner is the `Magic Bar`, a widget provided by the mikro-napari plugin, and the core UI element that allows apps to connect to Arkitekt.
    While developers can choose to implement their own UI elements to connect to Arkitekt, the MagicBar is a common UI element that is provided by the arkitekt package, and
-   you will encounter it in almost all apps that currently conncan connectect to Arkitekt.
+   you will encounter it in almost all apps that currently can connect to Arkitekt.
 2. **The Connection screen**:
    On initial setup you will see a screen that allows you to connect to your Arkitekt server. If you run Arkitekt locally you will see your instance automatically detected.
    For remote instances, endpoints you have connected through the [mesh](/docs/design/security/mesh) will be detected automatically and listed in the dropdown menu. If
    your instance is not on the mesh, you can also enter the URL manually.
 3. **Login in the Browser**:
-   To connect to your Arkitekt instance, you need to login. This is done in the browser, and you will be redirected to the login page of your Arkitekt instance. Please allow
-   requests to the firewall.
+   A browser opens and you approve the device login, exactly as you did for Orkestrator, see [Almost there](/docs/introduction/first-steps/interface#almost-there).
 
 Once you are connected, you can start using Arkitekt. The MagicBar will show you the current status of your connection,
 and of course you can always disconnect from your Arkitekt instance, and use Napari as you are used to.

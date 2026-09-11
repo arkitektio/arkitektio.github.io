@@ -34,7 +34,7 @@ my_deployment = deployment("my_deployment", channel="stable")
 The first argument is the name of your deployment. It will be used to create a folder in a ".dokker" folder in your
 working directory. The second argument is the channel you want to use. The channel determines which version of the
 Arkitekt Server will be used. The default channel is "stable", but you can also use "latest" or "next" to use other 
-versions.
+versions; how the channels relate is described in [How we version Arkitekt](/docs/design/philosophy/version).
 
 The deployment function will return a Deployment object. This object has a number of methods that allow you to interact
 with the deployment. The most important ones are:
@@ -63,9 +63,8 @@ with deployment("my_deployment", channel="stable") as d:
 ![A local development deployment](/docs/design/deployment/on_premise/local.png)
 
 <div className="text-gray-400 mb-2 mt-4">
-<small> An example of how you might version an Arkitekt Deployment depending on your needs. Generally you will want most of your apps to connect to stable
-services. The only "conserved" platform api for the platform is the fakts api, which will not be able to differ from app to app that connects to your deployment.
-It is the defining service for each deployment.  </small>
+<small> A local development deployment: the `deployment` function brings up a throwaway Arkitekt Server on your machine, next to the
+App you are developing, so the App can connect to it and be tested against real services. </small>
 </div>
 </div>
 

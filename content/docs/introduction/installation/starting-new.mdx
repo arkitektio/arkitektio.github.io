@@ -67,10 +67,12 @@ platform runs noticeably faster on Linux than on Windows or macOS. GPUs are used
 do the heavy lifting, not by the hub, so the hub machine does not need one.
 
 <Callout type="info" title="Where to install">
+
   The Arkitekt platform was designed as a multi-user platform that gets installed *once* on a **powerful** server and then
   can be accessed by multiple users and apps, on standard hardware. However it is also possible to install the platform on your own computer and
-  use it as a `personal` platform. As long as not all safety features are implemented and audited, we recommend to use the platform
-  in the latter way. We'll keep you posted, when we think the platform is safe ready for multi-user installations!
+  use it as a `personal` platform. Until the platform is production ready we recommend the latter; see
+  [On the production readiness of Arkitekt](/docs/design/deployment).
+
 </Callout>
 
 ## Graphical installation [#graphical-installer-recommended]
@@ -273,10 +275,12 @@ features. Two things update separately:
   the latest release, or download the new desktop installer.
 
 <Callout type="info" title="About channels">
+
   Konstruktor no longer has a channel picker. A hub's channel is simply the set of image tags in its
   `hub_config.yaml`; a stock hub ships on the `next` tag (with Kraph on `dev`). To move a service to
   another channel, change its tag there and pull. How the channels relate is described in
   [How we version Arkitekt](/docs/design/philosophy/version).
+
 </Callout>
 
 ## Mesh [#mesh]
@@ -298,11 +302,13 @@ told where to find the hub. What the mesh does and why it is the secure default 
 ## Local-network advertising (removed) [#advertising]
 
 <Callout type="warn" title="This feature was removed">
+
   Earlier versions of Arkitekt could **advertise** the platform on your local network with a UDP
   broadcast so that apps could discover it without knowing its IP address. Local networks turned out
   to be too much of a mess (firewalls, changing addresses, blocked broadcasts, VPNs) for that to be
   reliable, and it only ever worked within a single LAN. Apps now discover a hub by the addresses it
   advertises, and across networks through the [mesh](/docs/design/philosophy/topology#arkitekt-mesh).
+
 </Callout>
 
 ## Other installation strategies [#other-installation-strategies]

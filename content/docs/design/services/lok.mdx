@@ -9,9 +9,8 @@ import { GithubRepo } from "@/components/docs";
 
 ## Design
 
-Lok employs patterns for distributed authentication and authorization, through the use of JWT tokens. These tokens
-represent cryptographically signed claims about the user and the application issued by the Lok server. They can be
-verified by any service, and do not require a central session store.
+Lok employs patterns for distributed authentication and authorization, through the use of JWT tokens: cryptographically
+signed claims that any service can verify on its own, as described in [Identity & Access](/docs/design/security/identity).
 
 <div className="mt-2 p-6 w-full">
 

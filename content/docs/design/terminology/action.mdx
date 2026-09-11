@@ -6,7 +6,7 @@ description: Actions are a core conceptual element of Arkitekt that represent a 
 ## What is an action?
 
 Actions are a core conceptual element of the arkitekt platform, that represent the
-functionality that Arkitekt can do for you. As such you can think of an action as a provider of a bioimage task.
+functionality that Arkitekt can do for you. As such you can think of an action as a provider of a bioimage task; running one is what we call a [Task](/docs/design/terminology/task).
 
 E.g. an action can be a functionality provided by an app that maximum projects an image, or applies a gaussian filter
 to an image, but also a functionality that will ask you the user to select a file, or label an image. An action can
@@ -16,7 +16,7 @@ therefore be anything that you can envision as a task.
 
 Actions in Arkitekt are defined by their input and output. This means that an action can be a simple as an action that
 takes an image as an input and outputs an image, or more complex as an action that two images and some information
-about the images as an input and outputs a table of results.
+about the images as an input and outputs a table of results. Each of these typed inputs and outputs is a [Port](/docs/design/terminology/port).
 
 ## What is an action not?
 
@@ -44,14 +44,15 @@ Also this abstraction, comes with some additional benefits for the application d
 abstraction to automatically test their app against the action specification. More about this in the developer
 sections. As apps implementations are the primary way to interact with the platform, this means that even though part
 of their code can change each version, but users can still interface with the app in the same way, until the developer
-decides to change the input and output of the action.
+decides to change the input and output of the action. How apps and the platform are versioned is described in
+[How we version Arkitekt](/docs/design/philosophy/version).
 
 </Callout>
 
 ## Action can establish Streams
 
 Another important feature to understand about Arkitekt actions is how they process data. This section will only
-make sense if you have read the Workflow section, but it is important to understand how actions can establish
+make sense if you have read the [Workflow](/docs/design/terminology/workflow) section, but it is important to understand how actions can establish
 streams of data.
 
 ## Programming Analogy
@@ -69,4 +70,4 @@ analogy in Arkitekt.
 </div>
 </div>
 
-Actions are best explained in interplay with explaining it with an Implementation
+Actions are best explained in interplay with their concrete counterpart, the [Implementation](/docs/design/terminology/implementation).

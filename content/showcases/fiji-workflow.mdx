@@ -11,11 +11,9 @@ import { ShowWorkflow } from "@/components/arkitekt";
 ## The why
 
 But first, why would you want to automate work within a single app? And why is this so substanially different from automating work across apps?
-As explain the documentation about workflows [here](/docs/design/terminology/workflow), workflows are graphically constructed pipeline, that
-span multiple nodes where each node represents a functionality provided by an app, and that process your data (the edges) as it flows through the pipeline.
-In the standard setting when you want to run this workflow then, you would assign it to an app that becomes the 'scheduler' for the workflow, e.g the
-entity that will take care of taking calling arkitekt and its connected app according to your workflow blueprint. During the workflow run the data that gets altered
-and send from app to app gets stored centrally on the arkitekt server, so that apps can easily interchange and share data.
+As explained in [Workflow](/docs/design/terminology/workflow), a workflow is a graph of nodes, each provided by an app, that processes
+your data as it flows along the edges. Normally you assign it to an app that becomes its scheduler, and every intermediate result is
+stored centrally on the Arkitekt server so apps can share data.
 
 We believe, tjis parardigm works great when automating work across apps, as keeping track of your intermediate results , might not only allow you to inspect
 potential mistakes in your analysis, but it allows the arkitekt platform to establish means of data provenance, where you can track the origin of your data, and
@@ -26,7 +24,8 @@ keep your data local to your app, to benefit from the performance gains that thi
 storage of your data might be considered unnecessary overhead and in cases of real-time processing, might constitued a deal-breaking bottleneck.
 
 For these scenarious Arktitekt offers the possibility to run workflow tasks locally, where the data may be kept local in memory in your app, and where the
-scheduling of the workflow tasks is done locally within your app. This is what we will explore in this showcase.
+scheduling of the workflow tasks is done locally within your app. This is what we will explore in this showcase. Videos of creating and running such a
+workflow are in the [Local Workflows](/docs/introduction/advanced/local-workflows) tutorial.
 
 ## The how
 

@@ -5,19 +5,7 @@ description: How Arkitekt acts as a middleman between users, developers, and the
 
 ## How we see the landscape of bioimage analysis
 
-Bioimage analysis has been around for a long time, and has been a very active field of research for the past 20 years. There are many tools available for bioimage analysis, and many of them are very good at what they do. However, there are a few problems that we see with the current landscape of bioimage analysis tools.
-
-##### The tools are often very good at what they do, but not very good at doing anything else
-
-Many of the tools available for bioimage analysis are very good at what they do, but they are often not very good at doing anything else. This means that if you want to use a tool for a specific task, you have to use that tool for that task, and you can't use it for anything else. This is a problem because it means that you have to learn a new tool for every task you want to do, and you can't use the tools you already know and love for other tasks.
-
-##### Our tools are stuck in the past or stuck in the future
-
-A lot of the bioimage analysis tools have been written in the last decades and even though they have seen a lot of love and dedication by the developers and the community, the age of the tools is starting to show, which has in turn prompted a new era of bioimage apps, that are designed from the core up to be adapt to the new challenges of bioimage analysis (3D, Big Data, etc.). However, these new tools are often not backwards compatible with the old tools, or are even adapted to completely different ecosystem like the cloud.
-
-##### Meta data is being lost in translation
-
-While traversing a modern bioimage analysis pipeline, the data is often being transformed from one format to another, and the meta data is lost in translation. Often users after the experiment have to then to go back to the original data to find the meta data they need to make sense of the data
+Bioimage analysis has been around for a long time, and has been a very active field of research for the past 20 years. There are many tools available for bioimage analysis, and many of them are very good at what they do. But the landscape is fragmented: tools excel at one job and are not very good at doing anything else, they are either stuck in the past or built for an entirely different ecosystem like the cloud, and metadata is lost in translation as data moves from one of them to the next. We lay these complaints out in more detail in [What drives us](/docs/design/philosophy); this page is about the answer we settled on.
 
 #### What we would like to do with Arkitekt for users
 
@@ -35,3 +23,5 @@ Arkitekt therefore emerged as a platform that acts as a middleman between the us
 ![img](/img/middleman.svg)
 
 Arkitekt itself provides only a sound backbone, trying to offload computation to these apps and the hardware they run on. This enables arkitekt to connect multiple apps, written in different programming languages and running on different hardware, to interact and share data.
+
+In the language of the rest of these docs, this middleman is the **hub**: the one center that every app connects to and through. What the hub is, what it stores and what it deliberately leaves to apps and to the coordinator is described in [The Hub](/docs/design#the-hub).

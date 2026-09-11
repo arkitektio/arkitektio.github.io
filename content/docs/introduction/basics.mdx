@@ -5,13 +5,13 @@ description: An introduction to Arkitekt as an installable hub, a central middle
 
 ## Basics
 
-Arkitekt is software platform for bioimage analysis acting as a [middleman](/docs/design/philosophy) that connects data with analysis and humans.  To run them in real-time workflows but also to store and share your data. No more copying and moving data around, no more running analysis tools in isolation. Arkitekt wants to be the central hub that connects your data and your image analysis tools.
+Arkitekt is a software platform for bioimage analysis that acts as a [middleman](/docs/design/philosophy/middleman) between your data, your analysis tools and the people using them. Tools connect to Arkitekt rather than to each other, and data flows through it instead of being copied around. Arkitekt wants to be the central hub that connects your data and your image analysis tools.
 
 
 As such, Arkitekt comes with an installable **Hub** that runs in the background on your computer and provides
-a programming interface for apps to hook into. This Hub  will store your data, and provide a central point of communication between your image analysis tools. It is important to note that this Server besides storing your data and routing requests, does not do any image analysis itself. This is the purpose of **Apps**.
+a programming interface for apps to hook into. This Hub stores your data and routes requests between your image analysis tools, but does not do any image analysis itself. This is the purpose of **Apps**. What exactly the hub is (and is not) is spelled out in [The Hub](/docs/design#the-hub).
 
-You can use your exisiting and familiar bioimage apps like [Fiji](/docs/apps/standalones/mikroj),or [Napari](/docs/apps/standalones/mikro-napari) to connect to the Arkitekt Hub and get the data you need to analyze. However hopefully most of the time you will be using the Arkitekt Hub through a its [own graphical interface](/docs/apps/standalones/orkestrator) to explore your data and then only offload the analysis to your favorite image analysis tool. 
+You can use your exisiting and familiar bioimage apps like [Fiji](/docs/apps/standalones/imagej-plugin),or [Napari](/docs/apps/standalones/mikro-napari) to connect to the Arkitekt Hub and get the data you need to analyze. However hopefully most of the time you will be using the Arkitekt Hub through a its [own graphical interface](/docs/apps/standalones/orkestrator) to explore your data and then only offload the analysis to your favorite image analysis tool. 
 
 
 

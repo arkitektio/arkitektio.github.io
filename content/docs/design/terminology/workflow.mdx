@@ -1,0 +1,40 @@
+---
+title: Workflow
+description: What a workflow is in Arkitekt, a graph of actions wired together that processes data as a stream, and how it is designed, shared and run.
+---
+
+A **Workflow** is a graph of nodes wired together, where the output of one node becomes the input of the next.
+Each node runs an [Action](/docs/design/terminology/action), provided by some [App](/docs/design/terminology/app),
+and the edges carry your data, typed by the [Ports](/docs/design/terminology/port) they connect.
+Workflows let you compose individual [Tasks](/docs/design/terminology/task) into a larger, reusable pipeline.
+
+## Workflows are just nodes
+
+Every workflow has exactly one `Input` and one `Output` node. Whatever you connect to `Input` becomes a parameter
+of the workflow, whatever you connect to `Output` becomes its result. Because of this, a workflow is itself a node:
+you can use workflows inside workflows, and run a workflow on your data exactly like any other action.
+
+## Design is separate from execution
+
+A workflow is a blueprint. It is stored as JSON, can be exported, imported (also from this website) and shared, and it
+does not depend on the apps that happen to provide its nodes. If an app for a node is not installed, the node shows up
+in yellow in the designer and the workflow is not runnable until some app implements it. This is what makes workflows
+a reproducible and portable way to share an analysis: the same blueprint can run on completely different apps.
+
+## Data flows as a stream
+
+Workflows process data as a [stream](/docs/design/philosophy/realtime), not as a batch. Each node processes an item
+as soon as it arrives and passes the result on, without waiting for the rest. In a simple pipeline this just makes
+things fast; combined with [stream actions](/docs/design/terminology/action#action-can-establish-streams) it lets a
+workflow process data that is still being generated, for example images straight from a running acquisition.
+
+## Who runs a workflow
+
+When you run a workflow you assign it to an app that becomes its **scheduler**: the entity that calls Arkitekt and the
+connected apps according to the blueprint. Intermediate results are stored centrally, so apps can hand data to each
+other and the whole run is tracked for [provenance](/docs/design/architecture/provenance). Where that round trip is
+overhead, for example inside one app in real time, an app can also schedule the workflow itself and keep intermediate
+data in memory; see [Local workflows](/docs/introduction/advanced/local-workflows).
+
+Workflows are stored and run by the [Fluss](/docs/design/services/fluss) service. To build your first one, follow
+[Your first workflow](/docs/introduction/first-steps/first-workflow), and see them in action in the [Showcases](/showcase).

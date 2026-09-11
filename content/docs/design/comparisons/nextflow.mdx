@@ -9,7 +9,8 @@ Let's say it up front: we love Nextflow. It is one of the finest workflow engine
 ever written for science, and Arkitekt is better for having studied it. Nextflow
 and Arkitekt share a lot of the same DNA. They both offer streams,
 reproducibility, and running tasks across heterogeneous hardware. That shared
-ground is exactly why the *differences* are worth understanding. They are not better-or-worse differences; they are
+ground is exactly why the *differences* are worth understanding. As with the rest of the
+[Vs series](/docs/design/comparisons), these are not better-or-worse differences; they are
 different design centres, and each tool wins in its own niche.
 
 ### Conceptual differences
@@ -29,7 +30,7 @@ cross every time your logic outgrows what the DSL expresses comfortably.
 
 Arkitekt takes the opposite bet: **use programming and Python primitives you
 already know**. An action is just a decorated Python function. Your type hints
-become its input and output ports, and your docstring becomes its description:
+become its input and output [ports](/docs/design/terminology/port), and your docstring becomes its description:
 
 ```python
 from arkitekt_next import register

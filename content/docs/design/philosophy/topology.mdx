@@ -3,7 +3,7 @@ title: Where Arkitekt runs
 description: "Why a platform of apps still needs a central hub, why apps and hub have to meet, the three ways to arrange that meeting, and how the mesh reaches your platform from anywhere."
 ---
 
-import { DeploymentStrategies, MeshTunnel } from "@/components/docs";
+import { DeploymentStrategies } from "@/components/docs";
 
 Arkitekt is a **server-client platform**. The heavy lifting is done by **apps**: the actual
 processing, the training, and the analysis. And those apps can run *anywhere*: on a GPU box under your
@@ -59,11 +59,13 @@ genuine tradeoff rather than just a difficulty dial:
   reproducible demos, or a server that resets itself on a schedule.
 
 <Callout type="info" title="Two kinds of 'server'">
+
   It is worth separating two things that both get called a "server". The **central server** is the
-  Arkitekt platform itself. It holds your data and runs the services. The **coordination server** is the
-  *coordinator*: it only handles auth and discovery so that apps and servers can meet, and it never
-  touches your workload data. The three strategies above are really just different answers to *who runs
-  the central server* and *who runs the coordination server*.
+  Arkitekt platform itself, the [hub](/docs/design#the-hub) that holds your data and runs the services.
+  The **coordination server** is the *coordinator*: it only handles auth and discovery so that apps and
+  servers can meet, and it never touches your workload data. The three strategies above are really just
+  different answers to *who runs the central server* and *who runs the coordination server*.
+
 </Callout>
 
 <DeploymentStrategies />
@@ -98,59 +100,25 @@ node sitting behind a different NAT. The **mesh** is the answer to that problem:
 it, from anywhere, without poking holes in your firewall or memorizing IP addresses.
 
 The mesh is best understood as a **personal/private mesh** in the spirit of Tailscale, rather than as a federation of independent servers.
-A small central **coordinator** keeps track of who you are and which platforms and apps belong to you, and helps two endpoints find each other and
-establish a connection. Crucially, that is *all* it does. Once the introduction is made, the actual workload traffic flows **directly
-peer-to-peer** between the endpoints. That traffic is your images, your tables, your task arguments and results. It does not pass through the coordinator.
-
-In the language we use elsewhere in these docs, the mesh separates the **control plane** from the **data plane**:
-
-* The **control plane** is the coordinator. It handles authentication, discovery, and the signaling needed to set up a connection through NAT.
-  It is the part that needs to be reachable and the part that knows *that* two endpoints want to talk.
-* The **data plane** is the direct connection between your endpoints. This is where the real data moves, and it is established peer-to-peer
-  so that large transfers stay fast and never round-trip through a central bottleneck.
-
-Under the hood the data plane is an encrypted **WireGuard** tunnel, and the coordinator is built on
-[**Ionscale**](https://github.com/jsiebens/ionscale) (a self-hostable Tailscale control plane). This part of the platform is still
-**optional and experimental**. The diagram below shows how an outside app reaches a platform that lives behind NAT:
-
-<MeshTunnel />
-
-<Callout type="info" title="The coordinator never sees your data">
-  This is the single most important thing to understand about the mesh: the coordinator handles **auth and discovery only**, and your **workload
-  traffic flows directly peer-to-peer and never passes through the central server**. The mesh is *centrally-coordinated*, but it is *not*
-  centralized in the sense that matters for privacy. The operator of the coordinator cannot see your images, your results, or any of the data
-  moving between your nodes.
-</Callout>
-
-The same mechanics are described from the security angle, including why the mesh is the secure
-default and how to replace it with your own connectivity, in [The Mesh](/docs/design/security/mesh).
+A small central **coordinator** handles authentication and discovery only, and once two endpoints have been introduced, your workload traffic
+(your images, your tables, your task arguments and results) flows **directly peer-to-peer** between them and never passes through the coordinator.
+How that works under the hood (the split between control plane and data plane, the encrypted tunnel, the relay fallback when no direct connection
+can be made) and why it is the secure default are explained in [The Mesh](/docs/design/security/mesh). This part of the platform is still
+**optional and experimental**.
 
 ### How a hub joins [#joining-the-mesh]
 
-Joining is a choice you make when you create a hub with [Konstruktor](/docs/introduction/installation/starting-new#mesh).
-Its **Mesh** step offers three options:
-
-* **No mesh.** The hub stays on the addresses you picked and is reachable only where those addresses are.
-* **Join the organization's mesh.** Konstruktor asks the coordination server for a mesh key while it
-  authorizes the hub, and runs a small mesh sidecar next to the hub's gateway.
-* **Use a key I already have.** For a coordinator you run yourself: paste a pre-authorized key and
-  the control server URL.
-
-Joining is not the same as being *advertised*. Once the hub is up and has its mesh address, you add
-that address to the hub's advertised addresses on the dashboard and authorize the hub again, so that
-apps coming in over the mesh are told where to find it. Apps such as Orkestrator join the same mesh
-through the same coordinator, and from then on hub and apps can reach one another regardless of
-which network each happens to be sitting on.
-
-### When a direct connection can't be made [#mesh-relay-fallback]
-
-In the great majority of cases the two endpoints will manage to establish a direct peer-to-peer connection, even across NAT, by punching through
-with the coordinator's help. Occasionally a particularly restrictive network will refuse to cooperate and a direct connection simply cannot be
-formed. When that happens the mesh can fall back to **relaying** the traffic so that the connection still works. This costs some throughput,
-since the data now takes a longer path. This fallback is the exception, not the rule, and the mesh always *prefers* a direct connection first.
+Joining is a choice you make when you create a hub with Konstruktor: stay off the mesh, join the
+organization's mesh through the community coordination server, or bring a key from a coordinator you
+run yourself. Joining is not the same as being *advertised*: once the hub has its mesh address, you add
+it to the hub's advertised addresses and authorize the hub again, so that apps coming in over the mesh
+are told where to find it. The wizard options and the matching CLI flags are documented in the
+[Mesh step](/docs/introduction/installation/starting-new#mesh) of the installation guide.
 
 <Callout type="warn" title="The mesh is young">
+
   The mesh is one of the newer parts of the platform and is evolving quickly. The options described above may shift between
   releases, and as with the rest of the platform we recommend staying on a recent version to get fixes. If you run into trouble joining or reaching
   endpoints through the mesh, please consult the [Troubleshooting section](/docs/troubleshooting/startup) or open an issue.
+
 </Callout>

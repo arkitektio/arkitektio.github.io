@@ -49,11 +49,11 @@ export const redirects = {
 
   // design
   '/docs/design/various/lazy_loading': '/docs/design/various/lazy-loading',
-  '/docs/design/deployment/on_premise': '/docs/design/deployment/on-premise',
-  '/docs/design/deployment/on_premise/cli': '/docs/design/deployment/cli',
+  '/docs/design/deployment/on_premise': '/docs/introduction/installation/starting-new#other-installation-strategies',
+  '/docs/design/deployment/on_premise/cli': '/docs/introduction/installation/starting-new#cli',
   '/docs/design/deployment/on_premise/testing': '/docs/design/deployment/testing',
   '/docs/design/deployment/on_premise/Konstruktor': '/docs/apps/standalones/konstruktor',
-  '/docs/design/api': '/docs/design/philosophy/api',
+  '/docs/design/api': '/docs/design/various/graphql',
   '/docs/design/middleman': '/docs/design/philosophy/middleman',
   '/docs/design/version': '/docs/design/philosophy/version',
   '/docs/design/real-time': '/docs/design/philosophy/realtime',
@@ -74,12 +74,11 @@ export const redirects = {
   '/docs/design/terminology/assignation': '/docs/design/terminology/task',
   '/docs/design/terminology/provision': '/docs/design/terminology',
   '/docs/design/terminology/reservation': '/docs/design/terminology',
-  '/docs/design/terminology/workflow': '/docs/design/terminology',
 
   // developers
   '/docs/developers/contribute/next': '/docs/developers/contribute',
   '/docs/developers/python/classical': '/docs/developers/python/classic',
-  '/docs/developers/python/classical/Usage': '/docs/developers/python/classic-usage',
+  '/docs/developers/python/classical/Usage': '/docs/developers/python/classic',
   '/docs/developers/python/classical/read-write': '/docs/developers/python/read-write',
   '/docs/developers/python/plugin/getting-started': '/docs/developers/python/plugin',
   '/docs/developers/python/plugin/build': '/docs/developers/python/build',
@@ -87,6 +86,17 @@ export const redirects = {
 
   // roadmap
   '/docs/roadmap/thoughts/app': '/docs/roadmap/thoughts',
+  // merged pages (duplicate explanations folded into one canonical page)
+  '/docs/developers/javascript/usage': '/docs/developers/javascript/installation#usage',
+  '/docs/developers/python/classic-usage': '/docs/developers/python/classic',
+  '/docs/developers/python/plugin-usage': '/docs/developers/python/plugin',
+  '/docs/design/comparisons/why-not': '/docs/design/comparisons',
+  '/docs/design/philosophy/api': '/docs/design/various/graphql',
+  '/docs/apps/standalones/mikroj': '/docs/apps/standalones/imagej-plugin',
+  '/docs/design/philosophy/against-the-machine': '/docs/design/ai',
+  '/docs/design/deployment/gui': '/docs/introduction/installation/starting-new#graphical-installer-recommended',
+  '/docs/design/deployment/on-premise': '/docs/introduction/installation/starting-new#other-installation-strategies',
+  '/docs/design/deployment/cli': '/docs/introduction/installation/starting-new#cli',
 };
 
 const stub = (to) => `<!doctype html>

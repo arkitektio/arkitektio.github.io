@@ -4,20 +4,43 @@ description: The server-side Python libraries that Arkitekt services are built f
 ---
 
 Arkitekt's [services](/docs/design/services) are Django applications that share a small set of
-focused libraries, each owning one concern so the services don't have to reinvent it:
+focused libraries, each owning one concern so the services don't have to reinvent it. Together they
+form the stack that a request passes through on its way to the database:
 
-- **[kante](https://github.com/jhnnsrs/kante)** provides the GraphQL transport (ASGI) and request
-  context the other layers build on.
-- **[authentikate](https://github.com/jhnnsrs/authentikate)** handles identity: it verifies tokens and
-  resolves the acting user, client, and organization for each request.
-- **[koherent](/docs/developers/backend/koherent)** provides provenance-aware audit logging: it turns
-  every data change into a durable, attributed history row.
+```
+        Rekuest provenance token (signed, EdDSA)
+                       │
+        ┌──────────────▼───────────────┐
+ kante  │  GraphQL transport + context  │   ← carries the request + its context
+        └──────────────┬───────────────┘
+                       │
+        ┌──────────────▼───────────────┐
+ authn. │  authentikate                 │   ← verifies the token, resolves the
+        │  → user, client, organization │     acting user / client / organization and the task it ran under
+        └──────────────┬───────────────┘
+                       │
+        ┌──────────────▼───────────────┐
+ koher. │  koherent                     │   ← stamps every change with user, client,
+        │  → attributed history rows    │     and the verified task it ran under (based on django-simple-history)
+        └───────────────────────────────┘
+```
+
+- **[kante](https://github.com/jhnnsrs/kante)** provides the GraphQL transport (ASGI) and the request
+  context the upper layers build on.
+- **[authentikate](https://github.com/jhnnsrs/authentikate)** owns identity. It verifies the
+  signed provenance token and resolves the acting *user*, *client*, and *organization* for each
+  request. There is no bypass for provenance. The signature is always checked.
+- **[koherent](/docs/developers/backend/koherent)** consumes that verified context and provides
+  provenance-aware audit logging: it turns each data change into a durable, attributed history row,
+  building a `Task` from the token's claims.
 
 <Callout type="info">
+
 These libraries are the building blocks behind the [Security](/docs/design/security/measures)
 and [Provenance](/docs/design/architecture/provenance) guarantees described in the design
 section. If you want the *concepts* first, start there; if you want to wire them into a service,
 the pages here are the hands-on reference.
+
 </Callout>
 
 ## Where to start

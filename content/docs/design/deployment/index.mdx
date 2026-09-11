@@ -56,8 +56,9 @@ if you are deploying Plugin Apps on the Arkitekt Server (and your underlying doc
 
 
 Currently we only have limited support for sharing GPUs with Plugin Apps, and we are planning to improve this in the future. Especially with the new
-Kabinet service, we are planning to provide better support for GPU sharing. If your are interested in running multiple GPU intenstive Plugin Apps
-on Arkitekt, please make sure that you have enough GPUs available.
+Kabinet service, we are planning to provide better support for GPU sharing. If you are interested in running multiple GPU intensive Plugin Apps
+on Arkitekt, please make sure that you have enough GPUs available. How GPUs are made available to containers on each operating system is
+described in [GPU Support](/docs/design/various/gpu).
 
 
 </Callout>
@@ -65,6 +66,10 @@ on Arkitekt, please make sure that you have enough GPUs available.
 
 ## Deployment Strategies
 
-Arkitekt was build with the idea in mind that it should be highly customizable in its deployment strategies. This is why
-we have built Arkitekt in a way that it can be used to maintain Arkitekt from within a python process (development),
-or as a local deveopment setup (through the CLI), via a GUI installer 
+Arkitekt was built with the idea in mind that it should be highly customizable in its deployment strategies. This is why
+we have built Arkitekt in a way that it can be used to maintain Arkitekt from within a python process ([development](/docs/design/deployment/testing)),
+or as a local development setup (through the CLI), or via a GUI installer. The CLI and the GUI installer are both front ends of
+Konstruktor, and are described in the [installation guide](/docs/introduction/installation/starting-new), together with the
+[other installation strategies](/docs/introduction/installation/starting-new#other-installation-strategies) such as a maintained
+Docker Compose configuration and Helm charts.
+

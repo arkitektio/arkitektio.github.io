@@ -36,12 +36,10 @@ If you have implemented an OAuth2 device flow before, you already know almost al
 of Fakts. If you have not, the rest of this page walks through the four steps.
 
 <Callout type="info" title="Protocol version 2">
-This page describes the current Fakts protocol, as implemented by the Orkestrator
-client. The previous protocol (a custom `start`, `challenge` and `claim` sequence
-with its own `auth` block) is retired. A deployment that still speaks it answers
-discovery but fails the endpoint check in step 0, so clients can tell "wrong
-protocol version" apart from "server unreachable". The differences are laid out
-in [What's changed: Connecting apps](/docs/design/whats-changed/connecting).
+
+This page describes the current Fakts protocol; the retired Paper-era sequence is
+covered at the end, in [Coming from the Paper version](#coming-from-the-paper-version).
+
 </Callout>
 
 ## The flow
@@ -369,17 +367,19 @@ lab network and a browser on the other side of the internet.
   desktop app carries its own implementation, and the
   [fakts](https://github.com/jhnnsrs/fakts) (Python) and
   [fakts-ts](https://github.com/jhnnsrs/fakts-ts) (TypeScript) libraries do the
-  same for your own apps. In the Paper version this was split across two
-  packages, **Fakts** for configuration and **Herre** for the OAuth2 tokens.
-  With the token response now carrying both, one client handles both. Because
-  every step is plain HTTP with standard OAuth2 semantics, any OAuth2
-  device-flow client can be adapted with a few lines.
+  same for your own apps. Because every step is plain HTTP with standard OAuth2
+  semantics, any OAuth2 device-flow client can be adapted with a few lines. (In
+  the Paper version this was two packages, see [One protocol instead of two
+  packages](/docs/design/whats-changed/connecting#one-protocol-instead-of-two-packages).)
 - Across networks, the same coordinator role is played by the coordination server
   of the [mesh](/docs/design/security/mesh).
 
 ## Coming from the Paper version
 
-The Paper version used a custom `start`, `challenge` and `claim` sequence and a separate OAuth2
-client (Herre) for tokens. Every step of that sequence has a counterpart in the flow above, and the
+The Paper version used a custom `start`, `challenge` and `claim` sequence with its own `auth`
+block, and a separate OAuth2 client (Herre) for tokens. That protocol is retired: a deployment
+that still speaks it answers discovery but fails the endpoint check in
+[step 0](#step-0-discover-the-deployment), so clients can tell "wrong protocol version" apart from
+"server unreachable". Every step of the old sequence has a counterpart in the flow above, and the
 mapping, including how to tell a Paper deployment apart from a Next one, is laid out in
 [What's changed: Connecting apps](/docs/design/whats-changed/connecting).

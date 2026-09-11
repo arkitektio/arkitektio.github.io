@@ -11,17 +11,8 @@ works consistently across every service.
 ## Lok, the coordinator
 
 [**Lok**](/docs/design/services/lok) is the service responsible for authentication
-and authorization. Conceptually it is the **coordinator**: arguably the single
-most important part of the platform, because everything else trusts the identities
-it issues.
-
-The coordinator's job is two things that go hand in hand: **auth** (proving who you
-and your apps are) and **discovery** (helping apps and servers find and trust each
-other). Lok handles the auth; the discovery side shows up as the [Fakts
-protocol](/docs/design/architecture/service-discovery) on a local network, and as
-the [mesh](/docs/design/security/mesh) across networks, where the same coordinator
-role is run as a *coordination server*. It is one control plane wearing two hats,
-not two unrelated systems.
+and authorization. It fills the [**coordinator**](/docs/design#the-coordinator) role
+of the platform: everything else trusts the identities it issues.
 
 Lok issues **JWT tokens**, cryptographically signed claims about a user and the
 application acting on their behalf. Because the signature can be verified by any
@@ -43,37 +34,23 @@ more in [Apps](/docs/design/terminology/app).
 ## Fakts: discovery and app authorization
 
 Apps also need to *find* a deployment and get their configuration. That is the job
-of the **Fakts** protocol, described in [Service
+of the **Fakts** protocol, described step by step in [Service
 Discovery](/docs/design/architecture/service-discovery).
 
-Fakts is a standard **OAuth2 device authorization flow** (RFC 8628) with one
-Arkitekt-specific addition: the token response also carries the app's rendered
-service configuration.
-
-1. The app fetches the deployment's `.well-known/fakts` document, which lists the
-   OAuth2 endpoints to use.
-2. It posts its **Manifest** (identifier, version, scopes, required services) to
-   the device authorization endpoint. This registers it as a public OAuth2 client
-   and returns a device code and a verification link.
-3. You open the link, review the app and the permissions it asks for, choose
-   which service instances it may use, and approve.
-4. The app polls the token endpoint with the device-code grant and receives an
-   access token, a rotating refresh token, and the configuration of every service
-   it asked for, in one response.
-5. From then on it refreshes through the same token endpoint. Each refresh also
-   re-renders the configuration, so a changed deployment reaches connected apps
-   without anyone re-approving.
+In short, Fakts is a standard **OAuth2 device authorization flow** (RFC 8628) with
+one Arkitekt-specific addition: the token response also carries the app's rendered
+service configuration. The app presents its
+[Manifest](/docs/design/terminology/manifest), you review and approve it in a
+browser, and the app receives its tokens and configuration together, refreshed
+together from then on.
 
 Because every step is plain OAuth2, the tokens an app ends up holding are the
 same signed JWTs Lok issues to everyone else, and any service can verify them
-locally. On the client side the [fakts](https://github.com/jhnnsrs/fakts) and
-[fakts-ts](https://github.com/jhnnsrs/fakts-ts) libraries implement the flow
-for Python and TypeScript apps. The server side is Lok.
-
-In the Paper version this was two packages: **Fakts** fetched the configuration
-and **Herre**, an asynchronous OAuth2 client, ran a second grant to obtain the
-tokens. Since the Next version the token response carries the configuration, so
-the two have merged into one flow. See [What's changed: Connecting apps](/docs/design/whats-changed/connecting).
+locally. The server side is Lok; on the client side the
+[fakts](https://github.com/jhnnsrs/fakts) and
+[fakts-ts](https://github.com/jhnnsrs/fakts-ts) libraries implement the flow. In
+the Paper version this took two packages, see [One protocol instead of two
+packages](/docs/design/whats-changed/connecting#one-protocol-instead-of-two-packages).
 
 ## Scopes
 
@@ -83,10 +60,12 @@ Scopes are how you reason about "what can this app actually do with my data" bef
 you approve it.
 
 <Callout type="warn" title="Scopes are still being enforced">
+
 Scope-based access control is **not yet fully enforced** by the platform. Enforcing
 it too strictly today would hinder the development of new apps, so we are
 introducing it gradually. Treat scopes as the intended model, not yet a hard
 guarantee.
+
 </Callout>
 
 ## Social login

@@ -17,9 +17,9 @@ database.
 **Plugins are sandboxed** - Plugins run in a sandboxed environment, which means that they can't access the data of other plugins or your filesystem. This means that you can install plugins without worrying about them accessing your data or potentially damaging your system. They only
 can interact with our protected APIs.
 
-**Transport Layer Security (TLS)** - When hosting your own Arkitekt instance, you can enable TLS to encrypt the data that is sent between the client and the server. This means that even if someone intercepts the data, they won't be able to read it. You can find more information on how to enable TLS in the [deployment guide](/docs/design/deployment).
+**Transport Layer Security (TLS)** - When hosting your own Arkitekt instance, you can enable TLS to encrypt the data that is sent between the client and the server. This means that even if someone intercepts the data, they won't be able to read it. Which ports the hub exposes, including the HTTPS port, is listed in the [installation guide](/docs/introduction/installation/starting-new#system-requirements).
 
-**Multi-user support** - Arkitekt supports multiple users, and each user has their own data and roles. This means that you can share your Arkitekt instance with other people without worrying about them accessing your data. Teams can be created and users can be assigned to teams, and each team can have different permissions.
+**Multi-user support** - Arkitekt supports multiple users with their own data and roles, isolated per [organization](/docs/design/terminology/organization).
 
 **Admin configuration** - Arkitekt provides a variety of configuration options, that allow administrators to configure the system to their needs. This includes the ability to configure apps, plugins, and the system itself remotely. Do you want all users that use Napari to be blocked from using the system on a certain day? You can do that.
 
@@ -27,18 +27,10 @@ can interact with our protected APIs.
 
 ## User Management & Multi-Tenancy
 
-Every Arkitekt server ships with a multi-tenancy system at its core. A single deployment is not limited to one lab or one project: it can host multiple **organizations**, each with its own users, data, and configuration, fully isolated from one another. This means a department, a core facility, or a whole institute can run on a single deployment while every organization remains a self-contained world.
-
-**Open by default, within your organization** - We designed the defaults around how science actually works. By default, every (human) user inside an organization *can* look at the data of their colleagues in the same organization. Science is collaborative, and forcing people to explicitly share every dataset before anyone can build on it tends to grind real work to a halt. The boundary that always holds is the organization itself. Data never silently crosses from one organization to another.
-
-**Role-based access control for finer grain** - "Open by default" is a starting point, not a straitjacket. On top of it sits a role-based system that lets you tighten access as much as your situation requires. Roles let administrators define who may read, write, run, or administrate which resources, so that sensitive datasets, restricted instruments, or work-in-progress projects can be locked down to specific people or teams. Meanwhile the rest of the organization keeps the frictionless, collaborative default. You scale the strictness to the reality of your group, rather than the other way around.
+Every Arkitekt server ships with a multi-tenancy system at its core: a single deployment can host multiple **organizations**, each with its own users, data, and configuration, fully isolated from one another. Within an organization access is open by default, with role-based access control to tighten it where you need to. What an organization is, why it is the hard boundary, and how the defaults work is described in [Organizations](/docs/design/terminology/organization).
 
 ## You and the Machine
 
-Security and access control are only half of the story. The other half is **provenance**. It means knowing, with certainty, who did what to which piece of data. This has always mattered in science, but it has become urgent now that AI agents routinely act inside our systems. An agent that can read, transform, and write scientific data at machine speed is also, if we are careless, an agent that can quietly erode the record of how results came to be.
-
-Arkitekt is built with that reality firmly in mind. There is a deliberate, first-class distinction between **you** and **the machine**. It holds even when the machine is acting on your behalf. When an AI agent runs an action, transforms a dataset, or creates a new result, that action is attributed to the agent, operating under your authority, and not silently recorded as if you had done it yourself. The audit trail preserves both facts at once: that the work was authorized by a human, and that it was carried out by a machine.
-
-We consider this non-negotiable. Scientific provenance only means something if it is honest about its sources, and conflating a human decision with an automated one destroys exactly the trust that provenance exists to protect. Arkitekt keeps the line between you and the machine sharp: in authentication, in authorization, and in the audit log. This makes sure that handing work to an agent never costs you the ability to say, later and with confidence, how a result was really made.
+Security and access control are only half of the story. The other half is **provenance**: knowing, with certainty, who did what to which piece of data. This has become urgent now that AI agents routinely act inside our systems, and Arkitekt therefore keeps a deliberate, first-class distinction between **you** and **the machine**, even when the machine is acting on your behalf. We consider this non-negotiable: scientific provenance only means something if it is honest about its sources, and handing work to an agent should never cost you the ability to say, later and with confidence, how a result was really made.
 
 For how this audit trail is recorded, attributed, and queried in practice, see [Provenance & Audit Logging](/docs/design/architecture/provenance).

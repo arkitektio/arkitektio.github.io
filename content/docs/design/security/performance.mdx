@@ -43,15 +43,12 @@ Loading](/docs/design/various/lazy-loading).
 
 ## Scaling out
 
-- **Stateless services scale horizontally.** [Rekuest](/docs/design/services/rekuest)
-  and [Kluster](/docs/design/services/kluster) are designed to be stateless, so you
-  can run more replicas to handle more load. Kluster in particular is a thin,
-  stateless gateway in front of Dask (via Dask-Gateway on SLURM, PBS, Kubernetes,
-  and more) for on-demand compute clusters.
-- **No inter-service communication.** The core [services](/docs/design/services)
-  deliberately do *not* talk to each other. Each is an independent, containerized
-  web server authenticated by JWT. This keeps the failure and scaling story simple:
-  services scale on their own terms.
+- **Stateless, independent services scale horizontally.**
+  [Rekuest](/docs/design/services/rekuest) and [Kluster](/docs/design/services/kluster)
+  are stateless, so you can run more replicas to handle more load, and the core
+  services never talk to each other, so each scales on its own terms. The
+  principles behind this are laid out in [Design
+  Principles](/docs/design/services#design-principles).
 - **Compute lives in the apps.** Arkitekt is the middleman; the actual computation
   is offloaded to client-side **apps** and the hardware they run on, so heavy work
   scales with *your* machines, not a central bottleneck.
@@ -62,10 +59,9 @@ Performance is bounded by physics, and we would rather name the limits than pret
 they don't exist:
 
 - The usual bottleneck is **storage throughput**, MinIO moving bytes, rather than
-  the API layer. In our showcases a 1 Gbit/s link was the practical ceiling; only in
-  rare cases is the API layer itself the limit.
-- **GPU support is limited today.** Better GPU sharing is planned via
-  [Kabinet](/docs/design/services/kabinet). In the meantime, app **Flavours** (build
-  variants with **Selectors**, e.g. CUDA vs CPU) let the platform automatically pick
-  the right build for the resources available. See the
-  [Manifest](/docs/design/terminology/manifest).
+  the API layer; see [how much data will be streamed](/docs/design/deployment#how-much-data-will-be-streamed-through-arkitekt)
+  in the deployment guide.
+- **GPU support is limited today**; see [GPU Support](/docs/design/various/gpu). In
+  the meantime, [App Flavours](/docs/design/services/kabinet#app-flavours) (build
+  variants such as CUDA vs CPU) let the platform pick the right build for the
+  resources available.
