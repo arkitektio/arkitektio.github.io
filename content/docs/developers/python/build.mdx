@@ -143,6 +143,30 @@ This is the final step in the process of building your plugin. This will upload 
 a new "deployment" of your plugin in the local directory. If you push your directory to a git repository, you can now point any
 Arkitekt instance to this repository and it will be able to discover and use your plugin.
 
+### Add an "Open in Arkitekt" badge
+
+Put a badge at the top of the repository's README, so that anyone reading it can
+hand the repository to their own Arkitekt in one click:
+
+```markdown
+[![Open in Arkitekt](https://arkitekt.live/img/badge/open-in-arkitekt.svg)](https://arkitekt.live/deeplink?orkestrator=%2Fkabinet%2Frepos%2Finstall%3Frepo%3DYOUR-USER%252FYOUR-REPO)
+```
+
+Replace `YOUR-USER` and `YOUR-REPO`; the `%252F` between them is an encoded
+slash and has to stay encoded. The badge image is the same for every
+repository — what it opens is carried by the link, not by the picture.
+
+Clicking it opens the reader's own Orkestrator on the install prompt for your
+repository, where they can add it to their Kabinet. Readers without Orkestrator
+land on arkitekt.live instead, which tells them how to get it.
+
+<Callout type="info" title="Let Orkestrator write it for you">
+
+Orkestrator can produce the snippet: open the repository under **Kabinet →
+Repos** and use **Copy README badge**.
+
+</Callout>
+
 <Callout type="warn" title="On Versioning">
 
 
