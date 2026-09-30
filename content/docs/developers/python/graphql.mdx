@@ -3,15 +3,6 @@ title: Developing with GraphQL
 description: How to use the turms library and the Arkitekt CLI to generate typed Python code for interacting with the GraphQL API.
 ---
 
-<Callout type="info">
-
-
-This guide is an emerging documentation for now check out [turms](https://github.com/jhnnsrs/turms) for more information.
-
-
-</Callout>
-
-
 ## Introduction
 
 While developing Arkitekt applications, you will often need to interact with the GraphQL API. To retrieve and manipulate data, you will need to write queries and mutations.
@@ -19,23 +10,23 @@ Of course you can do this manually by writing the queries and mutations in plain
 especially because we will only receive plain JSON responses from the server. Wouldn't it be nice if we could have a more pythonic way of interacting with the GraphQL API?
 And get typed responses from the server? This is where code generation comes in.
 
-In this guide, we will show you how to use the `turms` library which is as build-in integration with the Arkitekt CLI to generate python code for interacting with the GraphQL API,
-and how to use the generated code in your application.
+In this guide, we will show you how to use the `turms` library which is built into with the Arkitekt CLI to generate python code for interacting with the GraphQL API,
+and how to use the generated code in your application. The service clients (`mikro`, `fluss`, …) are generated the same way, so you only need this when you want operations they don't ship.
 
 
 ## Prerequisites
 For this guide, you will need to have the following installed:
 
-- Python 3.6 or higher
-- Arkitekt CLI
+- Python 3.11 or higher
+- The `arkitekt` CLI and the client for the service you want to query (e.g. `pip install "arkitekt[mikro]"`)
 
 <Callout type="info">
 
-You need to have installed the Arkitekt CLI together with our code generating library `turms` to follow this guide. If you didn't install it (or you are not sure), you can do so by running the following command:
+Code generation needs [turms](https://github.com/jhnnsrs/turms), which is not installed with `arkitekt` by default:
 
 
 ```bash
-pip install turms>=0.5.0 black
+pip install "turms>=0.5.0" black
 ```
 
 
@@ -43,11 +34,11 @@ pip install turms>=0.5.0 black
 
 ## Getting Started
 
-To get started, you will need an Arkitekt project created with `arkitekt-next init`, as shown in [Your first plugin](/docs/developers/python/plugin).
+To get started, you will need an Arkitekt project created with `arkitekt init`, as shown in [Your first app](/docs/developers/python/first-app).
 Inside that project directory, we can now generate a configuration file for our code generation for our project by running the following command:
 
 ```bash
-arkitekt-next gen init mikro
+arkitekt gen init --services mikro
 ```
 
 It will ask you where you want to generate the module for your generated code. Leave it as the default and press enter.
@@ -86,9 +77,11 @@ This is a simple query that retrieves all datasets from the server. After saving
 
 ```bash
 
-arkitekt-next gen compile mikro
+arkitekt gen compile mikro
 
 ```
+
+While you edit documents, `arkitekt gen watch` regenerates the code on every change.
 
 This should now create a directory named `api` in the same directory, that contains the generated code for the query in the "mikro.py" file. You can now use this code in your application to interact with the GraphQL API.
 
@@ -97,25 +90,25 @@ This should now create a directory named `api` in the same directory, that conta
 To use the generated code, you will need to import the generated query and use it to interact with the GraphQL API. You can do this by running the following code:
 
 ```python
-from arkitekt_next import easy
+from arkitekt import easy
+from mikro import mikro_service
+
 from api.mikro import first_query
 
-# Create a new app
-app = easy("my_test_app")
-
-# Run the query
-with app:
+with easy("my_test_app", mikro_service):
     datasets = first_query()
     print(datasets)
-
 ```
 
-Thats its you have now successfully generated and used code for interacting with the GraphQL API. You can now use this code in your application to interact with the API, and always
+The generated functions use the client of the service that is connected, so call them inside the
+`easy(...)` block, or inside an action of an app that declares that service.
+
+That's it. You have now successfully generated and used code for interacting with the GraphQL API. You can now use this code in your application to interact with the API, and always
 be sure that you are getting the correct data types from the server.
 
 ### Why we love this
 
 - **Type Safety**: The generated code is fully typed, so you can be sure that you are getting the correct data types from the server.
 - **Easy to use**: The generated code is easy to use, so you can quickly get started with interacting with the GraphQL API.
-- **Completely Documentend**: The generated code is fully documented directly from our API documentation. Just inspect some fields.
-- **Traitfull**: Turms has the neat concepts of adding traits to the graphql types. Imagine traits like mixins, that allow you to add speciic logig to the return types (e.g. getting the numpy array for a zarr store field)
+- **Completely documented**: The generated code is fully documented directly from our API documentation. Just inspect some fields.
+- **Traits**: turms can add traits to the generated types. Traits are mixins that add specific logic to return types, for example turning a zarr store field into a lazy array.

@@ -44,32 +44,17 @@ covered at the end, in [Coming from the Paper version](#coming-from-the-paper-ve
 
 ## The flow
 
-```mermaid
-sequenceDiagram
-    participant App
-    participant Fakts as Deployment (Lok)
-    participant User
-
-    App->>Fakts: GET /.well-known/fakts
-    Fakts-->>App: endpoint document (device_authorization_endpoint, token_endpoint, ...)
-
-    App->>Fakts: POST device_authorization_endpoint { manifest }
-    Fakts-->>App: client_id, device_code, user_code, verification_uri_complete, interval
-
-    App->>User: open verification_uri_complete
-    User->>Fakts: review app, scopes and requirements, pick instances, approve
-
-    loop every `interval` seconds
-        App->>Fakts: POST token_endpoint grant_type=device_code
-        Fakts-->>App: 400 { error: authorization_pending }
-    end
-
-    App->>Fakts: POST token_endpoint grant_type=device_code
-    Fakts-->>App: 200 { access_token, refresh_token, client_id, self, instances, statuses }
-
-    App->>Fakts: POST token_endpoint grant_type=refresh_token (later)
-    Fakts-->>App: 200 { new tokens, re-rendered envelope }
-```
+| # | From → To | Message |
+|---|---|---|
+| 1 | App → Deployment (Lok) | `GET /.well-known/fakts` |
+| 2 | Deployment → App | the endpoint document (`device_authorization_endpoint`, `token_endpoint`, …) |
+| 3 | App → Deployment | `POST device_authorization_endpoint { manifest }` |
+| 4 | Deployment → App | `client_id`, `device_code`, `user_code`, `verification_uri_complete`, `interval` |
+| 5 | App → User | open `verification_uri_complete` |
+| 6 | User → Deployment | review the app, its scopes and requirements, pick instances, approve |
+| 7 | App → Deployment, every `interval` seconds | `POST token_endpoint grant_type=device_code`, answered with `400 { error: authorization_pending }` until step 6 is done |
+| 8 | Deployment → App | `200 { access_token, refresh_token, client_id, self, instances, statuses }` |
+| 9 | App → Deployment, later | `POST token_endpoint grant_type=refresh_token`, answered with new tokens and a re-rendered envelope |
 
 ### Step 0: Discover the deployment
 

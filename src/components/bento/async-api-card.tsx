@@ -92,7 +92,7 @@ export function AsyncApiCard() {
 
   return (
     <BentoCard
-      href="/docs/developers/python/plugin"
+      href="/docs/developers/python/concepts"
       hrefLabel="Learn about actions"
       className="grid grid-cols-1 gap-6 p-6 sm:col-span-2 sm:p-8 lg:grid-cols-2 lg:items-center"
     >
@@ -106,7 +106,7 @@ export function AsyncApiCard() {
         </h2>
         <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
           Every action is just a function, sync or async. Use standard python calls like {' '}
-          <code>progress()</code> to report how far along you are, and{' '}
+          <code>task.progress()</code> to report how far along you are, and{' '}
           <code>yield</code> results as they are produced. 
         </p>
 
@@ -131,13 +131,14 @@ export function AsyncApiCard() {
 
         <pre className="mt-3 overflow-x-auto rounded-xl border border-fd-border bg-[#0a0a0c] p-4 font-mono text-[12px] leading-relaxed text-white/80">
           <code>
-            <span className="text-[#c792ea]">@register</span>
+            <span className="text-[#c792ea]">@app.action</span>
             {'\n'}
             <span className="text-[#82aaff]">
               {mode === 'async' ? 'async def' : 'def'}
             </span>{' '}
             <span className="text-[#ffcb6b]">process</span>(stack:{' '}
-            <span className="text-[#82aaff]">Image</span>){' '}
+            <span className="text-[#82aaff]">Image</span>, task:{' '}
+            <span className="text-[#82aaff]">Task</span>){' '}
             <span className="text-[#89ddff]">{'->'}</span>{' '}
             <span className="text-[#82aaff]">Image</span>:{'\n'}
             {'    '}
@@ -149,14 +150,12 @@ export function AsyncApiCard() {
             <span className="text-[#82aaff]">for</span> i, plane{' '}
             <span className="text-[#82aaff]">in enumerate</span>(stack):{'\n'}
             {'        '}
-            <span className="text-[#ffcb6b]">{mode && mode === 'async' && 
-            <span className="text-[#c792ea]">await </span>}{mode && mode === 'async' ?
-            "aprogress": "progress"}</span>(i{' '}
+            {mode === 'async' && <span className="text-[#c792ea]">await </span>}task.
+            <span className="text-[#ffcb6b]">{mode === 'async' ? 'aprogress' : 'progress'}</span>(i{' '}
             <span className="text-[#89ddff]">*</span> 10){'\n'}
             {'        '}
             <span className="text-[#c792ea]">yield</span>{' '}
-            <span className="text-[#ffcb6b]">from_array_like</span>(
-            <span className="text-[#ffcb6b]">segment</span>(plane))
+            <span className="text-[#ffcb6b]">segment</span>(plane)
           </code>
         </pre>
       </div>

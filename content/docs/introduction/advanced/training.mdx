@@ -217,6 +217,16 @@ Also of course you can download the model and share it with others, just like we
 If you are a developer and you want to know how to integrate your own deep learning app into Arkitekt, you can read our Developer Tutorial on how to do this [here](/docs/developers/python).
 But also please just find here **ALL** the code for the `Train CARE` and `Predict CARE` actions, which are just a few lines of code, and should be easy to understand.
 
+<Callout type="warn" title="Paper-era API">
+
+This code was written for the Paper version of Arkitekt (`from arkitekt import register`,
+`mikro.api.schema` fragments). It shows the shape of a training action, but it will not run
+against the current `arkitekt` package. For the current way to declare actions, services and
+structures, see [Core concepts](/docs/developers/python/concepts) and
+[Types & data](/docs/developers/python/types).
+
+</Callout>
+
 ```python
 from arkitekt import register
 from mikro.api.schema import (

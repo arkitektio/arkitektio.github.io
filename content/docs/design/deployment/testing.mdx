@@ -19,7 +19,16 @@ security and should only be used for development purposes.
 
 </Callout>
 
-### Staring a Development Server
+<Callout type="warn" title="Outdated">
+
+This page describes the `deployment(...)` helper of an earlier `arkitekt` version, together with
+release channels. The current `arkitekt` package does not export `deployment`. Stand up a
+server with [konstruktor](/docs/introduction/installation/starting-new) instead, and point your app
+at it with `arkitekt run dev --url ...`.
+
+</Callout>
+
+### Starting a Development Server
 
 To start a development server from within your Python Code, you can use the 'deployment' function from the 'arkitekt'
 package. In its simplest form, the function takes the following arguments:

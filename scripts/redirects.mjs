@@ -77,19 +77,22 @@ export const redirects = {
 
   // developers
   '/docs/developers/contribute/next': '/docs/developers/contribute',
-  '/docs/developers/python/classical': '/docs/developers/python/classic',
-  '/docs/developers/python/classical/Usage': '/docs/developers/python/classic',
-  '/docs/developers/python/classical/read-write': '/docs/developers/python/read-write',
-  '/docs/developers/python/plugin/getting-started': '/docs/developers/python/plugin',
+  '/docs/developers/python/classical': '/docs/developers/python/scripts',
+  '/docs/developers/python/classical/Usage': '/docs/developers/python/scripts',
+  '/docs/developers/python/classical/read-write': '/docs/developers/python/types',
+  '/docs/developers/python/plugin/getting-started': '/docs/developers/python/first-app',
   '/docs/developers/python/plugin/build': '/docs/developers/python/build',
-  '/docs/developers/python/plugin/more': '/docs/developers/python/more',
+  '/docs/developers/python/plugin/more': '/docs/developers/python/state-lifecycle',
 
   // roadmap
   '/docs/roadmap/thoughts/app': '/docs/roadmap/thoughts',
   // merged pages (duplicate explanations folded into one canonical page)
-  '/docs/developers/javascript/usage': '/docs/developers/javascript/installation#usage',
-  '/docs/developers/python/classic-usage': '/docs/developers/python/classic',
-  '/docs/developers/python/plugin-usage': '/docs/developers/python/plugin',
+  '/docs/developers/javascript/usage': '/docs/developers',
+  // the JavaScript client docs were removed until the client is published again
+  '/docs/developers/javascript': '/docs/developers',
+  '/docs/developers/javascript/installation': '/docs/developers',
+  '/docs/developers/python/classic-usage': '/docs/developers/python/scripts',
+  '/docs/developers/python/plugin-usage': '/docs/developers/python/first-app',
   '/docs/design/comparisons/why-not': '/docs/design/comparisons',
   '/docs/design/philosophy/api': '/docs/design/various/graphql',
   '/docs/apps/standalones/mikroj': '/docs/apps/standalones/imagej-plugin',
@@ -97,6 +100,11 @@ export const redirects = {
   '/docs/design/deployment/gui': '/docs/introduction/installation/starting-new#graphical-installer-recommended',
   '/docs/design/deployment/on-premise': '/docs/introduction/installation/starting-new#other-installation-strategies',
   '/docs/design/deployment/cli': '/docs/introduction/installation/starting-new#cli',
+  // Python section rewrite for the arkitekt package (arkitekt-next pages folded in)
+  '/docs/developers/python/classic': '/docs/developers/python/scripts',
+  '/docs/developers/python/plugin': '/docs/developers/python/first-app',
+  '/docs/developers/python/read-write': '/docs/developers/python/types',
+  '/docs/developers/python/more': '/docs/developers/python/state-lifecycle',
 };
 
 const stub = (to) => `<!doctype html>

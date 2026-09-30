@@ -33,25 +33,35 @@ already know**. An action is just a decorated Python function. Your type hints
 become its input and output [ports](/docs/design/terminology/port), and your docstring becomes its description:
 
 ```python
-from arkitekt_next import register
+from arkitekt import App
+from mikro import mikro_service
+from mikro.arkitekt.specs import Image, LabelMask
 
-@register
-def run_stardist(image: Image) -> Image:
-    """Run StarDist segmentation on a single image."""
-    return segment(image)
+app = App("stardist", "0.1.0", services=[mikro_service])
+
+
+@app.action
+def run_stardist(image: Image) -> LabelMask:
+    """Run StarDist
+
+    Runs StarDist segmentation on a single image.
+    """
+    ...
 ```
 
-There is no separate workflow language to learn. You orchestrate these actions with
-ordinary Python: loops, conditionals, `async`/`await`, exceptions, your own
-helper functions. The control flow *is* Python. When your logic gets
-genuinely complex (a branch that depends on a measured value, a retry, a loop that
-runs until convergence), you do not hit a DSL ceiling; you just write the code.
+There is no separate workflow language to learn. You orchestrate these actions in an
+[`@app.workflow`](/docs/developers/python/workflows) with ordinary Python: loops,
+conditionals, `async`/`await`, exceptions, your own helper functions. The control flow *is*
+Python. When your logic gets genuinely complex (a branch that depends on a measured value, a
+retry, a loop that runs until convergence), you do not hit a DSL ceiling; you just write the
+code. Such a workflow is also [durable](/docs/design/architecture/durable-execution): if its
+process dies, it is resumed without redoing the steps that already finished.
 
 For the *simpler* end of the spectrum, and for collaborators who do not want to
 write code at all, Arkitekt also ships a **graphical Workflow Designer** (in the
-Orkestrator app). The exact same `@register`-ed actions show up as draggable blocks
-that you wire together visually. So the choice is not "graphical *or* code": simple
-flows can be drawn, complex ones written in Python, and both run on the same engine.
+Orkestrator app). The exact same actions show up as draggable blocks that you wire together visually. So the
+choice is not "graphical *or* code": simple flows can be drawn, complex ones written in Python,
+and both call actions through the same machinery.
 
 This is a very important difference, with implications not only for user experience
 but also for *how the workflow executes*. Some concepts of Arkitekt do not
@@ -67,18 +77,13 @@ for the way that a workflow is executed. Let's look at this example:
 ```groovy
 params.images = "./images/*.tif" // Images to load
 
-// Input channel for images
-Channel
-    .fromPath(params.images)
-    .into { imagesChannel }
-
 // Process 1: Run StarDist on each image
 process RunStarDist {
     input:
-    file image from imagesChannel
+    path image
 
     output:
-    file "segmented_${image.baseName}.tif" into stardistChannel
+    path "segmented_${image.baseName}.tif"
 
     script:
     """
@@ -90,21 +95,21 @@ process RunStarDist {
 // Process 2: Calculate Maximum or further processing
 process CalculateMaximum {
     input:
-    file segmentedImage from stardistChannel.collect()
+    path segmented
 
     output:
-    file "max_values.txt"
+    path "max_values.txt"
 
     script:
     """
     # Replace with your script/command to calculate the maximum or further process
-    your_analysis_tool ${segmentedImage} > max_values.txt
+    your_analysis_tool ${segmented} > max_values.txt
     """
 }
 
-// Workflow definition using pipe operator
+// Workflow definition using the pipe operator
 workflow {
-    imagesChannel | RunStarDist | CalculateMaximum
+    Channel.fromPath(params.images) | RunStarDist | collect | CalculateMaximum
 }
 ```
 
@@ -145,36 +150,56 @@ stateless model, every task is a fresh process, so that cold-start cost is paid
 There is no clean way around it: the process exits, the model goes with it.
 
 Arkitekt's stateful agents make this a non-issue. The model lives in the app's
-**`@context`**, which holds app-level resources injected into your actions. It is
-loaded **once** by a `@startup` hook when the agent first connects, then reused for every
+**context** (`@app.context`), which holds app-level resources injected into your actions. It is
+built **once** by an `@app.startup` hook when the agent starts, then reused for every
 item it processes:
 
 ```python
-from arkitekt_next import register, startup, context
+from dataclasses import dataclass
 
-@context
-class AppContext:
-    model: object = None
+import xarray as xr
 
-@startup
-async def load(context: AppContext):
-    context.model = load_my_model()  # paid once, at connect time
+from arkitekt import App
+from mikro import Mikro, mikro_service
+from mikro.arkitekt.specs import Image
 
-@register
-def run_inference(image: Image, context: AppContext) -> Image:
-    result = context.model.predict(image.data)  # the warm model, every call
-    return from_array_like(result, name="inference result")
+app = App("inference", "0.1.0", services=[mikro_service])
+
+
+@app.context
+@dataclass
+class Model:
+    net: object
+
+
+@app.startup
+def load() -> Model:
+    return Model(net=load_my_model())  # paid once, when the agent starts
+
+
+@app.action
+def run_inference(image: Image, model: Model, mikro: Mikro) -> Image:
+    """Run Inference"""
+    result = model.net.predict(image.data)  # the warm model, every call
+    dataset = mikro.create_array_dataset(
+        data=xr.DataArray(result, dims=image.data.dims),
+        scales=[],
+        name="inference result",
+        axes=image.carried_axes(image.data.dims),
+    )
+    return dataset.lens()
 ```
 
-(`@context` is the home for long-lived resources like models and service clients;
-`@state`, by contrast, is for mutable runtime state you want to share and publish
-between actions. It is not where a model belongs.)
+(A context is the home for long-lived private resources like models. `@app.state`, by
+contrast, is for runtime state you want to publish to the platform. It is not where a model
+belongs. See [State & lifecycle](/docs/developers/python/state-lifecycle).)
 
 The agent stays resident and keeps the warm model in GPU memory between
 invocations. For a streaming smart-microscopy loop, where you want the next frame
 analysed *now*, this is the difference between a workflow that feels live and one
-that re-pays its setup cost on every frame. Nextflow simply cannot preload a model
-across tasks, because it has no resident task to preload it into.
+that re-pays its setup cost on every frame. Nextflow cannot keep a model warm
+across tasks on its own, because it has no resident task to keep it in. You would need to run
+and manage a separate model server next to the pipeline.
 
 This core difference in the execution model of the two tools, has some important implications for the way that workflows are designed. For example, in Nextflow it is very common to use
 for big batch jobs, where you want to process a large number of images, and start up time is not a problem. In Arkitekt, it is more common to use workflows where you want to process single

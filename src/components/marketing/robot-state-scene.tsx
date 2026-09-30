@@ -14,6 +14,9 @@ import { toThreeColor } from './resolve-color';
  * node, no command packets. The surrounding card already tells the "live state"
  * story, so here we only want the robot itself.
  *
+ * `halted` freezes the arm and blinks its status ring amber (used by the
+ * workflow card: while the workflow's agent is down, nobody commands the arm).
+ *
  * Accent colours are pulled from the live `--color-fd-primary` brand variable so
  * the scene re-tints with the rest of the site.
  */
@@ -71,22 +74,35 @@ function FairinoModel() {
   );
 }
 
-function RobotWorld({ brand }: { brand: string }) {
+function RobotWorld({ brand, halted = false }: { brand: string; halted?: boolean }) {
   const arm = useRef<THREE.Group>(null);
   const ringMat = useRef<THREE.MeshStandardMaterial>(null);
+  // Scene time that only advances while running, so a halted arm freezes in
+  // place and picks up from the same pose instead of jumping.
+  const armTime = useRef(0);
+  const haltColor = useRef(new THREE.Color('#f59e0b'));
+  const brandColor = useRef(new THREE.Color(brand));
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
+    if (!halted) armTime.current += delta;
+    const a = armTime.current;
 
     // The arm slews gently on its base (axis-1), wandering as if working a
     // task. Pivots at the base (see grounding above), so no weird orbiting.
     if (arm.current) {
-      arm.current.rotation.y = Math.sin(t * 0.3) * 0.5 + Math.sin(t * 0.13) * 0.25;
+      arm.current.rotation.y = Math.sin(a * 0.3) * 0.5 + Math.sin(a * 0.13) * 0.25;
     }
 
     // soft breathing pulse on the brand status ring
     if (ringMat.current) {
-      ringMat.current.emissiveIntensity = 0.6 + (Math.sin(t * 1.6) * 0.5 + 0.5) * 0.6;
+      const c = halted ? haltColor.current : brandColor.current;
+      ringMat.current.color.copy(c);
+      ringMat.current.emissive.copy(c);
+      // a halted arm blinks its ring fast, a working one breathes
+      ringMat.current.emissiveIntensity = halted
+        ? 0.3 + (Math.sin(t * 8) * 0.5 + 0.5) * 1.2
+        : 0.6 + (Math.sin(t * 1.6) * 0.5 + 0.5) * 0.6;
     }
   });
 
@@ -146,7 +162,7 @@ function RobotWorld({ brand }: { brand: string }) {
   );
 }
 
-function Scene() {
+function Scene({ halted = false }: { halted?: boolean }) {
   const brand = useBrandColor();
   return (
     <Canvas
@@ -155,7 +171,7 @@ function Scene() {
       gl={{ antialias: true }}
       style={{ background: 'transparent' }}
     >
-      <RobotWorld brand={brand} />
+      <RobotWorld brand={brand} halted={halted} />
       <OrbitControls
         makeDefault
         enablePan={false}

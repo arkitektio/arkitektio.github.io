@@ -5,9 +5,11 @@ import { VscDebugDisconnect } from "react-icons/vsc";
 import * as Popover from "@radix-ui/react-popover";
 import React from "react";
 import { useForm } from "react-hook-form";
+import Link from "next/link";
 import {
   CircleUserRound,
   Loader2,
+  Network,
   LogIn,
   LogOut,
   ServerCog,
@@ -355,6 +357,9 @@ export const NotConnectedNav = () => {
             </Popover.Close>
 
             <MenuDivider />
+            <ExplorerMenuLink />
+
+            <MenuDivider />
             <BrandColorControls />
           </Popover.Content>
         </Popover.Portal>
@@ -365,6 +370,19 @@ export const NotConnectedNav = () => {
     </>
   );
 };
+
+/** Link to the GraphQL API explorer; it asks to connect by itself when signed out. */
+const ExplorerMenuLink = () => (
+  <Popover.Close asChild>
+    <Link
+      href="/explorer"
+      className="flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+    >
+      <Network className="size-4" />
+      API Explorer
+    </Link>
+  </Popover.Close>
+);
 
 /** Round avatar (image → initials) shared by the trigger and the menu header. */
 const Avatar = ({
@@ -458,6 +476,9 @@ export const ShowMeNav = () => {
               )}
             </div>
           </div>
+
+          <MenuDivider />
+          <ExplorerMenuLink />
 
           <MenuDivider />
           <BrandColorControls />

@@ -1,9 +1,10 @@
 {
-  "title": "For Developers",
+  "title": "Building",
   "pages": [
-    "contribute",
-    "javascript",
     "python",
-    "backend"
+    "rust",
+    "embedded",
+    "backend",
+    "contribute"
   ]
 }

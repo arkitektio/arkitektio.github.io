@@ -3,8 +3,6 @@ import {
   Atom,
   BookOpen,
   MonitorPlay,
-  Network,
-  Newspaper,
   Sparkles,
 } from 'lucide-react';
 import { Logo } from '@/components/site';
@@ -30,22 +28,10 @@ export function baseOptions(): BaseLayoutProps {
         icon: <BookOpen />,
       },
       {
-        text: 'Blog',
-        url: '/blog',
-        active: 'nested-url',
-        icon: <Newspaper />,
-      },
-      {
         text: 'Presentations',
         url: '/presentations',
         active: 'nested-url',
         icon: <MonitorPlay />,
-      },
-      {
-        text: 'Explorer',
-        url: '/explorer',
-        active: 'nested-url',
-        icon: <Network />,
       },
       {
         text: 'Showcase',

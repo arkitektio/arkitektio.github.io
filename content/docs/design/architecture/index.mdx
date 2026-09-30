@@ -5,6 +5,9 @@ description: "An overview of how Arkitekt is put together: how apps find and aut
 
 - **[Service Discovery](/docs/design/architecture/service-discovery)**: how apps locate and
   authenticate to the services running in a given deployment via the Fakts protocol.
+- **[Durable Execution](/docs/design/architecture/durable-execution)**: what happens to a task when
+  the agent running it dies, how workflows are resumed from a journal without redoing finished
+  steps, and what is left for you to decide.
 - **[Provenance & Audit Logging](/docs/design/architecture/provenance)**: how every change to
   your data is recorded with who changed it, under whose authority, and during which task.
 - **[Security & Privacy](/docs/design/security)**: the trust model, where your data lives, and

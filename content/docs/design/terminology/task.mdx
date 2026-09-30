@@ -1,38 +1,28 @@
 ---
 title: Task
-description: A Task is the process of running an action in Arkitekt, assigned directly to an action and able to stream results over time.
+description: "A task is one run of an action: who started it, where it was routed, what it reported, and how it ended, including cancellation and the LOST state for runs whose agent died."
 ---
 
-### Whats is a Task
+## What is a task
 
-A Task is the process of running an action in Arkitekt, and happens everytime
-you want to instruct an App to do something with your data. You assign a task
-**directly** to an action; Arkitekt then takes care of "where" and "how"
-it runs by routing it to a connected agent that implements that action.
+A **task** is one run of an [action](/docs/design/terminology/action). Every time you, a script or a
+workflow asks Arkitekt to do something, a task is created. You assign it **to the action**, not to a
+machine. Arkitekt decides where it runs by routing it to a connected [agent](/docs/design/terminology/agent)
+that has an [implementation](/docs/design/terminology/implementation) of that action.
 
-Also a Task is an ongoing process, and can be `cancelled` at any time. Cancellation
-is again an integral part of the Arkitekt design (and seperates it from a lot other message
-broker based systems). This is because we want to be able to cancel tasks at any time, and
-interupt critical processes if needed.
+A task:
 
-Because we establish a streaming network where actions can produce data over time, Tasks
-are also a way to establish data streams and will not onyl execute once, but can return 
-continouelsy new data over time. (See below for more on this).
+- belongs to the **user and organization** that started it, and runs with their permissions;
+- keeps a complete **event history** of what happened: when it was queued and started, its progress,
+  logs, yields, and how it ended;
+- can **stream**. A generator action yields results over time, and each one reaches the caller as it
+  is produced. That is what makes [real-time workflows](/docs/design/philosophy/realtime) possible;
+- can be **cancelled** at any point (see below);
+- can have **child tasks**. A [workflow](/docs/design/terminology/workflow) calls other actions as
+  children of its own task, so the history of a run is a tree, and every data change made along the
+  way is attributed to it ([Provenance](/docs/design/architecture/provenance)).
 
-
-## The path of a Task
-
-
-
-<Callout type="info">
-
-
-Understanding the inner workings of a Task is rather an "implementation detail" of Arkitekt,
-and we are abstracting it more and more away, so you do not need to crasp it to use Arkitekt.
-Just think of a Task as a way to run a Bioimage analysis in Arkitekt.
-
-
-</Callout>
+## The path of a task
 
 <div className="mt-2">
 
@@ -43,43 +33,52 @@ Just think of a Task as a way to run a Bioimage analysis in Arkitekt.
 </div>
 </div>
 
-When you create a Task in Akriekt you are essential creating a docket, a list of workitems
-that need to be done. Lets say you want to run a task like `segmentation` on a dataset.
+1. **Assign.** You pick "Segment Cells", fill in the inputs and run it. [Rekuest](/docs/design/services/rekuest)
+   checks that you may call it and that the inputs match its ports, and records the task.
+2. **Route and bind.** Rekuest chooses an implementation, and with it an agent, and queues the task
+   for that agent. From here on the task is **bound**: the platform knows exactly where it runs, so it
+   can be cancelled and so the agent's death can be noticed.
+3. **Run.** The agent reports `STARTED` before anything else, then calls the function. Progress, logs
+   and yielded values stream back while it runs.
+4. **End.** The task reaches exactly one terminal state (below), and its result or error is stored.
 
-You search the action "Segment Cells" and simply assign your data to it. You do not care
-where it runs, so Arkitekt decides for you, routing the task to any connected agent that
-implements the action.
+## States
 
-When you assign the task and enter the data you want to segment, you
-create a Task with the parameters you provided. This Task is now a "workorder"
-that is being sent through a pipeline of tasks.
+| State | Meaning |
+|---|---|
+| **Queued / assigned** | Accepted and routed, waiting for its agent to pick it up. A task nobody has picked up yet is safe to deliver again. |
+| **Running** | The agent has reported `STARTED` |
+| **Paused** | Paused by a person, or holding itself with a question for a person (`task.hold`) until someone resumes or cancels it |
+| **Completed** | Finished and returned its result *(terminal)* |
+| **Failed / critical** | Ended with an error *(terminal)* |
+| **Cancelled** | Stopped on request *(terminal)* |
+| **Interrupted** | Stopped by an interrupt, a harder request than cancel *(terminal)* |
+| **Lost** | Its agent died while it ran, so **how it ended is unknown** *(terminal)* |
 
+**Lost** needs a closer look, because it is neither a success nor a failure. A task ends lost when its
+agent disappears for longer than the grace window, or at once when a new process takes over the
+agent. The work may have finished, may have half-finished, or may never have started, and the lost
+event records what is known (whether it started, its last progress, and the action's claimed
+[effects](/docs/design/architecture/durable-execution#effects)). The platform does not re-run it.
+Whoever called decides. Lost is also final: if the dead agent's result turns up later, it is kept in
+the history but does not change the state, because the caller may already have acted on it.
 
-First Arkitekt acknoledges that you assigned the task (you had the permissions, and your parameters
-made sense), it entered the "Assigned" state. Now Arikitekt will put it through the rabbitmq
-based message broker, where it will be routed to the correct action. This is the process of
-"routing", once the task is routed to a desired implementation, the tasks is now "bound" to this
-implementation, and the implementation is responsible
-for running the tasks. Binding is an important concept in Arkitekt, as it allows us
-to keep track where exactly tasks are being executed so that we can always cancel them
-if needed.
+A **workflow** task is different: when *its* agent dies it is not lost but **resumed** from its journal.
+See [Durable execution](/docs/design/architecture/durable-execution).
 
-Once the task is running, the implementation will send back results to Arkitekt, which
-will then be sent back to the user. This is the process of "yielding" results from a task.
-Once the task is done, Arkiekt will mark the task as "done" and the Task is
-completed.
+## Cancellation
 
-At every step of the way, the task can be cancelled, by giving the Task ID to
-Arkitekt, and Arkitekt will then cancel the task, sending the request to cancel to the
-implementation, and then marking the task as "cancelled".
+Any task can be cancelled at any time by giving its id to Arkitekt. The request goes to the agent
+running it, and the task ends as cancelled once the agent confirms. Cancellation is a first-class
+part of the design, and it is one of the things that separates Arkitekt from plain message-queue
+systems. A person must always be able to stop a running experiment
+([Humans first](/docs/design/philosophy/humans-first)).
 
-<Callout type="warn" title="On Cancellation">
+<Callout type="warn" title="Cancellation needs the code's cooperation">
 
-
-Cancellation is not as trivial as it sounds, as computers are not always able to stop
-a process at any time. We have put a lot of care in our SDKs to make sure that
-cancellation is as smooth as possible, but some tasks might not be able to be cancelled
-at any time. Please be aware of this when you are running critical tasks.
-
+A computer cannot always stop work at an arbitrary instant. In Python, an `async` action is cancelled
+at its next `await`. A synchronous action runs in a worker thread, which cannot be killed, and
+stops only where it checks for cancellation. Hardware that must stop when its controller goes away
+needs its own watchdog. See [Disconnect policy](/docs/developers/python/concepts#disconnect-policy).
 
 </Callout>

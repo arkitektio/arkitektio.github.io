@@ -13,6 +13,16 @@ CLI.
 Drop it into your assistant and it will scaffold and edit apps following the
 conventions in these docs instead of guessing.
 
+<Callout type="warn" title="The skill still targets arkitekt-next">
+
+The published `SKILL.md` was written for the older `arkitekt-next` package (`@register`, `easy` as
+the app, the `arkitekt-next` CLI). Until it is updated, an assistant using it will produce code in
+that style. For the current API, point your assistant at this Python section, starting with
+[Core concepts](/docs/developers/python/concepts), and the
+[migration table](/docs/developers/python/installation#migrating-from-arkitekt-next).
+
+</Callout>
+
 ## Get the skill
 
 The skill is a single self-contained `SKILL.md` file, hosted here:
@@ -67,7 +77,7 @@ code.
   `gen`) and a pre-flight checklist.
 
 <Callout type="info" title="Keep it in sync">
-The skill mirrors the guidance in the [Python plugin guide](/docs/developers/python/plugin).
+The skill mirrors the guidance in the [Python guide](/docs/developers/python).
 If the API changes, update both `public/skills/arkitekt-next/SKILL.md` and the
 relevant docs pages together.
 </Callout>

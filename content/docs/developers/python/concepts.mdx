@@ -1,0 +1,351 @@
+---
+title: Core concepts
+description: "The model behind the arkitekt Python library: apps, actions, implementations, agents, tasks, ports and structures, injection, state, lifecycle hooks, streaming, workflows and disconnect policies. Each concept comes with a minimal example."
+---
+
+This page introduces the vocabulary you need to read the rest of the Python guide. Each concept has
+a platform-wide definition in the [terminology](/docs/design/terminology) section. Here you see what
+it looks like in code, and how the concepts fit together at runtime.
+
+## The big picture
+
+```text
+ your code                         the platform                         somebody else
+┌──────────────────┐   run(app)   ┌──────────────────────────┐  call   ┌──────────────┐
+│ App              │ ───────────► │ Rekuest                  │ ◄────── │ Orkestrator, │
+│  @app.action f   │  registers   │  action  "f"             │         │ a script, a  │
+│  @app.workflow w │  implement-  │  implementation of "f"   │  task   │ workflow …   │
+│  @app.state S    │  ations      │    by this app, for you  │ ──────► │              │
+└──────────────────┘              │  agent  (this process)   │         └──────────────┘
+          ▲                       └────────────┬─────────────┘
+          │        task: run f(x=1)            │
+          └────────────────────────────────────┘
+```
+
+1. You **declare** an `App` and decorate functions. Nothing connects yet.
+2. `run(app)` authenticates, starts an **agent** for this process and registers one
+   **implementation** per decorated function with [Rekuest](/docs/design/services/rekuest). The
+   implementation is attached to an **action**, the abstract "what", identified by the function's
+   inputs and outputs.
+3. Someone calls the action. Rekuest creates a **task** and routes it to an agent that implements
+   the action.
+4. Your agent receives the task, turns the arguments into Python objects, calls your function and
+   reports progress, logs, yields and the result back.
+
+## App
+
+An `App` is a **declaration**: who the app is and what it offers. Declaring it does no I/O.
+
+```python
+from arkitekt import App
+
+app = App(
+    "com.example.nuclei",   # identifier: defaults to the file name
+    "0.2.0",                # version: semver
+    description="Nucleus segmentation for widefield images",
+    services=[],            # service clients the actions use, see below
+)
+```
+
+The identifier and version tell the platform which app an implementation belongs to. Together they
+make up the app's [manifest](/docs/design/terminology/manifest). There is no manifest *file*: the
+manifest is computed from the declaration (`app.manifest`), and `arkitekt inspect all` prints what
+the app would register without connecting.
+
+An app is declared once, at module level, in a file the CLI can import. By default it is a variable
+called `app` in `app.py` (see [Your first app](/docs/developers/python/first-app)).
+
+## Action and implementation
+
+`@app.action` turns a function into an [implementation](/docs/design/terminology/implementation) of
+an [action](/docs/design/terminology/action):
+
+```python
+from typing import Annotated
+from arkitekt import App, Description, run
+
+app = App("hello", "0.1.0")
+
+
+@app.action
+def greet(
+    name: Annotated[str, Description("Who to greet")] = "world",
+    times: Annotated[int, Description("How often to say it")] = 1,
+) -> str:
+    """Greet
+
+    Says hello, possibly several times.
+    """
+    return " ".join([f"Hello {name}!"] * times)
+```
+
+- The **parameters** become the action's input [ports](/docs/design/terminology/port) and the
+  **return annotation** its output ports. A tuple return gives several outputs. Type hints are
+  required: they drive validation, the generated form in Orkestrator and how values are serialized.
+- The **first line of the docstring** is the action's title, and the rest is its description.
+  `{{name}}` placeholders in the description are filled with the call's arguments in the UI.
+- `Annotated[..., Description(...)]` documents a single port. `Default`, `Units`, `Requires` and
+  `Provides` are further markers you can add the same way.
+- A default value makes the port optional, and `Optional[...]` makes it nullable.
+
+The **action** is the abstract "what", defined by its ports. It is what users search for and what
+workflows are built from. The **implementation** is the concrete "how": this function, in this
+app, at this version, running for this user. Two apps can implement the same action, and the
+platform picks an implementation when a task is created.
+
+The decorated function stays an ordinary function. You can call it directly in tests. If it takes
+a `task`, pass `Task.local()`, a stand-in that logs to the console:
+
+```python
+from arkitekt import Task
+
+assert measure_nuclei(min_size=10, task=Task.local()).count > 0
+```
+
+`@app.action` takes keyword options when used with parentheses. The ones you will use most:
+
+| Option | Meaning |
+|---|---|
+| `name=` | Override the action's name (defaults to the function name) |
+| `effects=` | What running it again would do to the world: [`Effects`](/docs/developers/python/durable-execution#effects) |
+| `policy=` | What happens to a running task if this agent loses its connection: [disconnect policy](#disconnect-policy) |
+| `concurrency=` | `"serial"` (default) or `"parallel"`: whether this agent runs several tasks of this action at once |
+| `locks=` | Named locks a task must hold while it runs. Tasks that need the same lock wait for each other |
+| `widgets=`, `port_groups=`, `validators=` | Per-port UI widgets, grouping and validation |
+
+## Agent
+
+An **agent** is one running process that serves implementations: your `run(app)`, or a container
+started from your plugin. It holds a websocket to Rekuest, receives tasks, runs them and reports back.
+When you restart the process, a new agent session starts under the same agent name. That continuity
+is what lets the platform [resume workflows](/docs/developers/python/durable-execution) after a crash.
+
+You rarely touch the agent directly. It matters because it defines what "the agent died" means: the
+process exited, crashed, lost power or stayed disconnected past the grace window.
+
+## Task
+
+A [task](/docs/design/terminology/task) is **one run of an action**. It has an id, belongs to the
+user and organization who started it, can be cancelled, and records everything that happened in its
+event history.
+
+Inside your function the running task is available by annotating a parameter with `Task`. That
+parameter is **injected**. It is not a port, and callers never see it:
+
+```python
+from arkitekt import App, Task
+
+app = App("measure", "0.1.0")
+
+
+@app.action
+def measure(count: int, *, task: Task) -> float:
+    """Measure"""
+    total = 0.0
+    for i in range(count):
+        task.progress(int(100 * i / count), f"sample {i}")
+        total += read_sensor()
+    task.log(f"read {count} samples")
+    return total / count
+```
+
+| Method | Purpose |
+|---|---|
+| `task.log(message, level)` | A log line attached to the task, visible in the UI |
+| `task.progress(percent, message)` | Progress, shown live |
+| `task.pausepoint()` | A point where the task pauses if someone paused it |
+| `task.now()`, `task.random()`, `task.sleep()`, `task.record(fn)` | Values taken from outside, **recorded** so a resumed workflow gets the same ones back ([durable execution](/docs/developers/python/durable-execution)) |
+| `task.retry(...)`, `task.hold(...)`, `task.guard(...)` | Deciding about a lost step in a workflow |
+| `task.id`, `task.user`, `task.org` | Who and what this task is |
+
+Every method has an `a`-prefixed async twin (`await task.aprogress(...)`) for `async def` actions.
+With the `tqdm` extra, `from arkitekt.tqdm import tqdm` gives a progress bar that reports to the task.
+
+## Ports, types and structures
+
+A port may only name a type the app knows how to transport:
+
+| Kind | Examples | Travels as |
+|---|---|---|
+| Scalars | `str`, `int`, `float`, `bool`, `Enum` subclasses | the value |
+| Containers | `list[...]`, `dict[str, ...]`, `Optional[...]`, `Union[...]`, tuples as multiple returns | the value |
+| **Models** | a class decorated with `@app.model` | the value, field by field |
+| **Service structures** | `Volume`, `SingleChannelImage`, `LabelMask` from `mikro.arkitekt.specs` | a reference: the id of an object stored in the service |
+| **Registered structures** | your own class, via `app.register_structure(...)` | a reference that your expander resolves |
+| **Memory structures** | e.g. `np.ndarray`, via `app.memory_structure(...)` | a reference to an object kept on this agent |
+
+This is the *pass-by-reference* model. Large data never travels between apps inline. It lives in a
+data service like [Mikro](/docs/design/services/mikro) and only its id travels. The receiving app
+fetches it again ("expands" it). [Types & data](/docs/developers/python/types) explains each kind
+in detail. The platform-wide concept is described under [structure](/docs/design/terminology/structure).
+
+Using a type the app does not know is an error when the app is declared, not when it is called.
+
+## Injection by annotation
+
+Several kinds of parameters are filled in by the runtime rather than by the caller. Arkitekt tells
+them apart by their **type annotation**:
+
+| Annotated with | Injected value |
+|---|---|
+| `Task` | The running task |
+| A service client (`Mikro`, `Fluss`, …) | A connected client, if the service is listed in `App(services=[...])` |
+| An `@app.state` class | The app's live state instance |
+| An `@app.context` class | The shared context built by a startup hook |
+| The class passed as `App(app_context=...)` | The value passed to `run(app, context=...)` |
+| An `@app.declare` protocol | A proxy that calls another app's actions (workflows only) |
+
+Everything else is a port. Injected parameters can go anywhere in the signature. Making them
+keyword-only (after `*`) is a readable convention.
+
+## Services
+
+Actions that need a platform service name it in `services=` and take its client by annotation:
+
+```python
+from arkitekt import App, Task
+from mikro import Mikro, mikro_service
+from mikro.arkitekt.specs import Volume
+
+app = App("inspect-volume", "0.1.0", services=[mikro_service])
+
+
+@app.action
+def describe(volume: Volume, mikro: Mikro, task: Task) -> str:
+    """Describe Volume"""
+    task.progress(50, "Reading")
+    return f"{volume.data.shape}"
+```
+
+Listing a service does two things. It declares a **requirement**, which the user approves when the
+app first connects, and it makes the service's structures (here `Volume`) usable as ports. Pass the
+service object (`mikro_service`), not the client class. Passing a class raises `TypeError`.
+
+## State, context and lifecycle
+
+Some things live longer than one task: a connection to a device, a loaded model, the position of a
+stage. Arkitekt has three declarations for them, all populated by **startup hooks**:
+
+| Declaration | For | Visible to others? |
+|---|---|---|
+| `@app.state` | Values others should see change live: a stage position, a queue length | Yes, published to the platform and patched as it changes |
+| `@app.context` | Heavy or private objects: a model, a device handle | No |
+| `App(app_context=Setup)` | Configuration of this installation, given to `run(app, context=...)` | No |
+
+`@app.startup`, `@app.shutdown` and `@app.background` run when the agent starts providing, stops,
+or for as long as it runs. The details and a full device example are in
+[State & lifecycle](/docs/developers/python/state-lifecycle).
+
+## Streaming
+
+An action written as a **generator** streams. Each `yield` is delivered to the caller as it happens,
+and a workflow can process items while later ones are still being produced:
+
+```python
+from typing import Generator
+from arkitekt import App
+
+app = App("counter", "0.1.0")
+
+
+@app.action
+def count_to(n: int) -> Generator[int, None, None]:
+    """Count To"""
+    for i in range(n):
+        yield i
+```
+
+Async generators (`AsyncGenerator[...]`) work the same way. Streaming is what makes
+[real-time workflows](/docs/design/philosophy/realtime) possible.
+
+## Calling other actions: workflows
+
+A plain action **may not call other actions**. An action that orchestrates others is declared with
+`@app.workflow` instead. It names what it needs from another app as a **protocol**:
+
+```python
+from typing import Protocol
+from arkitekt import App, Task
+
+app = App("pipeline", "0.1.0")
+
+
+@app.declare(app="segmentation", auto_resolvable=True, min=1)
+class Segmentation(Protocol):
+    def count_cells(self, image_id: str) -> int:
+        """Count Cells"""
+        ...
+
+
+@app.workflow
+def count_twice(segmentation: Segmentation, image_id: str, *, task: Task) -> int:
+    """Count Twice"""
+    first = segmentation.count_cells(image_id)
+    second = segmentation.count_cells(image_id)
+    return max(first, second)
+```
+
+The restriction exists because only a workflow can be **resumed** if its agent dies. A plain action
+that had called three others and then crashed would have no way to find those calls again.
+[Workflows](/docs/developers/python/workflows) covers protocols and calling. [Durable execution](/docs/developers/python/durable-execution)
+covers what happens on failure.
+
+## Execution and effects
+
+Every implementation carries two claims that decide what happens when an agent dies mid-task:
+
+- **Execution**: `PLAIN` (`@app.action`) or `WORKFLOW` (`@app.workflow`). A plain task whose agent
+  dies ends **LOST** and the caller decides what to do. A workflow whose agent dies is **resumed**.
+- **Effects**: what running it again would do to the world. The values are `NONE`, `REPEATABLE`,
+  `UNKNOWN` (the default) and `IRREVERSIBLE`. This claim is information for whoever decides after a
+  loss. It is never a rule the platform acts on.
+
+```python
+from arkitekt import App, Effects
+
+app = App("liquid-handler", "0.1.0", effects=Effects.IRREVERSIBLE)  # default for this app
+
+
+@app.action(effects=Effects.NONE)   # this one only reads
+def read_absorbance(well: str) -> float:
+    """Read Absorbance"""
+    ...
+```
+
+See [Durable execution](/docs/developers/python/durable-execution) and the design page
+[Durable execution](/docs/design/architecture/durable-execution) for the full model.
+
+## Disconnect policy [#disconnect-policy]
+
+Separate from an agent *dying* is an agent temporarily *losing its connection*. By default a
+running task keeps going and reports when the link returns. That is right for a six-hour
+acquisition. For an action whose safety depends on being stoppable ("move the stage until I say
+stop"), declare that losing the link is itself a stop condition:
+
+```python
+from arkitekt import App, CancelOnDisconnect
+
+app = App("stage", "0.1.0")
+
+
+@app.action(policy=CancelOnDisconnect(grace=2.0))
+async def jog(direction: str) -> None:
+    """Jog
+
+    Moves until cancelled. Stops if control is lost for more than two seconds.
+    """
+    ...
+```
+
+The policy is enforced inside your process, because the server cannot reach a disconnected agent.
+An `async` action is cancelled at its next `await`. A **sync** action runs in a worker thread,
+which cannot be killed. It stops only at a `koil.check_cancelled()` call, so long-running sync loops
+must poll it. This narrows the window in which hardware keeps running after control is lost. It is
+not a safety interlock, and hardware that must stop needs its own watchdog.
+
+## Sync or async?
+
+Both are supported, for actions, hooks and workflows. Use `async def` when your code awaits I/O or
+calls async clients (`await mikro.acreate_folder(...)`), and plain `def` for CPU-bound or blocking
+library code. Sync functions run in a worker thread, so they don't block the agent. Every client and
+task method exists in both forms: `x(...)` and `await ax(...)`.

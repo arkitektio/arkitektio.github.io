@@ -2,16 +2,19 @@
   "title": "Python",
   "pages": [
     "installation",
-    "graphql",
-    "---Classic Style---",
-    "classic",
-    "read-write",
-    "---Plugin Style---",
-    "plugin",
-    "more",
-    "bloks",
+    "concepts",
+    "---Building apps---",
+    "first-app",
+    "types",
+    "state-lifecycle",
+    "---Orchestration---",
+    "workflows",
+    "durable-execution",
+    "---Calling & tooling---",
+    "scripts",
     "build",
-    "---Tooling---",
+    "bloks",
+    "graphql",
     "agent-skill"
   ]
 }

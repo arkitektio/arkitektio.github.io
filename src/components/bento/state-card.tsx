@@ -6,7 +6,7 @@ import { BentoCard } from './primitives';
 import { RobotStateScene } from '@/components/marketing';
 
 // A fake observable robot state. Each tick the agent mutates it and the change
-// is "published" live. This stands in for the real @state instance a dashboard
+// is "published" live. This stands in for the real @app.state instance a dashboard
 // would watch over the platform at `publish_interval`.
 const POSES = ['idle', 'reaching', 'gripping', 'lifting', 'placing'] as const;
 
@@ -31,7 +31,7 @@ export function StateCard() {
 
   return (
     <BentoCard
-      href="/docs/developers/python/plugin/more"
+      href="/docs/developers/python/state-lifecycle"
       hrefLabel="Learn about state"
       className="grid grid-cols-1 gap-6 p-6 sm:col-span-2 sm:p-8 lg:grid-cols-2 lg:items-center"
     >
@@ -44,7 +44,7 @@ export function StateCard() {
           Observability baked in
         </h2>
         <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
-          Declare any <code>@state</code> dataclass and any agent can read it (but only
+          Declare any <code>@app.state</code> class and any agent can read it (but only
           you mutate it). Every change is published to the
           platform automatically. Dashboards and other apps watch your
           that change. Did we say we keep track of it for replay and provenance too? We do.
@@ -52,9 +52,7 @@ export function StateCard() {
 
         <pre className="mt-5 overflow-x-auto rounded-xl border border-fd-border bg-[#0a0a0c] p-4 font-mono text-[12px] leading-relaxed text-white/80">
           <code>
-            <span className="text-[#c792ea]">@state</span>
-            {'\n'}
-            <span className="text-[#c792ea]">@dataclass</span>
+            <span className="text-[#c792ea]">@app.state</span>
             {'\n'}
             <span className="text-[#82aaff]">class</span>{' '}
             <span className="text-[#ffcb6b]">RobotState</span>:{'\n'}
@@ -65,7 +63,7 @@ export function StateCard() {
             {'    '}picks: <span className="text-[#82aaff]">int</span>{' '}
             <span className="text-[#89ddff]">=</span> 0{'\n'}
             {'\n'}
-            <span className="text-[#c792ea]">@register</span>
+            <span className="text-[#c792ea]">@app.action</span>
             {'\n'}
             <span className="text-[#82aaff]">def</span>{' '}
             <span className="text-[#ffcb6b]">pick</span>(robot:{' '}
