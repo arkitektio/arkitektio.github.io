@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { CircleQuestionMark, Loader2, RotateCw } from 'lucide-react';
 
 // Services that the legacy `?live=<url>` deep links can point at. The first
 // matching entry wins.
@@ -53,11 +53,28 @@ function resolve(search: string | null): Status {
   }
 }
 
+const whatsThisRoute = '/deeplink/whats-this';
+
+// The explainer keeps the original query string, so the reader can come back to
+// the very link they were sent once Orkestrator is installed.
+function WhatsThisLink({ search }: { search: string | null }) {
+  return (
+    <Link
+      href={`${whatsThisRoute}${search ?? ''}`}
+      className="inline-flex items-center gap-2 rounded-full border border-fd-border bg-fd-card/60 px-4 py-2 text-sm font-medium transition-colors hover:border-fd-primary/50 hover:text-fd-primary"
+    >
+      <CircleQuestionMark className="size-4" />
+      What&apos;s this?
+    </Link>
+  );
+}
+
 // Ported from the Docusaurus site's /deeplink page. Two forms are supported:
 //   /deeplink?orkestrator=<path>  → hands off to the orkestrator:// protocol
 //   /deeplink?live=<url>          → jumps to the docs of the matching service
 export function DeeplinkClient() {
-  const status = resolve(useSearch());
+  const search = useSearch();
+  const status = resolve(search);
 
   useEffect(() => {
     if (status.kind === 'orkestrator' || status.kind === 'live') {
@@ -78,6 +95,10 @@ export function DeeplinkClient() {
             </a>{' '}
             manually.
           </p>
+          <p className="text-fd-muted-foreground">
+            Somebody shared this with you and you have never heard of Arkitekt?
+          </p>
+          <WhatsThisLink search={search} />
         </>
       )}
       {status.kind === 'live' && (
@@ -96,6 +117,7 @@ export function DeeplinkClient() {
         <>
           <h1 className="text-2xl font-semibold">Nothing to open</h1>
           <p className="text-fd-muted-foreground">{status.message}</p>
+          <WhatsThisLink search={search} />
         </>
       )}
       <p className="text-sm text-fd-muted-foreground">
@@ -104,5 +126,23 @@ export function DeeplinkClient() {
         </Link>
       </p>
     </div>
+  );
+}
+
+// Shown on the explainer page: leads back to the link the reader came from. It
+// renders nothing when the page was opened without one.
+export function DeeplinkRetry() {
+  const search = useSearch();
+  const status = resolve(search);
+  if (status.kind !== 'orkestrator' && status.kind !== 'live') return null;
+
+  return (
+    <Link
+      href={`/deeplink${search}`}
+      className="inline-flex items-center gap-2 rounded-full bg-fd-primary px-5 py-2.5 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90"
+    >
+      <RotateCw className="size-4" />
+      Open the link again
+    </Link>
   );
 }
