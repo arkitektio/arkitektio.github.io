@@ -1,0 +1,57 @@
+---
+title: Mobile Companion
+description: What you can do with Arkitekt from your phone, and how Pokket, the mobile companion app, fits next to Orkestrator.
+---
+
+Most of the work in Arkitekt happens at a desk: you build workflows, look at volumes and annotate data in
+[Orkestrator](/docs/apps/standalones/orkestrator). But a lot of lab life happens away from the desk, next to a
+microscope, at the bench or on the way home while an overnight analysis is still running. For those moments
+there is **[Pokket](/docs/apps/standalones/pokket)**, the mobile companion app.
+
+![Pokket App](/docs/apps/standalones/pokket.png)
+
+## A companion, not a replacement
+
+Pokket does not try to be Orkestrator on a small screen. There is no workflow editor and no image viewer.
+It talks to the same server, with the same account, and is built around the few things that are actually
+useful when all you have is a phone:
+
+- **Keeping an eye on tasks.** Pokket lists your latest tasks from the `rekuest` service, so you can check
+  whether that long-running segmentation finished, or failed, without walking back to your computer.
+- **Bringing hardware online.** Pokket is how small devices get into Arkitekt. An ESP32 running the
+  [Arkitekt firmware](/docs/developers/embedded) advertises itself over Bluetooth; Pokket sends it your Wi-Fi
+  credentials (eduroam included) and an Arkitekt connection token over the **Improv Wi-Fi** protocol. The device
+  then connects, registers its actions, and shows up as an app in Orkestrator. Saved Wi-Fi profiles let you set up
+  a whole shelf of devices without retyping credentials.
+- **Reaching your server from anywhere.** If your organisation runs a [mesh](/docs/design/security/mesh), Pokket
+  can join it after you approve it, the same way Orkestrator does. It runs its own node inside the app, so it
+  needs no VPN permission and no separate Tailscale app, and services that only live on the mesh become reachable
+  from your phone.
+
+Pokket signs in through `lok`, like every other Arkitekt app, so what you can see and do on your phone is exactly
+what your account is allowed to see and do on the server.
+
+## Getting Pokket
+
+Pokket is available for **Android** as an APK and for **iPhone / iPad** through TestFlight:
+
+- **Android:** open [`pokket.apk`](https://github.com/arkitektio/pokket/releases/latest/download/pokket.apk) on
+  your phone and install it. This link always points to the latest release.
+- **iOS:** ask a maintainer for a TestFlight invite.
+
+Once installed, Pokket keeps itself up to date: most updates arrive over the air when you open the app. See the
+[Pokket page](/docs/apps/standalones/pokket#install) for details.
+
+<Callout type="info" title="Device provisioning needs Bluetooth">
+
+Setting up ESP32 devices uses Bluetooth Low Energy, so your phone needs BLE and Pokket needs permission to use it.
+The [embedded guide](/docs/developers/embedded) walks through flashing a device and provisioning it with Pokket.
+
+</Callout>
+
+<Callout type="warn" title="Live streams over the mesh">
+
+When Pokket reaches your server through the mesh, regular requests and live updates are carried, but WebRTC
+media (LiveKit) is not. Live video streams will not play on the phone over the mesh.
+
+</Callout>

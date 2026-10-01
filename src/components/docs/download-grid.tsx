@@ -5,7 +5,7 @@ import { FaApple, FaLinux } from "react-icons/fa";
 export const DownloadButton = ({ children }) => {
   return (
     <a
-      href={"https://github.com/arkitektio/konstruktor/releases"}
+      href={"https://github.com/arkitektio/konstruktor/releases/latest"}
       target="_blank"
       className="bg-primary-300 rounded-sm px-3 py-1 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white "
     >
@@ -62,7 +62,7 @@ export const OrkestratorGrid = ({ children }) => {
     <div className="grid grid-cols-3 md:grid-cols-3 gap-4 mb-3 ">
       <a
         href={
-          "https://github.com/arkitektio/orkestrator/releases/download/v0.0.7/orkestrator_0.0.7_amd64.deb"
+          "https://github.com/arkitektio/orkestrator/releases/latest"
         }
         target="_blank"
         className="p-2 bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto "
@@ -74,7 +74,7 @@ export const OrkestratorGrid = ({ children }) => {
       </a>
       <a
         href={
-          "https://github.com/arkitektio/orkestrator/releases/download/v0.0.7/orkestrator_0.0.7_x64-setup.exe"
+          "https://github.com/arkitektio/orkestrator/releases/latest"
         }
         target="_blank"
         className="bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto"
@@ -86,7 +86,7 @@ export const OrkestratorGrid = ({ children }) => {
       </a>
       <a
         href={
-          "https://github.com/arkitektio/orkestrator/releases/download/v0.0.7/orkestrator_0.0.7_x64.dmg"
+          "https://github.com/arkitektio/orkestrator/releases/latest"
         }
         target="_blank"
         className="bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white my-auto flex flex-col items-center my-auto"
