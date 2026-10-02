@@ -1,6 +1,6 @@
 ---
 title: Rekuest
-description: A core, stateless Arkitekt service that acts as a central repository of connected apps and routes tasks between callers and apps.
+description: The Arkitekt service that knows every connected app and assigns tasks to them. A Python server answers GraphQL; a Rust backend, takt, speaks to the agents and owns task assignment.
 ---
 
 import { GithubRepo } from "@/components/docs";
@@ -10,32 +10,68 @@ import { GithubRepo } from "@/components/docs";
 
 ## Rekuest Design
 
-Rekuest itself is designed as a stateless service (in order to be able to scale horizontally), and
-interfaces with proven open-source technologies, such as [Redis](https://redis.io/) and [RabbitMQ](https://www.rabbitmq.com/).
-to route tasks to the appropriate apps. The following diagram shows the high-level design of Rekuest:
+Rekuest is two programs that are released together and always run as a pair:
 
-<div className="mt-2">
+- **The Rekuest server** (Python) is what clients and the UI talk to. It serves the GraphQL API and
+  its subscriptions, holds the catalogue of actions and implementations, and owns the database
+  schema.
+- **takt** (Rust) is the backend for task assignment. It holds every agent's connection, registers
+  what an agent declares, assigns tasks, delivers controls such as cancel, interrupt and pause, and
+  runs every deadline: lost agents, redelivery, schedules, triggers and retention.
 
-![Rekuest](/docs/design/services/rekuest.png)
+Both read the same configuration file and share one Postgres database and one Redis. Neither keeps
+state of its own, so each can run as several replicas.
 
-<div className="text-gray-400 mb-2 mt-4">
-<small> The Rekuest stack with its supporting libraries. The RabbitMQ backend is replaceable by other
-message brokers   </small>
-</div>
-</div>
+```
+agents ──── websocket ─────┐
+webhook agents ── HTTP ────┤
+hub services ── signals ───┤
+                           ▼
+                 takt (Rust, N replicas) ◀── internal API ── Rekuest server (Python, GraphQL)
+                           │                                          │
+                           └─────────── Postgres · Redis ─────────────┘
+```
 
+A gateway in front of the pair sends the agent routes to takt and everything else to the server.
+When a GraphQL mutation needs something done to a task or an agent, the server asks takt over a
+signed internal API; takt is the only writer of task state.
 
 <Callout type="info">
 
-
-Rekuest is currently being rewritten to support other message brokers, such as [Kafka](https://kafka.apache.org/). This will
-however remain an opt-in feature, and RabbitMQ will remain the default message broker. To learn more about this design decision,
-please refer to the [Comparisons](/docs/design/comparisons) section.
-
+Earlier versions of Rekuest queued tasks through a message broker (RabbitMQ). That is gone: tasks
+are rows in Postgres, and Redis carries the queues to connected agents and the events between
+replicas.
 
 </Callout>
 
+### Why task assignment is written in Rust
 
+An agent's reports and its heartbeat answers must not wait behind API work. When GraphQL, every
+agent connection and every subscription lived in one Python process, they did: under load from the
+UI, agents fell behind on their heartbeat and were disconnected. Moving the agent side into its own
+program removed that coupling. Measured with one agent streaming a report every 50 ms while two
+workers query GraphQL:
+
+| GraphQL load | Agent protocol inside the Python server | takt |
+|---|---|---|
+| none | 19.5 reports/s, acknowledged after 0.22 s | 19.9 reports/s, 0.14 s |
+| 10 queries/s × 2 | 9.2 reports/s, 5.3 s, agent disconnected | 19.4 reports/s, 0.13 s |
+| 26 queries/s × 2 | agent already gone | 19.2 reports/s, 0.12 s |
+
+What this means for throughput and real-time behaviour is discussed in
+[Performance & Real-time](/docs/design/security/performance).
+
+### What happens when a task is assigned
+
+1. The caller names an action, or one implementation of it, and passes arguments. takt checks the
+   arguments against the action's ports.
+2. takt resolves the implementation's **dependencies**: the other apps it calls while it runs. A
+   dependency may have dependencies of its own, so the whole tree is resolved at once and frozen
+   onto the task. Every call the task later makes reaches the agents chosen at this moment.
+3. The task is stored, and handed to the agent as soon as the row is committed. A task whose agent
+   is offline waits for it.
+4. The agent reports what it does. Each report is stored once and acknowledged, and the caller sees
+   it as it arrives.
 
 ### Challenges as a Distributed System
 
@@ -49,11 +85,11 @@ things it connects fail. Its contract for that is specific:
 - **Workflows survive their agent.** A workflow task is resumed from its journal, and the calls it
   already made return their recorded results instead of running again.
 
-[Durable execution](/docs/design/architecture/durable-execution) describes this in full. Rekuest
-itself is a comparatively thin layer over proven infrastructure. A message broker (RabbitMQ) queues
-and distributes tasks, and a websocket API wraps it to authenticate agents and callers, authorize
-calls, and track the health of every connected app. What this means for throughput and real-time
-behaviour is discussed in [Performance & Real-time](/docs/design/security/performance).
+[Durable execution](/docs/design/architecture/durable-execution) describes this in full.
+
+Every deadline behind that contract is a column in the database, and takt's replicas sweep them. One
+replica sweeps per tick and every transition has exactly one winner, so a replica can stop at any
+moment without a deadline being missed.
 
 <div className="mt-2">
 
