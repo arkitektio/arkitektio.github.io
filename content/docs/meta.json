@@ -2,13 +2,10 @@
   "title": "Arkitekt",
   "pages": [
     "index",
-    "---Choose your path---",
     "use",
     "deploy",
     "build",
-    "---Background---",
     "design",
-    "---Resources---",
     "privacy"
   ]
 }
