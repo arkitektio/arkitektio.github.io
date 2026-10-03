@@ -1,0 +1,201 @@
+---
+title: Durable execution
+description: "How Arkitekt keeps long-running work correct when agents die: plain tasks end LOST, workflows are resumed from a journal, recorded effects make replay deterministic, and every decision about a lost step stays explicit."
+---
+
+Laboratory work does not fit in a request/response cycle. A workflow that acquires, segments and
+doses a 96-well plate runs for hours, across several apps on several machines, and any of those
+machines can crash, reboot or lose power. **Durable execution** is Arkitekt's contract for that case.
+It states what the platform guarantees when an agent dies mid-task, what it records to keep that
+promise, and which decisions it deliberately leaves to you.
+
+The hands-on counterpart, with Python API and examples, is
+[Durable execution](/docs/build/guides/python/durable-execution) in the developer guide.
+
+## Principles
+
+1. **Finished work is never redone.** A step that completed stays completed, whatever happens later
+   to the task that called it.
+2. **Unknown outcomes are not guessed.** If an agent dies while running something, the platform does
+   not know whether the work happened, and says so instead of retrying or failing it. The server
+   **re-runs nothing on its own**. The only exception is work that no agent ever picked up, which
+   cannot have happened and is delivered again.
+3. **Whoever has the context decides.** That is the workflow's code, the script that called, or a
+   person. The platform supplies what is known, and the decision is made in code or in the UI.
+
+## Two claims on every implementation
+
+When an app registers an [implementation](/docs/design/terminology/implementation), it makes two
+claims that the rest of the design builds on:
+
+| Claim | Values | Decides |
+|---|---|---|
+| **Execution** | `PLAIN` or `WORKFLOW` | What happens to a task of it when its agent dies: `PLAIN` ends **lost**, `WORKFLOW` is **resumed**. Only a workflow may call other actions. |
+| **Effects** | `NONE`, `REPEATABLE`, `UNKNOWN` (default), `IRREVERSIBLE` | Nothing automatically. It is *information* shown to whoever decides about a lost task: what running it again would do to the world. |
+
+### Effects [#effects]
+
+| `Effects` | Running it again… | Example |
+|---|---|---|
+| `NONE` | changes nothing | count cells, read absorbance |
+| `REPEATABLE` | leaves the same state as running it once | rename a dataset |
+| `UNKNOWN` | nobody has said (the default) | store a new label dataset |
+| `IRREVERSIBLE` | happens again, in the real world | dispense liquid |
+
+An app can set a default for all its actions, and an action's own claim overrides it. Neither the
+server nor the SDK's retry helper acts on the claim. It is shown to whoever decides.
+
+### Why only workflows may call
+
+The rule that only workflows may call follows from principle 1. A plain action that called three
+others and then died would leave no record of which calls had finished. A workflow records every call
+under a stable key, so a resumed run can find them all again.
+
+## What happens when an agent dies
+
+| What died | Who handles it | Outcome |
+|---|---|---|
+| the agent of a plain task | the caller | the task ends **LOST**, and the caller gets `AgentLost` / a lost event |
+| the agent of a workflow | the server | the workflow is **resumed** from its journal |
+| the agent of a step inside a workflow | the workflow's code | the step's call raises `AgentLost` inside the workflow |
+| a caller (UI, script) | nobody | nothing: a caller disconnecting is not a failure |
+
+An agent counts as dead when it stays disconnected past the server's grace window, or immediately
+when a new process takes over the same agent. A short network interruption only pauses reporting,
+and the agent's journal (below) delivers everything it missed once it reconnects.
+
+### LOST
+
+LOST is a terminal [task state](/docs/design/terminology/task#states) meaning *the outcome is unknown*.
+It is **not** a failure. The lost event carries what is known:
+
+| Field | Meaning |
+|---|---|
+| `started` | Whether the task ever reported `STARTED`. If not, nothing ran, and sending it again is safe. |
+| `last_progress` | The last progress it reported |
+| `effects` | The implementation's effects claim |
+| `reason` | In words |
+
+LOST is **final**. A result that arrives later (after a network partition outlasted the grace window,
+or from the dead process's journal) is stored as a *late report* in the history but never replaces
+LOST, because the caller may already have acted on it. Work that was never started ends LOST with
+`started: false` once its redelivery budget is spent, or when its agent never comes back.
+
+## What is persisted where [#what-is-persisted-where]
+
+Resuming is only possible because every value a workflow depends on is written down twice: on the
+agent's disk and on the server.
+
+**On the agent: the journal.** Every agent keeps a single ordered journal of everything it reports:
+task events, progress, logs, yields, recorded effects, lock changes and state patches. Each entry has
+a position (`pos`, gapless per agent session) and the task step it belongs to. The journal is a SQLite
+file (by default `.arkitekt/rekuest_journal.db` in the app's working directory, or
+`$REKUEST_JOURNAL_PATH`), and it has two jobs:
+
+- **Delivery.** Every numbered frame is kept until the server acknowledges it with a cumulative
+  `JOURNAL_ACK`. After a reconnect, and after a restart, retained frames are sent again before
+  anything new, and inserts on the server are idempotent. Nothing an agent reported is lost to a
+  dropped socket or a crash between writing and sending.
+- **Completing a resume.** Values the dead process recorded but never managed to send are still in
+  its journal on disk. The successor adds them before the workflow is replayed.
+
+**On the server: the task history.** Rekuest stores for every task:
+
+- its **events**, including each recorded effect as an `EFFECT` event that is unique per
+  `(task, key)`, so a value can never be recorded twice;
+- its **child tasks**, idempotent on `(parent, call_key)`. Re-issuing a call with the same key finds
+  the existing child instead of creating a new one;
+- the **code hash** of the implementation at dispatch (a hash of the function's source);
+- a **resume counter**.
+
+## Making replay deterministic: effects and call keys
+
+A resumed workflow re-runs its code **from the top**. To arrive at the same place without redoing
+anything, every value that came from outside the code must come back identical. There are two
+sources of such values, and both are recorded under keys.
+
+**Effects** are values the code took through the task: the current time (`task.now()`), randomness
+(`task.random()`), a sleep's deadline (`task.sleep()`), anything else via `task.record(fn)`, and
+the outcome of a hold. Each is recorded as an effect under a key formed from its kind and occurrence
+(`NOW:1`, `RECORD:3`) or chosen by the author. Values must be JSON.
+
+**Call keys** name the workflow's calls. By default a key is the target, a hash of the arguments and
+the occurrence (`atest.double:054b7d8d:1`). The [Fluss](/docs/build/concepts/services/fluss) engine, which
+runs graph workflows the same way, names calls by node. Keys stay stable when concurrent calls
+complete in a different order.
+
+Any other source of variation (`time.time()`, reading a file, an HTTP request) would make the resumed
+run diverge. That is why workflow code must be **deterministic** apart from calls and task helpers.
+
+## The resume lifecycle
+
+1. **Dispatch.** The workflow's task is created. Rekuest stores the implementation's code hash with it.
+2. **Run.** Each effect helper and each call first checks whether a value is already recorded under
+   its key. On a first run there is none, so it takes the value and journals an `EFFECT`, or it sends
+   an assign request carrying the parent task, its step and its call key.
+3. **The agent dies.** After the grace window, or at once if a new process takes the agent over,
+   Rekuest claims the task back to *queued*.
+4. **Checks.** If the stored code hash no longer matches the implementation, the task ends LOST
+   ("code changed"). If it has been resumed three times already, it ends LOST. Otherwise it is sent
+   again with a `resume` payload: its last step and every effect recorded so far.
+5. **The successor completes the journal.** The new process (same agent name, same journal file)
+   adds any effects the dead process recorded but never sent. Because effects are unique per key on
+   the server, the late resend of those frames changes nothing.
+6. **Replay from the top.**
+   - An effect helper finds its key and returns the recorded value. A sleep waits only until its
+     recorded deadline.
+   - A call is re-issued with the same key. Rekuest finds the existing child (`created: false`) and
+     replays its stored events. A **finished** child returns its result without running again, and a
+     stream replays its yields. A **running** child's events so far come first, then live ones.
+   - A value of a different kind under a known key, or a known call key that now names a different
+     action, raises `NonDeterministicWorkflow` instead of mixing two histories.
+7. **Continue live.** Once replay passes the last recorded step, new effects and calls are recorded as
+   usual and new reports continue after `last_step`.
+
+A workflow whose agent never comes back after being resent ends LOST with `started: true`.
+
+## Deciding about a lost step
+
+A step that dies inside a workflow is an ordinary exception there (`AgentLost`), and the workflow is
+the natural place to decide what to do. It knows whether the step can be repeated, whether the rest of
+the run is still meaningful, and whether a person should look. The SDK offers three answers:
+
+- **Retry** only when it is safe: automatically if the step never started, and after it started only if
+  the author opts in. Retry reacts to lost agents only, never to errors, and ignores effects.
+- **Hold.** The workflow pauses itself with a message and the lost step's details. A person checks the
+  real world and resumes or cancels. A resumed hold is recorded as an effect, so a later resume does
+  not ask again.
+- **Guard** a dependency's published [state](/docs/build/guides/python/state-lifecycle). The workflow
+  records the state's revision when it enters a block. On resume, it raises `StateChanged` if anything
+  other than the workflow's own calls changed the guarded paths, or if that agent restarted. This is
+  optimistic, like HTTP's `If-Match`: nothing is locked while the workflow is down.
+
+## Guarantees and non-guarantees
+
+| Arkitekt guarantees | Arkitekt does **not** guarantee |
+|---|---|
+| A finished child call is never run again for the same workflow run | That a *started but lost* step did or did not take effect |
+| A resumed workflow sees the same recorded time, randomness and recorded values | That code outside `task` helpers and calls is replayed identically |
+| Reports are delivered to the server, in order, despite reconnects and restarts | That a workflow survives a change to its own source code |
+| LOST is final, and late results are kept but never overwrite it | Automatic retries: the server re-runs only never-started work |
+| A plain task's loss is reported to its caller with what is known | Idempotency of your actions. `effects` is a claim, not an enforcement |
+
+## Known limits
+
+- Only the workflow function's own source is hashed. A change to a helper it calls goes unnoticed.
+- At most three resumes per task.
+- A resumed run reports progress, logs and its own yields again, so they appear twice in the history.
+- A guard sees only state the other app publishes. It works only for a dependency resolved to exactly
+  one agent, and it does not watch for changes while the workflow is running.
+- The journal lives on the agent's disk. If that disk is lost (an ephemeral container without a volume,
+  for example), a workflow can still be resumed from the server's history, but effects the dead
+  process recorded and never sent are gone, and the resumed run takes those values anew. Give
+  long-running workflow agents persistent storage for their `.arkitekt` folder.
+
+## Related designs
+
+Arkitekt's model resembles durable-execution engines such as Temporal: code is replayed against a
+recorded history, and side-effect-free determinism is the author's side of the contract. It differs in
+where the boundaries sit. Steps are **actions on other apps**, often on hardware, whose effects the
+platform cannot undo. For that reason the platform never retries a started step by itself, and it
+carries the effects claim and the hold to a person instead.

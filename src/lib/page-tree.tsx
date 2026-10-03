@@ -7,7 +7,7 @@ import type { Node, Root } from 'fumadocs-core/page-tree';
  * Fumadocs separators are plain text. In a meta.json, `---[Label](/url)---` parses
  * as a separator with icon `Label` and name `(/url)`; this turns such a separator
  * into a link to `/url` labelled `Label`, so a section heading can open its
- * overview page (e.g. `---[Apps](/docs/apps)---`).
+ * overview page (e.g. `---[Apps](/docs/use/guides/apps)---`).
  */
 const LINK_NAME = /^\((\/[^)]*)\)$/;
 

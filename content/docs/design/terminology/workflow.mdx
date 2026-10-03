@@ -32,9 +32,9 @@ workflow process data that is still being generated, for example images straight
 
 When you run a workflow you assign it to an app that becomes its **scheduler**: the entity that calls Arkitekt and the
 connected apps according to the blueprint. Intermediate results are stored centrally, so apps can hand data to each
-other and the whole run is tracked for [provenance](/docs/design/architecture/provenance). Where that round trip is
+other and the whole run is tracked for [provenance](/docs/design/provenance). Where that round trip is
 overhead, for example inside one app in real time, an app can also schedule the workflow itself and keep intermediate
-data in memory; see [Local workflows](/docs/introduction/advanced/local-workflows).
+data in memory; see [Local workflows](/docs/use/tutorials/advanced/local-workflows).
 
-Workflows are stored and run by the [Fluss](/docs/design/services/fluss) service. To build your first one, follow
-[Your first workflow](/docs/introduction/first-steps/first-workflow), and see them in action in the [Showcases](/showcase).
+Workflows are stored and run by the [Fluss](/docs/build/concepts/services/fluss) service. To build your first one, follow
+[Your first workflow](/docs/use/tutorials/first-steps/first-workflow), and see them in action in the [Showcases](/showcase).

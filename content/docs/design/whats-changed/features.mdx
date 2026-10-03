@@ -16,7 +16,7 @@ Orkestrator, the desktop control app, was rebuilt for Next. The Paper version bo
 functionality but was not very friendly; the new interface streamlines the layout and the flows
 around it. It is an Electron desktop app, and connects to any hub through the coordination server
 rather than to one deployment. Why it is a desktop app and not a website is explained on the
-[Orkestrator](/docs/apps/standalones/orkestrator) page.
+[Orkestrator](/docs/use/guides/apps/orkestrator) page.
 
 ### Assign tasks directly
 
@@ -49,7 +49,7 @@ be iterated on.
 A vision of Arkitekt was to capture the reality of biological systems in a database that lets you
 create arbitrary measurements and link them to each other. Paper could not capture those
 relationships intuitively. Next introduces the **knowledge graph**, backed by a graph database
-(Apache AGE) in the [Kraph](/docs/design/services/kraph) service, which lets you assign meaning to
+(Apache AGE) in the [Kraph](/docs/build/concepts/services/kraph) service, which lets you assign meaning to
 analyzed data in your own vocabulary ("this ROI delineates an axon") and link it to other data
 ("this axon is connected to this dendrite"). Programmers and database-savvy users can query it with
 standard graph query languages; everyone else gets an interactive interface for exploring the
@@ -104,7 +104,7 @@ handles the cascading failure of tasks on the server.
 
 Arkitekt is modular by design: do not care about Mikro? Do not install it. But Paper apps had no
 way to say which services and versions they needed before connecting, so an app could be installed
-against a deployment that could not serve it. In Next the app [manifest](/docs/design/terminology/manifest)
+against a deployment that could not serve it. In Next the app [manifest](/docs/build/reference/manifest)
 declares **requirements**, one per service the app needs, and the user sees and approves them per
 instance when the app connects. This was the biggest breaking change for Paper-era apps; see
 [Connecting apps](/docs/design/whats-changed/connecting).
@@ -115,14 +115,14 @@ instance when the app connects. This was the biggest breaking change for Paper-e
   and Postgres and replaces Graphene with Strawberry, a more type-safe GraphQL library. Everything
   you see on Next already runs on it.
 - **API design.** The Next APIs follow GraphQL best practices more consistently than the Paper ones
-  did. See [GraphQL](/docs/design/various/graphql).
+  did. See [GraphQL](/docs/build/concepts/graphql).
 - **Security.** Paper was secure by design but enforced little. Next enforces more by default; scope
-  enforcement is still being rolled out, see [Scopes](/docs/design/security/identity#scopes).
+  enforcement is still being rolled out, see [Scopes](/docs/deploy/concepts/security/identity#scopes).
 - **Performance.** Task assignment in Rekuest is being tuned. Ephemeral tasks, which would skip the
   database and go straight to a worker, are planned but do not exist yet.
 
 ## Ideas, not features
 
-Some things we have thought about but not built live under [Various](/docs/design/various):
-[Nextflow integration strategies](/docs/design/various/nextflow) and
-[UC2 open-source microscopes](/docs/design/various/uc2).
+Some things we have thought about but not built live under [Various](/docs/design):
+[Nextflow integration strategies](/docs/build/concepts/nextflow-integration) and
+[UC2 open-source microscopes](/docs/build/concepts/uc2).

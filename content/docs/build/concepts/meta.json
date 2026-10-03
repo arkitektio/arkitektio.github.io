@@ -1,0 +1,15 @@
+{
+  "title": "Concepts",
+  "pages": [
+    "python",
+    "---Architecture---",
+    "service-discovery",
+    "durable-execution",
+    "graphql",
+    "backend-libraries",
+    "services",
+    "---Ideas---",
+    "nextflow-integration",
+    "uc2"
+  ]
+}

@@ -6,10 +6,10 @@ import { CircleQuestionMark, Loader2, RotateCw } from 'lucide-react';
 // Services that the legacy `?live=<url>` deep links can point at. The first
 // matching entry wins.
 const liveTargets: { name: string; href: string }[] = [
-  { name: 'rekuest', href: '/docs/design/services/rekuest' },
-  { name: 'mikro', href: '/docs/design/services/mikro' },
-  { name: 'fluss', href: '/docs/design/services/fluss' },
-  { name: 'lok', href: '/docs/design/services/lok' },
+  { name: 'rekuest', href: '/docs/build/concepts/services/rekuest' },
+  { name: 'mikro', href: '/docs/build/concepts/services/mikro' },
+  { name: 'fluss', href: '/docs/build/concepts/services/fluss' },
+  { name: 'lok', href: '/docs/build/concepts/services/lok' },
 ];
 
 type Status =

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 const linkClass = 'underline underline-offset-4 hover:text-fd-primary';
 
-// The short version of /docs/introduction/installation/joining, which stays the
+// The short version of /docs/use/guides/joining, which stays the
 // source of truth for the details.
 const steps: { title: string; body: ReactNode }[] = [
   {
@@ -50,7 +50,7 @@ const steps: { title: string; body: ReactNode }[] = [
       <>
         <Link
           className={linkClass}
-          href="/docs/apps/standalones/orkestrator#desktop-application"
+          href="/docs/use/guides/apps/orkestrator#desktop-application"
         >
           Download Orkestrator
         </Link>
@@ -115,7 +115,7 @@ export default function WhatsThisPage() {
             More detail in{' '}
             <Link
               className={linkClass}
-              href="/docs/introduction/installation/joining"
+              href="/docs/use/guides/joining"
             >
               Joining somebody&apos;s server
             </Link>
@@ -131,7 +131,7 @@ export default function WhatsThisPage() {
             An open-source platform for bioimage analysis. It sits between a
             lab&apos;s data, its analysis tools and its people, so they can
             share images, workflows and results with each other.{' '}
-            <Link className={linkClass} href="/docs/introduction/basics">
+            <Link className={linkClass} href="/docs/use/concepts/basics">
               Read the basics
             </Link>
             .

@@ -1,0 +1,137 @@
+---
+title: Scripts & notebooks
+description: "Calling the platform from a script or Jupyter without offering actions: easy, aeasy and interactive, service clients, calling actions by id, and embedding Arkitekt in Qt applications."
+---
+
+Not every program offers actions. An analysis script that uploads a result, a notebook that pulls
+images from Mikro, or a CI job that starts a workflow only **calls** the platform. For these,
+`arkitekt` has `easy`: name the services you need and get their clients back.
+
+## `easy`
+
+```python
+import numpy as np
+import xarray as xr
+
+from arkitekt import easy
+from mikro import dataset_arrays, mikro_service
+
+volume = xr.DataArray(np.random.rand(1, 20, 256, 256).astype("float32"), dims=("c", "z", "y", "x"))
+
+with easy("my-upload-script", mikro_service) as mikro:
+    folder = mikro.create_folder(name="examples")
+    level_zero, scales = dataset_arrays(volume, levels=3, method="mean")
+    dataset = mikro.create_array_dataset(
+        data=level_zero,
+        scales=scales,
+        name="random volume",
+        axes=["c", "z", "y", "x"],
+        folder=folder.id,
+    )
+    print(dataset.id)
+```
+
+- `easy(identifier, *services, ...)` declares an app for you. Its identifier (default: the script's
+  file name) is what you authorize, and what shows up as the app in the platform.
+- **Nothing connects until the `with` block is entered.** Entering authenticates (opening a browser
+  the first time) and connects the clients. Leaving disconnects them.
+- **One service gives you its client, several give a tuple** in the order you named them:
+
+  ```python
+  from fluss import fluss_service
+
+  with easy("my-script", mikro_service, fluss_service) as (mikro, fluss):
+      ...
+  ```
+
+It takes the same connection options as `run`: `url=`, `headless=`, `token=`, `redeem_token=`,
+`no_cache=`, `mesh=` (see [Installation](/docs/build/guides/python/installation#connecting-to-a-server)).
+
+## Clients: sync and async
+
+Every service client exposes each operation twice: a blocking method and an `a`-prefixed coroutine.
+
+```python
+from arkitekt import aeasy
+
+async def main() -> None:
+    async with aeasy("my-script", mikro_service) as mikro:
+        folder = await mikro.acreate_folder(name="examples")
+```
+
+Objects returned by a client are snapshots of the server's state. Changing an attribute locally
+changes nothing on the server. Call the corresponding mutation to change the stored object.
+
+## Notebooks: `interactive`
+
+In Jupyter a `with` block per cell is awkward. `interactive` connects once and stays connected for
+the lifetime of the kernel:
+
+```python
+from arkitekt import interactive
+from mikro import mikro_service
+
+mikro = interactive("notebook", mikro_service)
+dataset = mikro.get_array_dataset("1234")   # any operation of the client
+```
+
+## Calling actions
+
+Add `rekuest_service` to get the [Rekuest](/docs/build/concepts/services/rekuest) client, and call any
+action you are allowed to call by its id (copied from Orkestrator):
+
+```python
+from rekuest.arkitekt import rekuest_service
+
+from arkitekt import AgentLost, easy, retry
+
+with easy("plate-runner", rekuest_service) as rekuest:
+    result = rekuest.call("<action-id>", x=21)
+```
+
+A call from a script is a **root** task: it has no parent, and it is recorded as started by you
+through this script.
+
+- **If the agent running it dies**, the call raises `AgentLost`. The top-level `retry(...)` works
+  like [`task.retry`](/docs/build/guides/python/durable-execution#taskretry-try-again-when-it-is-safe):
+  `retry(rekuest.call, "<action-id>", x=21, attempts=3, if_started=True)`.
+- **If your script dies**, the tasks it started keep running, but nothing waits for their results,
+  and the script is not resumed. Orchestration that must survive a crash belongs in an
+  [`@app.workflow`](/docs/build/guides/python/workflows).
+- **Inside a running action** you cannot use the client to call. That would create an unrelated root
+  task instead of a child, so it raises `RootOnlyCallError`. Use a workflow and its protocol proxies.
+
+## Using an `App` without offering it
+
+When a script needs the same declaration as an app (its services, its registered structures), use
+`connect(app)` instead of `run(app)`. It connects the app's clients but provides nothing:
+
+```python
+from arkitekt import connect
+from mikro import Mikro
+
+from app import app   # your app's declaration
+
+with connect(app) as runtime:
+    mikro = runtime.require(Mikro)
+```
+
+## Qt applications
+
+A desktop program with its own window, such as a microscope control GUI or a napari plugin, is a
+*standalone* app. It both offers actions and owns its event loop. `arkitekt.qt` (the `qt` extra)
+provides `QtApp`, a declaration whose actions can run in the Qt event loop, and `MagicBar`, a widget
+that runs the app and shows its connection status:
+
+```python
+from arkitekt import connect
+from arkitekt.qt import MagicBar, QtApp
+
+app = QtApp("my-viewer", parent=window)
+bar = MagicBar(connect(app))
+```
+
+## FastAPI
+
+`arkitekt.serve(app, fastapi_app, ...)` (the `serve` extra) serves an app's actions from an existing
+FastAPI application instead of a standalone agent process.

@@ -3,8 +3,6 @@
   "pages": [
     "humans-first",
     "middleman",
-    "topology",
-    "realtime",
-    "version"
+    "realtime"
   ]
 }

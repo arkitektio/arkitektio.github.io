@@ -11,7 +11,7 @@ export const ShowcasePrerequisites = () => {
     <>
       <Callout type="info" title="Please read">
         We <strong>strongly</strong> suggest to go through the{" "}
-        <Link href="/docs/introduction/first-steps">Getting Started</Link> guide before
+        <Link href="/docs/use/tutorials/first-steps">Getting Started</Link> guide before
         attempting to run this workflow. It will guide you through the
         installation of the Arkitekt platform and the setup of your first
         workflow, as well as how to install plugins and apps.
@@ -27,7 +27,7 @@ export const ShowcasePrerequisites = () => {
       </p>
       <p>
         The import and install buttons on this page only work once you have{" "}
-        <Link href="/docs/introduction/first-steps/brief-interlude#we-have-an-app-for-that">
+        <Link href="/docs/use/tutorials/first-steps/brief-interlude#we-have-an-app-for-that">
           connected this website to your Arkitekt instance
         </Link>
         .

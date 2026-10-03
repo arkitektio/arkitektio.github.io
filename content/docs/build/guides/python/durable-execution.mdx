@@ -1,0 +1,363 @@
+---
+title: Durable execution
+description: "What happens when an agent dies mid-task, and how to write code that survives it: LOST tasks and AgentLost, resumed workflows, determinism with task.now/record, effects claims, and task.retry, task.hold and task.guard."
+---
+
+Lab work runs for hours on machines that crash, reboot and lose power. Arkitekt's answer is
+**durable execution**: a workflow whose process dies is resumed from where it was, without redoing
+the steps that already finished. Everything else is made explicit, so you decide what a lost step
+means. The platform never guesses on your behalf.
+
+This page shows how to use that from Python. The design page
+[Durable execution](/docs/build/concepts/durable-execution) describes the mechanism: what is
+persisted where, and how a resume proceeds step by step.
+
+## What survives what
+
+What happens depends on **what** died and **what kind** of implementation it was running:
+
+| What died | Who handles it | What happens |
+|---|---|---|
+| the agent of a **plain** task (`@app.action`) | whoever called it | the task ends **LOST**, and the caller's `call` raises `AgentLost` |
+| the agent of a **workflow** (`@app.workflow`) | the platform | the workflow is **resumed** in a new process |
+| the agent of a **step** a workflow called | the workflow's code | the step's call raises `AgentLost` inside the workflow |
+| the **caller** (the UI closed, a script disconnected) | nobody needs to | nothing: a caller going away is not a failure, and the task continues |
+
+**The server re-runs nothing on its own.** The only exception is a task that was never picked up by
+any agent. It is delivered again, because nothing can have happened yet.
+
+"The agent died" means its process ended or stayed disconnected past the server's grace window. A
+short network blip does not end a task (see [disconnect policy](/docs/build/concepts/python/core-concepts#disconnect-policy)).
+When a new process takes over the agent, the old one's tasks are resolved immediately.
+
+## LOST and `AgentLost`
+
+**LOST** is a terminal task state that means *not failed: the outcome is unknown*. The work may have
+completed, half-completed or never started. LOST is also **final**. If the dead process's result
+turns up later (after a network partition, say), it is kept as a late report in the task's history,
+but the task stays LOST, because whoever called may already have acted on it.
+
+A caller sees LOST as an `AgentLost` exception carrying what *is* known:
+
+| Attribute | Meaning |
+|---|---|
+| `started` | Whether the task was ever started. **If `False`, nothing ran and sending it again is always safe.** |
+| `last_progress` | The last progress percentage it reported, or `None` |
+| `effects` | The implementation's [effects](#effects) claim, as a string: what running it again would do |
+| `task` | The lost task's id |
+
+```python
+from arkitekt import AgentLost
+
+try:
+    handler.dispense(well, volume_ul=v)
+except AgentLost as lost:
+    if not lost.started:
+        handler.dispense(well, volume_ul=v)      # never reached the robot: nothing happened
+    else:
+        task.hold(f"dispense into {well} was lost: check the well", lost=lost)
+```
+
+## Effects: telling the decider what a repeat would do [#effects]
+
+Whether to repeat a lost step depends on what it does. Counting cells again is harmless. Dispensing
+liquid again doubles the volume. `effects=` records that claim on each implementation:
+
+| `Effects` | Running it again… | Example |
+|---|---|---|
+| `NONE` | changes nothing | count cells, read absorbance |
+| `REPEATABLE` | leaves the same state as running it once | set a dataset's name |
+| `UNKNOWN` (default) | nobody has said | store a new label dataset |
+| `IRREVERSIBLE` | happens again, in the real world | dispense liquid, move a sample |
+
+```python
+from arkitekt import App, Effects
+
+app = App("liquid-handler", "0.1.0", effects=Effects.IRREVERSIBLE)   # default for this app
+
+
+@app.action(effects=Effects.NONE)     # an action's own claim wins
+def read_absorbance(well: str) -> float:
+    """Read Absorbance"""
+    ...
+```
+
+<Callout type="warn" title="Information, never a rule">
+
+Effects are shown to whoever decides: on `AgentLost.effects`, on a hold, and in the UI. **Neither
+the server nor `task.retry` acts on them.** Declaring an action `NONE` does not make the platform
+repeat it for you. It tells the workflow author, or the person looking at a hold, that repeating it
+is safe.
+
+</Callout>
+
+## Workflows are resumed
+
+When the process running a workflow dies, the server puts the task back in the queue and sends it
+again, together with the workflow's **journal**: the values it recorded and the steps it took. A
+new process (a restarted `arkitekt run`, or the same container coming back) picks it up and runs
+the function **again from the top**. This time:
+
+- **Every call that already finished returns its recorded result** without running again. A stream
+  replays its yields. A call that is still running is followed, and its remaining results arrive live.
+- **Every value taken through the task returns its recorded value.** That covers `task.now()`,
+  `task.random()`, `task.record(fn)`, and the deadline of `task.sleep()`, so a resumed sleep waits
+  only for what is left.
+- Execution catches up to where the first run died, then continues live.
+
+Finished work is never redone, whatever its effects. The segmentation that already stored its
+dataset is not run a second time.
+
+## The price: workflows must be deterministic
+
+Replay only works if the resumed run takes the same path as the first one. **Outside values may
+come in only through calls and through the task**, because those are what get recorded:
+
+| Instead of | Use |
+|---|---|
+| `time.time()`, `datetime.now()` | `task.now()` |
+| `random.random()`, `uuid4()` | `task.random(n)` (hex string of `n` random bytes) |
+| `time.sleep(s)` | `task.sleep(s)` |
+| reading a file, an HTTP request, an LLM completion | `task.record(lambda: ...)` (the value must be JSON) |
+
+```python
+import json
+from pathlib import Path
+
+
+@app.workflow
+def adaptive_scan(scope: Microscope, *, task: Task) -> int:   # Microscope: an @app.declare protocol
+    """Adaptive Scan"""
+    started = task.now()
+    plan = task.record(lambda: json.loads(Path("plan.json").read_text()))   # recorded
+    for position in plan["positions"]:
+        scope.acquire(position)                                              # a call: recorded
+    task.log(f"took {task.now() - started:.0f}s")
+    return len(plan["positions"])
+```
+
+`task.record` keys each value by its occurrence (`RECORD:1`, `RECORD:2`, …). Pass `key=` for a
+stable name when the order may vary. Every helper has an async twin (`anow`, `arecord`, `asleep`,
+…).
+
+If a resumed run asks for a value of a different kind where the first run recorded another, or makes
+a different call under a key the first run used, it raises **`NonDeterministicWorkflow`** instead
+of silently mixing two histories.
+
+### Limits of resuming
+
+- **Same code only.** The platform stores a hash of the workflow function's source when the task
+  starts. If the source changed before the resume, the task ends LOST ("code changed") instead.
+  Only the function's own source is hashed, so an edit to a helper it calls is **not** noticed.
+  Don't change helpers of long-running workflows under their feet.
+- **At most three resumes.** A workflow whose agent keeps dying ends LOST after the third.
+- **The same agent, the same journal.** Values the dead process took but had not yet sent are only
+  in its on-disk journal. A successor running as the same agent with the same journal file adds them
+  before replaying. See the
+  [design page](/docs/build/concepts/durable-execution#what-is-persisted-where).
+- **Duplicates in the history.** Progress, logs and a workflow's own yields are reported again by
+  the resumed run, so they appear twice in its history.
+
+## Handling a lost step [#handling-a-lost-step]
+
+Inside a workflow, a step whose agent died raises `AgentLost` at the call. Handle it like any
+exception. Three helpers cover the usual answers.
+
+### `task.retry`: try again when it is safe
+
+```python
+cells = task.retry(segmentation.count_cells, image, attempts=3, if_started=True)
+```
+
+`task.retry(call, *args, attempts=3, if_started=False, **kwargs)` calls `call(*args, **kwargs)` and
+calls again if it raises `AgentLost`, but only:
+
+- when the lost step **never started** (always safe), or
+- when you pass **`if_started=True`**, which is you saying a repeat is fine.
+
+It retries **only** `AgentLost`. Any other exception propagates on the first attempt, because a
+failure that your code raised is not a lost agent. There is no backoff: the next attempt is sent
+at once. When attempts run out, the last `AgentLost` is raised. The async form is
+`await task.aretry(proxy.method.acall, ...)`.
+
+### `task.hold`: ask a person
+
+```python
+task.hold(f"Dispense of {volume} µl into {well} was lost: check the well, then resume or abandon.", lost=lost)
+```
+
+The workflow **pauses** with your message, and with the lost step's `started`, `last_progress` and
+`effects` when you pass `lost=`. A person sees it in Orkestrator, checks the real world, and either
+**resumes** the task (the code continues after `hold`) or **cancels** it. A hold that was resumed is
+recorded, so if the workflow is later resumed after a crash, it does not stop there again. Outside a
+real task (`Task.local()` in tests) `hold` logs a warning and continues.
+
+### `task.guard`: notice that the world changed [#guard]
+
+A workflow can be down for a while: the machine reboots, someone investigates a hold. Meanwhile
+somebody may swap the plate on the robot. A guard detects this:
+
+```python
+with task.guard(handler.plate, "barcode"):
+    handler.dispense(well, volume_ul=volume)
+```
+
+- `handler.plate` is a **state demand** of the protocol (an annotated attribute), which the other
+  app publishes with `@app.state(name="plate")`. On the proxy it is a `StateRef`: a name for the
+  state, not its value.
+- On the first run, entering the guard records the state's current revision.
+- On a **resumed** run, entering the guard again raises **`StateChanged`** in two cases:
+  - the guarded paths (here `barcode`; with none given, the whole state) were changed by anything
+    other than this workflow's own calls;
+  - the other agent restarted and set its state up again.
+
+The check is optimistic, like HTTP's `If-Match`: nothing is locked while the workflow is down. It
+only sees what the other app models as state, so a robot should publish what matters (the loaded
+plate, what went into which well). Only a dependency resolved to exactly one agent can be guarded,
+and changes that happen while the workflow is running are not watched.
+
+## A complete example
+
+`stain_and_measure` counts cells, doses dye in proportion and reads the well. Every failure mode has
+an explicit answer:
+
+```python
+from typing import Protocol
+
+from mikro import mikro_service
+from mikro.arkitekt.specs import LabelMask, SingleChannelImage
+
+from arkitekt import AgentLost, App, StateChanged, Task, run
+
+app = App("plate-workflow", "0.1.0", services=[mikro_service])
+
+
+class PlateState(Protocol):
+    barcode: str
+    dispensed_ul: dict[str, float]
+
+
+@app.declare(app="segmentation", auto_resolvable=True, min=1)
+class Segmentation(Protocol):
+    def count_cells(self, image: SingleChannelImage) -> int:
+        """Count Cells"""
+        ...
+
+    def segment(self, image: SingleChannelImage) -> LabelMask:
+        """Segment"""
+        ...
+
+
+@app.declare(app="liquid-handler", auto_resolvable=True, min=1)
+class LiquidHandler(Protocol):
+    plate: PlateState
+
+    def dispense(self, well: str, volume_ul: float) -> float:
+        """Dispense"""
+        ...
+
+    def read_absorbance(self, well: str) -> float:
+        """Read Absorbance"""
+        ...
+
+
+@app.workflow
+def stain_and_measure(
+    segmentation: Segmentation,
+    handler: LiquidHandler,
+    image: SingleChannelImage,
+    well: str,
+    *,
+    task: Task,
+) -> float:
+    """Stain And Measure
+
+    Counts the cells in the well's image, doses dye in proportion, then reads the well.
+    """
+    started = task.now()  # recorded: a resumed run sees the same start time
+
+    # Counting changes nothing: if its agent dies, count again, even if it had started.
+    cells = task.retry(segmentation.count_cells, image, attempts=3, if_started=True)
+
+    # Segmenting stores a dataset. A repeat might leave a duplicate, and the labels
+    # are only kept for the record, so carry on without them.
+    try:
+        segmentation.segment(image)
+    except AgentLost as lost:
+        task.log(f"segmentation lost ({lost.last_progress}%), continuing without labels")
+
+    volume = 0.5 * cells
+    try:
+        with task.guard(handler.plate, "barcode"):
+            try:
+                handler.dispense(well, volume_ul=volume)
+            except AgentLost as lost:
+                if not lost.started:
+                    handler.dispense(well, volume_ul=volume)   # never reached the robot
+                else:
+                    task.hold(
+                        f"Dispense of {volume} µl into {well} was lost: "
+                        "check the well, then resume or abandon.",
+                        lost=lost,
+                    )
+            absorbance = task.retry(handler.read_absorbance, well, attempts=3, if_started=True)
+    except StateChanged as changed:
+        raise RuntimeError(f"Not continuing, the plate was swapped: {changed}") from None
+
+    task.log(f"{cells} cells, {absorbance:.3f} OD, {task.now() - started:.1f}s")
+    return absorbance
+
+
+if __name__ == "__main__":
+    run(app)
+```
+
+| Scenario | What happens |
+|---|---|
+| The workflow's own agent dies after segmentation | It is resumed. `count_cells` and `segment` return their recorded results, `task.now()` its recorded time, and it continues at `dispense`. |
+| `count_cells`' agent dies | `task.retry(..., if_started=True)` counts again. |
+| `segment`'s agent dies after starting | The workflow logs it and continues without labels. That choice is written in its code. |
+| The robot is offline when the dispense is sent | `AgentLost(started=False)`: nothing was dispensed, so it is sent again. |
+| The robot dies mid-dispense | The workflow holds with the lost step's details. A person checks the well and resumes or cancels. |
+| The plate is swapped while the workflow is held, **and** the workflow's agent dies | The resumed run enters the guard again and raises `StateChanged`. |
+| The person who started it closes Orkestrator | Nothing happens. The task keeps running. |
+
+The full example, with the two apps it calls, is in the
+[arkitekt repository](https://github.com/arkitektio/arkitekt/tree/main/examples/recovery).
+
+## From a script
+
+A script that calls actions directly is the caller, so it decides about a lost task in the same way.
+The top-level `retry` works like `task.retry`:
+
+```python
+from mikro import mikro_service
+from rekuest.arkitekt import rekuest_service
+
+from arkitekt import AgentLost, easy, retry
+
+with easy("plate-runner", rekuest_service, mikro_service) as (rekuest, mikro):
+    image = mikro.get_array_dataset("1234").lens()
+    cells = retry(rekuest.call, COUNT_CELLS_ID, image=image, attempts=3, if_started=True)
+    try:
+        rekuest.call(DISPENSE_ID, well="A1", volume_ul=0.5 * cells)
+    except AgentLost as lost:
+        if not lost.started:
+            rekuest.call(DISPENSE_ID, well="A1", volume_ul=0.5 * cells)
+        else:
+            print(f"Dispense lost at {lost.last_progress}% (effects: {lost.effects}): check A1.")
+```
+
+A script is not resumed. If the script itself dies, the tasks it started keep running, but nothing
+waits for their results. Put orchestration that must survive a crash into an `@app.workflow`.
+
+## Checklist
+
+- [ ] Actions that only read or compute declare `effects=Effects.NONE`. Hardware apps declare
+      `Effects.IRREVERSIBLE` as the app default.
+- [ ] Orchestration that calls other actions is an `@app.workflow`, not a script loop.
+- [ ] No `time.time()`, `random`, file or network reads in workflow code outside `task.*` helpers
+      or calls.
+- [ ] Each `AgentLost` a workflow can see is handled on purpose: `retry`, `hold`, or carry on.
+- [ ] Workflows that act on physical state `guard` it, and the device app publishes that state.
+- [ ] Long-running workflows are not redeployed with changed source while tasks are in flight.

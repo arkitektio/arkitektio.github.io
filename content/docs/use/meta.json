@@ -1,0 +1,14 @@
+{
+  "title": "Use",
+  "description": "For scientists",
+  "root": true,
+  "pages": [
+    "index",
+    "---Tutorials---",
+    "...tutorials",
+    "---Guides---",
+    "...guides",
+    "---Concepts---",
+    "...concepts"
+  ]
+}

@@ -1,16 +1,18 @@
 {
   "title": "Design",
+  "description": "Ideas and vocabulary",
+  "root": true,
   "pages": [
     "index",
     "philosophy",
-    "architecture",
-    "security",
-    "services",
     "terminology",
-    "deployment",
-    "whats-changed",
-    "various",
+    "---How it works---",
+    "provenance",
+    "performance",
+    "lazy-loading",
+    "---In context---",
     "comparisons",
+    "whats-changed",
     "ai"
   ]
 }

@@ -1,0 +1,209 @@
+---
+title: Workflows
+description: "Actions that call other apps' actions: declaring what you need as a protocol with @app.declare, writing the orchestration with @app.workflow, streaming through it, and why plain actions may not call."
+---
+
+A **workflow** is an action that calls other actions. It is declared with `@app.workflow` instead of
+`@app.action`, and it is called exactly like any action: from Orkestrator, from a script, or from
+another workflow. What sets it apart is that it may call, and that it is **resumed** rather than
+lost when its agent dies ([Durable execution](/docs/build/guides/python/durable-execution)).
+
+<Callout type="info" title="Two kinds of workflow">
+
+The workflows you draw in Orkestrator are graphs of actions, stored and run by
+[Fluss](/docs/build/concepts/services/fluss) (see [Workflow](/docs/design/terminology/workflow)).
+`@app.workflow` is the same idea written as Python: loops, branches and exceptions instead of nodes
+and edges. Both call actions the same way, as keyed child tasks of the workflow's task, so both get
+the same recovery behaviour.
+
+</Callout>
+
+## 1. Say what you need: `@app.declare`
+
+A workflow never imports another app's code. It declares what it needs from that app as a
+`Protocol`, and the platform finds a running agent that provides it:
+
+```python
+from typing import AsyncGenerator, Protocol
+
+from arkitekt import App
+from mikro import mikro_service
+from mikro.arkitekt.specs import LabelMask, SingleChannelImage
+
+app = App("plate-workflow", "0.1.0", services=[mikro_service])
+
+
+@app.declare(app="segmentation", auto_resolvable=True, min=1)
+class Segmentation(Protocol):
+    """What this workflow needs from the segmentation app."""
+
+    def count_cells(self, image: SingleChannelImage) -> int:
+        """Count Cells"""
+        ...
+
+    def segment(self, image: SingleChannelImage) -> LabelMask:
+        """Segment"""
+        ...
+
+    async def stream_labels(self, image: SingleChannelImage) -> AsyncGenerator[LabelMask, None]:
+        """Stream Labels"""
+        ...
+```
+
+- Each **public method** is an *action demand*. Its name, the title from its docstring and its
+  typed ports must match an action the other app offers.
+- Each **annotated attribute** is a *state demand*. It names a state the other app publishes with
+  `@app.state(name=...)`, typed as a class whose annotations are the fields you rely on. Workflows
+  use state demands to [guard](/docs/build/guides/python/durable-execution#guard) against a changed
+  world.
+- The ports are built against **this** app's known types. A demand that mentions `SingleChannelImage`
+  requires this app to declare `mikro_service` too, otherwise the declaration raises `DefinitionError`.
+
+| `@app.declare(...)` option | Meaning |
+|---|---|
+| `app=` | The identifier of the app the protocol is directed at |
+| `auto_resolvable=` | Whether any matching agent may be assigned automatically. Otherwise a person chooses when the workflow is set up. |
+| `min=`, `max=` | How many matching agents are viable |
+| `version=` | The protocol's version |
+
+## 2. Write the orchestration: `@app.workflow`
+
+Take the protocol by annotation, and you get a **proxy**. Calling a method on it creates a child
+task on the other app's agent and returns its result:
+
+```python
+from arkitekt import Task
+
+
+@app.workflow
+def count_and_segment(
+    segmentation: Segmentation,
+    image: SingleChannelImage,
+    *,
+    task: Task,
+) -> int:
+    """Count And Segment
+
+    Counts the cells in an image, then stores a label mask for it.
+    """
+    cells = segmentation.count_cells(image)
+    task.log(f"{cells} cells")
+    if cells > 0:
+        segmentation.segment(image)
+    return cells
+```
+
+Calling a proxy method behaves the way the protocol declared it. A plain method returns its result,
+an `async` method returns an awaitable, and a generator method returns an iterator (async if the
+method is `async`). Each proxy method also has explicit forms, for when you want the other style:
+
+| Form | Does |
+|---|---|
+| `proxy.method.call(...)` | call and block for the result |
+| `await proxy.method.acall(...)` | call and await the result |
+| `proxy.method.iterate(...)` | stream a generator, blocking between yields |
+| `proxy.method.aiterate(...)` | stream a generator as an async iterator |
+
+A method declared as an async generator **streams**. Iterating it yields each result as the child
+produces it, so a workflow can itself be a generator that transforms a stream on the fly:
+
+```python
+from typing import AsyncGenerator, Protocol
+
+from arkitekt import App, Task
+
+app = App("shouter", "0.1.0")
+
+
+@app.declare(app="testo", auto_resolvable=True, min=1)
+class Testo(Protocol):
+    async def stream_words(self, text: str) -> AsyncGenerator[str, None]:
+        """Stream Words"""
+        ...
+
+
+@app.workflow
+async def shout_words(testo: Testo, text: str, *, task: Task) -> AsyncGenerator[str, None]:
+    """Shout Words"""
+    async for word in testo.stream_words(text=text):
+        yield word.upper()
+```
+
+A child task belongs to the workflow's task. Cancelling the workflow cancels its running children,
+and provenance records every change they make under the workflow's task
+([Provenance](/docs/design/provenance)).
+
+## Calling by id
+
+The proxy is the preferred way to call because the demand is checked when the app is declared.
+When you only know an action at run time, resolve it with the Rekuest client and call it through
+the task:
+
+```python
+from arkitekt import App, Task
+from rekuest.arkitekt import rekuest_service
+from rekuest.client.client import Rekuest
+
+app = App("dynamic", "0.1.0", services=[rekuest_service])
+
+
+@app.workflow
+async def run_by_id(action_id: str, x: int, *, task: Task, rekuest: Rekuest) -> int:
+    """Run By Id"""
+    action = await rekuest.aresolve(action_id)
+    return await task.acall(action, x=x)
+```
+
+`task.call` / `task.acall` return a result, and `task.iterate` / `task.aiterate` stream a generator's
+yields.
+
+## Call keys
+
+Every child call has a **call key**: what the workflow calls that step. By default it is derived
+from the target, a hash of the arguments, and how often the workflow has made that exact call, for
+example `segmentation.count_cells:054b7d8d:1`. The key is how a resumed workflow finds its earlier
+calls again, so it has to be the same on every run.
+
+The default is right for sequential code. Pass `call_key=` yourself when two calls to the same target
+with the same arguments run **concurrently** and must be told apart, because then the order in which
+they are made is not fixed:
+
+```python
+import asyncio
+
+from arkitekt import Task
+from rekuest.client.client import Rekuest
+
+
+@app.workflow
+async def read_twice(well: str, *, task: Task, rekuest: Rekuest) -> float:
+    """Read Twice"""
+    read = await rekuest.aresolve(READ_ABSORBANCE_ID)  # an action id, e.g. copied in Orkestrator
+    a, b = await asyncio.gather(
+        task.acall(read, well=well, call_key="read-a"),
+        task.acall(read, well=well, call_key="read-b"),
+    )
+    return (a + b) / 2
+```
+
+## Why plain actions may not call
+
+`@app.action` functions are refused if they depend on another app's actions, and a call from inside
+one raises `NotAWorkflowError`. This is deliberate. If a plain action had called three others and
+then its agent died, nothing would know which of the three had already run, and running the action
+again might repeat work that cannot be undone. A workflow records its calls under stable keys and
+can be resumed without redoing them. That guarantee has a price: workflow code must be
+**deterministic**. [Durable execution](/docs/build/guides/python/durable-execution) spells out the
+rules.
+
+A protocol with **only state demands** is allowed on a plain action.
+
+## Errors you may meet
+
+| Error | When |
+|---|---|
+| `DefinitionError` | A plain action depends on an action demand, or a demand names a type this app does not know |
+| `NotAWorkflowError` | A plain action tried to call another action at run time |
+| `NoCallerError` | A call was made from a `Task.local()` (tests), where nothing routes calls |
+| `AgentLost` | The agent running a child died. See [handling a lost step](/docs/build/guides/python/durable-execution#handling-a-lost-step) |
+| `NonDeterministicWorkflow` | A resumed run took a different path than the run it resumes |

@@ -18,7 +18,7 @@ const tools = [
     isNot: 'Arkitekt is not a pure parallelization library.',
     weAre:
       'We are a concurrency platform: long-lived, stateful actor apps that broker data and compute. They are not ephemeral task graphs you submit and forget.',
-    link: '/docs/design/services/kluster',
+    link: '/docs/build/concepts/services/kluster',
     linkLabel: 'How we run Dask',
     hue: 195,
   },
@@ -42,7 +42,7 @@ const tools = [
     isNot: 'Arkitekt does not orchestrate robotic swarms.',
     weAre:
       'That layer is out of scope. But the moment your robot exposes a high-level action, wrap it as an Arkitekt app and we become your friend.',
-    link: '/docs/apps',
+    link: '/docs/use/guides/apps',
     linkLabel: 'Wrap it as an app',
     hue: 90,
   },

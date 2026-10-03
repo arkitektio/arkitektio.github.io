@@ -37,7 +37,7 @@ const GROUPS: { key: Group; title: string; blurb: React.ReactNode }[] = [
         Single-app and cross-app automation that assumes you know your way around Arkitekt. If
         you are new, start with the{' '}
         <Link
-          href="/docs/introduction/first-steps"
+          href="/docs/use/tutorials/first-steps"
           className="text-fd-primary underline underline-offset-4"
         >
           Getting Started

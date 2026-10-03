@@ -2,21 +2,13 @@
   "title": "Arkitekt",
   "pages": [
     "index",
-    "---Getting Started---",
-    "...introduction",
-    "---Concepts & Design---",
-    "...design",
-    "---[Building](/docs/developers)---",
-    "developers/python",
-    "developers/rust",
-    "developers/embedded",
-    "developers/backend",
-    "developers/contribute",
-    "---[Apps](/docs/apps)---",
-    "apps/plugins",
-    "apps/standalones",
+    "---Choose your path---",
+    "use",
+    "deploy",
+    "build",
+    "---Background---",
+    "design",
     "---Resources---",
-    "troubleshooting",
     "privacy"
   ]
 }

@@ -50,11 +50,11 @@ def run_stardist(image: Image) -> LabelMask:
 ```
 
 There is no separate workflow language to learn. You orchestrate these actions in an
-[`@app.workflow`](/docs/developers/python/workflows) with ordinary Python: loops,
+[`@app.workflow`](/docs/build/guides/python/workflows) with ordinary Python: loops,
 conditionals, `async`/`await`, exceptions, your own helper functions. The control flow *is*
 Python. When your logic gets genuinely complex (a branch that depends on a measured value, a
 retry, a loop that runs until convergence), you do not hit a DSL ceiling; you just write the
-code. Such a workflow is also [durable](/docs/design/architecture/durable-execution): if its
+code. Such a workflow is also [durable](/docs/build/concepts/durable-execution): if its
 process dies, it is resumed without redoing the steps that already finished.
 
 For the *simpler* end of the spectrum, and for collaborators who do not want to
@@ -192,7 +192,7 @@ def run_inference(image: Image, model: Model, mikro: Mikro) -> Image:
 
 (A context is the home for long-lived private resources like models. `@app.state`, by
 contrast, is for runtime state you want to publish to the platform. It is not where a model
-belongs. See [State & lifecycle](/docs/developers/python/state-lifecycle).)
+belongs. See [State & lifecycle](/docs/build/guides/python/state-lifecycle).)
 
 The agent stays resident and keeps the warm model in GPU memory between
 invocations. For a streaming smart-microscopy loop, where you want the next frame
@@ -288,6 +288,6 @@ processing ten thousand images overnight on a cluster, where start-up cost is
 noise. If your work is *live*, that is where Arkitekt was built to shine. Think of
 a stateful app reacting to fast-arriving data, a model that loads once and stays
 warm, a closed loop where results steer the next acquisition. And thanks to the
-[integration strategies](/docs/design/various/nextflow), you rarely have to
+[integration strategies](/docs/build/concepts/nextflow-integration), you rarely have to
 choose: Arkitekt apps can run inside Nextflow workflows, and Nextflow can be
 called from Arkitekt.

@@ -31,7 +31,7 @@ export function StateCard() {
 
   return (
     <BentoCard
-      href="/docs/developers/python/state-lifecycle"
+      href="/docs/build/guides/python/state-lifecycle"
       hrefLabel="Learn about state"
       className="grid grid-cols-1 gap-6 p-6 sm:col-span-2 sm:p-8 lg:grid-cols-2 lg:items-center"
     >

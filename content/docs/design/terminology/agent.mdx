@@ -5,7 +5,7 @@ description: "An agent is one running instance of an app that serves its impleme
 
 An **agent** is one running instance of an [app](/docs/design/terminology/app) that serves the app's
 [implementations](/docs/design/terminology/implementation). It is the process that holds a
-connection to [Rekuest](/docs/design/services/rekuest), receives [tasks](/docs/design/terminology/task),
+connection to [Rekuest](/docs/build/concepts/services/rekuest), receives [tasks](/docs/design/terminology/task),
 runs them and reports their progress and results back. `arkitekt run` on your laptop is an agent, and
 so is a plugin container started by Kabinet or a Qt application with a connected MagicBar.
 
@@ -21,7 +21,7 @@ How the terms relate:
 
 The same app can run as several agents, on different machines, for different users or with different
 hardware. The platform picks one when it routes a task. An agent also owns the app's live
-[state](/docs/developers/python/state-lifecycle) and publishes changes to it.
+[state](/docs/build/guides/python/state-lifecycle) and publishes changes to it.
 
 ## When an agent dies
 
@@ -35,7 +35,7 @@ running are resolved:
   journal the agent kept on disk.
 
 A restarted agent keeps its name, so the platform knows it is the same one coming back. The details
-are in [Durable execution](/docs/design/architecture/durable-execution).
+are in [Durable execution](/docs/build/concepts/durable-execution).
 
 <Callout type="info" title="Not an AI agent">
 

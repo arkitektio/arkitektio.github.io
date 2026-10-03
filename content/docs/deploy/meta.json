@@ -1,0 +1,16 @@
+{
+  "title": "Deploy",
+  "description": "For admins",
+  "root": true,
+  "pages": [
+    "index",
+    "---Tutorials---",
+    "...tutorials",
+    "---Guides---",
+    "...guides",
+    "---Reference---",
+    "...reference",
+    "---Concepts---",
+    "...concepts"
+  ]
+}

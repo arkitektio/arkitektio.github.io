@@ -20,7 +20,7 @@ A task:
 - can be **cancelled** at any point (see below);
 - can have **child tasks**. A [workflow](/docs/design/terminology/workflow) calls other actions as
   children of its own task, so the history of a run is a tree, and every data change made along the
-  way is attributed to it ([Provenance](/docs/design/architecture/provenance)).
+  way is attributed to it ([Provenance](/docs/design/provenance)).
 
 ## The path of a task
 
@@ -33,7 +33,7 @@ A task:
 </div>
 </div>
 
-1. **Assign.** You pick "Segment Cells", fill in the inputs and run it. [Rekuest](/docs/design/services/rekuest)
+1. **Assign.** You pick "Segment Cells", fill in the inputs and run it. [Rekuest](/docs/build/concepts/services/rekuest)
    checks that you may call it and that the inputs match its ports, and records the task.
 2. **Route and bind.** Rekuest chooses an implementation, and with it an agent, and queues the task
    for that agent. From here on the task is **bound**: the platform knows exactly where it runs, so it
@@ -59,12 +59,12 @@ A task:
 agent disappears for longer than the grace window, or at once when a new process takes over the
 agent. The work may have finished, may have half-finished, or may never have started, and the lost
 event records what is known (whether it started, its last progress, and the action's claimed
-[effects](/docs/design/architecture/durable-execution#effects)). The platform does not re-run it.
+[effects](/docs/build/concepts/durable-execution#effects)). The platform does not re-run it.
 Whoever called decides. Lost is also final: if the dead agent's result turns up later, it is kept in
 the history but does not change the state, because the caller may already have acted on it.
 
 A **workflow** task is different: when *its* agent dies it is not lost but **resumed** from its journal.
-See [Durable execution](/docs/design/architecture/durable-execution).
+See [Durable execution](/docs/build/concepts/durable-execution).
 
 ## Cancellation
 
@@ -79,6 +79,6 @@ systems. A person must always be able to stop a running experiment
 A computer cannot always stop work at an arbitrary instant. In Python, an `async` action is cancelled
 at its next `await`. A synchronous action runs in a worker thread, which cannot be killed, and
 stops only where it checks for cancellation. Hardware that must stop when its controller goes away
-needs its own watchdog. See [Disconnect policy](/docs/developers/python/concepts#disconnect-policy).
+needs its own watchdog. See [Disconnect policy](/docs/build/concepts/python/core-concepts#disconnect-policy).
 
 </Callout>

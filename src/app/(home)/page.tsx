@@ -97,7 +97,7 @@ export default function HomePage() {
                   size="lg"
                   className="rounded-full px-7 text-base"
                 >
-                  <Link href="/docs/introduction/installation">
+                  <Link href="/docs/use">
                     Lets gooo!
                     <ArrowRight className="size-4" />
                   </Link>
@@ -202,7 +202,7 @@ export default function HomePage() {
             first tool.
           </p>
           <Button asChild size="lg" className="mt-2 rounded-full">
-            <Link href="/docs/introduction/first-steps">
+            <Link href="/docs/use/tutorials/first-steps">
               Start the tutorial
               <ArrowRight className="size-4" />
             </Link>
