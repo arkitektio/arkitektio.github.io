@@ -1,0 +1,24 @@
+---
+title: Update a hub
+description: Arkitekt is a rapidly evolving platform, and updating regularly is the only way to get fixes and new features.
+---
+
+Arkitekt is a rapidly evolving platform, and updating regularly is the only way to get fixes and new
+features. Two things update separately:
+
+- **The platform images.** The dashboard checks the registries for newer images and shows, per
+  service, whether the running image is current, whether a newer one exists, or whether a newer one
+  has been pulled but is not running yet. **Pull images** and then **Start** applies an update; on
+  the command line that is `konstruktor pull lab-hub` followed by `konstruktor up lab-hub`. Updates
+  within a channel are meant to be backwards compatible and to keep your data intact.
+- **Konstruktor itself.** There is no auto-updater. Re-run the install script, which always resolves
+  the latest release, or download the new desktop installer.
+
+<Callout type="info" title="About channels">
+
+  Konstruktor no longer has a channel picker. A hub's channel is simply the set of image tags in its
+  `hub_config.yaml`; a stock hub ships on the `next` tag (with Kraph on `dev`). To move a service to
+  another channel, change its tag there and pull. How the channels relate is described in
+  [How we version Arkitekt](/docs/deploy/concepts/versioning).
+
+</Callout>

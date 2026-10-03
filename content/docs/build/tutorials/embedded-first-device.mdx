@@ -1,5 +1,5 @@
 ---
-title: Embedded
+title: Your first embedded device
 description: "arkitekt-esp32: turn an ESP32 microcontroller into an Arkitekt agent that offers actions and publishes live state, provisioned over Bluetooth with the Pokket app."
 ---
 
@@ -16,7 +16,7 @@ no computer in between.
 <Callout type="warn" title="Experimental">
 
 The embedded client is a working prototype and does not yet have the Python client's feature set.
-[What is not there yet](#what-is-not-there-yet) lists the gaps. The most important ones are: no
+[What is not there yet](/docs/build/reference/embedded#what-is-not-there-yet) lists the gaps. The most important ones are: no
 cancellation, no TLS certificate verification, and tasks that run synchronously. Use it for lab
 prototypes, not for safety-relevant hardware.
 
@@ -104,154 +104,10 @@ On first boot the device advertises itself over Bluetooth as `ARKITEKT_CONFIG`. 
 the device, and send it your WiFi and the Arkitekt connection. The device connects, registers
 `toggle_led` and appears under **Apps** in Orkestrator as `esp32-<adjective>-<noun>-<mac>`.
 
-## Declaring actions
-
-An action is a `FunctionDefinition` built with `FunctionBuilder`, and a callback that implements it.
-
-```cpp
-FunctionBuilder(name, description, argsSize = 1024, returnsSize = 512)
-```
-
-`argsSize` and `returnsSize` are the JSON buffer sizes for the definition's ports. Increase them
-for actions with many ports.
-
-| Builder method | Adds |
-|---|---|
-| `argInt`, `argFloat`, `argString`, `argBool` `(key, label, desc, nullable)` | an input port |
-| `argStringChoice(key, label, desc, {{"Label", "value"}, ...})` | a string input with a dropdown |
-| `argStructure(key, identifier, label, desc, nullable)` | a [structure](/docs/design/terminology/structure) input, passed as its id string |
-| `returnInt`, `returnFloat`, `returnString`, `returnBool`, `returnStructure` | an output port |
-| `withDefault(key, value)` | a default value for input `key` |
-| `withSlider(key, min, max, step)` | a slider widget for number input `key` |
-
-The callback receives the arguments as an ArduinoJson object and answers through a `ReplyChannel`:
-
-```cpp
-typedef std::function<bool(ArkitektApp &, Agent &, JsonObject, ReplyChannel &)> AgentFunction;
-```
-
-```cpp
-auto def = FunctionBuilder("divide", "Divides two numbers")
-    .argFloat("a", "A").argFloat("b", "B")
-    .returnFloat("result", "Result")
-    .build();
-
-app.registerFunction("divide", def,
-    [](ArkitektApp &app, Agent &agent, JsonObject args, ReplyChannel &reply) -> bool
-    {
-        float a = args["a"] | 0.0f;
-        float b = args["b"] | 0.0f;
-        if (b == 0) { reply.critical("Division by zero"); return true; }
-
-        reply.progress(0.5);
-        reply.log("dividing");
-
-        StaticJsonDocument<64> doc;
-        JsonObject ret = doc.to<JsonObject>();
-        ret["result"] = a / b;
-        reply.done(ret);
-        return true;
-    });
-```
-
-| `ReplyChannel` | Sends |
-|---|---|
-| `done(returns)` / `done()` | the result; the task completes |
-| `log(message, level = "INFO")` | a log line on the task |
-| `progress(fraction)` | progress, as a value from `0.0` to `1.0` |
-| `critical(error)` | an error; the task fails |
-| `yield(values)` | an intermediate result (see limits: actions cannot yet be declared as generators) |
-
-Returning `false` from the callback is reported as a failed task.
-
-## State
-
-A device can publish [state](/docs/build/guides/python/state-lifecycle) that Orkestrator shows live
-and workflows can [guard](/docs/build/guides/python/durable-execution#guard) on. Declare it with
-`StateBuilder` and update single fields with `setPort`. Each update is sent as a patch.
-
-```cpp
-app.registerState("sensor_status",
-    StateBuilder("sensor_status", "Temperature probe")
-        .portFloat("temperature")
-        .portInt("readings_count")
-        .build());
-
-app.registerBackgroundTask([](ArkitektApp &app, Agent &agent) {
-    AgentState *st = agent.getState("sensor_status");
-    if (st) st->setPort("temperature", readProbe());
-}, 5000);   // every 5 s
-```
-
-State fields are `int`, `float`, `String` or `bool`. `registerBackgroundTask(fn, intervalMs)` runs
-`fn` from `app.loop()` at the given interval.
-
-## Provisioning and connection
-
-`app.run(cfg)` takes a `RunConfig`:
-
-```cpp
-struct RunConfig
-{
-    bool ble = true;                                 // provision over Bluetooth
-    bool enableWpa2Enterprise = true;
-    unsigned long bootReconfigureTimeout = 5000;     // hold BOOT this long to reset
-    const char *bleDeviceName = "ARKITEKT_CONFIG";
-    String redeemToken = "";
-    String baseUrl = "";
-    uint8_t maxWifiRetries = 3;
-};
-```
-
-**Over Bluetooth (default).** Pokket writes the WiFi credentials (including enterprise identity
-and a CA certificate for eduroam), the server URL and a connection token to the device. These are
-stored in the ESP32's non-volatile storage (namespace `arkitekt`) and survive reboots.
-
-**Without Bluetooth.** Set `cfg.ble = false`, `cfg.baseUrl` and `cfg.redeemToken` in the firmware.
-The WiFi credentials must already be stored on the device.
-
-On every boot the device:
-
-1. connects to WiFi (`maxWifiRetries` attempts, 20 s each);
-2. claims its configuration from the server's fakts endpoint with the stored token, and gets an
-   OAuth2 client and the addresses of the services
-   ([Service discovery](/docs/build/concepts/service-discovery));
-3. gets an access token with the OAuth2 **client-credentials** grant. There is no browser on the
-   device, so the token from provisioning is the authorization;
-4. picks the first reachable address of each service, registers its actions and states with
-   [Rekuest](/docs/build/concepts/services/rekuest) (only when they changed), and opens the agent WebSocket.
-
-If WiFi never worked, or the server rejects the token, the device clears its configuration and
-returns to Bluetooth provisioning. To **reset** a device by hand, hold the BOOT button for
-`bootReconfigureTimeout` milliseconds while it runs. The WebSocket reconnects every 5 s after a
-drop and starts a fresh state session on each reconnect.
-
-## What is not there yet [#what-is-not-there-yet]
-
-| Python client | ESP32 today |
-|---|---|
-| Cancellation, pause, interrupt | **Not supported.** A running action cannot be stopped from the platform. |
-| Concurrent tasks | Actions run one at a time, **synchronously inside `app.loop()`**. A long action also blocks heartbeats and background tasks, so keep actions short. |
-| Generators / streaming | `reply.yield()` exists, but an action cannot be declared as a generator |
-| Workflows, calling other actions | Not supported |
-| [Durable execution](/docs/build/concepts/durable-execution) | No journal. A device that reboots mid-task leaves the task LOST. |
-| Types | `int`, `float`, `string`, `bool`, string choices, and structure ids. No lists, dicts, nested models or images. |
-| TLS | Connections use TLS when the server does, but **certificates are not verified** |
-| Token refresh | None. The access token is fetched at boot, so a device that outlives its token must reboot. |
-| Registration | Re-registration is triggered by the number of ports, not their types. Changing a port's type without changing the count needs a version bump. |
-
-Size limits come from fixed JSON buffers: 1 KB for an incoming task's arguments and for a result,
-and 8 KB for all action definitions together.
-
-<Callout type="warn" title="Serial output">
-
-The firmware logs verbosely to the serial console, including connection secrets. Do not leave
-provisioned devices attached to shared computers with a serial monitor open.
-
-</Callout>
-
 ## Prebuilt firmware
 
 A GitHub Actions workflow in the repository builds merged firmware images for the XIAO ESP32-S3
 and the ESP32 dev kit, and publishes them to the [UC2](/docs/build/concepts/uc2) web flasher. For
 your own actions you build from source with PlatformIO as above.
+
+Next: the [Embedded client reference](/docs/build/reference/embedded) covers declaring actions, state, provisioning and what is not there yet.

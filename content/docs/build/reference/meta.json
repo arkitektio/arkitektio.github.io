@@ -1,6 +1,10 @@
 {
   "title": "Reference",
   "pages": [
+    "plugin-config",
+    "rust",
+    "embedded",
+    "fakts-protocol",
     "manifest",
     "projects"
   ]

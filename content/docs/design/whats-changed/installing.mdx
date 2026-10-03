@@ -10,7 +10,7 @@ In Paper, Konstruktor was a desktop installer that asked you to pick a **channel
 the platform up. Updating meant a "Danger" button in its dashboard.
 
 In Next, Konstruktor comes as a desktop app *and* a `konstruktor` CLI, both writing a plain Docker
-Compose project (see [What Konstruktor is](/docs/deploy/tutorials/first-hub#konstruktor)).
+Compose project (see [What Konstruktor is](/docs/deploy/reference/konstruktor#konstruktor)).
 The old `arkitekt server init` command line tool from the `arkitekt[cli]` package is retired; the
 `konstruktor` CLI replaces it. The wizard asks about the folder, the coordination server, services,
 ports, storage, addresses and the mesh, and nothing else.
@@ -43,15 +43,15 @@ the coordinator is and why it is a separate piece is explained in
 In Paper, a channel was something you chose in the installer, and the whole deployment ran on it.
 In Next, **the channel is the set of image tags** in a hub's `hub_config.yaml`, per service, and
 the Paper channel itself is frozen for reproducibility; see
-[About channels](/docs/deploy/tutorials/first-hub#updating) and
+[About channels](/docs/deploy/guides/update) and
 [How we version Arkitekt](/docs/deploy/concepts/versioning).
 
 ## Finding the platform
 
 In Paper, a deployment could **advertise** itself on the local network with a UDP broadcast; that
-feature has been [removed](/docs/deploy/tutorials/first-hub#advertising). In Next, a
+feature has been [removed](/docs/deploy/guides/join-the-mesh#advertising). In Next, a
 hub **advertises a list of addresses** you choose at install time, and across networks it can join
-the [mesh](/docs/deploy/tutorials/first-hub#mesh), which did not exist in Paper. What
+the [mesh](/docs/deploy/guides/join-the-mesh), which did not exist in Paper. What
 the mesh is and why it is the secure default is explained in [The Mesh](/docs/deploy/concepts/security/mesh).
 
 ## No web application

@@ -35,15 +35,6 @@ This creates:
         └── config.yaml
 ```
 
-| `plugin init` option | Meaning |
-|---|---|
-| `--flavour`, `-f` | Name of the flavour (`vanilla`, `gpu`, …) |
-| `--template`, `-t` | Dockerfile template: `vanilla` (pip) or `uv` |
-| `--arkitekt-version`, `-av` | The `arkitekt` version to pin in the Dockerfile |
-| `--platform`, `-p` | Platforms to build for (repeatable). Default: `linux/amd64` and `linux/arm64` |
-| `--no-multi-arch` | Build only for this machine's architecture |
-| `--devcontainer`, `-dc` | Also generate a `.devcontainer/<flavour>/devcontainer.json` |
-
 Add more flavours with `arkitekt plugin flavour add --flavour gpu --description "CUDA build"`.
 
 ### The Dockerfile
@@ -54,42 +45,7 @@ entrypoint (e.g. `app.py`) and the `.arkitekt` folder in the working directory, 
 CUDA, model weights and so on. Paths in the Dockerfile are relative to the project root, not to the
 flavour folder.
 
-### `config.yaml` and selectors
-
-```yaml
-description: A CUDA build
-dockerfile: Dockerfile
-platforms:
-  - linux/amd64
-selectors:
-  - kind: cuda
-    compute_capability: "8.6"
-    memory: 8000        # VRAM in MB
-  - kind: ram
-    min: 16000          # MB
-```
-
-**Selectors** constrain where a flavour may run. Every selector has a `kind`, `required` (default
-`true`, a hard constraint) and `weight` (scores optional selectors). Add them with the CLI rather
-than by hand:
-
-```bash
-arkitekt plugin selector add gpu --kind cuda --compute-capability 8.6 --vram 8000
-```
-
-| Kind | Fields |
-|---|---|
-| `cpu` | `min_count` (cores), `frequency` (MHz), `arch` (`amd64`, `arm64`, …) |
-| `ram` | `min` (MB) |
-| `cuda` | `compute_capability`, `cuda_version`, `memory` (VRAM MB), `count` (GPUs) |
-| `rocm` | `api_version`, `api_thing` |
-| `oneapi` | `oneapi_version` |
-| `label` | `key`, `value`: matches a qualifier the server's operator put on a backend (e.g. `microscope: lightsheet`) |
-
-A **service** your app needs (Mikro, Rekuest, …) is never a selector. It is a requirement of the
-app, derived from `App(services=[...])`. `platforms` says what the image is *built* for, and a `cpu`
-selector's `arch` says where it may *run*. Setting both so that they contradict is flagged by
-`arkitekt plugin validate`.
+What `config.yaml` may contain, and the selector kinds, are listed in [Plugin configuration](/docs/build/reference/plugin-config).
 
 ## Build, stage, publish
 

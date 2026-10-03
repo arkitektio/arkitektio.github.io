@@ -1,0 +1,173 @@
+---
+title: Rust
+description: "How to publish state and use lifecycle hooks, use service clients like mikro and write scripts, and serve a Rust app over HTTP."
+---
+
+These guides build on the app from [Your first Rust app](/docs/build/tutorials/rust-first-app).
+
+## State and lifecycle
+
+A struct deriving `State` is published to the platform. Orkestrator shows it live, and each change
+is sent as a JSON patch. Field doc comments become the field descriptions.
+
+```rust
+use arkitekt::{action, App, State, StateMut, Task};
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize, State)]
+#[state(name = "CameraState", locks = ["camera"])]
+struct CameraState {
+    /// Whether the camera is connected
+    connected: bool,
+    /// Exposure time in milliseconds
+    exposure_ms: f64,
+    /// Frames acquired so far
+    frames: i64,
+}
+
+#[action]
+async fn acquire(
+    #[port(default = 3)] count: i64,
+    camera: StateMut<CameraState>,
+    task: Task,
+) -> anyhow::Result<i64> {
+    for i in 0..count {
+        task.pausepoint().await;
+        let exposure = camera.read(|c| c.exposure_ms);
+        tokio::time::sleep(std::time::Duration::from_millis(exposure as u64)).await;
+        camera.update(|c| c.frames += 1)?;
+        task.progress((100 * (i + 1) / count.max(1)) as i32, format!("frame {}", i + 1));
+    }
+    Ok(camera.read(|c| c.frames))
+}
+
+let app = App::new("camera", "0.1.0")
+    .state(CameraState::default())
+    .startup(|startup| async move {
+        startup.set_state(CameraState { connected: true, exposure_ms: 10.0, frames: 0 })?;
+        Ok(())
+    })
+    .shutdown(|_| async move { Ok(()) })
+    .action(acquire);
+```
+
+- `StateMut<T>` has `get()`, `read(|s| ..)`, `update(|s| ..)` and `set(v)`. `StateRef<T>` reads only.
+- **Locks:** an action that takes a state holds that state's locks while it runs, so two tasks
+  cannot drive the camera at once. Pass `auto_locks = false` to opt out, or `concurrency =
+  "parallel"` for actions that are safe to run side by side.
+- **Hooks:** `.startup(..)` runs before the first task and can `set_state` and `set_context`.
+  `.background(..)` runs for as long as the app does, and may change only states that need no lock.
+  `.shutdown(..)` runs on the way out. Each hook returns `anyhow::Result<()>`.
+- State fields should be plain values, not structures. Don't write "getter" actions that only return
+  a state: the state is already published.
+
+## Services and scripts
+
+A service client is built from the server's configuration when the app connects. Add the service
+to the app and take the client with `#[inject]`:
+
+```rust
+use arkitekt::{action, run, App, Task};
+use mikro::{axes_for, ArrayDataset, Mikro};
+
+/// Invert Image
+///
+/// Inverts a 16-bit image.
+///
+/// # Arguments
+/// * `image` - The image to invert
+///
+/// # Returns
+/// The inverted image
+#[action]
+async fn invert_image(
+    image: ArrayDataset,
+    #[inject] mikro: Mikro,
+    task: Task,
+) -> anyhow::Result<ArrayDataset> {
+    task.progress(10, "downloading");
+    let data = mikro.read_array::<u16>(&image, 0).await?;
+    let inverted = data.mapv(|v| u16::MAX - v);
+    task.progress(60, "uploading");
+    let axes = axes_for(
+        &image
+            .axis_names
+            .iter()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+    );
+    Ok(mikro
+        .create_array_dataset(&format!("{} (inverted)", image.name), &inverted, axes)
+        .await?)
+}
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    run(App::new("inverter", "0.1.0").service(mikro::service).action(invert_image)).await
+}
+```
+
+`ArrayDataset` is a structure. The caller passes an id, and the agent expands it into the dataset
+before your function runs. Adding `mikro::service` also declares the requirements (Mikro and its S3
+store) that the user approves when the app first connects.
+
+**Scripts** that only call the platform use `easy` and `connect`, the Rust twin of Python's
+[`easy`](/docs/build/guides/python/scripts):
+
+```rust
+use mikro::{axes_for, Mikro};
+use ndarray::ArrayD;
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let rt = arkitekt::easy("rusty-script", "0.1.0")
+        .service(mikro::service)
+        .connect()
+        .await?;
+    let mikro = rt.require::<Mikro>()?;
+
+    let data: ArrayD<f32> = ArrayD::from_shape_fn(vec![64, 64], |ix| (ix[0] * ix[1]) as f32);
+    let image = mikro.create_array_dataset("gradient", &data, axes_for(&["y", "x"])).await?;
+    println!("created {} with shape {:?}", image.id, image.shape);
+    Ok(())
+}
+```
+
+Mikro stores axes ordered time → channel → space. `axes_for` maps `t`, `c`, `z`/`y`/`x` to those
+kinds. For operations the crate does not wrap, `mikro.rath()` gives the authenticated GraphQL
+client.
+
+**Your own service** is a function annotated with `#[arkitekt::service]`. This is how the `mikro` crate defines its own. Its `#[require(..)]`
+parameters name the server-side services it needs, and it returns the client that is put into the
+context:
+
+```rust
+#[arkitekt::service(name = "mikro")]
+pub fn service(
+    #[require("live.arkitekt.mikro", "Where the user's images and their metadata live")]
+    mikro: Alias,
+    #[require("live.arkitekt.s3", "Where the user's files are stored")] s3: Alias,
+    fakts: Fakts,
+) -> anyhow::Result<Mikro> {
+    let rath = Rath::from_alias(&mikro, "graphql", Arc::new(fakts))?;
+    Ok(Mikro::new(rath, DataLayer::from_alias(&s3)))
+}
+```
+
+## Serving without a server
+
+With the `serve` feature, an app can be served straight from an [axum](https://github.com/tokio-rs/axum)
+router, without any Arkitekt server. That is useful for embedding a device API in a local service,
+or for testing:
+
+```rust
+use arkitekt::{serve, ServeOptions};
+
+let router = axum::Router::new();
+serve(app, router, ServeOptions::default()).await?.listen("0.0.0.0:8099").await
+```
+
+Every action becomes `POST /{interface}` (`curl -X POST localhost:8099/acquire -d '{"args": {"count": 3}}'`).
+Tasks can be cancelled, paused and resumed, states are available under `/states`, a websocket at
+`/ws` streams everything live, and `/docs` serves interactive OpenAPI docs. An app without services
+never authenticates in this mode.

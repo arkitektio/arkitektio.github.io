@@ -26,27 +26,39 @@ components hot-reload as you edit.
 | Command              | Description                                                        |
 | -------------------- | ----------------------------------------------------------------- |
 | `pnpm dev`           | Start the dev server with hot reload.                             |
-| `pnpm build`         | Build the static export into `out/`.                             |
+| `pnpm build`         | Build the static export into `out/`, including redirect stubs.   |
+| `pnpm check:links`   | Check every internal link of the built site (run after build).   |
 | `pnpm start`         | Serve the built `out/` directory locally (`serve`).              |
 | `pnpm types:check`   | Regenerate MDX/route types and run `tsc --noEmit`.              |
 | `pnpm lint`          | Run ESLint.                                                      |
 
 ## Writing content
 
-All documentation lives in [`content/docs`](content/docs) as MDX. The structure
-mirrors the site navigation:
+All documentation lives in [`content/docs`](content/docs) as MDX. It is organised by who is
+reading and by what kind of page it is ([Diataxis](https://diataxis.fr)):
 
-| Area                            | What it covers                                          |
-| ------------------------------- | ------------------------------------------------------- |
-| `content/docs/introduction`     | Installation and first-steps tutorials.                |
-| `content/docs/design`           | Philosophy, architecture, services and terminology.    |
-| `content/docs/apps`             | Standalone apps and plugins in the ecosystem.          |
-| `content/docs/developers`       | Building apps in Python and JavaScript.                |
-| `content/docs/roadmap`          | What's coming next.                                    |
+| Area                   | Reader                                                              |
+| ---------------------- | ------------------------------------------------------------------- |
+| `content/docs/use`     | Scientists using Orkestrator and the connected apps.                |
+| `content/docs/deploy`  | Admins installing and operating an Arkitekt server.                 |
+| `content/docs/build`   | Developers writing apps, plugins and services.                      |
+| `content/docs/design`  | Everyone: philosophy, terminology, comparisons, what's changed.     |
 
-Each folder uses a `meta.json` to control sidebar ordering and labels. To add a
-page, drop a new `.mdx` file in the relevant folder with a `title` and
-`description` in its frontmatter. The `meta.json` controls where it appears.
+Inside `use`, `deploy` and `build`, a page goes into one of four folders:
+
+| Folder       | What belongs there                                             |
+| ------------ | -------------------------------------------------------------- |
+| `tutorials`  | A lesson that takes a newcomer through a first success.        |
+| `guides`     | Steps for a reader who already knows what they want to do.     |
+| `reference`  | Facts to look up: options, tables, protocols.                  |
+| `concepts`   | Background that explains how and why something works.          |
+
+The four areas are separate sidebars, switched from the dropdown at the top of the sidebar (each
+has `"root": true` in its `meta.json`). Each folder uses a `meta.json` to control sidebar ordering
+and labels. To add a page, drop a new `.mdx` file in the relevant folder with a `title` and
+`description` in its frontmatter, and add it to that folder's `meta.json`.
+
+Link to other pages with absolute URLs (`/docs/build/guides/python/workflows`), not relative paths.
 
 MDX components (callouts, code blocks, custom React widgets) are available inside
 content. Frontmatter and MDX options are configured in
@@ -78,8 +90,22 @@ which runs `pnpm build` and publishes the static `out/` directory to
 the domain root, so `PAGES_BASE_PATH` stays unset; set it only when deploying to
 a project subpath.
 
-Old Docusaurus URLs are kept alive by static redirect stubs in `public/`, generated
-from the table in `scripts/redirects.mjs` (`pnpm redirects`). The previous
+The workflow also type-checks and runs `pnpm check:links`; pull requests are built and checked
+but not deployed.
+
+### Moving or renaming a page
+
+GitHub Pages has no server-side redirects, so every URL that used to exist gets a static stub
+that forwards the browser. The stubs are generated into `out/` at the end of `pnpm build` from
+the tables in [`scripts/redirects`](scripts/redirects):
+
+- `legacy.json`: old URL to new URL. Add an entry here when you move or remove a page.
+- `moves.json` and `splits/`: the move to the persona layout, including where each heading of a
+  split page went.
+- `required.json`: URLs that are linked from outside (released apps, READMEs) and must keep
+  resolving.
+
+The build fails if a redirect points at a page or heading that does not exist. The previous
 Docusaurus site lives on the `docusaurus-archive` branch.
 
 ## Learn more

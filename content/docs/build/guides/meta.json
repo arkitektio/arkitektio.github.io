@@ -2,6 +2,7 @@
   "title": "Guides",
   "pages": [
     "python",
+    "rust",
     "koherent",
     "contribute"
   ]

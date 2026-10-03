@@ -31,11 +31,10 @@ function check() {
   const { moves, removed, splits } = redirects;
   const errors = [];
   const pages = listPages();
-  const destinations = new Set(Object.values(moves));
 
-  // before the move every page is a source, afterwards every page is a destination
-  const moved = pages.every((page) => destinations.has(page));
-  if (!moved) {
+  // only before the move: every page must be accounted for
+  const pending = Object.entries(moves).some(([from, to]) => from !== to && pages.includes(from));
+  if (pending) {
     for (const page of pages) {
       if (!(page in moves) && !(page in removed)) errors.push(`${page}: not in moves.json`);
       if (page in moves && page in removed) errors.push(`${page}: both moved and removed`);
@@ -64,7 +63,9 @@ function check() {
     console.error(`migrate-docs: ${errors.length} problem(s)\n  ${errors.join('\n  ')}`);
     process.exit(1);
   }
-  console.log(`migrate-docs: ${Object.keys(moves).length} moves, ${Object.keys(removed).length} removed, ok`);
+  console.log(
+    `migrate-docs: ${Object.keys(moves).length} moves, ${Object.keys(removed).length} removed, ${splits.length} splits, ok`,
+  );
 }
 
 function mv() {

@@ -35,7 +35,18 @@ export default function Layout({ children }: LayoutProps<'/docs'>) {
       icon: tabIcon(<Compass />),
     },
     ...getLayoutTabs(tree, {
-      transform: (tab) => ({ ...tab, icon: tabIcon(icons[tab.url]) }),
+      transform: (tab) => ({
+        ...tab,
+        icon: tabIcon(icons[tab.url]),
+        // Design is shared by the personas, so a rule sets it apart from them
+        props:
+          tab.url === `${docsRoute}/design`
+            ? {
+                className:
+                  'relative mt-2 before:absolute before:inset-x-1 before:-top-1.5 before:h-px before:bg-fd-border',
+              }
+            : undefined,
+      }),
     }),
   ];
 

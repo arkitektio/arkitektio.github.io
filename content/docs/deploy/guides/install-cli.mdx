@@ -1,0 +1,100 @@
+---
+title: Install from the command line
+description: Everything the graphical installer does can be done from a terminal with the `konstruktor` CLI, which is what you want on a headless server, in a script, or in CI.
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+Everything in the [graphical installation](/docs/deploy/tutorials/first-hub#graphical-installer-recommended) can be done from a terminal with the `konstruktor` CLI, which is what you want on a
+headless server, in a script, or in CI.
+
+<Steps>
+<Step>
+
+## Install the CLI
+
+<Tabs items={["Linux / macOS", "Windows"]}>
+<Tab value="Linux / macOS">
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/arkitektio/konstruktor/master/install.sh | sh
+```
+
+The script downloads the latest release for your architecture into `~/.local/bin`, verifies it
+against the release's `SHA256SUMS`, and refuses to install if it cannot. With a terminal attached it
+then asks for a hub identifier and creates a hub for you right away. Useful flags, passed after
+`sh -s --`:
+
+| Flag | Effect |
+|---|---|
+| `--no-run` | Install only, do not create a hub |
+| `--hub-dir <path>` | Where to create the hub (default `~/MyHubs/<identifier>`) |
+| `--version <tag>` | Install a specific release, for example `konstruktor-v0.4.1` |
+| `--dir <path>` | Install the binary somewhere other than `~/.local/bin` |
+
+`KONSTRUKTOR_INSTALL_DIR` and `KONSTRUKTOR_HUB_PARENT` do the same as `--dir` and `--hub-dir`.
+
+</Tab>
+<Tab value="Windows">
+
+Download `konstruktor-x86_64-pc-windows-msvc.exe` from the
+[releases page](https://github.com/arkitektio/konstruktor/releases/latest), rename it to
+`konstruktor.exe` and put it somewhere on your `PATH`.
+
+</Tab>
+</Tabs>
+
+</Step>
+<Step>
+
+## Create a hub
+
+Interactively, the CLI asks the same questions as the wizard:
+
+```bash
+konstruktor hub create ~/MyHubs/lab-hub
+```
+
+Unattended, pass every answer as a flag. Without a terminal, a missing answer is an error naming
+the flag that would have supplied it, so a script never hangs on a prompt:
+
+```bash
+konstruktor hub create ~/MyHubs/lab-hub \
+  --server go.arkitekt.live \
+  --identifier lab-hub \
+  --services rekuest,mikro,fluss \
+  --yes
+```
+
+The flags mirror the wizard steps: `--server`, `--identifier`, `--name`, `--services`,
+`--rekuest local|<host>`, `--http-port`, `--https-port`, `--ssl`, `--storage volumes|folder`,
+`--reach local-only|this-network|public`, `--host <addr>` (repeatable), `--mesh none|coordination|manual`,
+`--dev`, `--no-start`, `--no-open`. Run `konstruktor hub create --help` for the full list.
+
+The one step that stays interactive is the **authorization**: the CLI prints the link and the code,
+and someone with an account accepts the hub in a browser. If that fails the command exits with
+code `4`. On success the hub's path is printed on standard output and, unless you passed
+`--no-start`, the hub is started.
+
+</Step>
+<Step>
+
+## Run it
+
+```bash
+konstruktor status lab-hub      # what is running
+konstruktor up lab-hub          # start
+konstruktor stop lab-hub        # stop
+konstruktor logs lab-hub --service mikro --tail 200
+konstruktor superuser mikro --in lab-hub   # create a user in a service
+konstruktor backup ./backup --in lab-hub
+konstruktor restore ./backup --in lab-hub
+konstruktor list                # every hub and engine this machine knows
+```
+
+A target can be a path or the name of a registered deployment, and defaults to the current
+directory.
+
+</Step>
+</Steps>

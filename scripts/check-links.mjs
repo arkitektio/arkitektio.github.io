@@ -57,7 +57,10 @@ function problem(url, { allowRedirect = false } = {}) {
   if (!page) return 'missing page';
   if (page.redirect) {
     if (!allowRedirect) return `goes through a redirect (to ${page.redirect.to})`;
-    const target = (hash && page.redirect.anchors?.[hash]) || page.redirect.to;
+    // same choice as the stub: a per-anchor target, else the target with the incoming hash
+    const moved = hash && page.redirect.anchors?.[hash];
+    if (moved) return problem(moved);
+    const target = page.redirect.to;
     return problem(target.includes('#') || !hash ? target : `${target}#${hash}`);
   }
   if (hash && !hasAnchor(page.html, decodeURIComponent(hash))) return `missing anchor #${hash}`;

@@ -45,8 +45,8 @@ const stub = ({ to, anchors }) => {
 <link rel="canonical" href="${base + to}">
 <script id="arkitekt-redirect" type="application/json">${data}</script>
 <script>(function(){var d=JSON.parse(document.getElementById('arkitekt-redirect').textContent),
-h=decodeURIComponent(location.hash.slice(1)),t=h&&d.anchors&&d.anchors[h]||d.to;
-var i=t.indexOf('#'),p=i<0?t:t.slice(0,i),g=i<0?(h?'#'+h:''):t.slice(i);
+h=decodeURIComponent(location.hash.slice(1)),o=h&&d.anchors&&d.anchors[h],t=o||d.to;
+var i=t.indexOf('#'),p=i<0?t:t.slice(0,i),g=i<0?(h&&!o?'#'+h:''):t.slice(i);
 location.replace(p+location.search+g)})()</script>
 <noscript><meta http-equiv="refresh" content="0; url=${base + to}"></noscript>
 <a href="${base + to}">Redirecting…</a>
@@ -57,7 +57,9 @@ const stubs = [];
 for (const from of new Set([...Object.keys(legacy), ...Object.keys(moved)])) {
   const { to, anchors = {} } = follow(from);
   if (splitUrl(to).path === from) continue;
-  if (existsSync(htmlFile(from))) {
+  // a stub from an earlier run of this script may be replaced, a page may not
+  const existing = existsSync(htmlFile(from)) && readFileSync(htmlFile(from), 'utf8');
+  if (existing && !existing.includes('id="arkitekt-redirect"')) {
     errors.push(`${from}: a page exists at this URL, the redirect would shadow it`);
     continue;
   }

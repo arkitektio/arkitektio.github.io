@@ -1,7 +1,12 @@
 {
   "title": "Guides",
   "pages": [
+    "install-cli",
+    "plugin-engine",
+    "update",
+    "join-the-mesh",
     "gpu",
+    "other-installation-strategies",
     "troubleshooting"
   ]
 }
