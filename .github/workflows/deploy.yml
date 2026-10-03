@@ -3,6 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 # Permissions required by the GitHub Pages deployment actions.
@@ -31,14 +32,21 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - run: pnpm types:check
+
       - run: pnpm build
 
+      - run: pnpm check:links
+
+      # Pull requests only build and check; they are not deployed.
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
         with:
           path: out
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
