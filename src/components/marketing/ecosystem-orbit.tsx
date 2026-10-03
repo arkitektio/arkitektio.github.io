@@ -62,7 +62,7 @@ const services: Node[] = [
   { label: 'Rekuest', sub: 'actions', icon: Network, href: '/docs/design/services/rekuest' },
   { label: 'Mikro', sub: 'images', icon: Layers, href: '/docs/design/services/mikro' },
   { label: 'Kraph', sub: 'graph', icon: Share2, href: '/docs/design/services' },
-  { label: 'Kabinet', sub: 'registry', icon: Box, href: '/docs/design/services/next/kabinet' },
+  { label: 'Kabinet', sub: 'registry', icon: Box, href: '/docs/design/services/kabinet' },
   { label: 'Yours?', sub: 'add a service', icon: Plus, placeholder: true, href: '/docs/developers/contribute' },
 ];
 
