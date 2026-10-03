@@ -1,15 +1,13 @@
-// Moves docs pages and rewrites the links that point at them, driven by the
-// tables in `scripts/redirects/` (`moves.json`, `splits/*.json`, `legacy.json`).
+// Rewrites links to docs pages that moved, driven by the tables in
+// `scripts/redirects/` (`moves.json`, `splits/*.json`, `legacy.json`).
 //
-//   node scripts/migrate-docs.mjs check             validate moves.json against content/docs
-//   node scripts/migrate-docs.mjs mv                git mv every page to its new path
+//   node scripts/migrate-docs.mjs check             validate the tables
 //   node scripts/migrate-docs.mjs links [--dry-run] rewrite /docs/... links to their final URL
 //
 // `links` also turns relative page links into absolute ones. It is idempotent:
 // a second run changes nothing.
-import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join, posix, relative } from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { posix, relative } from 'node:path';
 import {
   applyEdits,
   docsDir,
@@ -68,31 +66,6 @@ function check() {
   );
 }
 
-function mv() {
-  const git = (...args) => execFileSync('git', args, { cwd: docsDir, stdio: 'inherit' });
-  for (const [from, to] of Object.entries(redirects.moves)) {
-    if (from === to || !existsSync(join(docsDir, from))) continue;
-    // two steps, so a page can move into a folder that an old page still occupies
-    mkdirSync(dirname(join(docsDir, to)), { recursive: true });
-    git('mv', from, to);
-  }
-  for (const from of Object.keys(redirects.removed)) {
-    if (existsSync(join(docsDir, from))) git('rm', '-q', from);
-  }
-  // folders left with nothing but their meta.json are gone
-  const prune = (dir) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      if (entry.isDirectory()) prune(join(dir, entry.name));
-    }
-    const rest = readdirSync(dir);
-    if (rest.length === 0 || (rest.length === 1 && rest[0] === 'meta.json')) {
-      if (rest.length === 1) git('rm', '-q', relative(docsDir, join(dir, 'meta.json')));
-      rmSync(dir, { recursive: true, force: true });
-    }
-  };
-  prune(docsDir);
-}
-
 function links() {
   let changed = 0;
   const unresolved = [];
@@ -137,9 +110,9 @@ function links() {
   }
 }
 
-const commands = { check, mv, links };
+const commands = { check, links };
 if (!commands[command]) {
-  console.error('usage: node scripts/migrate-docs.mjs <check|mv|links> [--dry-run]');
+  console.error('usage: node scripts/migrate-docs.mjs <check|links> [--dry-run]');
   process.exit(1);
 }
 commands[command]();
