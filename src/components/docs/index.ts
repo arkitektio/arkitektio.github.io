@@ -1,6 +1,7 @@
 export { GithubRepo } from './github-repo';
 export { Terminal, InnerTerminal } from './terminal';
-export { DownloadButton, DownloadGrid, OrkestratorGrid } from './download-grid';
+export { DownloadButton, DownloadGrid } from './download-grid';
+export { OrkestratorGrid } from './orkestrator-grid';
 export { FijiGrid } from './fiji-grid';
 export { DeploymentStrategies } from './deployment-strategies';
 export { MeshTunnel } from './mesh-tunnel';

@@ -15,6 +15,7 @@ const liveTargets: { name: string; href: string }[] = [
 type Status =
   | { kind: 'pending' }
   | { kind: 'orkestrator'; href: string }
+  | { kind: 'pokket'; href: string }
   | { kind: 'live'; href: string }
   | { kind: 'error'; message: string };
 
@@ -32,10 +33,18 @@ function resolve(search: string | null): Status {
   if (search === null) return { kind: 'pending' };
   const params = new URLSearchParams(search);
   const orkestrator = params.get('orkestrator');
+  const pokket = params.get('pokket');
   const live = params.get('live');
   try {
     if (orkestrator) {
       return { kind: 'orkestrator', href: `orkestrator://${decodeURIComponent(orkestrator)}` };
+    }
+    // `params.get` has already decoded the value once; decoding again would
+    // unwrap the page's own query inside a scoped link
+    // (`/open?…&path=%2Fbank%3Fview%3D…`). The path keeps its leading slash
+    // (`pokket:///open?…`); the app reads either shape.
+    if (pokket) {
+      return { kind: 'pokket', href: `pokket://${pokket}` };
     }
     if (live) {
       const decoded = decodeURIComponent(live);
@@ -46,7 +55,7 @@ function resolve(search: string | null): Status {
     }
     return {
       kind: 'error',
-      message: 'This page expects an ?orkestrator= or ?live= query parameter.',
+      message: 'This page expects an ?orkestrator=, ?pokket= or ?live= query parameter.',
     };
   } catch (error) {
     return { kind: 'error', message: `Could not decode the link: ${String(error)}` };
@@ -69,15 +78,16 @@ function WhatsThisLink({ search }: { search: string | null }) {
   );
 }
 
-// Ported from the Docusaurus site's /deeplink page. Two forms are supported:
+// Ported from the Docusaurus site's /deeplink page. Three forms are supported:
 //   /deeplink?orkestrator=<path>  → hands off to the orkestrator:// protocol
+//   /deeplink?pokket=<path>       → hands off to the pokket:// protocol (mobile app)
 //   /deeplink?live=<url>          → jumps to the docs of the matching service
 export function DeeplinkClient() {
   const search = useSearch();
   const status = resolve(search);
 
   useEffect(() => {
-    if (status.kind === 'orkestrator' || status.kind === 'live') {
+    if (status.kind === 'orkestrator' || status.kind === 'pokket' || status.kind === 'live') {
       window.location.href = status.href;
     }
   }, [status]);
@@ -99,6 +109,23 @@ export function DeeplinkClient() {
             Somebody shared this with you and you have never heard of Arkitekt?
           </p>
           <WhatsThisLink search={search} />
+        </>
+      )}
+      {status.kind === 'pokket' && (
+        <>
+          <h1 className="text-2xl font-semibold">Opening Pokket…</h1>
+          <p className="text-fd-muted-foreground">
+            This link opens in Pokket, the Arkitekt mobile app, so open it on your phone. If
+            nothing happens there, make sure{' '}
+            <Link className="underline" href="/docs/use/guides/apps/pokket#install">
+              Pokket is installed
+            </Link>
+            , or open{' '}
+            <a className="underline" href={status.href}>
+              this link
+            </a>{' '}
+            manually.
+          </p>
         </>
       )}
       {status.kind === 'live' && (
@@ -134,7 +161,7 @@ export function DeeplinkClient() {
 export function DeeplinkRetry() {
   const search = useSearch();
   const status = resolve(search);
-  if (status.kind !== 'orkestrator' && status.kind !== 'live') return null;
+  if (status.kind !== 'orkestrator' && status.kind !== 'pokket' && status.kind !== 'live') return null;
 
   return (
     <Link
