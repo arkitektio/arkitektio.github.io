@@ -4,9 +4,11 @@ description: Learn how to connect and log in to your Arkitekt server using the O
 personas: [use]
 ---
 
-import { OrkestratorGrid } from "@/components/docs";
+import { OrkestratorGrid, OrkestratorConnect } from "@/components/docs";
 
 Our first step into the Arkitekt world will be to get familiar with its non-developer interface.
+
+
 
 <Prerequisites>
 
@@ -33,19 +35,23 @@ which will be your main tool to interact with the Arkitekt server.
 As previously mentioned all interaction with the Arkitekt server happens through apps, and `Orkestrator` is the default app that comes with the Arkitekt server. `Orkestrator` is a
 desktop app: you download it, install it on your computer, and it connects to your Arkitekt server from there. There is no browser version. So let's get started!
 
-<Callout type="info" title="On why Orkestrator is a desktop app">
-
-As Arkitekt is a webservice platform you might wonder why the interface is not simply a website. In short: browsers restrict what a web page may reach in your local network, a desktop app does not have
-these restrictions and can find and talk to any Arkitekt server. The full reasoning is on the [Orkestrator app page](/docs/guides/apps/orkestrator).
-
-</Callout>
-
-#### Download the desktop app
+<OrkestratorConnect />
 
 You can download the desktop app from the github release page of the Arkitekt server. You can find the latest release [here](https://github.com/arkitektio/orkestrator/releases/latest).
 Or just click on the button below, depending on your operating system. More about the app itself on the [Orkestrator page](/docs/guides/apps/orkestrator).
 
 <OrkestratorGrid />
+
+
+<Callout type="info" title="What, I cannot use my browser? ðŸ¤¨">
+
+No, and we know how that sounds. Arkitekt is a web platform, so you would expect its interface to be a website. But a browser restricts what a web page may reach:
+a page from the internet is not allowed to talk to a hub in your lab network. `Orkestrator` is therefore a desktop app, which has no such restrictions and can find
+and talk to any hub. You install it once, and trust us it is worth it, and comes with some goodies that a website cannot provid...
+
+</Callout>
+
+
 
 ### Lets Finally get started
 
@@ -98,54 +104,50 @@ just check out the [source code](/docs/guides/contribute), if you are worried ðŸ
 #### 2. Sign in and approve the app, in your browser
 
 In the browser, log in with your [go.arkitekt.live](https://go.arkitekt.live) account, or create one if this is your first time.
-Once Arkitekt knows who you are, it asks you one more question: do you want to let **this app** in?
+Once Arkitekt knows who you are, it greets you by name and asks you one more question: do you want to let **this app** in, and into **which hub**?
 
 <div className="mt-2 p-6 rounded-sm rounded-md">
 
-![OAuth2 authorization screen](/docs/introduction/first_steps/oauth.png)
+![The approval page on go.arkitekt.live: the app live.arkitekt.orkestrator on the left; on the right its requested permissions, the "Join the organization's mesh" switch, the "Assign to hub" selection and the buttons "Deny" and "Allow access"](/docs/introduction/first_steps/approve.png)
 
 <div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
-<small>The Authorization screen powered by Oauth2</small>
+<small>The approval page in your browser. Here the app has been approved on this computer before, which is why it is marked <b>Previously authorized</b>. The first time you will not see that badge.</small>
 </div>
 </div>
 
-This is the `Authorization` screen, which is used to grant the `Orkestrator` App access to your user account.
-This is a very important step and every App that connects to Arkitekt needs to undergo this step. During this step you will grant the **App** access to your user account,
-and tell Arkitekt which actions the App is allowed to perform on **your behalf**. We are working on a comprehensive documentation for this and give you detailed information
-about the App Rights (so called `Scopes`) in the future. For this tutorial we will just grant the app full access to your account.
-To do this, approve the app. You can then close the page and go back to the Orkestrator app, which has been waiting for you, and you are finally good to go.
+This is the `Authorization` screen, and every App that connects to Arkitekt has to go through it. Nothing on it is hidden from you, so let us read it from top to bottom:
+
+- **Who is asking.** On the left you see the app that wants in: `live.arkitekt.orkestrator` and its version. This is the app you just clicked the button in.
+  If you ever see this page without having started an app yourself, press **Deny**.
+- **Requested permissions.** What the app may do on **your behalf**, the so called `Scopes`. `Orkestrator` only asks for `openid`, which means: tell me who this user is.
+- **Optional services.** The parts of a hub the app can make use of when they are there. You can unfold the list, but there is nothing to decide here.
+- **Join the organization's mesh.** Leave this switched on. If your organization has a [mesh](/docs/concepts/security/mesh), this lets your computer
+  reach the hub from another network, without a second sign-in. If it has none, the switch does nothing.
+- **Assign to hub.** This is where the hub finally appears. An app is always let into *one* hub, and here you pick which: the list shows the hubs
+  of your [organizations](/docs/concepts/terminology#organization). If you only have one hub, it is already selected.
+
+To finish, click **Allow access**. You can then close the page and go back to the Orkestrator app, which has been waiting for you, and you are finally good to go.
+At the very bottom **Not you?**, **Log out** and **Change user** are there for the case that the browser is signed in as somebody else, for example on a shared computer.
 
 #### 3. Back in Orkestrator
 
-`Orkestrator` notices that you approved it and signs you in. Two things are worth knowing about what just happened:
+`Orkestrator` notices that you allowed it in and connects to the hub you picked. Two things are worth knowing about what just happened:
 
 - **The account stays on this computer.** That is the last half sentence on the sign-in screen: *the accounts you add stay on this computer*. `Orkestrator`
   remembers the login, so the next time you open the app you will not see this screen, and you do not have to go through the browser again.
   If you sign out, the screen comes back as **Welcome back**, with your account as a card to pick, and a plus to add another one.
-- **Your account knows your hubs.** Hubs that your [organization](/docs/concepts/terminology#organization) has authorized show up
-  on their own, which is why you never had to type an address. More in the [Service Discovery section](/docs/concepts/service-discovery) of the documentation.
+- **You never typed an address.** Your account knows the hubs of your organization, and told `Orkestrator` where to find the one you picked.
+  More in the [Service Discovery section](/docs/concepts/service-discovery) of the documentation.
 
-<Callout type="warn" title="I don't see my hub">
+<Callout type="warn" title="I don't see a hub">
 
-If your hub does not show up, this might be because the hub is not running (check the `Konstruktor` dashboard and validate all items are highlighted green), because your account
-is not part of the organization the hub belongs to (ask the person running it to add you), or because the hub is not reachable from your computer.
-If all services are running but the hub is on a different network, connect it through the [mesh](/docs/concepts/security/mesh). If you are still not able to connect, please refer to the [troubleshooting section](/docs/guides/troubleshooting) for more information.
+If the **Assign to hub** list is empty, nothing is broken: no hub has been connected to your account yet. A hub always belongs to an
+[organization](/docs/concepts/terminology#organization), so there are two ways to get one, and neither is hard:
 
-</Callout>
+- **Join an organization** that already runs a hub. Ask the person who runs it to add you, as described in [Joining somebody's server](/docs/guides/joining).
+- **Start your own.** [Install a hub](/docs/tutorials/first-hub) on your computer, and it is connected to your account while you set it up.
 
-<Callout type="info" title="On the OAuth process">
-
-This Authentication and Authorization process is the arguely one of the most important concept in the Arkitekt design. It is the first step to ensure a secure and trustworthy connection between the Arkitekt server and the app. As we believe data
-privacy and security is a very important topic, every app needs to alert what it can potentially do with your data. As Arkitekt is a very flexible platform, we cannot know what every app can do, so we need to ask you to grant
-to make sure that you are always in control of your data.
-
-</Callout>
-
-<Callout type="warn" title="We are not production ready">
-
-While the Authentication and Authorization process might give you the impression that Arkitekt is safe and sound and production ready, we are **not**. Some of the security features have been disabled in the `Paper` channel deployment or are not fully implemented yet.
-Safety is our top priority, but we are still in the early stages of development. For now Arkitekt should be safe by `Design` not by `Implementation`. Online features of Arkitekt should stil be happening in a controlled environment such as a local network or a [secure VPN](/docs/concepts/security/mesh#arkitekt-through-a-vpn).
-If you are interested in helping us to make Arkitekt production ready, please check out our [contribution guide](/docs/guides/contribute).
+Then come back to this page and the hub is in the list.
 
 </Callout>
 
@@ -180,7 +182,7 @@ Lets explore the different views in the next tutorials.
     Browsers restrict what a web page may reach in your local network. A desktop app does not have these restrictions and can find and talk to any Arkitekt server.
   </Question>
   <Question q="What do you decide on the Authorization screen?">
-    You grant the app access to your user account and tell Arkitekt which actions the app may perform on your behalf.
+    Whether this app is let in, what it may do on your behalf, and which of your hubs it connects to.
   </Question>
 </Quiz>
 
