@@ -13,7 +13,7 @@ export default function Layout({ children }: LayoutProps<'/docs'>) {
       tabs={false}
       {...baseOptions()}
       links={[]}
-      sidebar={{ banner: <PersonaBar /> }}
+      sidebar={{ banner: <PersonaBar key="persona" /> }}
       slots={{ themeSwitch: ThemeSwitchWithConnector }}
     >
       {children}

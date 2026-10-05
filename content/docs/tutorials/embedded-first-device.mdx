@@ -23,7 +23,7 @@ prototypes, not for safety-relevant hardware.
 
 </Callout>
 
-## What you need
+<Prerequisites>
 
 - An **ESP32** board. The project ships PlatformIO environments for a classic ESP32 dev kit
   (`az-delivery-devkit-v4`, the default) and the **Seeed XIAO ESP32-S3** (`seeed_xiao_esp32s3`).
@@ -33,6 +33,17 @@ prototypes, not for safety-relevant hardware.
   WiFi credentials and Arkitekt connection over Bluetooth.
 - A WiFi network (WPA2 personal or WPA2-Enterprise such as eduroam) from which the device can reach
   your Arkitekt server.
+
+</Prerequisites>
+
+<Learn>
+
+- Turn an ESP32 into an Arkitekt agent
+- Register an action and publish live state from firmware
+- Build and flash the firmware with PlatformIO
+- Provision the device over Bluetooth with the Pokket app
+
+</Learn>
 
 The client is a C++ header library that lives in the firmware project (`src/lib/`), not a packaged
 library. Start by cloning the repository and editing `src/main.cpp`.
@@ -112,3 +123,15 @@ and the ESP32 dev kit, and publishes them to the [UC2](/docs/concepts/uc2) web f
 your own actions you build from source with PlatformIO as above.
 
 Next: the [Embedded client reference](/docs/reference/embedded) covers declaring actions, state, provisioning and what is not there yet.
+
+<Quiz>
+  <Question q="What does arkitekt-esp32 turn an ESP32 into?">
+    An Arkitekt agent of its own, which registers actions and publishes live state with no computer in between.
+  </Question>
+  <Question q="How does the device get its WiFi credentials and Arkitekt connection?">
+    On first boot it advertises itself over Bluetooth, and you send it the WiFi and the Arkitekt connection from the Pokket app.
+  </Question>
+  <Question q="Why should the embedded client not be used for safety-relevant hardware?">
+    It is a working prototype with gaps such as no cancellation, no TLS certificate verification and tasks that run synchronously.
+  </Question>
+</Quiz>

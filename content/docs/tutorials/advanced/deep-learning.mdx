@@ -12,15 +12,24 @@ the deep learning tools that are available.
 In this section of the documentation we will try to show you how to get started with deep learning and how Arkitekt can help you,
 by showing you how to create a simple "deep learning enabled" workflow, that you can use to predict the segmentation of nuclei in a cell culture.
 
-### Prerequisites
-
-To get started with deep learning and Arkitekt you should:
+<Prerequisites>
 
 - Have a basic understanding of deep learning, in the sense of what the words "Training" and "Inference" mean.
 - Have gone through the [basics of Arkitekt](/docs/tutorials/absolute-basics).
 - Have a CUDA capable GPU. If you don't have a GPU, you should still be able to follow along, but the prediction
   will be very slow.
 - Either Mikro-Napari or Fiji with the [ImageJ Arkitekt plugin](/docs/guides/apps/imagej-plugin) installed. If you don't have either of these, you can still follow along, but you won't be able to run the workflow.
+
+</Prerequisites>
+
+<Learn>
+
+- See how containerized plugins, bridging workflows and offloading ease deep learning
+- Install the `segmentor` plugin and test it with a pretrained model
+- Build a workflow that segments the image open in Fiji
+- Build the same workflow for Napari with its own actions
+
+</Learn>
 
 ## Our task
 
@@ -54,11 +63,9 @@ that you might encounter when trying to create your own deep learning workflows.
 
 <Callout type="info" title="On other solutions">
 
-
 We are not the only ones trying to solve these problems. There are other great solutions out there, that you should definitely check out. One of it is [DeepImageJ](https://deepimagej.github.io).
 Arkitet is not trying to replace these solutions, but rather complement them. We are rather trying to provide a solution that is as generic as possible, so that you can use it with _any_ deep learning algorithm
 (that might use a different framework, rely on heavy pre and postprocessing, ...) and _integrate_ with any bioimage analysis app.
-
 
 </Callout>
 
@@ -130,7 +137,6 @@ Import, deploy and run, just like you did with the ImageJ workflow. Its the same
 
 <Callout type="info" title="On universal Workflows">
 
-
 You might have noticed that the workflow, is similar to the one we created for ImageJ, but not the same. We could have created a universal workflow, that would work for both ImageJ and Napari, by
 utilizing the `Upload Image` action and the `Show Image` action, and before deployment let the user choose which app he wants to use. This will be thematized in a later tutorial.
 
@@ -139,3 +145,15 @@ utilizing the `Upload Image` action and the `Show Image` action, and before depl
 ### Our own model
 
 Here we have used a pretrained model, but what if we want to use our own model? Well that's easy. Training your own model on the segmentor plugin is also quite easy, but lets explore that in the [next tutorial](/docs/tutorials/advanced/training)
+
+<Quiz>
+  <Question q="Why do you not need to install deep learning software requirements on your own computer?">
+    Arkitekt plugins are containerized, so the developer already ships all the software requirements with the plugin.
+  </Question>
+  <Question q="What does a bridging workflow do with an image from your bioimage analysis app?">
+    It takes the image from the app, offloads it to the Arkitekt server and pipes the result back to the app.
+  </Question>
+  <Question q="How can you still use deep learning if your own computer has no GPU?">
+    You offload the prediction to a computer that has a GPU, such as your Arkitekt server. Without any GPU you can use the CPU version of Stardist.
+  </Question>
+</Quiz>

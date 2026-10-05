@@ -4,17 +4,22 @@ description: Convert your first file with an action, inspect the result, and mar
 personas: [use]
 ---
 
-<Callout type="info" title="Before you start">
+So far the data just sits in the hub. Time to do something with it.
+
+<Prerequisites>
 
 The example image is in the hub ([Upload your first images](/docs/tutorials/upload-data)) and the converter plugin is installed ([Install your first tool](/docs/tutorials/install-a-tool)).
 
-</Callout>
+</Prerequisites>
 
-So far the data just sits in the hub. Time to do something with it. In this tutorial we will:
+<Learn>
 
-- Convert our first File
+- Convert your first file with an action
 - Inspect the result in Orkestrator
-- Mark a ROI (Region of Interest) in our Image
+- Mark a ROI (Region of Interest) in your image
+- See how files, images and ROIs are linked in the Data Graph
+
+</Learn>
 
 ## Convert our first File
 
@@ -60,7 +65,6 @@ should have appeared in the `Data` tab. If you click on it you should see the im
 
 <Callout type="info" title="What just happened?">
 
-
 We just performed our first conversion. We took a file from our Server and converted it to the internal Arkitekt format based on Zarr, again storing
 it on our server. In practicallity this meant that our "Omero" PluginApp streamed the file from the server, converted it and then uploaded the
 converted zarr dataset again to the server. More on that in [How Tasks Work](/docs/concepts/terminology#task). You will notice that
@@ -91,20 +95,16 @@ visualitaizon of the image. You can choose different channels, and different z-p
 
 <Callout type="info" title="Visualization within Orkestrator">
 
-
 Orkestrator is not meant to be a dedicated visualization tool and would rather like to integrate with other tools.
 For example we will later see how we can use [Napari](https://napari.org/) to visualize our data.
 We would love to integrate [Viv](https://github.com/hms-dbmi/vizarr) into Orkestrator, if you are interested in that please let us know.
-
 
 </Callout>
 
 <Callout type="info" title="On Mikro next">
 
-
 After some lessons learned about metadata handling in Arkitekt we are currently working on a new version of "Mikro" (the storage service) that will be able to handle
 metadata in a more flexible way. This will also allow us to provide more advanced visualization options in the future..
-
 
 </Callout>
 
@@ -139,15 +139,25 @@ This graph is currently not very interesting. But you will see later how we can 
 
 <Callout type="info" title="A bit technical">
 
-
 The Mikro `Data Graph` is a graph that is backed by a relational database, and is exposed via the GraphQL API. This means that you can also query the `Data Graph` directly
 via GraphQL.
-
 
 </Callout>
 
 ## Before we start our analysis!
 
 Looking at our Data on the Website might be fun. But lets first inspect our Image in a GUI app of our choice. We prefer [Napari](https://napari.org/), but you can also use [Fiji](https://fiji.sc/).
+
+<Quiz>
+  <Question q="What does the conversion do with your file, and where does the result go?">
+    The file is converted to the internal Arkitekt format based on Zarr. The converted image is stored on the server again.
+  </Question>
+  <Question q="What is an assign dialog for?">
+    It lets you define the parameters of your analysis. These parameters are sent to the tool when it is executed.
+  </Question>
+  <Question q="What is the Data Graph?">
+    It is the graph of relationships between data elements and their metadata. Your original file, the converted image and your ROI are already linked in it.
+  </Question>
+</Quiz>
 
 **Next:** [Open your data in napari and Fiji](/docs/tutorials/napari-and-fiji)

@@ -4,19 +4,22 @@ description: Learn how to upload data to the Arkitekt platform, use drag-and-dro
 personas: [use]
 ---
 
-<Callout type="info" title="Before you start">
+In this tutorial, we will upload our first data to the platform, and convert it to a format that can be used by the platform and all connected tools.
+
+<Prerequisites>
 
 Orkestrator is connected to a hub and you are signed in. If not, do [Connect with Orkestrator](/docs/tutorials/connect-orkestrator) first.
 
-</Callout>
+</Prerequisites>
 
-In this tutorial, we will upload our first data to the platform, and convert it to a format that can be used by the platform and all connected tools.
-Here you will learn how to:
+<Learn>
 
 - Upload data to the platform
-- Familiarize yourself with the Orkestrator drag-n-drop
-- Have a first look at the contextual help that Orkestrator provides
+- Use drag and drop in Orkestrator
+- Read the contextual help that Orkestrator offers while you drag
 - Organize your data in `Datasets`
+
+</Learn>
 
 ## Upload data
 
@@ -28,10 +31,8 @@ Lets try this out. Download the following file to your computer: [here](/demos/c
 
 <Callout type="info" title="About the data">
 
-
 Of course you can use any data you want. However, for the sake of this tutorial, and to make sure that everything works, we recommend to use the
 provided file. It is a 2D image of some cells that we will use in the next tutorial to create a 3D image.
-
 
 </Callout>
 
@@ -83,13 +84,11 @@ items over each other, and Arktiekt will give you information about what to do w
 
 <Callout type="info" title="About Accessibility">
 
-
 As show Drag and Drop plays a crucial role when interfacing with the Orkestrator interface. Most of the time, you will be able to drag and drop
 data to associate with each other, or to organize it. However drag and drop is not the most accessible technology. 
 Therefore Orkestrator provides also a set of functionality that is entirely keyboard accessible (and screen reader friendly). Allmost all commands
 can be also accessed through the Menu (Meta-M) or (Ctrl-M) and "non associative actions" can be accessed through a right click on
 the item.
-
 
 </Callout>
 
@@ -98,5 +97,17 @@ the item.
 Before we move on, lets upload one more file. You can download it [here](/demos/cells2.TIF).
 You can upload it the same way as before. However, this time, lets try to upload it directly into the `Dataset` that we created before. You can do this opening
 the `Dataset` and then drag and drop the file into the `Dataset`. Now that we have two files in the `Dataset` lets do something with them.
+
+<Quiz>
+  <Question q="What is a Dataset in Arkitekt?">
+    It is Arkitekt's way of organizing data in a hierarchy, much like sorting files into folders.
+  </Question>
+  <Question q="What happens when you drag one item over another in Orkestrator?">
+    Arkitekt shows you what you can do with that data, for example moving a file into another `Dataset`.
+  </Question>
+  <Question q="What is the difference between Manage Actions and Tool Actions?">
+    `Manage Actions` are built into the platform and are always available, such as delete or move. `Tool Actions` come from the tools you have installed.
+  </Question>
+</Quiz>
 
 **Next:** [Install your first tool](/docs/tutorials/install-a-tool)

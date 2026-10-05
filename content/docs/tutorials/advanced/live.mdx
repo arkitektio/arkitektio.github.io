@@ -15,12 +15,23 @@ a continous stream-like fashion.
 
 In this tutorial we will show you how to build a [Streaming Analysis Workflow](/docs/concepts/philosophy#everything-everywhere-all-at-once) in Arkitekt, and how to run it on live data.
 For a full example on a real microscope, see the [Streaming Analysis showcase](/showcase/streaming-workflow).
-This tutorial will cover:
 
-- Why streaming analysis?
-- How we model Streaming Analysis in Arkitekt (Generator Actions)
-- Constructing a streaming analysis workflow
-- Challenges of streaming analysis
+<Prerequisites>
+
+- Followed the [Deep Learning](/docs/tutorials/advanced/deep-learning) tutorial
+- Followed the [First Steps](/docs/tutorials/connect-orkestrator) tutorial
+- The [Gucker](/docs/guides/apps/gucker) app and the omero, reaktor and segmentor plugins installed
+
+</Prerequisites>
+
+<Learn>
+
+- Understand why streaming analysis is useful
+- See how Arkitekt models streaming analysis with generator actions
+- Tell functional actions apart from stream actions
+- Plan a streaming workflow fed by a watched folder
+
+</Learn>
 
 ### Why Streaming Analysis?
 
@@ -87,3 +98,15 @@ workflow:
     to Images, Segment them and Measure them.{" "}
   </small>
 </div>
+
+<Quiz>
+  <Question q="How does a stream action differ from a functional action?">
+    A functional action returns items once. A stream action yields items multiple times and over time.
+  </Question>
+  <Question q="What happens to the items a stream action yields inside a workflow?">
+    Each item is processed by the next node in the workflow at the time it is generated.
+  </Question>
+  <Question q="What is the Gucker app used for in this tutorial?">
+    It watches a folder and puts any images placed in that folder into the workflow.
+  </Question>
+</Quiz>

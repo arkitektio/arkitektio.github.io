@@ -4,21 +4,25 @@ description: Learn how to connect Napari or Fiji to your Arkitekt server and vis
 personas: [use]
 ---
 
-<Callout type="info" title="Before you start">
-
-The hub holds an image that has been converted, as in [Run your first task](/docs/tutorials/run-a-task).
-
-</Callout>
-
 Every analysis starts with the visualization of our data. And we have a great selection of tools in the bioimage world to help us.
 But how do we get our data into these tools? How do we get our data from our server into Napari or Fiji? Well, we could download it, and then open it in the tool.
 But that is not really what we want. We want to be able to use our data directly from the server, and we want to be able to save our results back to the server.
 
 So lets see how we can do that.
-In this tutorial you will learn:
 
-- How to connect both Napari or Fiji to your Arkitekt server.
-- How to visualize your data in Napari or Fiji.
+<Prerequisites>
+
+The hub holds an image that has been converted, as in [Run your first task](/docs/tutorials/run-a-task).
+
+</Prerequisites>
+
+<Learn>
+
+- Connect Napari or Fiji to your Arkitekt server
+- Open your converted image in Napari or Fiji
+- Understand how Napari and Fiji handle your data differently
+
+</Learn>
 
 ## Team Napari or Team Fiji?
 
@@ -27,10 +31,8 @@ with Arkitekt and together in your workflows. So lets try install them both and 
 
 <Callout type="info" title="Our darling">
 
-
 We truly love Napari for data visualization. If you have not tried it yet, you should. It is a great tool and we are sure you will love it too. And a few of the
 features that we will show you here are only available in Napari. So if you are not familiar with Napari yet, we recommend you to give it a try.
-
 
 </Callout>
 
@@ -47,10 +49,8 @@ on to see the ROI you marked in Orkestrator), and there it is.
 
 <Callout type="info" title="Seems familiar?">
 
-
 You might recall the same process that you went through to connect Orkestrator. This will become a common theme, as all apps that connect to Arkitekt need to undergo the same
 connection process. Again. Only once if you so wish.
-
 
 </Callout>
 
@@ -78,5 +78,17 @@ where it will appear in the bottom right corner.
 
 Unlike Napari, Fiji downloads the whole image into its memory, so you can close Orkestrator and keep working on it. ROIs are synced with Fiji's ROI manager
 in both directions, and whatever alterations you make in Fiji stay in Fiji until you save them back with the `Upload from ImageJ` action. More on that in the advanced tutorial.
+
+<Quiz>
+  <Question q="Why connect Napari or Fiji to Arkitekt when you could download the image and open it by hand?">
+    Because you want to use your data directly from the server and save your results back to the server.
+  </Question>
+  <Question q="Why does connecting Napari feel similar to connecting Orkestrator?">
+    All apps that connect to Arkitekt go through the same connection process.
+  </Question>
+  <Question q="What happens to changes you make to an image in Fiji?">
+    They stay in Fiji until you save them back with the `Upload from ImageJ` action.
+  </Question>
+</Quiz>
 
 **Next:** [Why so many steps?](/docs/tutorials/why-so-many-steps)

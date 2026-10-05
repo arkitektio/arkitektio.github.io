@@ -15,11 +15,22 @@ In this tutorial we will show you how to train your own deep learning model usin
 We advise you to first read the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7) to understand the methodology of care, as well as following both the
 first steps of the [Arkitekt tutorial](/docs/tutorials/connect-orkestrator) and the [Deep Learning Bridge tutorial](/docs/tutorials/advanced/deep-learning).
 
-This tutorial aims to cover the following topics:
+<Prerequisites>
 
-- Our conceptional understanding of Deep Learning Training
-- What is a training `Context` and how to use it
-- How to train a CARE model
+- Read the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7)
+- Followed the first steps of the [Arkitekt tutorial](/docs/tutorials/connect-orkestrator)
+- Followed the [Deep Learning Bridge tutorial](/docs/tutorials/advanced/deep-learning)
+
+</Prerequisites>
+
+<Learn>
+
+- Understand how Arkitekt thinks about deep learning training
+- Know what a training `Context` is and how to use it
+- Relate two images in a `Context` to form a training dataset
+- Train a CARE model and use it to make predictions
+
+</Learn>
 
 ## What we are trying to achieve
 
@@ -29,10 +40,8 @@ their signal-to-roise ratio. We here will aim to train a model that will help us
 
 <Callout type="warn">
 
-
 For the purpose of this tutorial we will only train a model on a subset of the data, and we will use the `same` data for training and validation. This is _NOT AT ALL_ how you should train a model,
 and we are doing this only for the purpose of this tutorial. Training, Testing, and Validation should always be done on different datasets. This is just a demo.
-
 
 </Callout>
 
@@ -130,11 +139,9 @@ and the `Predict CARE` action will take a `Model` and an `Image` as input and wi
 
 <Callout type="info">
 
-
 Sadly with modern deep learning frameworks there is not yet a _reliable_ way see if another process is using the GPU and some deep learning methods like Stardist and CARE sometimes still linger in the GPU memory even after
 the process has finished. So if you run into the problem that you can't train a CARE model, because the GPU is already in use, simply stop any other deep learning process that might be running. We are working on a more user
 friendly solution for this (also for better multi-gpu support).
-
 
 </Callout>
 
@@ -182,12 +189,10 @@ check the output of the Deep Learning process in the `PluginApps` tab, by clicki
 
 <Callout type="info">
 
-
 While we are working on providing a few feedback graphs, that illustrate the training process, we are pretty much settled on the idea, that we don't want to provide a full fledged training
 interface inside Arkitekt. We think that this is best left to the deep learning frameworks and software projects like [wandb](https://wandb.ai/site) that are specifically designed for this purpose.
 We rather think Arkitekt should be seen as a tool for `transfer learning` and `model adaptation`, and not as a tool for developing deep learning models from scratch. But hey we are open to feedback,
 and you can always just integrate your favorite deep learning framework into Arkitekt and use it as you like.
-
 
 </Callout>
 
@@ -214,3 +219,15 @@ And thats it, you trained a CARE model and used it to make predictions. You can 
 Also of course you can download the model and share it with others, just like we did with the models that we are using in our [Showcases](/showcase).
 
 If you want to see the code behind the `Train CARE` and `Predict CARE` actions, read [Example: a training plugin](/docs/guides/python/training-example).
+
+<Quiz>
+  <Question q="How does Arkitekt conceptually model the training of a deep learning model?">
+    Training is simply an action that returns a model. That model can then be used in a prediction action.
+  </Question>
+  <Question q="What is a Context in Arkitekt?">
+    It is a way to define arbitrary relationships between different data types, for example between two images used for CARE training.
+  </Question>
+  <Question q="Why is using the same data for training and validation only acceptable in this demo?">
+    Training, testing and validation should always be done on different datasets. The tutorial reuses the data only to keep the demo short.
+  </Question>
+</Quiz>

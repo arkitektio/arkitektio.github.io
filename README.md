@@ -65,6 +65,45 @@ terminology, comparisons). The switch at the top of the sidebar lets a reader pi
 sidebar, the search and the previous/next links then leave out pages tagged only for the others.
 Folders and sidebar headings follow their pages, so there is nothing to tag in a `meta.json`.
 
+### Tutorials
+
+A tutorial follows one template: what the reader needs, what they will be able to do, the steps,
+and a self-check. The parts are components, so they look the same everywhere:
+
+```mdx
+---
+title: Upload your first images
+description: ...
+personas: [use]
+---
+
+One or two sentences on what this tutorial is about.
+
+<Prerequisites>
+
+- Orkestrator is connected to a hub ([Connect with Orkestrator](/docs/tutorials/connect-orkestrator)).
+
+</Prerequisites>
+
+<Learn>
+
+- Upload data to the hub
+- Organize your data in datasets
+
+</Learn>
+
+## The steps…
+
+<Quiz>
+  <Question q="Where does an uploaded file end up?">
+    In the hub.
+  </Question>
+</Quiz>
+```
+
+`<Quiz>` lists the questions; clicking a question reveals its answer.
+Keep it to three or four questions that the page itself answers.
+
 Every tutorial opens with its steward, the person who guides the reader through it. Stewards are
 the team members marked `steward` in [`src/lib/team.ts`](src/lib/team.ts), which also feeds the
 `/team` page (pictures go in `public/team`); a tutorial names one with `steward: <key>` in its

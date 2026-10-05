@@ -9,6 +9,24 @@ assumes you have [installed arkitekt](/docs/guides/python/installation) and have
 connect to. Read [Core concepts](/docs/concepts/python#core-concepts) first if the words *action*,
 *agent* or *task* are unfamiliar.
 
+<Prerequisites>
+
+- [Installed arkitekt](/docs/guides/python/installation)
+- A server to connect to
+- Know the words action, agent and task, see [Core concepts](/docs/concepts/python#core-concepts)
+
+</Prerequisites>
+
+<Learn>
+
+- Scaffold a project with `arkitekt init`
+- Read the generated `app.py` and its actions
+- Run the app in development mode with hot reloading
+- Call an action from Orkestrator
+- See what the app registers with `arkitekt inspect`
+
+</Learn>
+
 ## 1. Scaffold the project
 
 In a new, empty folder run:
@@ -53,7 +71,6 @@ from arkitekt import App, run
 
 app = App("com.example.myapp", "0.1.0", author="jane")
 
-
 @app.action
 def generate_n_string(n: int = 10, timeout: int = 2) -> Generator[str, None, None]:
     """Generate N Strings
@@ -64,7 +81,6 @@ def generate_n_string(n: int = 10, timeout: int = 2) -> Generator[str, None, Non
         time.sleep(timeout)
         yield f"Hello {i}"
 
-
 @app.action
 def append_world(hello: str) -> str:
     """Append World
@@ -72,7 +88,6 @@ def append_world(hello: str) -> str:
     Appends " World" to {{hello}}.
     """
     return hello + " World"
-
 
 if __name__ == "__main__":
     run(app)
@@ -156,3 +171,15 @@ server would, so it is a good check in CI. The packaging step runs it inside the
 - Give your actions real inputs and outputs: [Types & data](/docs/guides/python/types).
 - Keep a device or model around between tasks: [State & lifecycle](/docs/guides/python/state-lifecycle).
 - Ship it: [Packaging](/docs/guides/python/packaging).
+
+<Quiz>
+  <Question q="Where does the identity of the app live, given that there is no manifest file?">
+    It is written into `app.py` as the arguments of `App(...)`. That code is the single source of truth.
+  </Question>
+  <Question q="Why should work like opening a device or loading a model not happen at module level?">
+    The CLI imports the module when running, inspecting and building the container, so that work would happen every time. It belongs in an `@app.startup` hook.
+  </Question>
+  <Question q="What happens to a running task when the app process is killed?">
+    The task ends as LOST once the grace window has passed, because the platform cannot know whether the work finished.
+  </Question>
+</Quiz>

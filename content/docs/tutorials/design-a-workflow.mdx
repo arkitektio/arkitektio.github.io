@@ -11,12 +11,22 @@ We now have a basic understanding of how to call an conversion node on your data
 spanning the most basic nodes.
 
 Here we will use our uploaded image, max project it, threshold it (yeah analysis), and then measure the fraction of the image that is above the threshold (
-yeah quantification). In the course of this tutorial you will get to understand:
+yeah quantification).
 
-- What even are workflows?
-- What is a Workflow Scheduler?
-- How to create a workflow?
-- How to deploy a workflow on a Scheduler?
+<Prerequisites>
+
+The hub holds a converted image ([Run your first task](/docs/tutorials/run-a-task)), and you know how to install a plugin ([Install your first tool](/docs/tutorials/install-a-tool)).
+
+</Prerequisites>
+
+<Learn>
+
+- Understand what a workflow is
+- Install the `stdlib` and `reaktor` plugins the workflow needs
+- Build a workflow in the drag and drop Workflow Designer
+- Set node parameters and save the workflow
+
+</Learn>
 
 ## Before we start
 
@@ -80,7 +90,6 @@ We will need two new plugins for this workflow, so lets install them. One plugin
 Make sure to install the `stdlib` and `reaktor` apps. You can do that by clicking on the `Install` button below, or 
 the classic way by adding these Repositories to your plugin store.
 
-
 <div className="flex flex-row gap-2">
   <InstallRepoButton repo={"stdlib"} user={"arkitektio-apps"} branch={"main"} />
   <InstallRepoButton repo={"reaktor"} user={"arkitektio-apps"} branch={"master"} />
@@ -139,9 +148,7 @@ Lets see the design in progress.
 
 <Callout type="info" title="Ready to Run">
 
-
 Once saved, your workflow is immediately available to be run on your data. You don't need to deploy it manually anymore.
-
 
 </Callout>
 
@@ -149,10 +156,16 @@ Once saved, your workflow is immediately available to be run on your data. You d
 
 Running the workflow on our data should seem quite straightforward. Lets see that in the next tutorial...
 
-<Callout type="info" title="Before you start">
-
-The hub holds a converted image ([Run your first task](/docs/tutorials/run-a-task)), and you know how to install a plugin ([Install your first tool](/docs/tutorials/install-a-tool)).
-
-</Callout>
+<Quiz>
+  <Question q="What is a workflow in Arkitekt?">
+    It is a processing pipeline, a graph of nodes wired together so that data streams from one node to the next.
+  </Question>
+  <Question q="Why can you design and share a workflow before the apps that provide its nodes are installed?">
+    Because workflow design is separate from execution. The design does not depend on which apps end up running it.
+  </Question>
+  <Question q="What happens when you change a workflow, and why does that matter?">
+    A new version of the workflow is created. This matters for the reproducibility and traceability of your analysis.
+  </Question>
+</Quiz>
 
 **Next:** [Run your first workflow](/docs/tutorials/run-a-workflow)

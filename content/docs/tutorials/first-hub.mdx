@@ -21,9 +21,24 @@ the terminal route is in [Install from the command line](/docs/guides/install-cl
 [updating](/docs/guides/hub#update-a-hub), [the mesh](/docs/guides/hub#join-the-mesh) and
 [the advanced options](/docs/guides/other-installation-strategies) have their own pages.
 
-## Graphical installation [#graphical-installer-recommended]
+<Prerequisites>
 
-Before you start, check the [Requirements](/docs/reference/requirements).
+- A machine with Docker
+- Checked the [Requirements](/docs/reference/requirements)
+- An account on the coordination server, go.arkitekt.live by default
+
+</Prerequisites>
+
+<Learn>
+
+- Install Konstruktor and let it check Docker
+- Create a hub with the deployment wizard
+- Authorize the hub on the coordination server with your account
+- Start the hub and manage it from its dashboard
+
+</Learn>
+
+## Graphical installation [#graphical-installer-recommended]
 
 <Steps>
 <Step>
@@ -96,3 +111,15 @@ the window does not stop anything.
 
 </Step>
 </Steps>
+
+<Quiz>
+  <Question q="Why does a hub have to be accepted on the coordination server before it is written to disk?">
+    A hub manages no accounts of its own. Users, organizations and permissions live on the coordination server.
+  </Question>
+  <Question q="Why can the first start of a hub take a while?">
+    Docker pulls the images on first start, and how long that takes depends on your connection.
+  </Question>
+  <Question q="Does closing the Konstruktor window stop your hub?">
+    No. Konstruktor keeps living in the system tray and closing the window does not stop anything.
+  </Question>
+</Quiz>

@@ -4,26 +4,28 @@ description: "Learn how to run, monitor, and inspect the result of your first Ar
 personas: [use]
 ---
 
-<Callout type="info" title="Before you start">
-
-You have built the workflow from [Design your first workflow](/docs/tutorials/design-a-workflow).
-
-</Callout>
-
 We are finally there, we can run our first workflow. In this tutorial we will run our first workflow, that we designed in the previous tutorial.
 Remember it will take an image , max project it, threshold it and then measure the fraction of the image that is below the threshold, to
 estimate the fraction of the image that is not covered by cells.
-In this tutorial you will learn:
 
-- How to run a workflow
-- How to monitor the progress of a workflow
-- How to inspect the result of a workflow
+<Prerequisites>
+
+You have built the workflow from [Design your first workflow](/docs/tutorials/design-a-workflow).
+
+</Prerequisites>
+
+<Learn>
+
+- Run a workflow on your image
+- Monitor the progress of a workflow on the `Run` page
+- Inspect the result of a workflow and the images it created
+- Tell the `Data Graph` apart from the `Provenance Graph`
+
+</Learn>
 
 <Callout type="info" title="Immediate Execution">
 
-
 In Arkitekt, workflows and tasks are executed immediately. Just assign your data to an action and Arkitekt routes it to a connected agent automatically.
-
 
 </Callout>
 
@@ -63,11 +65,9 @@ and you can scan through the history of your run (current bug, you might need to
 
 <Callout type="info" title="The Run Page">
 
-
 Everytime you run a workflow, Arkitekt will create a `Run` for you. This run will keep track of the progress of your workflow, and will also keep track of the result of your workflow.
 A run is not only an indicator of the live progress of your workflow, but will also be your go to point to inspect the processing pipeline and potential debug entrypoint. All data is
 linked in your run and can be exported (e.g. in your methods section just like here). You can find your latest runs in the `Workflow` tab.
-
 
 </Callout>
 
@@ -110,18 +110,15 @@ Just explore this datagraph. You can click on the images and inspect them.
 
 <Callout type="info" title="The Data Graph vs the Provenance Graph">
 
-
 Interestingly there is two types of graphs that are linked to your data. The `Data Graph` and the `Provenance Graph`. The `Data Graph` is the graph that is created through
 interlinking of data by the application itself (e.g. a thresholding algorithm can decide to declare that the thresholded image is a derivative of the original image). The
 `Provenance Graph` is however a graph that is created through keeping track which `Action` task created an image. If you click on the `Provenance` icon you will see a reference
 to the `Task` that created that image. And that task will in turn have a reference to the `Workflow Task` that created it. How this is recorded is described in
 [Provenance](/docs/concepts/provenance).
 
-
 </Callout>
 
 ## Done
-
 
 You have now successfully completed the beginner tutorials, which used only a subpart of the functinality of the software.
 It was probably a lot to learn, but you should now have a more in depth understanding of how the software works and how to use it.
@@ -144,3 +141,15 @@ But we would really like to do better! And you can help to make it better! If yo
 a developer, you can even contribute to the software yourself. Just check out the our [Contribute](/docs/guides/contribute) section.
 
 ### Thanks for using the software! <span role="img" aria-label="heart">❤️</span>
+
+<Quiz>
+  <Question q="What is a Run?">
+    Arkitekt creates a `Run` every time you run a workflow. It keeps track of the progress and the result of that workflow.
+  </Question>
+  <Question q="Where do the images created during the workflow show up?">
+    They appear as derived images linked to your original image, which you can click on and inspect.
+  </Question>
+  <Question q="What does the Provenance Graph record that the Data Graph does not?">
+    It keeps track of which task created an image. The `Data Graph` holds the links between data that the application itself declares.
+  </Question>
+</Quiz>

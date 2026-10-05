@@ -4,6 +4,8 @@ import type { MDXComponents } from 'mdx/types';
 import type { ComponentProps } from 'react';
 import { PersonaCard, PersonaSection } from './persona';
 import { Steward } from './steward';
+import { Learn, Prerequisites } from '@/components/docs/tutorial';
+import { Question, Quiz } from '@/components/docs/quiz';
 
 /**
  * Markdown images (`![alt](/docs/...)`) are bundled by fumadocs-mdx's
@@ -23,6 +25,11 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     PersonaCard,
     PersonaSection,
     Steward,
+    // the parts every tutorial is built from
+    Prerequisites,
+    Learn,
+    Quiz,
+    Question,
     ...components,
   } as MDXComponents;
 }

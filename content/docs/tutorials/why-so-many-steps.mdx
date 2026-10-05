@@ -9,6 +9,21 @@ import { InstallRepoButton } from "@/components/arkitekt";
 
 We now have a basic understanding of how to call an conversion action on your data, we can visualize the results, now before we continue, lets address a few things.
 
+<Prerequisites>
+
+Nothing new. This one is mostly for reading. To try the install buttons on this page you need a hub that Orkestrator is connected to ([Connect with Orkestrator](/docs/tutorials/connect-orkestrator)).
+
+</Prerequisites>
+
+<Learn>
+
+- Understand why Arkitekt splits functionality across several apps
+- See what Actions and Plugins give you in reuse and customization
+- Connect this documentation website to your Arkitekt instance as an app
+- Install the `stdlib` and `reaktor` plugins for your first workflow
+
+</Learn>
+
 ### 😭 So many steps...
 
 You may have noticed that we have to do a lot of steps to get to the point where we can visualize our data on an app. You might think that's to much hassle for nothing (and
@@ -95,18 +110,22 @@ Turned green? Great! You now have the `reaktor` repository installed. Next chapt
 
 <Callout type="info" title="We love this feature">
 
-
 We love this feature, as it allows us to provide you with increaingly more and more interactive documentation. You can look at and install plugins and workflows directly from the documentation.
 But most importantly, we love it because everyone can do that. You can create your own documentation website and use it to install your own plugins and workflows. Just check out the github repo for
 this documentatoin. Its not that complicated.
 
-
-</Callout>
-
-<Callout type="info" title="Before you start">
-
-Nothing to install here. This one is for reading: it explains why the earlier tutorials had you install several small apps instead of one big one.
-
 </Callout>
 
 **Next:** [Design your first workflow](/docs/tutorials/design-a-workflow)
+
+<Quiz>
+  <Question q="Why does Arkitekt spread functionality over several apps and not one big app?">
+    Each tool can concentrate on what it is really good at. App developers can also update their apps without worrying about breaking other apps.
+  </Question>
+  <Question q="Which Arkitekt app have you been using all along without installing it?">
+    This documentation website. Once connected, it can install repositories and workflows to your Arkitekt instance.
+  </Question>
+  <Question q="What is the reaktor plugin for?">
+    It does not analyze anything itself. It lets you run (schedule) your workflows directly on the Arkitekt server.
+  </Question>
+</Quiz>

@@ -9,13 +9,20 @@ import { InstallRepoButton } from "@/components/arkitekt";
 You might have noticed that so far there is not really a lot that we can do with the Arkitekt server so far. We can create datasets, but we cannot really do anything with them.
 Sure we might comment on them. But that's not really what we want to do. We want to use the data to create something. So its time to install our first `App`.
 
-In this tutorial we will explore:
+<Prerequisites>
 
-- What are Apps
-- What are Plugins
-- Install our first Arkitekt Plugin (A File Converter)
-- Understand Actions and how to use them
-- Convert a file
+Orkestrator is connected to a hub ([Connect with Orkestrator](/docs/tutorials/connect-orkestrator)), and the hub holds the example image from [Upload your first images](/docs/tutorials/upload-data).
+
+</Prerequisites>
+
+<Learn>
+
+- Understand what Apps are in Arkitekt
+- Understand what Plugins are and how they differ from other apps
+- Install your first Arkitekt plugin, a file converter
+- Understand what Actions are and how they become available
+
+</Learn>
 
 ## Apps and Actions
 
@@ -117,7 +124,6 @@ of course it only happens once.
 
 <Callout type="warn" title="About the Plugin system">
 
-
 The plugin system is still in its early stages. We are working on making this process more streamlined, and we will some
 default repositories that you can install from. But for now, this is the way to install apps on the Arkitekt server. Also note that the
 "progress" indicator is (even though) functional not really accurate. It will show you the progress of the download, and
@@ -162,10 +168,16 @@ and run the conversion directly.
 But lets finally do the conversion.
 See you in the next tutorial.
 
-<Callout type="info" title="Before you start">
-
-Orkestrator is connected to a hub ([Connect with Orkestrator](/docs/tutorials/connect-orkestrator)), and the hub holds the example image from [Upload your first images](/docs/tutorials/upload-data).
-
-</Callout>
+<Quiz>
+  <Question q="What is an Action?">
+    It is a description of a functionality that an app can provide to the platform. Its inputs and outputs say what the app expects and what it gives back.
+  </Question>
+  <Question q="What makes a PluginApp different from other apps?">
+    It is installed and runs inside the Arkitekt server, and it is easy to install through the Arkitekt interface. Otherwise it is an app like any other.
+  </Question>
+  <Question q="What do you have to do before you can use the actions of a newly deployed app?">
+    Nothing special. Once the app is deployed and running, every action it provides is immediately available.
+  </Question>
+</Quiz>
 
 **Next:** [Run your first task](/docs/tutorials/run-a-task)

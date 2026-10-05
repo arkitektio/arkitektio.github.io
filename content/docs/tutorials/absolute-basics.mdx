@@ -1,19 +1,26 @@
 ---
 title: Absolute Basics
-description: What Arkitekt does with your data, in the simplest terms. By the end you know what the hub is, how sharing works and why you need an account.
+description: "Before you install or click anything, one question is worth five minutes what does Arkitekt actually do with your data?"
+
 ---
 
 import { HubSharing } from "@/components/docs";
 
-Before you install or click anything, one question is worth five minutes: **what does Arkitekt
-actually do with your data?** There is nothing to install for this tutorial. You only read.
 
-By the end of this tutorial you should be able to understand:
+<Prerequisites>
 
-- what the **hub** is, and what it does with your data
-- what happens to an image from the moment you upload it
-- why you can open your data from anywhere, and share it with a colleague
-- why Arkitekt asks you for an **account**, and what that account does *not* hold
+Nothing. There is nothing to install and no account to create for this tutorial. You only read.
+
+</Prerequisites>
+
+<Learn>
+
+- Say what the **hub** is, and what it does with your data
+- Follow an image from the moment you upload it
+- Explain why you can open your data from anywhere, and share it with a colleague
+- Explain why Arkitekt asks you for an **account**, and what that account does *not* hold
+
+</Learn>
 
 ## One place for your data: the hub
 
@@ -95,15 +102,6 @@ The concepts behind this, for when you want the details:
   data.
 - [Where Arkitekt runs](/docs/concepts/topology): how apps find a hub across networks.
 
-## What you should know now
-
-Check yourself. You are ready for the next tutorial if you can answer these:
-
-- Where is an image after you uploaded it? *In the hub, not on your laptop.*
-- Who analyses it? *Apps that connect to the hub. The hub only stores, shows and passes work around.*
-- How does a colleague get to see it? *You give them access, and they open the same image from the hub.*
-- What is the account for? *It tells the hub who you are. It does not hold your data.*
-
 ## What you need to continue
 
 A running hub. Either somebody runs one for you and you [join it](/docs/guides/joining), or you
@@ -122,3 +120,21 @@ first analysis:
 6. [Why so many steps?](/docs/tutorials/why-so-many-steps): a short read on why Arkitekt is split into small apps.
 7. [Design your first workflow](/docs/tutorials/design-a-workflow): chain several steps into one analysis.
 8. [Run your first workflow](/docs/tutorials/run-a-workflow): run it and see what came out.
+
+<Quiz>
+  <Question q="Where is an image after you uploaded it?">
+    In the hub, on the computer of whoever runs it. Not on your laptop, and not with us.
+  </Question>
+  <Question q="Who analyses your data?">
+    Apps that connect to the hub, such as napari, Fiji or a script. The hub itself only stores and
+    shows your data and passes work around.
+  </Question>
+  <Question q="How does a colleague get to see one of your images?">
+    You give them access. They then open the very same image from the hub, on their own computer.
+    Nothing is copied or sent around.
+  </Question>
+  <Question q="What is the account for, and what does it not hold?">
+    It tells the hub who you are, so that you can decide who gets access. It does not hold your
+    data.
+  </Question>
+</Quiz>

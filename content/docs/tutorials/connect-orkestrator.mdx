@@ -6,38 +6,28 @@ personas: [use]
 
 import { OrkestratorGrid } from "@/components/docs";
 
-Our first step into the Arkitekt world will be to get familiar with its non-developer interface. By the end of this tutorial, we will have shown
-you how to:
+Our first step into the Arkitekt world will be to get familiar with its non-developer interface.
 
-- Connect your first App (`Orkestrator`) to your Arkitekt server
-- Login with your Arkitekt server with your user account
-- Understand the basics of the [Authentication and Authorization](/docs/concepts/security#security-measures) process
-- Get familiar with the `Orkestrator` interface
+<Prerequisites>
+
+- A running hub that you can reach: one you [joined](/docs/guides/joining) or one you [installed yourself](/docs/tutorials/first-hub)
+
+</Prerequisites>
+
+<Learn>
+
+- Sign in to your first app, `Orkestrator`, with your account
+- Explain why signing in happens in your browser, and what you approve there
+- Understand the basics of authentication and authorization
+- Find your way around the `Orkestrator` interface
+
+</Learn>
 
 Small steps to get you started!
 
-### Prerequisites
-
-Before you can start using Arkitekt, you need to have the Arkitekt server platform installed and **started**. Please refer to the
-[installation guide](/docs#using-arkitekt) for more information. If you are using `Konstruktor` to manage your Arkitekt server,
-you should be seing a screen similar to the one below, before you continue with this tutorial.
-
-<div className="mt-2 p-6">
-
-![Konstruktor dashboard](/docs/introduction/first_steps/dashboard.png)
-
-<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
-<small>
-The konstruktor dashboard of a started Arkitekt app. Make sure that all services are highlighted green before 
-proceeding. Depending on your hardware configuration this might take a few seconds, after you press <b>Start</b>. If a service remains red or 
-keeps restarting check our <a href="/docs/guides/troubleshooting/deployment">troubleshooting section</a>
-</small>
-</div>
-</div>
-
 ### About Orkestrator
 
-Now that you have the Arkitekt server installed, you can start using our default interface `Orkestrator`,
+With a hub to connect to, you can start using our default interface `Orkestrator`,
 which will be your main tool to interact with the Arkitekt server.
 
 As previously mentioned all interaction with the Arkitekt server happens through apps, and `Orkestrator` is the default app that comes with the Arkitekt server. `Orkestrator` is a
@@ -45,10 +35,8 @@ desktop app: you download it, install it on your computer, and it connects to yo
 
 <Callout type="info" title="On why Orkestrator is a desktop app">
 
-
 As Arkitekt is a webservice platform you might wonder why the interface is not simply a website. In short: browsers restrict what a web page may reach in your local network, a desktop app does not have
 these restrictions and can find and talk to any Arkitekt server. The full reasoning is on the [Orkestrator app page](/docs/guides/apps/orkestrator).
-
 
 </Callout>
 
@@ -67,62 +55,50 @@ and how we ensure that your data is [safe and secure](/docs/concepts/security#se
 
 <div className="mt-2 p-6">
 
-![Orkestrator startscreen](/docs/introduction/first_steps/server.png)
+![The Orkestrator sign-in screen: "Let's get you started", with a "Sign in with go.arkitekt.live" button and "More Options" below it](/docs/introduction/first_steps/sign_in.png)
 
 <div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
-<small>The Orkestrator desktop app startscreen, if you have never conntected to an Arkitekt server </small>
+<small>The Orkestrator sign-in screen, as you see it when no account has been added on this computer yet</small>
 </div>
 </div>
 
-This is the `Connection Screen` of the Orkestrator app.
-The big coloured button in the center of the screen is the start button to connect to your Arkitekt server. If you click on it, you will instruct this app to connect to
-the named server (this is the name of the "deployment" you gave during the installation). During this connection process `Orkestrator` will understand which services are available on the server and will
-potentially will negotaite access rights negotiations. Every app that can connect to Arkitekt has to undergo this connection step.
+This is the `Sign-in Screen` of the Orkestrator app. There is no hub on it yet, and that is on purpose: before `Orkestrator` can show you
+any data, Arkitekt needs to understand **who you are**. So the first thing we do is not to connect to a hub, but to sign in with an account.
+The screen has only two things on it:
 
-<Callout type="info" title="On the connection process">
+- **Sign in with go.arkitekt.live** is the big button in the center, and the one we will use. [go.arkitekt.live](https://go.arkitekt.live) is the
+  account service that we host, the one the [Absolute Basics](/docs/tutorials/absolute-basics#who-gets-in-and-why-you-need-an-account) told you about.
+  If you do not have an account there yet, do not worry, you can create one on the way.
+- **More Options** hides everything you will not need today: **Connect to Custom Coordination Server**, if your accounts are not with us but for
+  example with your institute, **Diagnose connection**, if signing in fails, and a link that explains what Arkitekt is.
 
+The text above the button already tells you what is about to happen, and we will go through it in three small steps.
 
-The connection process is a very important step in the Arkitekt ecosystem. It is the first step to ensure that apps can reliable interface with the Arkitekt server and potential third party modules. It is also
-an important step that system administrators can use to control which apps can connect to the server, or if they want to restrict access to the server or submodules of the server. More in the
-[Service Discovery section](/docs/concepts/service-discovery) of the documentation.
+#### 1. Click "Sign in with go.arkitekt.live"
 
+`Orkestrator` will not ask you for a password. Instead it opens a webpage in your default **webbrowser** and waits there for you. While it waits,
+the button is replaced by two small ones: **Open browser again**, in case you closed the page or it never showed up, and **Cancel**.
+
+<Callout type="info" title="Why the browser, and not the app?">
+
+Your password is something only you and the account service should ever see. If every app had its own login form, you would have to trust every app
+with your password. So an Arkitekt app never sees it: you type it into the page of the account service, in your browser, and the app only
+learns that *you allowed it in*. Every app that connects to Arkitekt signs in this way. More in [Identity & Access](/docs/concepts/security/identity).
 
 </Callout>
-
-<Callout type="warn" title="I don't see my server">
-
-
-If you are not seing a button with the name of your server, this might be because the server is not running (check the `Konstruktor` dashboard and validate all items are highlighted green) or because the server is not reachable from your computer.
-If all services are running but the server is on a different network, connect it through the [mesh](/docs/concepts/security/mesh). If you are still not able to connect to the server, please refer to the [troubleshooting section](/docs/guides/troubleshooting) for more information.
-
-</Callout>
-
-### Almost there
-
-Now that we have connected to the Arkitekt Server there is one more step before we can start using the app. Arkitekt needs to understand who we are, which is why we need to **login** with our server.
-Once clicking login a webpage will open in your default **webbrowser** and you will be prompted to provide your login details in the `Authentication` screen.
-These should be the user account details that you have created during the installation of the Arkitekt server. (defaults: user: `demo`, password: `demo`).
 
 <Callout type="info" title="On the login process">
-
 
 If you are using the `Orkestrator` app for the first time you may be prompted by your firewall to allow access to network.
 This is a security feature of your operating system and you should allow access to the network. Don't worry Arkitekt will not send any data to the internet,
 just check out the [source code](/docs/guides/contribute), if you are worried 😉.
 
-
 </Callout>
 
-<Callout type="warn" title="No Admin Login">
+#### 2. Sign in and approve the app, in your browser
 
-
-During the installation you were prompted to create both an admin account and various user accounts. You should **never** use the admin account to login to the server,
-as this account is only used to manage the server. Please use one of the user accounts that you have created during the installation process.
-
-
-</Callout>
-
-Shortly after you have logged in, you should see the following screen in the `Orkestrator` app.
+In the browser, log in with your [go.arkitekt.live](https://go.arkitekt.live) account, or create one if this is your first time.
+Once Arkitekt knows who you are, it asks you one more question: do you want to let **this app** in?
 
 <div className="mt-2 p-6 rounded-sm rounded-md">
 
@@ -137,25 +113,39 @@ This is the `Authorization` screen, which is used to grant the `Orkestrator` App
 This is a very important step and every App that connects to Arkitekt needs to undergo this step. During this step you will grant the **App** access to your user account,
 and tell Arkitekt which actions the App is allowed to perform on **your behalf**. We are working on a comprehensive documentation for this and give you detailed information
 about the App Rights (so called `Scopes`) in the future. For this tutorial we will just grant the app full access to your account.
-To do this, click on the **Authorize** button. You will be redirected back to the Orkestrator app and you are finally go to go.
+To do this, approve the app. You can then close the page and go back to the Orkestrator app, which has been waiting for you, and you are finally good to go.
+
+#### 3. Back in Orkestrator
+
+`Orkestrator` notices that you approved it and signs you in. Two things are worth knowing about what just happened:
+
+- **The account stays on this computer.** That is the last half sentence on the sign-in screen: *the accounts you add stay on this computer*. `Orkestrator`
+  remembers the login, so the next time you open the app you will not see this screen, and you do not have to go through the browser again.
+  If you sign out, the screen comes back as **Welcome back**, with your account as a card to pick, and a plus to add another one.
+- **Your account knows your hubs.** Hubs that your [organization](/docs/concepts/terminology#organization) has authorized show up
+  on their own, which is why you never had to type an address. More in the [Service Discovery section](/docs/concepts/service-discovery) of the documentation.
+
+<Callout type="warn" title="I don't see my hub">
+
+If your hub does not show up, this might be because the hub is not running (check the `Konstruktor` dashboard and validate all items are highlighted green), because your account
+is not part of the organization the hub belongs to (ask the person running it to add you), or because the hub is not reachable from your computer.
+If all services are running but the hub is on a different network, connect it through the [mesh](/docs/concepts/security/mesh). If you are still not able to connect, please refer to the [troubleshooting section](/docs/guides/troubleshooting) for more information.
+
+</Callout>
 
 <Callout type="info" title="On the OAuth process">
-
 
 This Authentication and Authorization process is the arguely one of the most important concept in the Arkitekt design. It is the first step to ensure a secure and trustworthy connection between the Arkitekt server and the app. As we believe data
 privacy and security is a very important topic, every app needs to alert what it can potentially do with your data. As Arkitekt is a very flexible platform, we cannot know what every app can do, so we need to ask you to grant
 to make sure that you are always in control of your data.
 
-
 </Callout>
 
 <Callout type="warn" title="We are not production ready">
 
-
 While the Authentication and Authorization process might give you the impression that Arkitekt is safe and sound and production ready, we are **not**. Some of the security features have been disabled in the `Paper` channel deployment or are not fully implemented yet.
 Safety is our top priority, but we are still in the early stages of development. For now Arkitekt should be safe by `Design` not by `Implementation`. Online features of Arkitekt should stil be happening in a controlled environment such as a local network or a [secure VPN](/docs/concepts/security/mesh#arkitekt-through-a-vpn).
 If you are interested in helping us to make Arkitekt production ready, please check out our [contribution guide](/docs/guides/contribute).
-
 
 </Callout>
 
@@ -185,6 +175,13 @@ Three things are important to know:
 
 Lets explore the different views in the next tutorials.
 
-
+<Quiz>
+  <Question q="Why is Orkestrator a desktop app and not a website?">
+    Browsers restrict what a web page may reach in your local network. A desktop app does not have these restrictions and can find and talk to any Arkitekt server.
+  </Question>
+  <Question q="What do you decide on the Authorization screen?">
+    You grant the app access to your user account and tell Arkitekt which actions the app may perform on your behalf.
+  </Question>
+</Quiz>
 
 **Next:** [Upload your first images](/docs/tutorials/upload-data)
