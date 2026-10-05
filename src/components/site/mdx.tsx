@@ -4,6 +4,7 @@ import type { MDXComponents } from 'mdx/types';
 import type { ComponentProps } from 'react';
 import type { Persona } from '@/lib/persona';
 import { PersonaCard } from './persona';
+import { Steward } from './steward';
 
 /**
  * Markdown images (`![alt](/docs/...)`) are bundled by fumadocs-mdx's
@@ -30,6 +31,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     img: DocImage,
     PersonaCard,
     PersonaSection,
+    Steward,
     ...components,
   } as MDXComponents;
 }

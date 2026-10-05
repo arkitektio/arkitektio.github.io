@@ -8,7 +8,7 @@ import {
   ViewOptionsPopover,
 } from 'fumadocs-ui/layouts/docs/page';
 import { notFound } from 'next/navigation';
-import { getMDXComponents, PersonaFooter } from '@/components/site';
+import { getMDXComponents, PersonaFooter, StewardCard } from '@/components/site';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
@@ -61,6 +61,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
         />
       </div>
+      {page.slugs[0] === 'tutorials' && <StewardCard id={page.data.steward} />}
       <DocsBody>
         <MDX
           components={getMDXComponents({
