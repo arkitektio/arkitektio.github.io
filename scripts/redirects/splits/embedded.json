@@ -1,10 +1,10 @@
 {
   "source": "developers/embedded.mdx",
-  "primary": "build/tutorials/embedded-first-device.mdx",
+  "primary": "tutorials/embedded-first-device.mdx",
   "anchors": {
-    "declaring-actions": "build/reference/embedded.mdx#declaring-actions",
-    "state": "build/reference/embedded.mdx#state",
-    "provisioning-and-connection": "build/reference/embedded.mdx#provisioning-and-connection",
-    "what-is-not-there-yet": "build/reference/embedded.mdx#what-is-not-there-yet"
+    "declaring-actions": "reference/embedded.mdx#declaring-actions",
+    "state": "reference/embedded.mdx#state",
+    "provisioning-and-connection": "reference/embedded.mdx#provisioning-and-connection",
+    "what-is-not-there-yet": "reference/embedded.mdx#what-is-not-there-yet"
   }
 }

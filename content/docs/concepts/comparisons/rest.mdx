@@ -1,0 +1,46 @@
+---
+title: Why not Rest?
+description: Why Arkitekt chose GraphQL over REST for its API, along with the challenges that decision brings.
+---
+
+## Why not Rest?
+
+When deciding on the API for Arkitekt, we considered using REST, but ultimately decided on GraphQL.
+
+## Why we like GraphQL
+
+In short: bioimage data is highly relational, and GraphQL lets a client declare exactly which slice of that relationship graph it needs in a single, strongly typed, self-documenting query, with subscriptions for real-time updates on top. The full list of reasons, along with examples you can try against your own server, lives in [GraphQL: Why we like GraphQL](/docs/concepts/graphql#why-we-like-graphql).
+
+<Callout type="info" title="Developing with GraphQL">
+
+
+Developing a Python or Typescript client that interfaces with our GraphQL API is easy and fun. We have outlined the steps in the [Developing with GraphQL](/docs/guides/python/graphql) section,
+which utilizes some of the tools and libraries mentioned above.
+
+
+</Callout>
+
+
+## Challenges of using GraphQL
+
+While we believe that GraphQL is a great fit for bioimage analysis, it is not without its challenges. Here are some of the challenges we have encountered:
+
+1. **Learning Curve**: GraphQL has a steeper learning curve compared to REST, especially for developers who are new to it. However, we believe that the benefits of GraphQL outweigh the initial learning curve,
+and our tooling should help to make the transition easier.
+
+2. **Caching**: Caching in GraphQL can be more complex than in REST, especially when dealing with complex queries and mutations. While we employ a number of strategies to mitigate this, it is still an area that requires careful consideration.
+
+3. **N + 1 Problem**: The N + 1 problem occurs when a query results in multiple requests to the server to fetch related data, and can lead to performance issues.In REST, the N + 1 problem can be mitigated by using endpoints that return the exact data needed. In GraphQL, this problem can be exacerbated by the flexibility of the API. 
+However, we have implemented a number of strategies to mitigate this problem, such as dataloader and federation and especially our new strawberrry based implementation, comes with a lot of performance improvements.
+
+4. **Security**: While GraphQL provides a lot of flexibility, it also introduces new security challenges. For example, clients can craft complex queries that can lead to performance issues or even denial of service attacks. Our new APIs
+have implemented a number of strategies to mitigate these risks, such as query complexity analysis and rate limiting.
+
+
+<Callout type="info" title="Work in progress">
+
+
+This section is still work in progress.
+
+
+</Callout>

@@ -10,7 +10,7 @@ const linkClass = 'underline underline-offset-4 hover:text-fd-primary';
 const pokket = <>Pokket, the {appName} mobile app</>;
 const orkestrator = <>Orkestrator, the {appName} desktop app</>;
 
-// The short version of /docs/use/guides/joining, which stays the
+// The short version of /docs/guides/joining, which stays the
 // source of truth for the details.
 const steps: { title: string; body: ReactNode; extra?: ReactNode }[] = [
   {
@@ -119,7 +119,7 @@ export function DeeplinkGuide() {
             An open-source platform for bioimage analysis. It sits between a
             lab&apos;s data, its analysis tools and its people, so they can
             share images, workflows and results with each other.{' '}
-            <Link className={linkClass} href="/docs/use/concepts/basics">
+            <Link className={linkClass} href="/docs/concepts/basics">
               Read the basics
             </Link>
             .

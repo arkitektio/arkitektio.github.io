@@ -141,7 +141,7 @@ export default function HomePage() {
         Let us dump some features on you, like every weird marketing site. If
         you care more about what Arkitekt stands for check out{" "}
         <Link
-          href="/docs/design/philosophy"
+          href="/docs/concepts/philosophy"
           className="text-primary underline inline font-medium"
         >
           Why we exists?
@@ -181,7 +181,7 @@ export default function HomePage() {
               className="shrink-0 rounded-md"
               variant={"outline"}
             >
-              <Link href="/docs/design/ai">
+              <Link href="/docs/concepts/ai">
                 What we do care about with regards to AI
                 <ArrowRight className="size-4" />
               </Link>
@@ -202,7 +202,7 @@ export default function HomePage() {
             first tool.
           </p>
           <Button asChild size="lg" className="mt-2 rounded-full">
-            <Link href="/docs/use/tutorials/first-steps">
+            <Link href="/docs/tutorials/first-steps">
               Start the tutorial
               <ArrowRight className="size-4" />
             </Link>

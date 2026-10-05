@@ -29,7 +29,7 @@ export const presentations: Presentation[] = [
     tags: ['Coordinates', 'Metadata', 'Microscopy'],
     slides: 22,
     minutes: 18,
-    docsHref: '/docs/build/concepts/services/mikro/coordinate-systems',
+    docsHref: '/docs/concepts/services/mikro/coordinate-systems',
   },
   {
     slug: 'volume-viewer',

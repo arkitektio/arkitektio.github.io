@@ -1,0 +1,117 @@
+---
+title: Your first Rust app
+description: "The arkitekt Rust crates: install them, declare an app with #[action], and connect it as an agent with run(app)."
+personas: [build]
+---
+
+import { GithubRepo } from "@/components/docs";
+
+<GithubRepo url="https://github.com/arkitektio/arkirust" title="arkirust" />
+
+The Rust client follows the same model as the [Python client](/docs/concepts/python): an **app**
+declares **actions**, `run(app)` connects it as an [agent](/docs/concepts/terminology/agent), and the
+platform calls it. Use it when you want a small, fast, self-contained binary: a device driver, a
+camera server, or an agent on a machine where you would rather not install Python.
+
+<Callout type="info" title="Pre-1.0">
+
+The crates are at **0.2** and still change in breaking ways between minor versions. The feature set
+is smaller than Python's. Most notably, there are no [workflows](/docs/reference/rust#durable-execution), so a Rust action
+cannot call other actions yet. [Status](/docs/reference/rust#status) lists what is and is not implemented.
+
+</Callout>
+
+## Install
+
+```toml
+[dependencies]
+arkitekt = "0.2"
+mikro = { package = "arkitekt-mikro", version = "0.2" }   # only if you use mikro
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+anyhow = "1"
+futures = "0.3"                                           # for streaming actions
+```
+
+Apps normally depend on `arkitekt` and on the service crates they use. `arkitekt` re-exports the
+lower-level crates (`fakts`, `rath`, `rekuest`) and the macros. Some crates are published under a
+prefixed name because the plain name was taken on crates.io, but you import them under the short
+name:
+
+| Crate on crates.io | Import as | What it is |
+|---|---|---|
+| `arkitekt` | `arkitekt` | `App`, `run`, `connect`, `easy`, `serve`, and re-exports of everything below |
+| `rekuest` | `arkitekt::rekuest` | ports and types, the agent, `Task`, states and locks, the journal |
+| `rekuest-macros` | via `arkitekt` | `#[action]`, `#[arkitekt::service]`, `#[derive(State)]` |
+| `fakts` | `arkitekt::fakts` | server discovery and authentication |
+| `arkitekt-rath` | `arkitekt::rath` | an authenticated GraphQL client |
+| `arkitekt-mikro` | `mikro` | the [Mikro](/docs/concepts/services/mikro) client: array datasets as zarr on S3 |
+| `arkitekt-lovekit` | `lovekit` | LiveKit broadcasts and video streams |
+
+The runtime is built on **tokio**. Enable `arkitekt`'s `serve` feature to [serve an app over
+HTTP](/docs/guides/rust#serving-without-a-server), and `mesh` / `mesh-native` to reach services on the
+[mesh](/docs/concepts/security/mesh).
+
+## A first app
+
+```rust
+use std::time::Duration;
+
+use arkitekt::{action, run, App, Task};
+use futures::Stream;
+
+/// Greet someone
+///
+/// Says hello, possibly several times.
+///
+/// # Arguments
+/// * `name` - Who to greet
+/// * `times` - How often
+///
+/// # Returns
+/// The greeting
+#[action]
+async fn greet(name: String, #[port(default = 1)] times: i64) -> String {
+    format!("Hello {name}! ")
+        .repeat(times.max(1) as usize)
+        .trim_end()
+        .to_owned()
+}
+
+/// Count
+///
+/// Yields every number up to `to`, one per second.
+///
+/// # Arguments
+/// * `to` - Where to stop (exclusive)
+#[action]
+async fn count(to: i64, task: Task) -> impl Stream<Item = i64> {
+    futures::stream::unfold(0, move |i| {
+        let task = task.clone();
+        async move {
+            if i >= to {
+                return None;
+            }
+            tokio::time::sleep(Duration::from_secs(1)).await;
+            task.progress((100 * (i + 1) / to.max(1)) as i32, format!("at {i}"));
+            Some((i, i + 1))
+        }
+    })
+}
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let app = App::new("hello-rust", "0.1.0")
+        .description("Says hello from Rust")
+        .action(greet)
+        .action(count);
+
+    run(app).await
+}
+```
+
+Nothing connects until `run(app)` is awaited. On first run it prints a URL and a code to the
+terminal. Open the URL, confirm the code and authorize the app. The credential is cached, so later
+runs connect straight away. `greet` and `count` then show up in Orkestrator like any Python action.
+`count` streams: each item reaches the caller as it is yielded.
+
+Next: [State, services and serving over HTTP](/docs/guides/rust) in the Rust guide, and the [Rust client reference](/docs/reference/rust) for `#[action]`, connecting and status.

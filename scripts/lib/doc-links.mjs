@@ -119,7 +119,7 @@ export function applyEdits(text, edits) {
 
 /**
  * The redirect tables: `legacy.json` (URLs of the old Docusaurus site and of
- * earlier layouts), `moves.json` (file moves of the persona restructure) and
+ * earlier layouts), `moves.json` (file moves of the restructure, pointing at today's paths) and
  * `splits/*.json` (pages that were split, with a target per heading anchor).
  */
 export function loadRedirects() {

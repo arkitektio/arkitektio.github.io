@@ -121,7 +121,7 @@ export function DeclareCard() {
 
   return (
     <BentoCard
-      href="/docs/build/guides/python/durable-execution"
+      href="/docs/guides/python/durable-execution"
       hrefLabel="Learn about durable workflows"
       className="grid grid-cols-1 gap-6 p-6 sm:col-span-2 sm:p-8 lg:grid-cols-2 lg:items-center"
     >

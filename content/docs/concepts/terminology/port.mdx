@@ -1,0 +1,46 @@
+---
+title: Port
+description: A port is the typed input or output of an Action, defined by a key, a type, and an optional label.
+---
+
+### Whats is a port?
+
+A port is concept tightligly related to Actions and their input and outputs.
+Each action has multiple input and output ports.
+
+Ports are defined by a mandatory `key` and a `type` and an optional `label`.
+
+```javascript
+{
+  key: 'input',
+  type: 'number',
+  label: 'Input'
+}
+```
+
+### Port Types
+
+Each port has a type, that defines the type of data that can be passed through it.
+The following basic types are supported:
+
+- `int`
+- `float`
+- `string`
+- `boolean`
+- `structure`
+
+Additionality there are some special types:
+
+- `List` - A list of values of the same type
+- `Dict` - A key-value pair of values of the same type
+- `Union` - A value that can be one of multiple types
+
+Importantly Ports always specifie if they expect nullable values or not.
+
+<Callout type="info">
+
+
+Structure Ports are a bit special: they carry non-serializable data structures that are shrunk to a serializable form on one side and expanded back on the other, as explained in [Shrink and Expand](/docs/concepts/terminology/structure#shrink-and-expand).
+
+
+</Callout>

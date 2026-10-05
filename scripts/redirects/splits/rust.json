@@ -1,14 +1,14 @@
 {
   "source": "developers/rust.mdx",
-  "primary": "build/tutorials/rust-first-app.mdx",
+  "primary": "tutorials/rust-first-app.mdx",
   "anchors": {
-    "action": "build/reference/rust.mdx#action",
-    "the-task": "build/reference/rust.mdx#the-task",
-    "state-and-lifecycle": "build/guides/rust.mdx#state-and-lifecycle",
-    "services-and-scripts": "build/guides/rust.mdx#services-and-scripts",
-    "connecting": "build/reference/rust.mdx#connecting",
-    "serving-without-a-server": "build/guides/rust.mdx#serving-without-a-server",
-    "durable-execution": "build/reference/rust.mdx#durable-execution",
-    "status": "build/reference/rust.mdx#status"
+    "action": "reference/rust.mdx#action",
+    "the-task": "reference/rust.mdx#the-task",
+    "state-and-lifecycle": "guides/rust.mdx#state-and-lifecycle",
+    "services-and-scripts": "guides/rust.mdx#services-and-scripts",
+    "connecting": "reference/rust.mdx#connecting",
+    "serving-without-a-server": "guides/rust.mdx#serving-without-a-server",
+    "durable-execution": "reference/rust.mdx#durable-execution",
+    "status": "reference/rust.mdx#status"
   }
 }

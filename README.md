@@ -34,17 +34,8 @@ components hot-reload as you edit.
 
 ## Writing content
 
-All documentation lives in [`content/docs`](content/docs) as MDX. It is organised by who is
-reading and by what kind of page it is ([Diataxis](https://diataxis.fr)):
-
-| Area                   | Reader                                                              |
-| ---------------------- | ------------------------------------------------------------------- |
-| `content/docs/use`     | Scientists using Orkestrator and the connected apps.                |
-| `content/docs/deploy`  | Admins installing and operating an Arkitekt server.                 |
-| `content/docs/build`   | Developers writing apps, plugins and services.                      |
-| `content/docs/design`  | Everyone: philosophy, terminology, comparisons, what's changed.     |
-
-Inside `use`, `deploy` and `build`, a page goes into one of four folders:
+All documentation lives in [`content/docs`](content/docs) as MDX, in one tree organised by what
+kind of page it is ([Diataxis](https://diataxis.fr)):
 
 | Folder       | What belongs there                                             |
 | ------------ | -------------------------------------------------------------- |
@@ -53,12 +44,32 @@ Inside `use`, `deploy` and `build`, a page goes into one of four folders:
 | `reference`  | Facts to look up: options, tables, protocols.                  |
 | `concepts`   | Background that explains how and why something works.          |
 
-The four areas are separate sidebars, switched from the dropdown at the top of the sidebar (each
-has `"root": true` in its `meta.json`). Each folder uses a `meta.json` to control sidebar ordering
-and labels. To add a page, drop a new `.mdx` file in the relevant folder with a `title` and
-`description` in its frontmatter, and add it to that folder's `meta.json`.
+Who a page is for is a tag, not a path. Set `personas` in the frontmatter:
 
-Link to other pages with absolute URLs (`/docs/build/guides/python/workflows`), not relative paths.
+| Persona   | Reader                                                 |
+| --------- | ------------------------------------------------------ |
+| `use`     | Scientists using Orkestrator and the connected apps.   |
+| `deploy`  | Admins installing and operating an Arkitekt server.    |
+| `build`   | Developers writing apps, plugins and services.         |
+
+```mdx
+---
+title: Join the mesh
+description: ...
+personas: [deploy]
+---
+```
+
+A page can name several personas. Leave the key out for a page that is for everyone (philosophy,
+terminology, comparisons). The bar at the top of the docs lets a reader pick a persona; the
+sidebar, the search and the previous/next links then leave out pages tagged only for the others.
+Folders and sidebar headings follow their pages, so there is nothing to tag in a `meta.json`.
+
+Each folder uses a `meta.json` to control sidebar ordering and labels. To add a page, drop a new
+`.mdx` file in the relevant folder with a `title` and `description` in its frontmatter, and add
+it to that folder's `meta.json`.
+
+Link to other pages with absolute URLs (`/docs/guides/python/workflows`), not relative paths.
 
 MDX components (callouts, code blocks, custom React widgets) are available inside
 content. Frontmatter and MDX options are configured in
@@ -100,8 +111,8 @@ that forwards the browser. The stubs are generated into `out/` at the end of `pn
 the tables in [`scripts/redirects`](scripts/redirects):
 
 - `legacy.json`: old URL to new URL. Add an entry here when you move or remove a page.
-- `moves.json` and `splits/`: the move to the persona layout, including where each heading of a
-  split page went.
+- `moves.json` and `splits/`: where the pages of the first restructure ended up, including where
+  each heading of a split page went. Their targets are today's paths.
 - `required.json`: URLs that are linked from outside (released apps, READMEs) and must keep
   resolving.
 

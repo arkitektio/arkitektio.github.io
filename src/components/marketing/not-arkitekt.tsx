@@ -18,7 +18,7 @@ const tools = [
     isNot: 'Arkitekt is not a pure parallelization library.',
     weAre:
       'We are a concurrency platform: long-lived, stateful actor apps that broker data and compute. They are not ephemeral task graphs you submit and forget.',
-    link: '/docs/build/concepts/services/kluster',
+    link: '/docs/concepts/services/kluster',
     linkLabel: 'How we run Dask',
     hue: 195,
   },
@@ -30,7 +30,7 @@ const tools = [
     isNot: 'Arkitekt is not just a stateless executor.',
     weAre:
       'Smart microscopy is rarely stateless. A model is loaded once and results steer the next acquisition. Our apps stay alive and keep their state across a live feedback loop.',
-    link: '/docs/design/comparisons/nextflow',
+    link: '/docs/concepts/comparisons/nextflow',
     linkLabel: 'Arkitekt vs Nextflow',
     hue: 268,
   },
@@ -42,7 +42,7 @@ const tools = [
     isNot: 'Arkitekt does not orchestrate robotic swarms.',
     weAre:
       'That layer is out of scope. But the moment your robot exposes a high-level action, wrap it as an Arkitekt app and we become your friend.',
-    link: '/docs/use/guides/apps',
+    link: '/docs/guides/apps',
     linkLabel: 'Wrap it as an app',
     hue: 90,
   },

@@ -1,0 +1,38 @@
+---
+title: Requirements
+description: Docker, or a Docker-compatible engine, is the only dependency.
+personas: [deploy]
+---
+
+**Docker, or a Docker-compatible engine, is the only dependency.** Konstruktor needs Docker Compose
+**2.20** or newer and an Engine API of **1.41** or newer (Docker 20.10). Konstruktor checks this when it
+starts and, if something is missing, tells you which of four things is wrong (no Docker binary, no
+Compose, the daemon is not running, or the version is too old) and how to fix it. On the command line
+`konstruktor doctor` prints the same advice.
+
+| Operating system | Recommended engine | Also works |
+|---|---|---|
+| macOS | [Colima](https://github.com/abiosoft/colima): `brew install colima docker docker-compose` | OrbStack, Podman Desktop, Docker Desktop |
+| Windows | [Rancher Desktop](https://rancherdesktop.io/): `winget install SUSE.RancherDesktop` | Podman Desktop, Docker Desktop |
+| Linux | Docker Engine from your distribution | Podman with `podman-docker` and `podman-compose` |
+
+On macOS and Windows the desktop app can install the recommended engine for you with one click. On
+Linux the commands need `sudo`, so the app prints them for you to paste. If a machine has both Docker
+and Podman, `KONSTRUKTOR_ENGINE=podman` picks Podman. You do **not** need a Docker account. Git is only
+needed if you want to run a service from source.
+
+**Hardware.** The platform is not yet optimized for low-end machines. We recommend at least **16 GB
+of RAM**, a decent modern CPU, and **50 GB of free space on an SSD**. It runs on less (it works on a
+Raspberry Pi 4), but transferring large amounts of data will be slow. As the hub moves a lot of data
+between services and apps, a wired network connection helps a great deal, and on equal hardware the
+platform runs noticeably faster on Linux than on Windows or macOS. GPUs are used by the **apps** that
+do the heavy lifting, not by the hub, so the hub machine does not need one.
+
+<Callout type="info" title="Where to install">
+
+  The Arkitekt platform was designed as a multi-user platform that gets installed *once* on a **powerful** server and then
+  can be accessed by multiple users and apps, on standard hardware. However it is also possible to install the platform on your own computer and
+  use it as a `personal` platform. Until the platform is production ready we recommend the latter; see
+  [On the production readiness of Arkitekt](/docs/concepts/planning).
+
+</Callout>

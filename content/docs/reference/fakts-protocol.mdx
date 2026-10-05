@@ -1,0 +1,294 @@
+---
+title: Fakts protocol
+description: "The Fakts protocol step by step: discovery, registration and device authorization, user approval, token polling, refresh, and the envelope of service configuration."
+personas: [build]
+---
+
+The messages of the Fakts flow, step by step; [Service Discovery](/docs/concepts/service-discovery) explains what the protocol is for and shows the flow at a glance.
+
+## Step 0: Discover the deployment
+
+The app knows a single thing: a host name or URL, for example
+`arkitekt.example.org` or `http://localhost:8000`. It fetches the well-known
+document at that base:
+
+```http
+GET https://arkitekt.example.org/.well-known/fakts
+```
+
+If the user typed a bare host without a scheme, clients try `https://` first and
+`http://` as a fallback. The response describes the deployment and, most
+importantly, tells the app which OAuth2 endpoints to use:
+
+```json
+{
+  "name": "My Lab Deployment",
+  "version": "1.0.0",
+  "protocol_version": "2",
+  "description": "Arkitekt for the imaging facility",
+  "base_url": "https://arkitekt.example.org",
+
+  "configure": "https://arkitekt.example.org/lok/configure?code={code}",
+  "device_authorization_endpoint": "https://arkitekt.example.org/lok/o/device/",
+  "token_endpoint": "https://arkitekt.example.org/lok/o/token/",
+
+  "issuer": "https://arkitekt.example.org/lok",
+  "jwks_uri": "https://arkitekt.example.org/lok/.well-known/jwks.json",
+  "grant_types_supported": [
+    "urn:ietf:params:oauth:grant-type:device_code",
+    "refresh_token"
+  ],
+  "token_endpoint_auth_methods_supported": ["none"]
+}
+```
+
+The three fields the flow runs on are `configure`,
+`device_authorization_endpoint` and `token_endpoint`. They are required. The
+rest (`issuer`, `jwks_uri`, supported grant types) is the usual OAuth2 server
+metadata, and is what lets every other service verify the JWTs Lok issues on its
+own, without calling back to Lok.
+
+Apps cache this document together with their session so they can reconnect
+without rediscovering.
+
+## Step 1: Register and request device authorization
+
+The app posts its manifest to the device authorization endpoint. This one call
+does two things at once: it **dynamically registers** the app as a public OAuth2
+client (minting a `client_id` from the manifest) and it starts a **device
+authorization** request.
+
+```http
+POST https://arkitekt.example.org/lok/o/device/
+Content-Type: application/json
+
+{
+  "manifest": {
+    "identifier": "live.arkitekt.orkestrator",
+    "version": "0.0.1",
+    "scopes": ["openid"],
+    "logo": "https://example.org/logo.png",
+    "requirements": [
+      { "key": "lok",     "service": "live.arkitekt.lok" },
+      { "key": "rekuest", "service": "live.arkitekt.rekuest", "optional": false },
+      { "key": "mikro",   "service": "live.arkitekt.mikro",   "optional": false },
+      { "key": "kabinet", "service": "live.arkitekt.kabinet", "optional": true }
+    ]
+  },
+  "requested_client_kind": "desktop",
+  "expiration_time_seconds": 300
+}
+```
+
+The **manifest** is what the user will be shown, and what the deployment uses to
+decide which configuration to render. Its `requirements` list the services the
+app needs: each has a `key` the app will use to look the service up later, the
+`service` identifier it must be an instance of, and whether it is `optional`.
+The optional fields `requested_client_kind` (a label such as `desktop`, `website`
+or `development`) and `expiration_time_seconds` (how long the user has to
+approve) do not change the grant itself.
+
+The response is a standard RFC 8628 device authorization response, plus the
+freshly minted `client_id` and the token endpoint to poll:
+
+```json
+{
+  "status": "granted",
+  "client_id": "b1f0c1e2-...",
+  "device_code": "3f9c2b9a1d8e4f7a9c0b2e1d5a6f7b8c...",
+  "user_code": "ABCD-1234",
+  "verification_uri": "https://arkitekt.example.org/lok/configure",
+  "verification_uri_complete": "https://arkitekt.example.org/lok/configure?code=ABCD-1234",
+  "token_endpoint": "https://arkitekt.example.org/lok/o/token/",
+  "expires_in": 300,
+  "interval": 5
+}
+```
+
+Two codes come back and they play different roles:
+
+- `device_code` is a long, full-entropy secret. The app keeps it and uses it to
+  poll. It is never shown to a human.
+- `user_code` is short and transcribable. It is what the configure page carries,
+  and what a user would type if they had to enter it by hand.
+
+The `client_id` exists from this moment, but it is unusable until a human
+approves the code.
+
+## Step 2: The user approves the app
+
+The app opens `verification_uri_complete` for the user, in a browser window, a
+pop-out, or by printing the link in a terminal. The URL is built by the server
+from its own `configure` template, so a deployment can move the page without any
+client knowing.
+
+On that page the user sees the app's identity, version and logo, the scopes it
+asks for, and the requirements it declares. For each requirement the user picks
+which running **instance** of that service the app should be given (a deployment
+may have more than one instance of a service, for example two storage backends),
+or denies it. Optional requirements can be left unsatisfied. Then they approve.
+
+This is the "log in with Google" moment of Arkitekt. It authenticates the user
+*and* authorizes the app in one step, which is why Arkitekt talks about a
+[double authentication](/docs/concepts/security/identity#two-step-authentication-users-and-apps).
+
+## Step 3: Poll the token endpoint
+
+While the user is busy, the app polls the token endpoint with the device-code
+grant, exactly as RFC 8628 prescribes. The request is form-encoded, and because
+the app is a public client it sends only its `client_id`, no secret:
+
+```http
+POST https://arkitekt.example.org/lok/o/token/
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:device_code
+&device_code=3f9c2b9a1d8e4f7a9c0b2e1d5a6f7b8c...
+&client_id=b1f0c1e2-...
+```
+
+Until the user has decided, the answer is an HTTP 400 with a standard OAuth2
+error member. Clients branch on `error`, never on the HTTP status alone:
+
+| `error`                 | Meaning                                              | What the client does                       |
+| ----------------------- | ---------------------------------------------------- | ------------------------------------------ |
+| `authorization_pending` | The user has not approved yet.                       | Wait `interval` seconds, poll again.       |
+| `slow_down`             | Polled too fast.                                     | Add 5 seconds to the interval, keep going. |
+| `access_denied`         | The user declined.                                   | Stop, tell the user.                       |
+| `expired_token`         | `expires_in` passed without a decision.              | Stop, start over from step 1.              |
+
+The loop is bounded by the wall clock (`expires_in`), not by a retry count.
+
+Once the user approves, the same request returns HTTP 200 with a **standard
+OAuth2 token response**, and the Fakts **envelope** appended to it:
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIs...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "openid",
+  "refresh_token": "def50200...",
+  "client_id": "b1f0c1e2-...",
+
+  "self": {
+    "deployment_name": "My Lab Deployment",
+    "alias": {
+      "id": "lok-public",
+      "host": "arkitekt.example.org",
+      "port": 443,
+      "ssl": true,
+      "path": "lok",
+      "challenge": "ht",
+      "public": true
+    }
+  },
+  "instances": {
+    "lok": {
+      "identifier": "lok",
+      "service": "live.arkitekt.lok",
+      "aliases": [
+        { "id": "lok-public", "host": "arkitekt.example.org", "port": 443, "ssl": true, "path": "lok", "challenge": "ht", "public": true }
+      ]
+    },
+    "mikro": {
+      "identifier": "mikro-facility",
+      "service": "live.arkitekt.mikro",
+      "aliases": [
+        { "id": "mikro-lan", "host": "10.0.0.12", "port": 8080, "ssl": false, "path": "", "challenge": "ht" },
+        { "id": "mikro-public", "host": "arkitekt.example.org", "port": 443, "ssl": true, "path": "mikro", "challenge": "ht", "public": true }
+      ],
+      "challenge_key": { "kind": "ed25519", "key": "MCowBQYDK2VwAyEA..." }
+    },
+    "rekuest": { "...": "..." }
+  },
+  "statuses": {
+    "lok": "granted",
+    "rekuest": "granted",
+    "mikro": "granted",
+    "kabinet": "unavailable"
+  }
+}
+```
+
+The device code is **single-use**: this response burns it server-side. From here
+on the app never polls again. Continuity is the refresh chain described in step 4.
+
+There is no separate "claim" or "give me my config" request any more: the token
+and the configuration arrive together, in one response, and the identity that
+used to live in a bespoke `auth` block is now just the standard token-response
+members (`access_token`, `refresh_token`, `client_id`).
+
+## Step 4: Refresh, and pick up configuration changes
+
+Access tokens are short-lived. When one is close to expiry, or when a service
+rejects it, the app refreshes through the same token endpoint with the standard
+refresh grant, again as a public client:
+
+```http
+POST https://arkitekt.example.org/lok/o/token/
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token
+&refresh_token=def50200...
+&client_id=b1f0c1e2-...
+```
+
+Two things are worth knowing about refresh in Arkitekt:
+
+- **Refresh tokens rotate.** Every refresh returns a new refresh token and
+  invalidates the old one, so the returned token must always be persisted.
+- **The envelope comes back too.** The deployment re-renders `self`, `instances`
+  and `statuses` on every refresh, resolving aliases against the requesting host.
+  This is how an administrator can move a service, add an alias or change an
+  instance and have every connected app pick it up on its next refresh, without
+  any user re-approving anything. The envelope is appended on a best-effort
+  basis. If it is missing, the token is still valid and the app keeps the
+  configuration it already has.
+
+Clients coalesce concurrent refreshes into one round-trip, with one exception: a
+refresh that was *forced* because a service rejected the current token must
+never be satisfied by a refresh that started earlier and may hand back that same
+rejected token.
+
+## The envelope
+
+The Fakts envelope is the part of the protocol that is specific to Arkitekt. It
+has three members.
+
+**`self`** describes the deployment the app is now part of: its display name and
+the alias of the coordinating Lok service.
+
+**`instances`** is a map from the **requirement keys of the manifest** to the
+instance the user picked for each. An instance has:
+
+- `identifier`, the name of that particular running instance in the deployment.
+- `service`, the service identifier it implements, which matches the
+  requirement's `service`.
+- `aliases`, one or more ways to reach it (see below).
+- `challenge_key`, optionally, an Ed25519 public key an app can use to verify
+  that the endpoint it reached is the one the deployment meant.
+
+**`statuses`** records the outcome for every requirement: `granted`, `denied` (the
+user said no) or `unavailable` (the deployment has no instance of that service).
+A required requirement that is not `granted` means the app cannot function, an
+optional one simply switches that feature off.
+
+### Aliases: one service, many addresses
+
+A service is often reachable at more than one address: on the lab network by a
+plain IP and port, from the outside through a reverse proxy over TLS, from
+another container by its Docker service name. Rather than guessing, each instance
+carries an ordered list of **aliases**:
+
+```json
+{ "id": "mikro-lan", "host": "10.0.0.12", "port": 8080, "ssl": false, "path": "", "challenge": "ht" }
+```
+
+An alias is a full address (`host`, `port`, `ssl`, `path`) plus a `challenge`, a
+relative path the app appends to that address to check that the service is
+actually reachable from where the app sits. The app walks the list in order,
+fetches the challenge URL of each alias with a short timeout, and uses the first
+one that answers. Aliases marked `public` are the ones that are expected to work
+from anywhere. This is what lets the same configuration serve a desktop app on the
+lab network and a browser on the other side of the internet.

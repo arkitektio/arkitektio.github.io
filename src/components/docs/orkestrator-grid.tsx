@@ -18,7 +18,7 @@ const PLATFORMS = [
 
 const POKKET_APK =
   "https://github.com/arkitektio/pokket/releases/latest/download/pokket.apk";
-const POKKET_IOS = "/docs/use/guides/apps/pokket#install";
+const POKKET_IOS = "/docs/guides/apps/pokket#install";
 
 const tile =
   "bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto";
@@ -69,7 +69,7 @@ export const OrkestratorGrid = ({ children }) => {
           <span className="mr-2 rounded bg-amber-500/20 px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">
             Experimental
           </span>
-          <Link href="/docs/use/guides/apps/pokket">Pokket</Link>, the mobile
+          <Link href="/docs/guides/apps/pokket">Pokket</Link>, the mobile
           companion app
         </div>
         <div className="grid grid-cols-2 gap-4">

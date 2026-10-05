@@ -1,0 +1,19 @@
+{
+  "title": "Guides",
+  "defaultOpen": true,
+  "pages": [
+    "joining",
+    "apps",
+    "troubleshooting",
+    "install-cli",
+    "plugin-engine",
+    "update",
+    "join-the-mesh",
+    "gpu",
+    "other-installation-strategies",
+    "python",
+    "rust",
+    "koherent",
+    "contribute"
+  ]
+}

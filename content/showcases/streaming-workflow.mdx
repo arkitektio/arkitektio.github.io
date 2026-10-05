@@ -12,7 +12,7 @@ import { InstallRepoButton } from "@/components/arkitekt";
 import { UploadModelButton } from "@/components/arkitekt";
 
 Classically, images are batch-processed once the acquisition is complete, leaving no chance for real-time feedback on a running experiment; why that matters is laid out in
-[Real-time](/docs/design/philosophy/realtime) and practised in the [Live Analysis](/docs/use/tutorials/advanced/live) tutorial. In this second workflow, we illustrate how Arkitekt with its ability for streaming analysis (i.e., processing immediately after each acquisition event), enables to display real-time feedback on the running acquisition.
+[Real-time](/docs/concepts/philosophy/realtime) and practised in the [Live Analysis](/docs/tutorials/advanced/live) tutorial. In this second workflow, we illustrate how Arkitekt with its ability for streaming analysis (i.e., processing immediately after each acquisition event), enables to display real-time feedback on the running acquisition.
 Here we used Arkitekt to perform real-time quantitative monitoring of soSPIM 21,22 3D microscopy data using the popular StarDist 23 deep-learning segmentation algorithm, while they were being acquired (Fig. 3). A user-defined directory located on the microscope’s computer was monitored for new data, and all the analysis steps were performed remotely on each newly acquired data, in parallel with the acquisition, minimizing the risks of slowing the acquisition down or causing its crash.
 As the deep learning-based segmentation steps can be highly time-consuming, several processes were run in parallel and distributed on 3 different available hardware. Visualization of both the 3D acquisition and the results were performed in Napari 7 on a remote and mobile computer, as well as through the web-interface, where results (here the number of nuclei and the average volume) were plotted on a live-dashboard, accessible to other remote members of the lab. (see Supp. Video 5)
 
@@ -29,7 +29,7 @@ As the deep learning-based segmentation steps can be highly time-consuming, seve
 
 <ShowcasePrerequisites />
 
-Additionally, we suggest to go through the [Live Analysis Basics](/docs/use/tutorials/advanced/live) guide to get familiar with the Streaming
+Additionally, we suggest to go through the [Live Analysis Basics](/docs/tutorials/advanced/live) guide to get familiar with the Streaming
 capabilities of Arkitekt.
 
 ### Hardware Requirements
@@ -49,17 +49,17 @@ OME compliant format.
 #### [Gucker](https://github.com/arkitektio-apps/gucker)
 
 This workflow uses the Gucker App to watch a directory for new files on the Acquisition Computer. Installation and configuration are described on the
-[Gucker page](/docs/use/guides/apps/gucker).
+[Gucker page](/docs/guides/apps/gucker).
 
 #### [Mikro-Napari](https://github.com/arkitektio-apps/mikro-napari) and [Napari](https://napari.org/)
 
 For visualization of the 3D data, we use the Napari App. To install Napari, follow the instructions on the [Napari Website](https://napari.org/), as well as install
-the mikro-napari plugin by following the instructions [here](/docs/use/tutorials/first-steps/first-app) or [here](/docs/use/guides/apps/mikro-napari).
+the mikro-napari plugin by following the instructions [here](/docs/tutorials/first-steps/first-app) or [here](/docs/guides/apps/mikro-napari).
 
 #### PluginApps
 
-This workflow uses the following `PluginApps` installed through the Arkitekt Plugin Store. To install these plugins follow the instructions [here](/docs/use/tutorials/first-steps/first-tool),
-or [connect this website](/docs/use/tutorials/first-steps/brief-interlude#we-have-an-app-for-that) to your Arkitekt instance and click on the button below:
+This workflow uses the following `PluginApps` installed through the Arkitekt Plugin Store. To install these plugins follow the instructions [here](/docs/tutorials/first-steps/first-tool),
+or [connect this website](/docs/tutorials/first-steps/brief-interlude#we-have-an-app-for-that) to your Arkitekt instance and click on the button below:
 
 <div className="flex flex-row gap-2">
   <InstallRepoButton repo="stdlib" user="arkitektio-apps" branch="master" />
@@ -78,7 +78,7 @@ Arkitekt does not need to be installed on this computer, but we will run the Seg
 
 1. Install Arkitekt on your analysis computer following the instructions [here](/docs/use).
 
-2. Depending if you want to reproduce the results illustrated in the Paper, you can either install the Stardist Model which we used for the demo data, via the button below or train your own model by following the instructions [here](/docs/use/tutorials/advanced/training).
+2. Depending if you want to reproduce the results illustrated in the Paper, you can either install the Stardist Model which we used for the demo data, via the button below or train your own model by following the instructions [here](/docs/tutorials/advanced/training).
 
 <UploadModelButton
   name="Organoid Model"
@@ -90,10 +90,10 @@ Arkitekt does not need to be installed on this computer, but we will run the Seg
 1. On the Acquisition Computer, you will need to setup your microscope software to save the images in an OME compliant format to a directory that is accessible to the analysis computer.
    For this example, we will assume that the images are saved to the directory `C://Data` on the microscope computer, any other directory can be used, but will need to be specified correctly in the Gucker App.
 
-2. Start Gucker and set it up as described in [Gucker: Configuration](/docs/use/guides/apps/gucker#configuration). For this example the "Import" directory is `C://Data`
+2. Start Gucker and set it up as described in [Gucker: Configuration](/docs/guides/apps/gucker#configuration). For this example the "Import" directory is `C://Data`
    from the previous step; the "Export" directory can be any other writable directory.
 
-3. Connect and Login with the Arkitekt instance (if your Arkitekt instance does not show up, connect it through the [mesh](/docs/deploy/concepts/security/mesh) or enter its URL manually)
+3. Connect and Login with the Arkitekt instance (if your Arkitekt instance does not show up, connect it through the [mesh](/docs/concepts/security/mesh) or enter its URL manually)
 
 ### Optional: Parallel Processing Computers
 
@@ -136,7 +136,7 @@ A few notes on this workflow:
 
 1. Creating the Workflow follows the same patterns as illustrated in the Tutorials.
 
-1. Connect the nodes by dragging the output ports of one node to the input ports of another node. As illustrated in the [Live Analysis](/docs/use/tutorials/advanced/live), the
+1. Connect the nodes by dragging the output ports of one node to the input ports of another node. As illustrated in the [Live Analysis](/docs/tutorials/advanced/live), the
    `Convert Omero` node is returning a list of Images (as some OME formats can contain multiple series), which is why we need to `Chunk` the list of images into single images, before we can
    run the rest of the workflow on each image individually.
 
@@ -206,7 +206,7 @@ assignment Arkitekt will ask you for the global Parameters that we set in the wo
 
 2. RegExp: This is a regular expression that will be used to filter the files that are found in the "Import Directory". In our case we want to only segment the images
    that are saved in the TIF format, so we used the regular expression `*.TIF` to only select these files. More patterns are listed in
-   [Gucker: Usage in Arkitekt Workflows](/docs/use/guides/apps/gucker#usage-in-arkitekt-workflows).
+   [Gucker: Usage in Arkitekt Workflows](/docs/guides/apps/gucker#usage-in-arkitekt-workflows).
 
 3. Stage: Just select the stage that you created in the "Context Preparation" step.
 

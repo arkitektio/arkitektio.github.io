@@ -1,0 +1,85 @@
+---
+title: The Mesh
+description: "How apps reach a hub across networks without exposing it: a coordinator hands out credentials, and your data flows peer-to-peer over WireGuard."
+personas: [deploy]
+---
+
+import { MeshTunnel, MeshHandshake } from "@/components/docs";
+
+On one local network, apps reach a hub directly. Across networks (a laptop on the train, a
+collaborator's institute, a GPU node behind another NAT) you would usually have to open ports or
+route everything through a central server. The **mesh** avoids both. It is a private,
+Tailscale-style network per organization, not a federation of public servers.
+
+## Control plane and data plane
+
+- **Control plane: the [coordinator](/docs/concepts#the-coordinator).** It knows your accounts,
+  organizations, hubs and apps. It hands out credentials and introduces endpoints to each other.
+  It handles auth, discovery and signaling, and nothing else.
+- **Data plane: the tunnel.** Images, tables, task arguments and results travel **directly between
+  endpoints** over encrypted **WireGuard**. They never pass through the coordinator.
+
+<MeshTunnel />
+
+<Callout type="info" title="The coordinator never sees your data">
+
+The coordinator knows *that* two endpoints talk, not *what* they say. Whoever runs it cannot see
+your images, results or any other data moving between your machines.
+
+</Callout>
+
+## How an app and a hub meet
+
+Both sides go through the same four steps:
+
+1. **Authorize.** The hub (during [installation](/docs/guides/join-the-mesh))
+   and the app (when it connects) each sign in with the coordinator for one organization.
+2. **Get credentials.** Each receives a token for the platform and a **mesh key** for that
+   organization's mesh.
+3. **Start a sidecar.** Each starts a **Tailscale sidecar** with its key. On the hub the sidecar is
+   one more container in its Docker Compose project, next to the gateway.
+4. **Meet.** The two sidecars find each other and open a WireGuard tunnel. From then on the app
+   talks to the hub over that tunnel.
+
+Mesh keys belong to an organization. When an app **switches organization**, it authorizes again,
+gets a new key, and restarts its sidecar on the new organization's mesh. The old key is dropped, so
+the app can no longer reach the previous organization's hubs.
+
+<MeshHandshake />
+
+## Why it is the secure default
+
+- **Nothing is exposed.** No public IP, no inbound firewall ports.
+- **Encrypted end to end.** The tunnel runs between your own machines.
+- **Access follows identity.** Only endpoints authorized for the organization get a key, so only
+  they can find and reach each other. See [Identity & Access](/docs/concepts/security/identity).
+- **Self-hostable.** The coordinator's mesh side is [Ionscale](https://github.com/jsiebens/ionscale),
+  an open-source Tailscale control server you can run yourself.
+
+## Relay fallback
+
+Most connections are direct, even across NAT. If a network blocks every direct path, traffic is
+**relayed** instead, at some cost to speed. The relay only forwards WireGuard packets it cannot
+decrypt.
+
+## Bring your own connectivity
+
+The mesh is optional. Arkitekt is a set of network services, so any way of connecting your machines
+works:
+
+- **Your own Tailscale** (or other WireGuard network), if your group already runs one.
+- **Your institution's VPN.** See [Using a VPN](/docs/concepts/security/vpn).
+- **Nothing at all** on a single trusted LAN.
+
+The security boundary is Arkitekt's [authentication and
+authorization](/docs/concepts/security/identity), not the transport. Every request is checked,
+however the bytes get there.
+
+<Callout type="warn" title="Optional and experimental">
+
+The mesh is new and changing quickly. Since [local-network advertising was
+removed](/docs/guides/join-the-mesh#advertising), it is the only built-in way to
+find a hub across networks. To join a hub, see the [Mesh step](/docs/guides/join-the-mesh)
+of the installation guide.
+
+</Callout>

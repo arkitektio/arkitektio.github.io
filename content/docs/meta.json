@@ -5,7 +5,12 @@
     "use",
     "deploy",
     "build",
-    "design",
+    "---Documentation---",
+    "tutorials",
+    "guides",
+    "reference",
+    "concepts",
+    "---Legal---",
     "privacy"
   ]
 }

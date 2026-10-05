@@ -1,0 +1,74 @@
+---
+title: Visualize in Napari/Fiji
+description: Learn how to connect Napari or Fiji to your Arkitekt server and visualize your data directly from the platform.
+personas: [use]
+---
+
+Every analysis starts with the visualization of our data. And we have a great selection of tools in the bioimage world to help us.
+But how do we get our data into these tools? How do we get our data from our server into Napari or Fiji? Well, we could download it, and then open it in the tool.
+But that is not really what we want. We want to be able to use our data directly from the server, and we want to be able to save our results back to the server.
+
+So lets see how we can do that.
+In this section you will learn:
+
+- How to connect both Napari or Fiji to your Arkitekt server.
+- How to visualize your data in Napari or Fiji.
+
+## Team Napari or Team Fiji?
+
+We love Napari and we love Fiji. And we think that both tools have their place in the bioimage analysis world. So we want to make sure that you can use both tools
+with Arkitekt and together in your workflows. So lets try install them both and see how we can connect them to Arkitekt.
+
+<Callout type="info" title="Our darling">
+
+
+We truly love Napari for data visualization. If you have not tried it yet, you should. It is a great tool and we are sure you will love it too. And a few of the
+features that we will show you here are only available in Napari. So if you are not familiar with Napari yet, we recommend you to give it a try.
+
+
+</Callout>
+
+### Napari
+
+First lets see how we can get napari to work with Arkitekt. Napari is our go to choice for large data visualization and can take advantage of all of the [lazy loading](/docs/concepts/lazy-loading)
+capabilities of Arkitekt, so that you can easily visualize terabyte sized datasets. To enable Napari to work with Arkitekt we need to install a plugin.
+
+The goal of this part of the tutorial is simple: get the image we converted in the previous section open in Napari. Install the `mikro-napari` plugin
+as described in [Mikro-Napari: Installation](/docs/guides/apps/mikro-napari#installation), then click the `Provide` button that appeared in Napari and
+walk through the connection process, explained in [Mikro-Napari: Usage](/docs/guides/apps/mikro-napari#usage). Once connected, your Napari instance
+appears on the Dashboard and the `Show on Napari` action shows up in the bottom right corner of the image pane. Run it on your image (leave "show roi layer"
+on to see the ROI you marked in Orkestrator), and there it is.
+
+<Callout type="info" title="Seems familiar?">
+
+
+You might recall the same process that you went through to connect Orkestrator. This will become a common theme, as all apps that connect to Arkitekt need to undergo the same
+connection process. Again. Only once if you so wish.
+
+
+</Callout>
+
+### Fiji
+
+Fiji is a great tool for image analysis and has a huge community of developers and users. So we want to make sure that you can use Fiji with Arkitekt as well.
+For this we provide a native Fiji plugin, the [ImageJ Arkitekt plugin](https://github.com/arkitektio/imagej-arkitekt-plugin), which runs directly inside Fiji.
+No extra app needs to be installed, and it works on Windows, Linux and Mac alike.
+
+Same goal here: get our converted image open in Fiji. Drop the plugin jar into your Fiji installation as described in
+[ImageJ Plugin: Installation](/docs/guides/apps/imagej-plugin#installation), open `Plugins › Arkitekt` and log in, see
+[ImageJ Plugin: Usage](/docs/guides/apps/imagej-plugin#usage). Then search for the `Load into Imagej` action and run it directly from the image pane,
+where it will appear in the bottom right corner.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/introduction/first_steps/visualize_imagej.webm" />
+</video>
+
+Unlike Napari, Fiji downloads the whole image into its memory, so you can close Orkestrator and keep working on it. ROIs are synced with Fiji's ROI manager
+in both directions, and whatever alterations you make in Fiji stay in Fiji until you save them back with the `Upload from ImageJ` action. More on that in the advanced tutorial.

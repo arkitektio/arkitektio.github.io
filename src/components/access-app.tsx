@@ -12,13 +12,13 @@ export type Platform = 'android' | 'ios' | 'windows' | 'mac' | 'linux' | 'unknow
 const ORKESTRATOR_RELEASES = 'https://github.com/arkitektio/orkestrator/releases/latest';
 const ORKESTRATOR_RELEASES_API =
   'https://api.github.com/repos/arkitektio/orkestrator/releases/latest';
-const ORKESTRATOR_DOCS = '/docs/use/guides/apps/orkestrator#desktop-application';
+const ORKESTRATOR_DOCS = '/docs/guides/apps/orkestrator#desktop-application';
 
 export const POKKET_APK =
   'https://github.com/arkitektio/pokket/releases/latest/download/pokket.apk';
 // Pokket for iOS is handed out through TestFlight invites, so there is no
 // direct download: the install section explains how to get one.
-export const POKKET_INSTALL = '/docs/use/guides/apps/pokket#install';
+export const POKKET_INSTALL = '/docs/guides/apps/pokket#install';
 
 // Asset names carry the version (orkestrator-2.18.0.dmg), so there is no
 // stable /releases/latest/download/ URL: match the installer per platform.

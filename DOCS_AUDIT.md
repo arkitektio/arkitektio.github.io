@@ -3,8 +3,9 @@
 Audit of all 125 MDX pages under `content/` (2026-09-30). ✅ marks what was fixed in the same change
 as this report. Everything else is open. Line numbers refer to the state before this change.
 
-**Paths.** Pages have since moved to `use/`, `deploy/`, `build/` and `design/`. The paths below
-are the ones from before that move; `scripts/redirects/moves.json` maps each to its new location.
+**Paths.** Pages have since moved into `tutorials/`, `guides/`, `reference/` and `concepts/`. The
+paths below are the ones from before that move; `scripts/redirects/moves.json` maps each to its new
+location.
 
 **How to read it.** The largest problem is not individual pages but **drift between two generations
 of the platform**. Pages written for the *Paper* release (installer channels, demo/demo accounts,

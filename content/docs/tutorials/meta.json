@@ -1,0 +1,12 @@
+{
+  "title": "Tutorials",
+  "defaultOpen": true,
+  "pages": [
+    "first-steps",
+    "advanced",
+    "first-hub",
+    "python-first-app",
+    "rust-first-app",
+    "embedded-first-device"
+  ]
+}

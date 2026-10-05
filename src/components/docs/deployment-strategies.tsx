@@ -128,7 +128,7 @@ const STRATEGIES: Strategy[] = [PARTNER, LOCAL, SELFHOST];
 
 const ICON: Record<Kind, typeof Server> = { central: Server, coordinator: Network, apps: Boxes, outside: Laptop };
 const colorOf = (e: Edge) => (e.variant === 'blocked' ? RED : e.plane === 'data' ? DATA : AUTH);
-const DISCOVERY_URL = '/docs/build/concepts/service-discovery';
+const DISCOVERY_URL = '/docs/concepts/service-discovery';
 
 const PARAM = 'deploy';
 const DEFAULT = Math.max(0, STRATEGIES.findIndex((s) => s.key === 'local'));
