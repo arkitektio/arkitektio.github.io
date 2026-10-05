@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import type { ComponentProps } from 'react';
 import { usePathname } from 'next/navigation';
 import type { Item, Node } from 'fumadocs-core/page-tree';
@@ -128,21 +128,53 @@ export function PersonaBar() {
   );
 }
 
-/** A card that also picks a persona, for the "I want to…" choice on the docs home. */
+/**
+ * A card that picks a persona, for the "I want to…" choice on the docs home.
+ * global.css marks the card of the picked persona.
+ */
 export function PersonaCard({
   persona,
   ...props
-}: ComponentProps<typeof Card> & { persona: Persona }) {
+}: Omit<ComponentProps<typeof Card>, 'href'> & { persona: Persona }) {
   const Icon = icons[persona];
+  const active = usePersona() === persona;
   return (
     <Card
       icon={<Icon />}
       {...props}
-      // global.css marks the card of the picked persona
+      role="button"
+      tabIndex={0}
+      aria-pressed={active}
       data-persona-card={persona}
+      className="relative cursor-pointer hover:bg-fd-accent/80"
       onClick={() => setPersona(persona)}
+      onKeyDown={(event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        setPersona(persona);
+      }}
     />
   );
+}
+
+/**
+ * A part of a page written for one persona. global.css hides it while another
+ * persona is picked. A link that points into it (an old start page URL lands
+ * here) picks its persona, so the reader sees what they came for.
+ */
+export function PersonaSection({
+  persona,
+  ...props
+}: ComponentProps<'section'> & { persona: Persona }) {
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    const target = id ? document.getElementById(id) : null;
+    if (!target || !ref.current?.contains(target)) return;
+    setPersona(persona);
+    target.scrollIntoView();
+  }, [persona]);
+  return <section ref={ref} {...props} data-for-persona={persona} />;
 }
 
 const trim = (url: string) => (url.length > 1 ? url.replace(/\/$/, '') : url);

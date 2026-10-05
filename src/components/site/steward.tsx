@@ -48,13 +48,13 @@ export function StewardCard({ id }: { id?: string }) {
       <Avatar steward={steward} />
       <div className="flex flex-col">
         <span className="text-xs font-medium uppercase tracking-wide text-fd-muted-foreground">
-          Your steward
+          Stewarded by
         </span>
         <span className="font-semibold">
           <Name steward={steward} />
         </span>
         <span className="text-sm text-fd-muted-foreground">
-          Guides you through this tutorial, one step at a time.
+          Your guide through this tutorial, one step at a time.
         </span>
       </div>
     </div>

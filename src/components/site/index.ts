@@ -15,6 +15,7 @@ export {
   PersonaBar,
   PersonaCard,
   PersonaFooter,
+  PersonaSection,
   PersonaScript,
   setPersona,
   usePersona,

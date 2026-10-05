@@ -2,8 +2,7 @@ import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
 import type { MDXComponents } from 'mdx/types';
 import type { ComponentProps } from 'react';
-import type { Persona } from '@/lib/persona';
-import { PersonaCard } from './persona';
+import { PersonaCard, PersonaSection } from './persona';
 import { Steward } from './steward';
 
 /**
@@ -15,14 +14,6 @@ import { Steward } from './steward';
  */
 function DocImage(props: ComponentProps<'img'>) {
   return <ImageZoom {...(props as ComponentProps<typeof ImageZoom>)} className="w-full rounded-lg" />;
-}
-
-/**
- * A part of a page written for one persona. global.css hides it while another
- * persona is picked, unless a link points into it.
- */
-function PersonaSection({ persona, ...props }: ComponentProps<'section'> & { persona: Persona }) {
-  return <section {...props} data-for-persona={persona} />;
 }
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {

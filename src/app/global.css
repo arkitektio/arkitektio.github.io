@@ -268,10 +268,10 @@ html[data-persona-animate] {
 
 /* The same pick on a page: the "I want to…" card of the picked persona is marked,
    and a <PersonaSection> for another persona is left out (see
-   src/components/site/mdx.tsx). A section a link points into always shows. */
-html[data-persona='use'] [data-for-persona]:not([data-for-persona='use']):not(:has(:target)),
-html[data-persona='run'] [data-for-persona]:not([data-for-persona='run']):not(:has(:target)),
-html[data-persona='build'] [data-for-persona]:not([data-for-persona='build']):not(:has(:target)) {
+   src/components/site/persona.tsx). */
+html[data-persona='use'] [data-for-persona]:not([data-for-persona='use']),
+html[data-persona='run'] [data-for-persona]:not([data-for-persona='run']),
+html[data-persona='build'] [data-for-persona]:not([data-for-persona='build']) {
   display: none;
 }
 
@@ -280,4 +280,19 @@ html[data-persona='run'] [data-persona-card='run'],
 html[data-persona='build'] [data-persona-card='build'] {
   border-color: var(--color-fd-primary);
   background-color: color-mix(in oklab, var(--color-fd-primary) 8%, var(--color-fd-card));
+  box-shadow: 0 0 0 1px var(--color-fd-primary);
+}
+html[data-persona='use'] [data-persona-card='use']::after,
+html[data-persona='run'] [data-persona-card='run']::after,
+html[data-persona='build'] [data-persona-card='build']::after {
+  content: '✓ Selected';
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border-radius: 9999px;
+  background-color: var(--color-fd-primary);
+  color: var(--color-fd-primary-foreground);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
