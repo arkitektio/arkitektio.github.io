@@ -8,10 +8,11 @@ import {
   ViewOptionsPopover,
 } from 'fumadocs-ui/layouts/docs/page';
 import { notFound } from 'next/navigation';
-import { getMDXComponents } from '@/components/site';
+import { getMDXComponents, PersonaFooter } from '@/components/site';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
+import { pageTypes, personaInfo } from '@/lib/persona';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -21,8 +22,30 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
 
+  // what kind of page this is (its top folder) and who it is written for
+  const badges = [
+    pageTypes[page.slugs[0]],
+    ...page.data.personas.map((persona) => personaInfo[persona].badge),
+  ].filter(Boolean);
+
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
+    <DocsPage toc={page.data.toc} full={page.data.full} slots={{ footer: PersonaFooter }}>
+      {badges.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {badges.map((badge, index) => (
+            <span
+              key={badge}
+              className={
+                index === 0
+                  ? 'rounded-full bg-fd-primary/10 px-2.5 py-0.5 text-xs font-medium text-fd-primary'
+                  : 'rounded-full border px-2.5 py-0.5 text-xs font-medium text-fd-muted-foreground'
+              }
+            >
+              {badge}
+            </span>
+          ))}
+        </div>
+      )}
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
       <div className="flex flex-row gap-2 items-center border-b pb-6">
