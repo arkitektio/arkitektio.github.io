@@ -1,13 +1,12 @@
 // @ts-nocheck
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { BsWindows } from "react-icons/bs";
 import { FaAndroid, FaApple, FaLinux } from "react-icons/fa";
+import { useOrkestratorRelease } from "@/components/access-app";
 
 const RELEASES = "https://github.com/arkitektio/orkestrator/releases/latest";
-const RELEASES_API =
-  "https://api.github.com/repos/arkitektio/orkestrator/releases/latest";
 
 // Asset names carry the version (orkestrator-2.18.0.dmg), so there is no
 // stable /releases/latest/download/ URL: match the installer per platform.
@@ -25,25 +24,7 @@ const tile =
   "bg-primary-300 rounded-sm px-3 py-2 rounded-lg text-white cursor-pointer hover:bg-primary-500 hover:text-white flex flex-col items-center my-auto";
 
 export const OrkestratorGrid = ({ children }) => {
-  const [release, setRelease] = useState(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch(RELEASES_API, { headers: { Accept: "application/vnd.github+json" } })
-      .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
-      .then((data) => {
-        if (!cancelled) setRelease(data);
-      })
-      // Rate limited or offline: the tiles keep pointing at the release page.
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const assets = release?.assets ?? [];
-  const find = (match) =>
-    assets.find((a) => match.test(a.name))?.browser_download_url;
+  const { release, find } = useOrkestratorRelease();
   const deb = find(/\.deb$/i);
 
   return (
