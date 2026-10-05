@@ -21,6 +21,9 @@ import type { Tagged } from '@/lib/page-tree';
 import { cn } from '@/lib/utils';
 
 const PERSONA_EVENT = 'arkitekt:persona';
+// what a first-time reader sees, and the stored value for "show everything"
+const DEFAULT_PERSONA: Persona = 'use';
+const ALL = 'all';
 // Only while this is on <html> do sidebar rows glide in and out (see
 // global.css), so a page that loads with a persona already picked does not move.
 const ANIMATE_ATTR = 'data-persona-animate';
@@ -39,8 +42,12 @@ function subscribe(onChange: () => void) {
   return () => document.removeEventListener(PERSONA_EVENT, onChange);
 }
 
-/** The persona the reader picked, or `null` for everyone (also while prerendering). */
-export const usePersona = () => useSyncExternalStore(subscribe, readPersona, () => null);
+/**
+ * The persona the docs are filtered to, or `null` for all of them. A reader who
+ * never picked gets the default, which is also what the prerender assumes.
+ */
+export const usePersona = () =>
+  useSyncExternalStore<Persona | null>(subscribe, readPersona, () => DEFAULT_PERSONA);
 
 export function setPersona(persona: Persona | null) {
   const root = document.documentElement;
@@ -50,8 +57,8 @@ export function setPersona(persona: Persona | null) {
   if (animateTimer) clearTimeout(animateTimer);
   animateTimer = setTimeout(() => root.removeAttribute(ANIMATE_ATTR), ANIMATE_MS);
   try {
-    if (persona) localStorage.setItem(PERSONA_STORAGE_KEY, persona);
-    else localStorage.removeItem(PERSONA_STORAGE_KEY);
+    // "all" is stored too: no stored value means the default persona
+    localStorage.setItem(PERSONA_STORAGE_KEY, persona ?? ALL);
   } catch {
     /* ignore */
   }
@@ -59,13 +66,15 @@ export function setPersona(persona: Persona | null) {
 }
 
 /**
- * Runs before paint: puts the saved persona on <html>, so the sidebar comes up
- * already filtered.
+ * Runs before paint: puts the saved persona on <html>, or the default one for a
+ * first visit, so the sidebar comes up already filtered.
  */
 export function PersonaScript() {
   const code = `(function(){try{var p=localStorage.getItem(${JSON.stringify(
     PERSONA_STORAGE_KEY,
-  )});if(${JSON.stringify(personas)}.indexOf(p)>-1)document.documentElement.setAttribute(${JSON.stringify(
+  )});if(p==null)p=${JSON.stringify(DEFAULT_PERSONA)};if(${JSON.stringify(
+    personas,
+  )}.indexOf(p)>-1)document.documentElement.setAttribute(${JSON.stringify(
     PERSONA_ATTR,
   )},p);}catch(e){}})();`;
   return <script dangerouslySetInnerHTML={{ __html: code }} />;
