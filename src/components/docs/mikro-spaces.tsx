@@ -65,7 +65,7 @@ function detailOf(sel: SelId, refined: boolean): Detail {
         ? { title: 'tile → slide', badge: 'edge · affine · v2', badgeColor: AFFINE, body: '0.108 µm/px, placed at (14.6, 8.2) mm · validity VALIDATED. The refinement bumped this one edge from v1 to v2: the tile moved on the slide, and every overlay that looks through the edge moved with it. Nothing drawn in tile pixels moved at all.' }
         : { title: 'tile → slide', badge: 'edge · affine · v1', badgeColor: AFFINE, body: '0.108 µm/px, placed at (14.2, 8.4) mm · validity MANUAL. This edge is the only place this placement is stored. Try "refine calibration" above: fixing the edge fixes everything that looks through it.' };
     case 'e-derived':
-      return { title: 'tile → mask', badge: 'edge · derived', badgeColor: DERIVED, body: 'Spatially an identity, values categorized. The segmentation moved no pixels, it changed what the values mean, and the edge records exactly that as a fact.' };
+      return { title: 'tile → mask', badge: 'edge · identity', badgeColor: DERIVED, body: 'A derivation: spatially an identity, values categorized. The segmentation moved no pixels, it changed what the values mean, and the edge records exactly that as a fact.' };
     case 'e-field':
       return { title: 'mask → cells.parquet', badge: 'edge · field', badgeColor: FIELD, body: 'A pixel’s value is a row number in the table. This is the single kind of edge that crosses from geometry into records, and it is the edge attribute plans walk.' };
   }
@@ -153,7 +153,7 @@ export function MikroSpaces() {
           {[
             { c: AFFINE, t: 'affine · places pixels in the world' },
             { c: SCALE, t: 'scale · pyramid levels' },
-            { c: DERIVED, t: 'derived · same pixels, new meaning' },
+            { c: DERIVED, t: 'identity · same grid, values now ids' },
             { c: FIELD, t: 'field · pixels into a table' },
           ].map((l) => (
             <span key={l.t} className="flex items-center gap-2">
@@ -296,7 +296,7 @@ function SlideScene({ pick, hot, refined }: { pick: PickFn; hot: (id: SelId) => 
         <line x1={MX + MW / 2 + 22} y1={SY + SH} x2={MX + MW / 2 + 22} y2={MY} stroke="transparent" strokeWidth="20" />
         <line x1={MX + MW / 2 + 22} y1={SY + SH + 4} x2={MX + MW / 2 + 22} y2={MY - 5} strokeWidth={hot('e-derived') ? 2.8 : 2.2} strokeDasharray="6 5" markerEnd="url(#mkDerived)" style={{ stroke: DERIVED, ...glow(hot('e-derived'), DERIVED) }} />
         <text x={MX + MW / 2 + 32} y={(SY + SH + MY) / 2 + 4} fontFamily={MONO} fontSize="9.5" style={{ fill: DERIVED }}>
-          derived
+          identity
         </text>
       </g>
 

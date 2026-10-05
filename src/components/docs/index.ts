@@ -10,3 +10,4 @@ export { GuckerGrid } from './gucker-grid';
 export { MikroSpaces } from './mikro-spaces';
 export { ShowcasePrerequisites } from './showcase-prerequisites';
 export { MeshHandshake } from './mesh-handshake';
+export { MikroLineage, MikroSpaceValues, MikroPlacementTrust } from './mikro-lineage';

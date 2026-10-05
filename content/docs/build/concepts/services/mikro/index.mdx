@@ -79,4 +79,8 @@ the same functionality, but is a single file database that does not require a se
 Beyond storage and metadata, Mikro keeps track of *space*: where your images, masks, tables and
 annotations live relative to each other, and how a viewer can tell you everything it knows about
 the cell under your cursor. Read about it in
-[Coordinate Systems and Attribute Plans](/docs/build/concepts/services/mikro/coordinate-systems).
+[Coordinate Systems and Attribute Plans](/docs/design/services/mikro/coordinate-systems).
+
+It also remembers what every result was computed from, which is why a crop, a deconvolution or a
+segmentation shows up exactly where its raw image is. Read about that in
+[Lineage and Derived Data](/docs/design/services/mikro/lineage).

@@ -54,8 +54,10 @@ edge from one space to another, with a *kind* that says what sort of map it is:
 - **scale** relates a pyramid level to the full-resolution grid (level 1 is exactly 2× coarser).
 - **affine** places pixels in a physical space: the pixel size, rotation and stage position of a
   tile on the slide, or the registration of one round of imaging onto another.
-- **derived** edges record processing: a segmentation is spatially an identity (no pixel moved) but
-  its *values* changed meaning, from intensities to cell ids.
+- **identity** says two grids are the same grid. A segmentation is spatially an identity (no pixel
+  moved) but its *values* changed meaning, from intensities to cell ids. Edges like this, which
+  record what a result was computed from, are the subject of
+  [Lineage and Derived Data](/docs/design/services/mikro/lineage).
 - **field** is the special crossing from geometry into records: it says that a mask pixel's value
   *is* a row number in a table of objects.
 - **unmappable** honestly records that no correspondence exists anymore, for example after an
@@ -136,6 +138,9 @@ describes *where* something is, it is an edge in the graph, and fixing the edge 
 uses it.
 
 </Callout>
+
+How results keep their place when they are cropped, deconvolved, segmented or measured is covered
+in [Lineage and Derived Data](/docs/design/services/mikro/lineage).
 
 If you want to put data into Mikro from your own analysis scripts, the
 [Python guide on reading and writing data](/docs/build/guides/python/types) is the natural next
