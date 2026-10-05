@@ -71,56 +71,50 @@ export function PersonaScript() {
   return <script dangerouslySetInnerHTML={{ __html: code }} />;
 }
 
-const BAR_HEIGHT = '2.75rem';
-
 /**
- * The bar across the top of the docs: pick who you are, and the sidebar, the
- * search and the previous/next links leave out what is written for the others.
+ * The persona switch at the top of the sidebar: pick who you are, and the
+ * sidebar, the search and the previous/next links leave out what is written
+ * for the others.
  */
 export function PersonaBar() {
   const persona = usePersona();
-  const options: { value: Persona | null; title: string; hint?: string; Icon: LucideIcon }[] = [
-    { value: null, title: 'Everyone', Icon: Users },
+  const options: { value: Persona | null; title: string; hint: string; Icon: LucideIcon }[] = [
+    { value: null, title: 'All', hint: 'Docs for everyone', Icon: Users },
     ...personas.map((value) => ({
       value,
       title: personaInfo[value].title,
-      hint: personaInfo[value].audience,
+      hint: personaInfo[value].badge,
       Icon: icons[value],
     })),
   ];
 
   return (
     <div
-      id="persona-bar"
-      className="sticky top-0 z-40 flex items-center gap-3 border-b bg-fd-background/80 px-4 text-sm backdrop-blur-sm"
-      style={{ height: BAR_HEIGHT }}
+      role="group"
+      aria-label="Show the docs for"
+      className="grid grid-cols-4 gap-0.5 rounded-lg border bg-fd-secondary/50 p-0.5 text-xs"
     >
-      {/* the docs layout starts below the bar */}
-      <style>{`:root { --fd-banner-height: ${BAR_HEIGHT}; }`}</style>
-      <span className="text-fd-muted-foreground max-sm:hidden">Show the docs for</span>
-      <div role="group" aria-label="Show the docs for" className="flex items-center gap-1">
-        {options.map(({ value, title, hint, Icon }) => {
-          const active = persona === value;
-          return (
-            <button
-              key={title}
-              type="button"
-              aria-pressed={active}
-              onClick={() => setPersona(value)}
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-medium transition-colors',
-                active
-                  ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
-                  : 'border-transparent text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground',
-              )}
-            >
-              <Icon className="size-3.5" />
-              {title}
-              {hint && <span className="font-normal opacity-70 max-md:hidden">· {hint}</span>}
-            </button>
-          );
-        })}
-      </div>
+      {options.map(({ value, title, hint, Icon }) => {
+        const active = persona === value;
+        return (
+          <button
+            key={title}
+            type="button"
+            title={hint}
+            aria-pressed={active}
+            onClick={() => setPersona(value)}
+            className={cn(
+              'flex flex-col items-center gap-1 rounded-md px-1 py-1.5 font-medium transition-colors',
+              active
+                ? 'bg-fd-background text-fd-primary shadow-sm'
+                : 'text-fd-muted-foreground hover:text-fd-accent-foreground',
+            )}
+          >
+            <Icon className="size-4" />
+            {title}
+          </button>
+        );
+      })}
     </div>
   );
 }

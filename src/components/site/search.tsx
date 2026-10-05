@@ -31,7 +31,7 @@ function initOrama() {
 
 export default function DefaultSearchDialog(props: SharedProps) {
   const { locale } = useI18n(); // (optional) for i18n
-  // The search starts out narrowed to the persona picked in the docs bar; the
+  // The search starts out narrowed to the persona picked in the sidebar; the
   // chips below the results change that for this dialog only.
   const persona = usePersona();
   const [picked, setPicked] = useState<{ tag: string | undefined } | null>(null);

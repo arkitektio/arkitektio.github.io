@@ -216,7 +216,7 @@ html[data-brand-hue-animate] {
 }
 
 /* ----------------------------------------------------------------------------
-   Persona filter. The docs bar puts the picked persona on <html data-persona>
+   Persona filter. The sidebar switch puts the picked persona on <html data-persona>
    (src/components/site/persona.tsx), and every sidebar label that is not for
    everyone carries `data-personas` (src/lib/page-tree.tsx). A row whose label
    lacks the picked persona folds away: pages and headings on their own, a

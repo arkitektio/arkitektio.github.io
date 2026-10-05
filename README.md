@@ -61,7 +61,7 @@ personas: [deploy]
 ```
 
 A page can name several personas. Leave the key out for a page that is for everyone (philosophy,
-terminology, comparisons). The bar at the top of the docs lets a reader pick a persona; the
+terminology, comparisons). The switch at the top of the sidebar lets a reader pick a persona; the
 sidebar, the search and the previous/next links then leave out pages tagged only for the others.
 Folders and sidebar headings follow their pages, so there is nothing to tag in a `meta.json`.
 
