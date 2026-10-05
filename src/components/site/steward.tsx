@@ -11,7 +11,7 @@ const initials = (name: string) =>
     .slice(0, 2)
     .toUpperCase();
 
-function Avatar({ steward, className }: { steward: StewardInfo; className?: string }) {
+export function Avatar({ steward, className }: { steward: StewardInfo; className?: string }) {
   const shape = cn('size-12 shrink-0 rounded-full ring-2 ring-fd-primary/30', className);
   if (steward.avatar) {
     // eslint-disable-next-line @next/next/no-img-element
@@ -40,23 +40,20 @@ function Name({ steward }: { steward: StewardInfo }) {
   );
 }
 
-/** Opens every tutorial page: who guides the reader through it. */
+/** Sits next to the title of every tutorial page: who guides the reader through it. */
 export function StewardCard({ id }: { id?: string }) {
   const steward = getSteward(id);
   return (
-    <div className="not-prose flex items-center gap-4 rounded-xl border bg-fd-card p-4">
-      <Avatar steward={steward} />
-      <div className="flex flex-col">
+    <div className="not-prose flex shrink-0 items-center gap-3">
+      <div className="flex flex-col text-end max-sm:order-2 max-sm:text-start">
         <span className="text-xs font-medium uppercase tracking-wide text-fd-muted-foreground">
           Stewarded by
         </span>
-        <span className="font-semibold">
+        <span className="text-sm font-semibold">
           <Name steward={steward} />
         </span>
-        <span className="text-sm text-fd-muted-foreground">
-          Your guide through this tutorial, one step at a time.
-        </span>
       </div>
+      <Avatar steward={steward} />
     </div>
   );
 }

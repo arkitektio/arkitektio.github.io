@@ -9,7 +9,7 @@ export {
 export { Logo } from './logo';
 export { getMDXComponents, useMDXComponents } from './mdx';
 export { default as DefaultSearchDialog } from './search';
-export { Steward, StewardCard } from './steward';
+export { Avatar, Steward, StewardCard } from './steward';
 export { ThemeSwitchWithConnector } from './sidebar-theme-switch';
 export {
   PersonaBar,

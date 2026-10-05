@@ -66,8 +66,9 @@ sidebar, the search and the previous/next links then leave out pages tagged only
 Folders and sidebar headings follow their pages, so there is nothing to tag in a `meta.json`.
 
 Every tutorial opens with its steward, the person who guides the reader through it. Stewards are
-listed in [`src/lib/stewards.ts`](src/lib/stewards.ts) (pictures go in `public/stewards`); a tutorial
-names one with `steward: <key>` in its frontmatter and gets the default one otherwise. Inside a
+the team members marked `steward` in [`src/lib/team.ts`](src/lib/team.ts), which also feeds the
+`/team` page (pictures go in `public/team`); a tutorial names one with `steward: <key>` in its
+frontmatter and gets the default one otherwise. Inside a
 tutorial, `<Steward>…</Steward>` puts a note from the steward next to a step.
 
 Each folder uses a `meta.json` to control sidebar ordering and labels. To add a page, drop a new

@@ -52,7 +52,15 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           ))}
         </div>
       )}
-      <DocsTitle>{page.data.title}</DocsTitle>
+      {page.slugs[0] === 'tutorials' ? (
+        // a tutorial names its steward to the right of the title
+        <div className="flex items-center justify-between gap-6 max-sm:flex-col max-sm:items-start max-sm:gap-3">
+          <DocsTitle>{page.data.title}</DocsTitle>
+          <StewardCard id={page.data.steward} />
+        </div>
+      ) : (
+        <DocsTitle>{page.data.title}</DocsTitle>
+      )}
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
       <div className="flex flex-row gap-2 items-center border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
@@ -61,7 +69,6 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
         />
       </div>
-      {page.slugs[0] === 'tutorials' && <StewardCard id={page.data.steward} />}
       <DocsBody>
         <MDX
           components={getMDXComponents({

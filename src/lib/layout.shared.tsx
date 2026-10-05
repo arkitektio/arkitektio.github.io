@@ -4,6 +4,7 @@ import {
   BookOpen,
   MonitorPlay,
   Sparkles,
+  Users,
 } from 'lucide-react';
 import { Logo } from '@/components/site';
 import { NavConnector } from '@/components/arkitekt';
@@ -44,6 +45,12 @@ export function baseOptions(): BaseLayoutProps {
         url: '/giants',
         active: 'nested-url',
         icon: <Atom />,
+      },
+      {
+        text: 'Team',
+        url: '/team',
+        active: 'nested-url',
+        icon: <Users />,
       },
       {
         type: 'custom',

@@ -71,7 +71,7 @@ export const docs = defineDocs({
     // who a page is for; empty means everyone (see src/lib/persona.ts)
     schema: pageSchema.extend({
       personas: z.array(z.enum(['use', 'run', 'build'])).default([]),
-      // who guides a tutorial, a key of src/lib/stewards.ts (optional)
+      // who guides a tutorial, a key of src/lib/team.ts (optional)
       steward: z.string().optional(),
     }),
     postprocess: {
