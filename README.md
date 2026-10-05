@@ -49,14 +49,14 @@ Who a page is for is a tag, not a path. Set `personas` in the frontmatter:
 | Persona   | Reader                                                 |
 | --------- | ------------------------------------------------------ |
 | `use`     | Scientists using Orkestrator and the connected apps.   |
-| `deploy`  | Admins installing and operating an Arkitekt server.    |
+| `run`     | Admins installing and operating an Arkitekt server.    |
 | `build`   | Developers writing apps, plugins and services.         |
 
 ```mdx
 ---
 title: Join the mesh
 description: ...
-personas: [deploy]
+personas: [run]
 ---
 ```
 

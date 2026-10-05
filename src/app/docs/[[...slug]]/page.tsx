@@ -29,7 +29,13 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   ].filter(Boolean);
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full} slots={{ footer: PersonaFooter }}>
+    <DocsPage
+      // the docs home shows a different part per persona, so a list of all its
+      // headings would point at hidden ones
+      toc={page.slugs.length === 0 ? [] : page.data.toc}
+      full={page.data.full}
+      slots={{ footer: PersonaFooter }}
+    >
       {badges.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {badges.map((badge, index) => (

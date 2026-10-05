@@ -1,12 +1,12 @@
 // The docs are one tree, organised by kind of page (Diataxis). Who a page is for
 // is a tag: `personas` in its frontmatter. A page without the tag is for everyone.
-export const personas = ['use', 'deploy', 'build'] as const;
+export const personas = ['use', 'run', 'build'] as const;
 
 export type Persona = (typeof personas)[number];
 
 export const personaInfo: Record<Persona, { title: string; audience: string; badge: string }> = {
   use: { title: 'Use', audience: 'Scientists', badge: 'For scientists' },
-  deploy: { title: 'Deploy', audience: 'Admins', badge: 'For admins' },
+  run: { title: 'Run', audience: 'Admins', badge: 'For admins' },
   build: { title: 'Build', audience: 'Developers', badge: 'For developers' },
 };
 

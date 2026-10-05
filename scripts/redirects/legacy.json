@@ -197,7 +197,7 @@
   "/docs/concepts/comparisons/rest": "/docs/concepts/comparisons#why-not-rest",
   "/docs/concepts/lazy-loading": "/docs/concepts/performance#lazy-loading",
   "/docs/use": "/docs#using-arkitekt",
-  "/docs/deploy": "/docs#deploying-arkitekt",
+  "/docs/deploy": "/docs#running-arkitekt",
   "/docs/build": "/docs#building-with-arkitekt",
   "/docs/guides/troubleshooting/general": "/docs/guides/troubleshooting#help",
   "/docs/guides/apps/kare": "/docs/guides/apps#kare",

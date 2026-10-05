@@ -70,7 +70,7 @@ export const docs = defineDocs({
   docs: {
     // who a page is for; empty means everyone (see src/lib/persona.ts)
     schema: pageSchema.extend({
-      personas: z.array(z.enum(['use', 'deploy', 'build'])).default([]),
+      personas: z.array(z.enum(['use', 'run', 'build'])).default([]),
     }),
     postprocess: {
       includeProcessedMarkdown: true,

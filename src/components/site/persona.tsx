@@ -30,7 +30,7 @@ const ANIMATE_ATTR = 'data-persona-animate';
 const ANIMATE_MS = 450;
 let animateTimer: ReturnType<typeof setTimeout> | undefined;
 
-const icons: Record<Persona, LucideIcon> = { use: Microscope, deploy: Server, build: Code };
+const icons: Record<Persona, LucideIcon> = { use: Microscope, run: Server, build: Code };
 
 function readPersona(): Persona | null {
   const value = document.documentElement.getAttribute(PERSONA_ATTR);
@@ -134,7 +134,15 @@ export function PersonaCard({
   ...props
 }: ComponentProps<typeof Card> & { persona: Persona }) {
   const Icon = icons[persona];
-  return <Card icon={<Icon />} {...props} onClick={() => setPersona(persona)} />;
+  return (
+    <Card
+      icon={<Icon />}
+      {...props}
+      // global.css marks the card of the picked persona
+      data-persona-card={persona}
+      onClick={() => setPersona(persona)}
+    />
+  );
 }
 
 const trim = (url: string) => (url.length > 1 ? url.replace(/\/$/, '') : url);
