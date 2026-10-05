@@ -32,7 +32,7 @@ your images, results or any other data moving between your machines.
 
 Both sides go through the same four steps:
 
-1. **Authorize.** The hub (during [installation](/docs/guides/join-the-mesh))
+1. **Authorize.** The hub (during [installation](/docs/guides/hub#join-the-mesh))
    and the app (when it connects) each sign in with the coordinator for one organization.
 2. **Get credentials.** Each receives a token for the platform and a **mesh key** for that
    organization's mesh.
@@ -68,7 +68,7 @@ The mesh is optional. Arkitekt is a set of network services, so any way of conne
 works:
 
 - **Your own Tailscale** (or other WireGuard network), if your group already runs one.
-- **Your institution's VPN.** See [Using a VPN](/docs/concepts/security/vpn).
+- **Your institution's VPN.** See [Using a VPN](/docs/concepts/security/mesh#arkitekt-through-a-vpn).
 - **Nothing at all** on a single trusted LAN.
 
 The security boundary is Arkitekt's [authentication and
@@ -78,8 +78,33 @@ however the bytes get there.
 <Callout type="warn" title="Optional and experimental">
 
 The mesh is new and changing quickly. Since [local-network advertising was
-removed](/docs/guides/join-the-mesh#advertising), it is the only built-in way to
-find a hub across networks. To join a hub, see the [Mesh step](/docs/guides/join-the-mesh)
+removed](/docs/guides/hub#advertising), it is the only built-in way to
+find a hub across networks. To join a hub, see the [Mesh step](/docs/guides/hub#join-the-mesh)
 of the installation guide.
+
+</Callout>
+
+## Arkitekt through a VPN
+
+### Introduction
+
+Arkitekt is not an entirely secure system, just yet. So if you want to use some of the arguably more interesting features of
+Arkitekt like online monitoring and remote control, you should consider using a VPN, to secure your connection.
+
+### I don't have a VPN
+
+No, this is not a NordVPN ad. And we are not going to recommend any specific VPN solution. There are plenty of them out there,
+and you can find a lot of reviews and comparisons online. We would however try to steer you away from the online VPN services,
+that advertised all over the place. They are usually not very secure, and you are the product, not the customer. If your university
+VPN is shit, we can however recommend a pretty straightforward solution, that is easy to set up and use and can easily
+coexist with other VPNs you might be using: [Tailscale](https://tailscale.com/)( It's what we have been using to enable remote
+monitoring)
+
+<Callout type="warn" title="This is not open source software">
+
+
+While big parts of the Tailscale software are open source, some of the core components are not. Tailscale is a commercial product,
+that is free for personal use.
+
 
 </Callout>

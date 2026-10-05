@@ -25,7 +25,7 @@ First what do we mean with `Workflow`?
 
 A workflow is a processing pipeline: a graph of `Nodes`, just like the `Show on Napari` or `Convert File` nodes you have
 used, wired together so that data streams from one to the next. The concept is explained in
-[Workflow](/docs/concepts/terminology/workflow); here we build one. You can stitch nodes together in the GUI or import a
+[Workflow](/docs/concepts/terminology#workflow); here we build one. You can stitch nodes together in the GUI or import a
 workflow from a file or even from this website. We will do the first, to get more familiar with the UI.
 
 Lets look first at the workflow we would like to create, and then we will go through the steps to create it.
@@ -50,7 +50,7 @@ This is probably the most basic workflow you can create, but it will teach you a
 
   Every `Node` has inputs and outputs that you connect to other nodes; the connections define the **flow of data**. The special
   `Input` and `Output` nodes are the entry and exit points of the workflow, which is why a workflow is itself just a node
-  (see [Workflows are just nodes](/docs/concepts/terminology/workflow#workflows-are-just-nodes)).
+  (see [Workflows are just nodes](/docs/concepts/terminology#workflows-are-just-nodes)).
 
 - About their colors:
 
@@ -61,7 +61,7 @@ This is probably the most basic workflow you can create, but it will teach you a
 - About the data as a stream:
 
   Nodes process each item as it arrives and pass it on, rather than waiting for a batch (see
-  [Data flows as a stream](/docs/concepts/terminology/workflow#data-flows-as-a-stream)). The edges are labeled
+  [Data flows as a stream](/docs/concepts/terminology#data-flows-as-a-stream)). The edges are labeled
   `@mikro/representation` and `@mikro/metric`: the data types passed between nodes, where `@` marks a
   [mikro](/docs/concepts/services/mikro) type. The first two nodes turn an image into an image, the last one returns a
   `metric` (a scalar attached to an image, here the fraction), which is also the output of our workflow.

@@ -38,7 +38,7 @@ can build on it. On its own the hub does very little "analysis"; its job is to
 broker and to remember. The heavy lifting is left to the apps, and identity is left
 to the coordinator. Why we built Arkitekt around a middleman in the first place, and
 how that answers the fragmented landscape of bioimage tools, is the subject of
-[Arkitekt the Middleman](/docs/concepts/philosophy/middleman).
+[Arkitekt the Middleman](/docs/concepts/philosophy#arkitekt-the-middleman).
 
 The hub is modular. It is built from a set of [**Services**](/docs/concepts/services)
 (like Mikro for data, or Rekuest for tasks), and when you deploy Arkitekt you choose
@@ -64,7 +64,7 @@ Crucially, apps connect only to the hub, never directly to one another. An app
 exposes part of its functionality to the hub, and the hub makes that functionality
 available to *other* apps, to you, and to workflows. What an app is, and how it
 differs from the services the hub is built from, is explained in
-[Apps vs Services](/docs/concepts/terminology/apps-vs-services).
+[Apps vs Services](/docs/concepts/terminology#apps-vs-services).
 
 ## The Coordinator
 

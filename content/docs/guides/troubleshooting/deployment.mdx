@@ -5,7 +5,7 @@ personas: [deploy]
 ---
 
 Puh. This is probably the worst case scenario, and one of the hardest to debug. But don't worry, we will get you through this.
-Start with the [general tips](/docs/guides/troubleshooting/general) if you haven't.
+Start with the [general tips](/docs/guides/troubleshooting#help) if you haven't.
 
 ## Before we start
 
@@ -260,11 +260,11 @@ If your Deployment is running, but it doesn't appear in Orkestrator, it means th
 
 2. Restart Discovery: restart the whole Orkestrator app.
 
-3. Make sure you can reach your deployment, either on the same machine, or across networks through the [mesh](/docs/concepts/security/mesh). (Local-network advertising has been removed, see the [installation guide](/docs/guides/join-the-mesh#advertising).)
+3. Make sure you can reach your deployment, either on the same machine, or across networks through the [mesh](/docs/concepts/security/mesh). (Local-network advertising has been removed, see the [installation guide](/docs/guides/hub#advertising).)
 
 4. For automatic detection: Make sure that:
 
-   - Your deployment and the Desktop App have both [joined the mesh](/docs/guides/join-the-mesh), so they can discover each other.
+   - Your deployment and the Desktop App have both [joined the mesh](/docs/guides/hub#join-the-mesh), so they can discover each other.
 
 5. For manual connection. If the automatic steps fail, you can always try to manually connect
    your instance by entering in the ipaddr or hostname of your deployment followed by the Lok Service Port (8000) in the `Advanced Connect` tab of Orkestrator.

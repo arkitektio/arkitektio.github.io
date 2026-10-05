@@ -1,0 +1,104 @@
+---
+title: Running a hub
+description: "Everyday tasks on a hub that is already installed: adding a plugin engine, updating, joining the mesh and using the GPU."
+personas: [deploy]
+---
+
+Your hub is installed and running (if not, start with [Install your first hub](/docs/tutorials/first-hub)).
+These are the tasks that come up afterwards.
+
+## Add a plugin engine
+
+A **plugin engine** is the second thing Konstruktor can create: one container that runs the plugins
+an organization has installed, on the machine where the engine lives. It is how a lab adds compute
+to a hub without touching the hub itself. Choose **Plugin engine** in the app, or run:
+
+```bash
+konstruktor engine create ~/MyEngines/gpu-box --server go.arkitekt.live --identifier gpu-box
+```
+
+Engines are authorized against the coordination server the same way hubs are.
+
+## Update a hub
+
+Arkitekt is a rapidly evolving platform, and updating regularly is the only way to get fixes and new
+features. Two things update separately:
+
+- **The platform images.** The dashboard checks the registries for newer images and shows, per
+  service, whether the running image is current, whether a newer one exists, or whether a newer one
+  has been pulled but is not running yet. **Pull images** and then **Start** applies an update; on
+  the command line that is `konstruktor pull lab-hub` followed by `konstruktor up lab-hub`. Updates
+  within a channel are meant to be backwards compatible and to keep your data intact.
+- **Konstruktor itself.** There is no auto-updater. Re-run the install script, which always resolves
+  the latest release, or download the new desktop installer.
+
+<Callout type="info" title="About channels">
+
+  Konstruktor no longer has a channel picker. A hub's channel is simply the set of image tags in its
+  `hub_config.yaml`; a stock hub ships on the `next` tag (with Kraph on `dev`). To move a service to
+  another channel, change its tag there and pull. How the channels relate is described in
+  [How we version Arkitekt](/docs/concepts/versioning).
+
+</Callout>
+
+## Join the mesh
+
+The **Mesh** step of the wizard (or `--mesh` on the command line) decides whether the hub can be
+reached across networks through the [Arkitekt mesh](/docs/concepts/topology#arkitekt-mesh):
+
+- **No mesh** (`none`): the hub stays on the addresses you picked.
+- **Join the organization's mesh** (`coordination`): Konstruktor asks the coordination server for a
+  mesh key while it authorizes the hub, and runs a mesh sidecar next to the gateway.
+- **Use a key I already have** (`manual`): paste a pre-authorized key and the control server URL,
+  for a coordinator you run yourself (`--mesh-key`, or better `KONSTRUKTOR_MESH_KEY`, and `--mesh-coord-url`).
+
+Joining is not the same as being advertised. Once the hub is up and has its mesh address, add that
+address on the dashboard's address list and **Authorize** again, so apps arriving over the mesh are
+told where to find the hub. What the mesh does and why it is the secure default is explained in
+[The Mesh](/docs/concepts/security/mesh).
+
+### Local-network advertising (removed) [#advertising]
+
+<Callout type="warn" title="This feature was removed">
+
+  Earlier versions of Arkitekt could **advertise** the platform on your local network with a UDP
+  broadcast so that apps could discover it without knowing its IP address. Local networks turned out
+  to be too much of a mess (firewalls, changing addresses, blocked broadcasts, VPNs) for that to be
+  reliable, and it only ever worked within a single LAN. Apps now discover a hub by the addresses it
+  advertises, and across networks through the [mesh](/docs/concepts/topology#arkitekt-mesh).
+
+</Callout>
+
+## Arkitekt and the GPU
+
+### GPU Support
+
+There are two different ways to use GPUs with Arkitekt. The first is to use the GPU support built into the standalone tools themselves and
+on their hardware. This is probably the case when this tool exists primarily outside of the Arkitekt ecosystem, and Arkitekt is just being used to bridge it.
+You can then just connect this tool like any other tool, and Arkitekt will run in on the connecting tool and hardware.
+
+The second way is to use the GPU support built into Arkitekt itself. This is the case when the tool is designed to run inside Arkitekt as a PluginApp. See more
+in the [developer](/docs#building-with-arkitekt) section on how to build an Arkitekt plugin. Here Arkitekt uses the docker support system to run the plugin in a docker container
+within the Arkitekt server.
+
+<figure className="my-6 w-full">
+
+![How the Arkitekt server can manage GPU access](/docs/design/various/docker_gpu.png)
+
+<figcaption className="mt-2 text-sm text-fd-muted-foreground">How the Arkitekt server can manage GPU access. (Adapted from the NVIDIA Container Toolkit Documentatoin) . Containers run in a sandbodex environment and request GPU access from the underlying service (docker engine). This</figcaption>
+</figure>
+
+### GPU Support on Windows
+
+Luckily the easy of integration of the CUDA support into docker containers has gotten **a lot** easier in the last two years.
+Windows users will no longer need to install the NVIDIA Container Toolkit, but can instead use the WSL2 backend of Docker Desktop.
+The installation instructions for this can be found [here](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#installing-nvidia-drivers).
+
+- Install the **latest** NVIDIA drivers on your host machine (https://docs.docker.com/desktop/install/windows-install/)
+- Install Docker Desktop and enable the WSL2 backend (https://docs.docker.com/desktop/wsl/)
+- Run Konstruktor (which will check if your system is ready for GPU support)
+
+### GPU Support on Linux
+
+The same is true for Linux users. The NVIDIA Container Toolkit is no longer needed, and the docker engine can be used directly.
+The installation instructions for this can be found [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker).

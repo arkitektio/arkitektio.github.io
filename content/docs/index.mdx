@@ -1,6 +1,6 @@
 ---
 title: Arkitekt Docs
-description: Documentation for the Arkitekt bioimage analysis platform. Get started, learn the design, follow tutorials, and build apps.
+description: "Documentation for the Arkitekt bioimage analysis platform. Get started, learn the design, follow tutorials, and build apps."
 ---
 
 Arkitekt is an open-source platform for bioimage analysis. It is a "middleman" that
@@ -13,19 +13,19 @@ sits between your data, your tools and your team.
     persona="use"
     title="Use Arkitekt"
     description="Your lab or facility already runs Arkitekt. Connect, follow the tutorials and run your first workflows."
-    href="/docs/use"
+    href="/docs#using-arkitekt"
   />
   <PersonaCard
     persona="deploy"
     title="Deploy Arkitekt"
     description="Nobody runs Arkitekt for you yet. Set up your own server with Konstruktor, in one line or with a desktop app."
-    href="/docs/deploy"
+    href="/docs#deploying-arkitekt"
   />
   <PersonaCard
     persona="build"
     title="Build with Arkitekt"
     description="Go deeper and start building bioimage apps on top of the platform."
-    href="/docs/build"
+    href="/docs#building-with-arkitekt"
   />
   <Card
     title="Understand Arkitekt"
@@ -33,3 +33,144 @@ sits between your data, your tools and your team.
     href="/docs/concepts"
   />
 </Cards>
+
+## Using Arkitekt
+
+Which of these are you?
+
+<Cards>
+  <Card
+    title="Joining somebody's server?"
+    description="Your lab or facility already runs Arkitekt. You install nothing but the Orkestrator app."
+    href="/docs/guides/joining"
+  />
+  <Card
+    title="I am starting new"
+    description="Nobody runs Arkitekt for you yet. Set up your own server with Konstruktor, in one line or with a desktop app."
+    href="/docs/tutorials/first-hub"
+  />
+</Cards>
+
+Both paths, as written, start with an **account on [go.arkitekt.live](https://go.arkitekt.live)**,
+our hosted coordination server.
+
+<Callout type="warn" title="Wait, I need an account?">
+
+  No. You can run Arkitekt without ever talking to us: point Konstruktor at your institute's own
+  coordination server, or [self-host everything](/docs/concepts/topology#three-ways-to-meet),
+  coordinator included, and stay fully offline. The account just makes things easier: go.arkitekt.live
+  is a [coordinator](/docs/concepts/security/identity) we already run, so there is nothing extra to
+  operate and the [mesh](/docs/concepts/security/mesh) works across networks out of the box. It stores
+  only what a login needs (see the [privacy policy](/docs/privacy#tier-2-an-account-on-goarkitektlive)),
+  and your data and compute never go through it. If you would rather not, read
+  [Where Arkitekt runs](/docs/concepts/topology) for the trade-offs and pick the
+  **Another server** option in Konstruktor.
+
+</Callout>
+
+### Once you are connected
+
+- **[First Steps](/docs/tutorials/first-steps)**. Spend your first few minutes with Arkitekt:
+  data management, analysis execution and dashboarding.
+- **[A bit more advanced](/docs/tutorials/advanced)**. Deep learning, local workflows and live
+  analysis.
+- **[Apps](/docs/guides/apps)**. The standalones and plugins that connect to Arkitekt.
+- **[Troubleshooting](/docs/guides/troubleshooting)**. Stuck? Start here.
+
+## Deploying Arkitekt
+
+<Cards>
+  <Card
+    title="Install your first hub"
+    description="Nobody runs Arkitekt for you yet. Set up your own server with Konstruktor, in one line or with a desktop app."
+    href="/docs/tutorials/first-hub"
+  />
+  <Card
+    title="Konstruktor"
+    description="The desktop admin interface for installing and inspecting the services of your Arkitekt deployment."
+    href="/docs/reference/konstruktor"
+  />
+  <Card
+    title="Where Arkitekt runs"
+    description="Why a platform of apps still needs a central hub, why apps and hub have to meet, the three ways to arrange that meeting, and how the mesh reaches your platform from anywhere."
+    href="/docs/concepts/topology"
+  />
+  <Card
+    title="Deployment"
+    description="A high-level overview of Arkitekt's customizable deployment strategies and the considerations behind them."
+    href="/docs/concepts/planning"
+  />
+  <Card
+    title="Security & Privacy"
+    description="How Arkitekt thinks about security, privacy and performance: the trust model, where your data lives, and the honest limits of an early-stage platform."
+    href="/docs/concepts/security"
+  />
+  <Card
+    title="Help! My Server doesn't startup"
+    description="Step-by-step troubleshooting for installing Docker, running Konstruktor, and getting your Arkitekt deployment up and running."
+    href="/docs/guides/troubleshooting/deployment"
+  />
+</Cards>
+
+## Building with Arkitekt
+
+### Why Arkitekt?
+
+Arkitekt is a framework, that aims to provide you (the bioimage analyst developer) with a set of tools to let you build
+your own bioimage analysis software, that others are happy to use and orchestrate in
+real-time workflows, without having to worry too much about all the underlying infrastructure.
+
+As such we are trying to provide you with a set of tools that will help you to build your own
+applications. We also would like you to have an easy time sharing your analysis programs with others,
+so that they can use them as well.
+
+As Arkitekt follows a highly modular approach so that you don't have to use and enable all of the framework
+if you don't want to. But some features you can rely on include:
+
+- **Easy to build and easy to use GUI and API**
+
+  Arkitekt can build powerful and highly customizable widgets, that users can use when interfacing
+  remotely with your analysis program. Have a CLI interface? No problem, Arkitekt can build a GUI for you.
+  Have a GUI interface? No problem, Arkitekt can build remote API for it to.
+
+- **Build safe tools**
+
+  Arkitekt apps are always protected by a user and app authentication system. This means that
+  you highly customize your application for specific users, restrict access to resources, and most importantly that
+  your development app does not delete all of your data.
+
+- **Rely on the ecosystem**
+
+  With Arkitekt you can easily integrate all the ecosystem of other apps in your program. This is
+  especially useful if you want to build a small new analysis script (your new special algorithm),
+  but don't want to reinvent the wheel for all the other analysis steps that are already available in other apps.
+
+- **Use your work in Workflows**
+
+  Want to integrate your analysis program in a workflow? No problem, Arkitekt can help you with that. All functionality
+  that you build in your app can be **automatically** used in a workflow.
+
+- **Access data from anywhere**
+
+  With arkitekt you can access your data from anywhere. This means that you can use your analysis program on your local machine,
+  on a remote server, or even in the cloud. Arkitekt will take care of all the data transfer and storage for you.
+
+### What Arkitekt is not
+
+- Arkitekt is **not** a framework for replacing your existing analysis software and highly specialised GUIs. You should still use
+  (and develop) your existing software and GUIs for your analysis. Look at Arkitekt as a bridge between your analysis software and
+  the outside world of other bioimage apps.
+
+- Arkitekt is also **not** a tool for building highly parallelizable and highly available distributed systems. There are other frameworks
+  out there that are better suited for this task (e.g. [Dask](https://dask.org/), [Spark](https://spark.apache.org/)). Where these tools
+  shine in their ability to highly scale **specific** analysis tasks, Arkitekt shines in **universally bridging** and **orchestrating**
+  these tasks in a real-time workflow.
+
+### Where to start
+
+- **Python**: the reference client. Start with [Core concepts](/docs/concepts/python#core-concepts),
+  then [Your first app](/docs/tutorials/python-first-app).
+- **Rust**: the same model as a native library, for fast agents and small binaries. See
+  [Rust](/docs/tutorials/rust-first-app).
+- **Embedded**: microcontrollers that offer actions themselves. See [Embedded](/docs/tutorials/embedded-first-device).
+- **Backend**: for writing services of your own, see [Backend](/docs/concepts/backend-libraries).

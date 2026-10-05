@@ -1,6 +1,6 @@
 ---
 title: Arkitekt vs…
-description: The "Vs" series explains how Arkitekt compares to other tools and the design decisions behind it.
+description: "The \"Vs\" series explains how Arkitekt compares to other tools and the design decisions behind it."
 ---
 
 ## What Vs is not
@@ -11,6 +11,93 @@ The "Vs" deep dives and the "Why Not…?" articles are not a series that explain
 
 
 You disagree with a description in one of these articles? You think we misrepresent a tool, or that Arkitekt should support a feature it does not? You think that Arkitekt should do things differently? We would love your feedback and insight about the topic. Please, please please open a discussion on the [GitHub Discussions](https://github.com/orgs/arkitektio/discussions) page. We would love to hear your thoughts and ideas. Really!
+
+
+</Callout>
+
+## Why not Kafka?
+
+
+Arkitekt aims to be a platform, that allows for real-time data processing. For this it neeeds a messaging system, and comes with RabbitMQ out of the box. But why not Kafka? Let's have a look at the differences between the two
+and why Arkitekt chose RabbitMQ.
+
+#### Kafka
+
+Kafka is a distributed streaming platform, that is used for building real-time data pipelines and streaming apps. It is a distributed, partitioned, replicated commit log service. 
+It provides the functionality of a messaging system, but can keep the data for a longer time, and is optimized for high throughput. It is often used for building real-time data pipelines and streaming apps.
+
+##### Sounds great, why not use it, why RabbitMQ?
+
+Kafka is a great tool, but it is not the best fit for every use case. It is optimized for high throughput in distributed settings and is powering the real-time data pipelines of many gigantous companies.
+So why did Arkitekt choose RabbitMQ?
+
+
+##### Complexity
+
+Kafka is a complex system to setup and maintain. It comes only configurable as a distributed system, and requires multiple instances of the broker to be running. 
+This makes it hard to setup and maintain for small projects, especially if you are just trying to set it up on your local machine. RabbitMQ is much easier to setup and maintain, and is a better fit for small projects.
+
+
+##### Performance
+
+Kafka is optimized for high **throughput**, but this comes at a cost. If you are looking for low **latency**, RabbitMQ can achieve lower latencies than Kafka.
+You can find more about this [here](https://double.cloud/blog/posts/2023/03/apache-kafka-vs-rabbitmq/). We wanted to provide very low message latencies, as in
+biology the time between the stimulus and the response is very short. This is why we chose RabbitMQ.
+
+<Callout type="info" title="On Message Size">
+
+
+RabbitMQ is also better suited for small message sizes, as it has a lower overhead than Kafka. This is important for Arkitekt, as the messages are often very small because
+we pass only message IDs and not the whole message. This is because the messages are stored in a database, and we only need to pass the ID of the message to the next service.
+
+
+</Callout>
+
+#### Outlook
+
+It is important to note that Arkitekt is still in development, and we are always looking for ways to improve the platform. We are looking into adding support for Kafka in the future, 
+as it is a great tool for real-time data processing in larger scale projects. We are currently reworking [rekuest](/docs/concepts/services/rekuest) to add support for other message 
+brokers, and Kafka is on our list. If you are interested in this, please let us know in the [Discord](https://discord.gg/arkitekt)!
+
+## Why not Rest?
+
+
+When deciding on the API for Arkitekt, we considered using REST, but ultimately decided on GraphQL.
+
+### Why we like GraphQL
+
+In short: bioimage data is highly relational, and GraphQL lets a client declare exactly which slice of that relationship graph it needs in a single, strongly typed, self-documenting query, with subscriptions for real-time updates on top. The full list of reasons, along with examples you can try against your own server, lives in [GraphQL: Why we like GraphQL](/docs/concepts/graphql#why-we-like-graphql).
+
+<Callout type="info" title="Developing with GraphQL">
+
+
+Developing a Python or Typescript client that interfaces with our GraphQL API is easy and fun. We have outlined the steps in the [Developing with GraphQL](/docs/guides/python/graphql) section,
+which utilizes some of the tools and libraries mentioned above.
+
+
+</Callout>
+
+
+### Challenges of using GraphQL
+
+While we believe that GraphQL is a great fit for bioimage analysis, it is not without its challenges. Here are some of the challenges we have encountered:
+
+1. **Learning Curve**: GraphQL has a steeper learning curve compared to REST, especially for developers who are new to it. However, we believe that the benefits of GraphQL outweigh the initial learning curve,
+and our tooling should help to make the transition easier.
+
+2. **Caching**: Caching in GraphQL can be more complex than in REST, especially when dealing with complex queries and mutations. While we employ a number of strategies to mitigate this, it is still an area that requires careful consideration.
+
+3. **N + 1 Problem**: The N + 1 problem occurs when a query results in multiple requests to the server to fetch related data, and can lead to performance issues.In REST, the N + 1 problem can be mitigated by using endpoints that return the exact data needed. In GraphQL, this problem can be exacerbated by the flexibility of the API. 
+However, we have implemented a number of strategies to mitigate this problem, such as dataloader and federation and especially our new strawberrry based implementation, comes with a lot of performance improvements.
+
+4. **Security**: While GraphQL provides a lot of flexibility, it also introduces new security challenges. For example, clients can craft complex queries that can lead to performance issues or even denial of service attacks. Our new APIs
+have implemented a number of strategies to mitigate these risks, such as query complexity analysis and rate limiting.
+
+
+<Callout type="info" title="Work in progress">
+
+
+This section is still work in progress.
 
 
 </Callout>

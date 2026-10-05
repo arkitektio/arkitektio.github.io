@@ -85,7 +85,7 @@ always travel **by value**, so keep them small.
 Images, volumes, traces and tables are too big to send through a task. They live in a data service
 (for images, [Mikro](/docs/concepts/services/mikro), backed by a database and an S3-compatible object
 store), and **only a reference travels**. The receiving agent resolves the reference with its own
-client. This is what Arkitekt calls a [structure](/docs/concepts/terminology/structure).
+client. This is what Arkitekt calls a [structure](/docs/concepts/terminology#how-do-these-elements-relate).
 
 A service brings its structures with it. Declare the service, and its types become valid ports:
 

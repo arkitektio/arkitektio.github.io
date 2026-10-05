@@ -1,14 +1,10 @@
 {
   "title": "Apps",
   "pages": [
-    "---Standalones---",
     "orkestrator",
     "mikro-napari",
     "imagej-plugin",
     "gucker",
-    "pokket",
-    "---Plugins---",
-    "kare",
-    "segmentor"
+    "pokket"
   ]
 }

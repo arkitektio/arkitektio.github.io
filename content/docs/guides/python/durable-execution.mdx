@@ -28,7 +28,7 @@ What happens depends on **what** died and **what kind** of implementation it was
 any agent. It is delivered again, because nothing can have happened yet.
 
 "The agent died" means its process ended or stayed disconnected past the server's grace window. A
-short network blip does not end a task (see [disconnect policy](/docs/concepts/python/core-concepts#disconnect-policy)).
+short network blip does not end a task (see [disconnect policy](/docs/concepts/python#disconnect-policy)).
 When a new process takes over the agent, the old one's tasks are resolved immediately.
 
 ## LOST and `AgentLost`

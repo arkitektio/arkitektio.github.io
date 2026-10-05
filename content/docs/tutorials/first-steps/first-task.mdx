@@ -57,7 +57,7 @@ should have appeared in the `Data` tab. If you click on it you should see the im
 
 We just performed our first conversion. We took a file from our Server and converted it to the internal Arkitekt format based on Zarr, again storing
 it on our server. In practicallity this meant that our "Omero" PluginApp streamed the file from the server, converted it and then uploaded the
-converted zarr dataset again to the server. More on that in [How Tasks Work](/docs/concepts/terminology/task). You will notice that
+converted zarr dataset again to the server. More on that in [How Tasks Work](/docs/concepts/terminology#task). You will notice that
 first conversion takes a bit longer. This is because we only start the Java process that performs the conversion when we need it.
 On subsequent conversions this process will already be running and the conversion should be much faster.
 

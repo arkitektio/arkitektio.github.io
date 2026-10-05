@@ -2,10 +2,6 @@
   "title": "Comparisons",
   "pages": [
     "not-arkitekt",
-    "---Deep dives---",
-    "nextflow",
-    "---Why Not…?---",
-    "kafka",
-    "rest"
+    "nextflow"
   ]
 }

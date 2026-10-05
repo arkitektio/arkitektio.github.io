@@ -1,0 +1,551 @@
+---
+title: Terminology
+description: "An introduction to the terminology used throughout Arkitekt and why learning these terms helps you understand the platform."
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+If you feel like we have missed something, or if you have a suggestion for a better explanation, please let us know by creating an issue on our [Github repository](https://github.com/arkitektio/arkitektio.github.io) (or just edit the file and create a pull request).
+
+## Before we start
+
+This document assumes that you have a basic understanding of what arkitekt is, and what it is used for. If you don't, we recommend that you take a look at the [Introduction](/docs/concepts/basics) page.
+
+## A short visual guide
+
+We have created a short visual guide to help you understand the concepts that we use in Arkitekt. It is not meant to be a complete guide, but rather a quick overview of the concepts that we use in Arkitekt. Just click on one of the items to be guided to the corresponding section in this document.
+
+If you have no idea what we are talking about, we recommend that you start with the [What is an App?](/docs/concepts/terminology#what-is-an-app) section.
+
+## A note on Workflows
+
+A **Workflow** is a graph of nodes wired together, where the output of one node becomes the input of the next, and each node runs an [Action](/docs/concepts/terminology#what-is-an-action). See [Workflow](/docs/concepts/terminology#workflow).
+
+## What is an App?
+
+<div className="mt-2">
+
+![Arkitekts design as an App middleman](/docs/design/terminology/app.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+<small>Arkitekts design as an App middleman</small>
+</div>
+</div>
+
+How apps fit into the Arkitekt ecosystem is best exemplified by the interplay between the Orkestrator _App_ and the Fiji _App_: Orkestrator assigns work and Fiji does the actual work, while Arkitekt only acts as the [middleman](/docs/concepts#the-hub) so that the two never have to interact directly with each other (which would be a lot more complicated than you might think). Apps are the "spokes" of that hub; how they differ from the Services the hub itself is built from is explained in [Apps vs Services](/docs/concepts/terminology#apps-vs-services).
+
+
+### The type of Apps
+
+You already saw that Orkestrator and Fiji are apps, but Arkitekts definition of apps is way broader that an application with a Graphical User Interface.
+ In fact, almost anything can be an app, as long as it is able to connect to Arkitekt. 
+ This means that you can use a website as an app, or your own code, or even your robot or Iot device. 
+ What _unifies_ all of these apps is that they all follow some common principles of **authentication** when connecting with the platform.
+This is an important feature, because it not only that you are in control of your data, but Arkitekt can use the provided information of the app to _version_ the app. 
+This versioning ensures that if you want to use the functionality of this app in a workflows or just directly in tasks you can be sure that the app will behave the same way every time. Note that apps are versioned independently of the Arkitekt server itself, which follows its own release channels; see [How we version Arkitekt](/docs/concepts/versioning).
+
+This means that the first time a new app decides to connect to Arkitekt, you will be asked to approve the connection 
+and the permissions that the app is asking for (this is done through Oauth2 Standard, the same principle that is used when you press "login with google",
+ but you don't need to know that to use Arkitekt.). This double authentication process is key to Arkitekts security and some other design principles,
+  and we will go into more detail about it in the [Security](/docs/concepts/security#security-measures) section.
+
+<div className="mt-2 w-max-xl">
+
+![Example of an App asking for permissions](/docs/design/terminology/oauth_example.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+<small>Example of an App asking for permissions</small>
+</div>
+</div>
+
+### Apps can provide functionality
+
+Depending on the App, you can use it to do a lot of different things. For example, you can use an App to just download images from Arkitekt, or you can use some interesting python code to display a graph of your data. One important aspect is that an app can also choose to expose some of its functionality as [Implementations](/docs/concepts/terminology#what-is-an-implementation). This means that you can use the functionality of the App in other Apps, or in the Orkestrator. This is a very powerful feature, and we will go into more detail about it in the [Actions and Implementations](/docs/concepts/terminology#what-is-an-action) section.
+
+### Examples of Apps
+
+As we are a firm believer in the power of the example, here are a few examples of Apps in the Arkitekt sense, and a few negative examples of Apps in the Arkitekt sense.
+
+<Tabs items={['Computer','Website','Robot','Code']}>
+  <Tab value="Computer">
+    An App on your computer is the obvious example, and yes, if that app is able to connect to Arkitekt (because the developer decided to make it an Arkitekt App), then it is an Arkitekt App. Easy. Two examples of this are the Orkestrator Desktop App, and Fiji with the ImageJ Arkitekt plugin installed. Both apps will ask you to approve the connection to Arkitekt, and both apps will ask you for permissions.
+
+Importantly though the Orkestrator app asks you for a lot more permissions than the ImageJ plugin, because the Orkestrator app is able to do a lot more things with your data. If you want to know more about the permissions that an App can ask for, you can read more about it in the [Security](/docs/concepts/security#security-measures) section. Always remember that you are in control of your data, and you decide what Apps are allowed to do with it, so check the permissions before you approve an App.
+</Tab>
+<Tab value="Website">
+
+Also a website can be an an arkitekt app. Indeed this website is an arkitekt app (If you haven't done so already, you can try it out by clicking the "login with arkitekt" button in the top right corner). In most cases the website will ask you to point it to your arkitekt instance (which could be running on a public server, or in your local network), and then it will ask you to approve the connection. If you do, you will be able to use the website to interact with your data in Arkitekt.
+
+  </Tab>
+  <Tab value="Robot">
+    
+Now this is where it gets interesting. Your robot or Iot device can also become an arkitekt app. Most of the time, these machines do not need access to your data, but can provide functionality like taking pictures, or measuring temperature. In this case you can use the [Orkestrator](/docs/concepts/basics) to connect to your robot or Iot device, and call the functionality that it provides. This is a very powerful feature, and we will go into more detail about it in the [Actions and Implementations](/docs/concepts/terminology#what-is-an-action) section.
+  </Tab>
+  <Tab value="Code">
+
+Your code can also become an Arkitekt app. In fact, if you want your code to connect to an arkitekt server, it needs to become an app, because it needs rights to access your data. If you are using python you can use the arkitekt python library to connect to Arkitekt. If you are using javascript you can use the arkitekt javascript/typescript library. If you are using another language, you can use the Arkitekt API directly.
+
+If you want to know more about how to connect to Arkitekt, you can read more about it in the [Developer](/docs#building-with-arkitekt) section. We made sure to be compatible with standard webstandards (Oauth2, websockets), so you can use almost any language that is able to connect to a webserver.
+</Tab>
+</Tabs>
+
+
+#### TLDR
+
+- Apps are Agents that connect with the Arkitekt Platform
+- Apps are versioned
+- Apps can provide functionality
+- Apps can be anything that can connect to a webserver
+- All Code that connects to Arkitekt needs to be an App
+- Apps are powered by Oauth2 Authentication
+- Apps have specific rights to access your data (scopes)
+
+## What is an Action?
+
+
+Actions are a core conceptual element of the arkitekt platform, that represent the
+functionality that Arkitekt can do for you. As such you can think of an action as a provider of a bioimage task; running one is what we call a [Task](/docs/concepts/terminology#task).
+
+E.g. an action can be a functionality provided by an app that maximum projects an image, or applies a gaussian filter
+to an image, but also a functionality that will ask you the user to select a file, or label an image. An action can
+therefore be anything that you can envision as a task.
+
+### Input and Output
+
+Actions in Arkitekt are defined by their input and output. This means that an action can be a simple as an action that
+takes an image as an input and outputs an image, or more complex as an action that two images and some information
+about the images as an input and outputs a table of results. Each of these typed inputs and outputs is a [Port](/docs/concepts/terminology#port).
+
+### What is an action not?
+
+The most important feature to understand about Arkitekt actions is that they are not bound to an implementation.
+
+<div className="mt-2">
+
+![Arkitekt's actions and implementations](/docs/design/terminology/node-template.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+<small>Arkitekt's actions and implementations</small>
+</div>
+</div>
+
+This means that an action can be implemented in many different ways **AND**, by various different apps.
+For example, here the show Action is implemented by the Fiji app, but also by the Napari app. These apps
+can implement the same action in different ways, as long as they respect the input and output and the general
+logic of the action. As actions are the primary way to interact with the platform, this means that you can
+rest assured that the action will behave the same way, no matter which app implements it, but also that
+you can choose the app that you like the most.
+
+<Callout type="info">
+
+Also this abstraction, comes with some additional benefits for the application developer as they can use this
+abstraction to automatically test their app against the action specification. More about this in the developer
+sections. As apps implementations are the primary way to interact with the platform, this means that even though part
+of their code can change each version, but users can still interface with the app in the same way, until the developer
+decides to change the input and output of the action. How apps and the platform are versioned is described in
+[How we version Arkitekt](/docs/concepts/versioning).
+
+</Callout>
+
+### Action can establish Streams
+
+Another important feature to understand about Arkitekt actions is how they process data. This section will only
+make sense if you have read the [Workflow](/docs/concepts/terminology#workflow) section, but it is important to understand how actions can establish
+streams of data.
+
+### Programming Analogy
+
+Everybody knows and loves functions, especially functional programming friends like us. If you are
+are familiar with the core concepts of function and generators in programming, then have a look at their
+analogy in Arkitekt.
+
+<div className="mt-2">
+
+![Arkitekt's actions and implementations](/docs/design/terminology/node-stream.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+<small>Arkitekt's actions and implementations</small>
+</div>
+</div>
+
+Actions are best explained in interplay with their concrete counterpart, the [Implementation](/docs/concepts/terminology#what-is-an-implementation).
+
+## How do these elements relate?
+
+### Structure
+
+Structures are a core building block in Arkitekts Design and allow you to use more complex
+data-types in your workflows and apps. By defining Structures you can define your own schema
+of input and output data, that can be used in your apps and workflows.
+
+
+### Shrink and Expand
+
+Structures are data objects that can be `shrunk` and `expanded`. Shrinking a structure means
+to convert it into a JSON serializable object, that can be send over the network. Expanding
+a structure means to convert it from a JSON serializable object back into a structure.
+
+
+
+### GLobal vs Local Structures
+
+Structures can be defined globally or locally. 
+
+Global structures are structures that live distributed and universally accesible to all apps.  
+For the most part these are structures
+that are defined by some service of the platform, and when created live on the platform.
+Shrinking and expanding global structures is easily handled by sending only the ID of the
+structure over the network, and then expanding it on the other side.
+
+Local Structures are structures that are defined locally by an app. These structures are
+NOT distributed and only accesible to the app that created them. Shrinking and expanding
+local structures is simply done by putting them on a local "shelve" getting the ID of the
+that shelved structure, and then expanding it on the other side. However, this means that
+local structures are not accesible to other apps, and can only be used by the app that
+created them.
+
+Arkitekt allows you to define both global and local structures, and you can use both
+in your workflows, however, Arkitket ensures that you can never pass a local structure
+from one app to another, as this would break the workflow. 
+
+<Callout type="info">
+
+
+Currently we are limiting the use of local structures to applications, that also acts
+as the scheduler for the workflow. This means that you can only use local structures
+in workflows on the same app, so called 'in app workflows'. We are not sure if we will
+keep this limitation, but it is a good way to ensure that you do not break your workflow
+by passing local structures between apps.
+
+
+</Callout>
+
+## What is an Implementation?
+
+### Example
+
+Let's say you have want to do a bioimage task that is called "Project Maximum Intensity". This tasks has exactly on input, such as an image, and a single output, the segmented image Thats the abstract description of the task, and is represented by an action in Arkitekt. 
+Now this tasks could run on a variety of different applications, such as on ImageJ, Stardist or Napari. 
+Each of these applications would have a different way of running the task, but the abstract idea including the inputs and outputs would be the same.
+ These different ways of running the task are represented by implementations in Arkitekt.
+For what an action is, see [Action](/docs/concepts/terminology#what-is-an-action).
+
+Actions are never attached to an application, implementations always are. 
+
+<Callout type="info">
+
+
+Importantly implementations are not created only on the app level, but for each user that runs the app. This allows us to find the best fitting
+implementation for each bioimage task based on the user's preferences and the available resources.
+
+
+</Callout>
+
+### Developer Side 
+
+When developing an app, you will never really interact with actions and implementations, as they are abstract concepts that are abstracted away by our SDKs. 
+Once you register a python function, that function will be automatically inspected to infer inputs and outputs and the documentaiton of the function.
+This information is now send to the Arkitekt server, and if no action with the parameters of the function exists, a new action is automatically created and
+associated with the app.
+
+## Agent
+
+An **agent** is one running instance of an [app](/docs/concepts/terminology#what-is-an-app) that serves the app's
+[implementations](/docs/concepts/terminology#what-is-an-implementation). It is the process that holds a
+connection to [Rekuest](/docs/concepts/services/rekuest), receives [tasks](/docs/concepts/terminology#task),
+runs them and reports their progress and results back. `arkitekt run` on your laptop is an agent, and
+so is a plugin container started by Kabinet or a Qt application with a connected MagicBar.
+
+How the terms relate:
+
+| Term | Is | Example |
+|---|---|---|
+| **Action** | *what* can be done, defined by its inputs and outputs | "Segment Cells: Image → LabelMask" |
+| **App** | a program that can offer implementations | the `stardist` plugin, version 0.3 |
+| **Implementation** | *how* an app does an action | stardist's `segment_cells` function |
+| **Agent** | a running instance of an app that serves its implementations | stardist running on the GPU server |
+| **Task** | one run of an action, routed to an agent | "segment image 42", started by you at 10:14 |
+
+The same app can run as several agents, on different machines, for different users or with different
+hardware. The platform picks one when it routes a task. An agent also owns the app's live
+[state](/docs/guides/python/state-lifecycle) and publishes changes to it.
+
+### When an agent dies
+
+An agent is a process, and processes crash, lose power and lose their network. When Rekuest loses an
+agent for longer than a grace window, or a new process takes over the same agent, the tasks it was
+running are resolved:
+
+- A task of a plain action ends **lost**, meaning its outcome is unknown, and whoever called decides
+  what to do.
+- A task of a **workflow** is **resumed** by the next process that takes over the agent, from the
+  journal the agent kept on disk.
+
+A restarted agent keeps its name, so the platform knows it is the same one coming back. The details
+are in [Durable execution](/docs/concepts/durable-execution).
+
+<Callout type="info" title="Not an AI agent">
+
+Some pages also talk about AI agents: language-model assistants that call actions. In the
+terminology of the platform, an AI assistant is a *caller*, like a person or a script. It starts
+tasks and may run an app, but "agent" here always means the running app instance.
+
+</Callout>
+
+## Apps vs Services
+
+
+Services are the building blocks of the Arkitekt **Server** and are making up the backbone of your analysis. They are web-based applications that are running on the server and are used to provide
+common functionality and ways of retrieving and updating data. As opposed to Apps, Services are not user-facing and are not meant to be used directly by a user.
+Instead, they are used by Apps to provide the necessary functionality to the user. 
+
+Services in the Arkitekt sense never really do anything on their own in the analysis sense, they rather provide a way for Apps to do things. 
+For example, a Service might provide a way to retrieve (query) data from a database, or to send a notification to a user. This means that for the most
+part Services are stateless.
+
+### Apps
+
+Apps are the true stars of the Arkitekt platform and your analysis. While Services provide only primitives to store and retrieve data, Apps will actually do something with that data.
+Depending on what type of analysis you are doing, Apps can be anything from a desktop application that visualizes your data (such as Orkestrator) to a complex machine learning model that
+runs in a docker container on the servers (a Plugin). Importantly Apps can choose to expose part of their functionality to the users, which can then remotely instruct the App to do something.
+This functionality then also becomes available to other Apps, and in Workflows, so that you can create a net of functionality in your lab.
+
+<Callout type="info">
+
+
+While Apps **can** chose to expose functionality, they are not required to do so. For example you could design an Arkitekt App that just connects to the server in order to visualize some data.
+
+
+</Callout>
+
+Apps come in two big flavours, Standalone Apps and Plugins. To read more about these, see the [Apps](/docs/guides/apps) section. For a tour of what can be an app at all (a desktop tool, a website, a robot, plain code), see [What is an App?](/docs/concepts/terminology#what-is-an-app).
+
+### Interplay between Apps and Services
+
+Apps and Services are designed to work together in order to provide the necessary functionality to the user. Services provide the necessary primitives to store and retrieve data, while Apps
+provide the functionality to do something with that data. This means that Services are used by Apps to provide the necessary functionality to the user.
+
+<Callout type="info">
+
+
+As Apps **depend** on Services to provide the necessary functionality, you can only run Apps with your Arkitekt Server that has the necessary Services installed. No worries, the Arkitekt platform
+will automatically check for this and let you know if you are missing any Services. And of course you can always install the necessary Services yourself.
+
+
+</Callout>
+
+## Organization
+
+
+An **Organization** is the top-level container that everything else in an Arkitekt
+deployment lives inside. It is a self-contained world of **users, data, and
+configuration**. Think of it as "who this data belongs to" at the broadest level:
+a lab, a department, a core facility, or a whole institute.
+
+Every Arkitekt server ships with **multi-tenancy** at its core, which
+means a single deployment is never limited to one lab or one project. One server
+can host **many** organizations side by side, each fully isolated from the others.
+A core facility can run a single Arkitekt instance and still keep every group that
+uses it in its own separate world.
+
+<Callout type="info">
+
+An Organization is a logical boundary, not a physical one. Just like a
+[Server](/docs/concepts) can span multiple machines, one deployment can host
+many organizations, and one organization's work is spread across whatever machines
+and services that deployment happens to run on.
+
+</Callout>
+
+### The hard boundary
+
+The organization is the one boundary in Arkitekt that **always holds**. Data never
+silently crosses from one organization to another. Whatever else you configure, you
+can rely on this line staying sharp, which is exactly what makes it safe to run
+many independent groups on the same server.
+
+### Open by default, within your organization
+
+Inside an organization the defaults are deliberately **collaborative**. By default,
+every human user in an organization *can* look at the data of their colleagues in
+the same organization. Science is collaborative, and forcing people to explicitly
+share every dataset before anyone can build on it tends to grind real work to a
+halt.
+
+That openness is a starting point, not a straitjacket. On top of it sits
+**role-based access control**, which lets administrators define who may read,
+write, run, or administrate which resources. Sensitive datasets, restricted
+instruments, or work-in-progress projects can be locked down to specific people or
+teams, while the rest of the organization keeps the frictionless default. You can
+read more in [Security Measures](/docs/concepts/security#security-measures).
+
+### Organizations in attribution
+
+Organizations are not just an access-control concept, they are part of how Arkitekt
+records **who did what**. Every tracked action resolves an acting *user*, a
+*client* (the app acting on their behalf), and the *organization* it happened in.
+So the audit trail always knows not only which person and which app made a change,
+but which organization owns it. See [Provenance & Audit
+Logging](/docs/concepts/provenance).
+
+## Task
+
+
+A **task** is one run of an [action](/docs/concepts/terminology#what-is-an-action). Every time you, a script or a
+workflow asks Arkitekt to do something, a task is created. You assign it **to the action**, not to a
+machine. Arkitekt decides where it runs by routing it to a connected [agent](/docs/concepts/terminology#agent)
+that has an [implementation](/docs/concepts/terminology#what-is-an-implementation) of that action.
+
+A task:
+
+- belongs to the **user and organization** that started it, and runs with their permissions;
+- keeps a complete **event history** of what happened: when it was queued and started, its progress,
+  logs, yields, and how it ended;
+- can **stream**. A generator action yields results over time, and each one reaches the caller as it
+  is produced. That is what makes [real-time workflows](/docs/concepts/philosophy#everything-everywhere-all-at-once) possible;
+- can be **cancelled** at any point (see below);
+- can have **child tasks**. A [workflow](/docs/concepts/terminology#workflow) calls other actions as
+  children of its own task, so the history of a run is a tree, and every data change made along the
+  way is attributed to it ([Provenance](/docs/concepts/provenance)).
+
+### The path of a task
+
+<div className="mt-2">
+
+![The stages of a task](/docs/design/terminology/assignment.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+<small>The stages of a task</small>
+</div>
+</div>
+
+1. **Assign.** You pick "Segment Cells", fill in the inputs and run it. [Rekuest](/docs/concepts/services/rekuest)
+   checks that you may call it and that the inputs match its ports, and records the task.
+2. **Route and bind.** Rekuest chooses an implementation, and with it an agent, and queues the task
+   for that agent. From here on the task is **bound**: the platform knows exactly where it runs, so it
+   can be cancelled and so the agent's death can be noticed.
+3. **Run.** The agent reports `STARTED` before anything else, then calls the function. Progress, logs
+   and yielded values stream back while it runs.
+4. **End.** The task reaches exactly one terminal state (below), and its result or error is stored.
+
+### States
+
+| State | Meaning |
+|---|---|
+| **Queued / assigned** | Accepted and routed, waiting for its agent to pick it up. A task nobody has picked up yet is safe to deliver again. |
+| **Running** | The agent has reported `STARTED` |
+| **Paused** | Paused by a person, or holding itself with a question for a person (`task.hold`) until someone resumes or cancels it |
+| **Completed** | Finished and returned its result *(terminal)* |
+| **Failed / critical** | Ended with an error *(terminal)* |
+| **Cancelled** | Stopped on request *(terminal)* |
+| **Interrupted** | Stopped by an interrupt, a harder request than cancel *(terminal)* |
+| **Lost** | Its agent died while it ran, so **how it ended is unknown** *(terminal)* |
+
+**Lost** needs a closer look, because it is neither a success nor a failure. A task ends lost when its
+agent disappears for longer than the grace window, or at once when a new process takes over the
+agent. The work may have finished, may have half-finished, or may never have started, and the lost
+event records what is known (whether it started, its last progress, and the action's claimed
+[effects](/docs/concepts/durable-execution#effects)). The platform does not re-run it.
+Whoever called decides. Lost is also final: if the dead agent's result turns up later, it is kept in
+the history but does not change the state, because the caller may already have acted on it.
+
+A **workflow** task is different: when *its* agent dies it is not lost but **resumed** from its journal.
+See [Durable execution](/docs/concepts/durable-execution).
+
+### Cancellation
+
+Any task can be cancelled at any time by giving its id to Arkitekt. The request goes to the agent
+running it, and the task ends as cancelled once the agent confirms. Cancellation is a first-class
+part of the design, and it is one of the things that separates Arkitekt from plain message-queue
+systems. A person must always be able to stop a running experiment
+([Humans first](/docs/concepts/philosophy#a-platform-for-humans)).
+
+<Callout type="warn" title="Cancellation needs the code's cooperation">
+
+A computer cannot always stop work at an arbitrary instant. In Python, an `async` action is cancelled
+at its next `await`. A synchronous action runs in a worker thread, which cannot be killed, and
+stops only where it checks for cancellation. Hardware that must stop when its controller goes away
+needs its own watchdog. See [Disconnect policy](/docs/concepts/python#disconnect-policy).
+
+</Callout>
+
+## Workflow
+
+A **Workflow** is a graph of nodes wired together, where the output of one node becomes the input of the next.
+Each node runs an [Action](/docs/concepts/terminology#what-is-an-action), provided by some [App](/docs/concepts/terminology#what-is-an-app),
+and the edges carry your data, typed by the [Ports](/docs/concepts/terminology#port) they connect.
+Workflows let you compose individual [Tasks](/docs/concepts/terminology#task) into a larger, reusable pipeline.
+
+### Workflows are just nodes
+
+Every workflow has exactly one `Input` and one `Output` node. Whatever you connect to `Input` becomes a parameter
+of the workflow, whatever you connect to `Output` becomes its result. Because of this, a workflow is itself a node:
+you can use workflows inside workflows, and run a workflow on your data exactly like any other action.
+
+### Design is separate from execution
+
+A workflow is a blueprint. It is stored as JSON, can be exported, imported (also from this website) and shared, and it
+does not depend on the apps that happen to provide its nodes. If an app for a node is not installed, the node shows up
+in yellow in the designer and the workflow is not runnable until some app implements it. This is what makes workflows
+a reproducible and portable way to share an analysis: the same blueprint can run on completely different apps.
+
+### Data flows as a stream
+
+Workflows process data as a [stream](/docs/concepts/philosophy#everything-everywhere-all-at-once), not as a batch. Each node processes an item
+as soon as it arrives and passes the result on, without waiting for the rest. In a simple pipeline this just makes
+things fast; combined with [stream actions](/docs/concepts/terminology#action-can-establish-streams) it lets a
+workflow process data that is still being generated, for example images straight from a running acquisition.
+
+### Who runs a workflow
+
+When you run a workflow you assign it to an app that becomes its **scheduler**: the entity that calls Arkitekt and the
+connected apps according to the blueprint. Intermediate results are stored centrally, so apps can hand data to each
+other and the whole run is tracked for [provenance](/docs/concepts/provenance). Where that round trip is
+overhead, for example inside one app in real time, an app can also schedule the workflow itself and keep intermediate
+data in memory; see [Local workflows](/docs/tutorials/advanced/local-workflows).
+
+Workflows are stored and run by the [Fluss](/docs/concepts/services/fluss) service. To build your first one, follow
+[Your first workflow](/docs/tutorials/first-steps/first-workflow), and see them in action in the [Showcases](/showcase).
+
+## Port
+
+
+A port is concept tightligly related to Actions and their input and outputs.
+Each action has multiple input and output ports.
+
+Ports are defined by a mandatory `key` and a `type` and an optional `label`.
+
+```javascript
+{
+  key: 'input',
+  type: 'number',
+  label: 'Input'
+}
+```
+
+#### Port Types
+
+Each port has a type, that defines the type of data that can be passed through it.
+The following basic types are supported:
+
+- `int`
+- `float`
+- `string`
+- `boolean`
+- `structure`
+
+Additionality there are some special types:
+
+- `List` - A list of values of the same type
+- `Dict` - A key-value pair of values of the same type
+- `Union` - A value that can be one of multiple types
+
+Importantly Ports always specifie if they expect nullable values or not.
+
+<Callout type="info">
+
+
+Structure Ports are a bit special: they carry non-serializable data structures that are shrunk to a serializable form on one side and expanded back on the other, as explained in [Shrink and Expand](/docs/concepts/terminology#shrink-and-expand).
+
+
+</Callout>

@@ -97,7 +97,7 @@ export default function HomePage() {
                   size="lg"
                   className="rounded-full px-7 text-base"
                 >
-                  <Link href="/docs/use">
+                  <Link href="/docs#using-arkitekt">
                     Lets gooo!
                     <ArrowRight className="size-4" />
                   </Link>

@@ -70,7 +70,7 @@ const services: Node[] = [
 const apps: Node[] = [
   { label: 'Acquire', sub: 'Capture from the scope', tech: 'µManager', icon: Aperture, hue: 195, href: '/docs/guides/apps' },
   { label: 'Process', sub: 'Denoise & restore', tech: 'Python', icon: Workflow, hue: 92, href: '/docs/concepts/python' },
-  { label: 'Segment', sub: 'Find the objects', tech: 'Docker', icon: Box, hue: 250, href: '/docs/guides/apps/segmentor' },
+  { label: 'Segment', sub: 'Find the objects', tech: 'Docker', icon: Box, hue: 250, href: '/docs/guides/apps#segmentor' },
   { label: 'Analyze', sub: 'Measure & quantify', tech: 'Jupyter', icon: LineChart, hue: 40, href: '/docs/guides/python/scripts' },
   { label: 'Visualize', sub: 'Inspect & validate', tech: 'napari', icon: Eye, hue: 320, href: '/docs/guides/apps/mikro-napari' },
   { label: 'Protocol', sub: 'Adaptive routine', tech: 'custom', icon: FlaskConical, hue: 25, href: '/docs/tutorials/python-first-app' },

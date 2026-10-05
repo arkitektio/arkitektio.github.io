@@ -15,7 +15,7 @@ create it, who may see it and how to hand it to your actions.
 | configuration of this installation (a path, a pixel size) | `App(app_context=Setup)` | you, via `run(app, context=...)` | no |
 | work that runs as long as the app does | `@app.background` | the runtime | no |
 
-All of them reach an action the same way: by [annotation](/docs/concepts/python/core-concepts#injection-by-annotation).
+All of them reach an action the same way: by [annotation](/docs/concepts/python#injection-by-annotation).
 
 ## Startup and shutdown
 
@@ -219,6 +219,6 @@ report no progress.
 
 Background work should keep the app's own view of the world current. It should not start experiments
 on its own. Arkitekt's model is that every task is started by a person or by a workflow a person
-started. See [Humans first](/docs/concepts/philosophy/humans-first).
+started. See [Humans first](/docs/concepts/philosophy#a-platform-for-humans).
 
 </Callout>

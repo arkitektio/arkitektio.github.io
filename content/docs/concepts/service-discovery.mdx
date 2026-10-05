@@ -69,7 +69,7 @@ covered at the end, in [Coming from the Paper version](#coming-from-the-paper-ve
   same for your own apps. Because every step is plain HTTP with standard OAuth2
   semantics, any OAuth2 device-flow client can be adapted with a few lines. (In
   the Paper version this was two packages, see [One protocol instead of two
-  packages](/docs/concepts/whats-changed/connecting#one-protocol-instead-of-two-packages).)
+  packages](/docs/concepts/whats-changed#one-protocol-instead-of-two-packages).)
 - Across networks, the same coordinator role is played by the coordination server
   of the [mesh](/docs/concepts/security/mesh).
 
@@ -81,4 +81,4 @@ that still speaks it answers discovery but fails the endpoint check in
 [step 0](/docs/reference/fakts-protocol#step-0-discover-the-deployment), so clients can tell "wrong protocol version" apart from
 "server unreachable". Every step of the old sequence has a counterpart in the flow above, and the
 mapping, including how to tell a Paper deployment apart from a Next one, is laid out in
-[What's changed: Connecting apps](/docs/concepts/whats-changed/connecting).
+[What's changed: Connecting apps](/docs/concepts/whats-changed#connecting-apps).

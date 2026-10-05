@@ -18,7 +18,7 @@ It installs Konstruktor, asks for a name, and creates and starts a hub. When it 
 approve it in your browser with your account. Prefer clicking, or on Windows? Use the
 [desktop app](#graphical-installer-recommended). This page walks through the desktop app in detail;
 the terminal route is in [Install from the command line](/docs/guides/install-cli), and
-[updating](/docs/guides/update), [the mesh](/docs/guides/join-the-mesh) and
+[updating](/docs/guides/hub#update-a-hub), [the mesh](/docs/guides/hub#join-the-mesh) and
 [the advanced options](/docs/guides/other-installation-strategies) have their own pages.
 
 ## Graphical installation [#graphical-installer-recommended]
@@ -61,7 +61,7 @@ the standard install you can accept the defaults everywhere except the folder an
 | **Ports** | The HTTP and HTTPS ports the gateway publishes. Every service is routed behind them (`/rekuest`, `/mikro`, and so on). | 7080 / 7443 |
 | **Storage** | Docker volumes (recommended) or the deployment folder for the database and uploaded files. | Docker volumes |
 | **Addresses** | How far the hub is reachable (local only, this network, public) and which addresses it advertises to apps. At least one is required. | This network |
-| **Mesh** | Whether the hub joins a mesh. See [Mesh](/docs/guides/join-the-mesh). | No mesh |
+| **Mesh** | Whether the hub joins a mesh. See [Mesh](/docs/guides/hub#join-the-mesh). | No mesh |
 | **Review** | A summary of every choice and a preview of the files that will be written. | |
 
 </Step>

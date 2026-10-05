@@ -12,7 +12,7 @@ import { InstallRepoButton } from "@/components/arkitekt";
 import { UploadModelButton } from "@/components/arkitekt";
 
 Classically, images are batch-processed once the acquisition is complete, leaving no chance for real-time feedback on a running experiment; why that matters is laid out in
-[Real-time](/docs/concepts/philosophy/realtime) and practised in the [Live Analysis](/docs/tutorials/advanced/live) tutorial. In this second workflow, we illustrate how Arkitekt with its ability for streaming analysis (i.e., processing immediately after each acquisition event), enables to display real-time feedback on the running acquisition.
+[Real-time](/docs/concepts/philosophy#everything-everywhere-all-at-once) and practised in the [Live Analysis](/docs/tutorials/advanced/live) tutorial. In this second workflow, we illustrate how Arkitekt with its ability for streaming analysis (i.e., processing immediately after each acquisition event), enables to display real-time feedback on the running acquisition.
 Here we used Arkitekt to perform real-time quantitative monitoring of soSPIM 21,22 3D microscopy data using the popular StarDist 23 deep-learning segmentation algorithm, while they were being acquired (Fig. 3). A user-defined directory located on the microscope’s computer was monitored for new data, and all the analysis steps were performed remotely on each newly acquired data, in parallel with the acquisition, minimizing the risks of slowing the acquisition down or causing its crash.
 As the deep learning-based segmentation steps can be highly time-consuming, several processes were run in parallel and distributed on 3 different available hardware. Visualization of both the 3D acquisition and the results were performed in Napari 7 on a remote and mobile computer, as well as through the web-interface, where results (here the number of nuclei and the average volume) were plotted on a live-dashboard, accessible to other remote members of the lab. (see Supp. Video 5)
 
@@ -76,7 +76,7 @@ Arkitekt does not need to be installed on this computer, but we will run the Seg
 
 ### Analysis Computer
 
-1. Install Arkitekt on your analysis computer following the instructions [here](/docs/use).
+1. Install Arkitekt on your analysis computer following the instructions [here](/docs#using-arkitekt).
 
 2. Depending if you want to reproduce the results illustrated in the Paper, you can either install the Stardist Model which we used for the demo data, via the button below or train your own model by following the instructions [here](/docs/tutorials/advanced/training).
 

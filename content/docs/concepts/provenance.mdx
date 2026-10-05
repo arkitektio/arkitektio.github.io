@@ -7,11 +7,11 @@ import { GithubRepo, ProvenanceFlow } from "@/components/docs";
 
 Arkitekt keeps a sharp line between **you** and **the machine that runs the analysis**, and ensures that every change to your data 
 is honestly attributed and accounted for. Why we consider this non-negotiable is argued in
-[You and the Machine](/docs/concepts/security/measures#you-and-the-machine); this page is about how it is done.
+[You and the Machine](/docs/concepts/security#you-and-the-machine); this page is about how it is done.
 
 For this we ensure **provenance-aware audit logging**. Every create, update, and delete on a tracked
 record inside one of Arkitekt's services is captured as a history update and each update is attributed to *who* made the change,
-*which app* they used, the [organization](/docs/concepts/terminology/organization) it happened in, and, crucially, the verified **task** it happened under. This lets anyone ask
+*which app* they used, the [organization](/docs/concepts/terminology#organization) it happened in, and, crucially, the verified **task** it happened under. This lets anyone ask
 
 > *"Which automated run touched this record, on whose authority, and what exactly did it change? And by the way what else did it touch?"*
 

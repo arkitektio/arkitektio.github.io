@@ -1,8 +1,10 @@
 ---
 title: Apps
-description: A collection of Standalone Apps and Plugin Apps that hook into the Arkitekt platform and provide its actual functionality.
+description: "A collection of Standalone Apps and Plugin Apps that hook into the Arkitekt platform and provide its actual functionality."
 personas: [use]
 ---
+
+import { InstallRepoButton } from "@/components/arkitekt";
 
 #### Standalones
 
@@ -31,3 +33,31 @@ as easy as possible, so if you have any questions or need help, feel free to rea
 | **Installation**   | Designed to be easy to install and use by people not necessarily familiar with the Arkitekt platform. | Come with their own set of requirements and limitations due to being built using software containers. | Installed to extend the functionality of the Arkitekt platform.         |
 | **Primary Purpose**| Serve as user-friendly entrypoints to the Arkitekt platform.                                     | Interact with the Arkitekt Server, though they can be run in other environments like NextFlow pipelines. | Provide new ways of storing data and connecting to other systems.       |
 | **Integration**    | Designed to be installed on any resource that can connect to the Arkitekt platform. Provide their own GUI              | Provide a more seamless integration with the Arkitekt Platform, using it for a graphical user interface. | -                                                                        |
+
+## Kare
+
+
+Kare is just CARE (content-aware restoration of fluorescence microscopy images) with a K and enabled as an Arkitekt Plugin.
+When installing Kare, you can rely on two major features:
+
+- **Training**: Train a CARE model using your own data.
+
+- **Prediction**: Use a trained CARE model to restore images.
+
+### Installation
+
+To install Kare, you can use the Arkitekt Plugin Service "Port" to install it.
+
+<InstallRepoButton repo="kare" user="arkitektio-apps" branch="master" />
+
+### Usage
+
+If you want to use Kare in your project, you can check out one of the following tutorials or showcases:
+
+- [Training a CARE model](/docs/tutorials/advanced/training)
+- [Interactive Analysis with Napari](/showcase/interactive-workflow)
+
+## Segmentor
+
+
+Segmentor is Stardist enabled as an Arkitekt Plugin.
