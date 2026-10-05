@@ -8,10 +8,11 @@ import {
   ViewOptionsPopover,
 } from 'fumadocs-ui/layouts/docs/page';
 import { notFound } from 'next/navigation';
-import { getMDXComponents } from '@/components/site';
+import { getMDXComponents, PersonaFooter, StewardCard } from '@/components/site';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
+import { pageTypes, personaInfo } from '@/lib/persona';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -21,9 +22,45 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
 
+  // what kind of page this is (its top folder) and who it is written for
+  const badges = [
+    pageTypes[page.slugs[0]],
+    ...page.data.personas.map((persona) => personaInfo[persona].badge),
+  ].filter(Boolean);
+
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
-      <DocsTitle>{page.data.title}</DocsTitle>
+    <DocsPage
+      // the docs home shows a different part per persona, so a list of all its
+      // headings would point at hidden ones
+      toc={page.slugs.length === 0 ? [] : page.data.toc}
+      full={page.data.full}
+      slots={{ footer: PersonaFooter }}
+    >
+      {badges.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {badges.map((badge, index) => (
+            <span
+              key={badge}
+              className={
+                index === 0
+                  ? 'rounded-full bg-fd-primary/10 px-2.5 py-0.5 text-xs font-medium text-fd-primary'
+                  : 'rounded-full border px-2.5 py-0.5 text-xs font-medium text-fd-muted-foreground'
+              }
+            >
+              {badge}
+            </span>
+          ))}
+        </div>
+      )}
+      {page.slugs[0] === 'tutorials' ? (
+        // a tutorial names its steward to the right of the title
+        <div className="flex items-center justify-between gap-6 max-sm:flex-col max-sm:items-start max-sm:gap-3">
+          <DocsTitle>{page.data.title}</DocsTitle>
+          <StewardCard id={page.data.steward} />
+        </div>
+      ) : (
+        <DocsTitle>{page.data.title}</DocsTitle>
+      )}
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
       <div className="flex flex-row gap-2 items-center border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />

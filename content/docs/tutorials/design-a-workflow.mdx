@@ -1,0 +1,171 @@
+---
+title: Design your first workflow
+description: Learn what Arkitekt workflows are and how to design your first workflow with a workflow scheduler using the drag-and-drop designer.
+personas: [use]
+---
+
+import { InstallRepoButton } from "@/components/arkitekt";
+import { DisplayWorkflow } from "@/components/arkitekt";
+
+We now have a basic understanding of how to call an conversion node on your data, we can visualize the results, now lets put it all together and create our first workflow,
+spanning the most basic nodes.
+
+Here we will use our uploaded image, max project it, threshold it (yeah analysis), and then measure the fraction of the image that is above the threshold (
+yeah quantification).
+
+<Prerequisites>
+
+The hub holds a converted image ([Run your first task](/docs/tutorials/run-a-task)), and you know how to install a plugin ([Install your first tool](/docs/tutorials/install-a-tool)).
+
+</Prerequisites>
+
+<Learn>
+
+- Understand what a workflow is
+- Install the `stdlib` and `reaktor` plugins the workflow needs
+- Build a workflow in the drag and drop Workflow Designer
+- Set node parameters and save the workflow
+
+</Learn>
+
+## Before we start
+
+You are familiar with this by now.. There are a few things we need to do before we can start.
+First what do we mean with `Workflow`?
+
+A workflow is a processing pipeline: a graph of `Nodes`, just like the `Show on Napari` or `Convert File` nodes you have
+used, wired together so that data streams from one to the next. The concept is explained in
+[Workflow](/docs/concepts/terminology#workflow); here we build one. You can stitch nodes together in the GUI or import a
+workflow from a file or even from this website. We will do the first, to get more familiar with the UI.
+
+Lets look first at the workflow we would like to create, and then we will go through the steps to create it.
+
+<DisplayWorkflow blockImport />
+<div className="text-gray-400 mb-2">
+  <small>
+    {" "}
+    This is the workflow we would like to create. For now we disabled the import
+    feature.. You should really try to create it on your own{" "}
+  </small>
+</div>
+
+This is probably the most basic workflow you can create, but it will teach you a lot about the Arkitekt `Workflow` and its design. A few things to note here.
+
+- This is an Arkitekt `Workflow` that we just exported from Arkitekt and then embeded in this website.
+
+  Arkitekt workflows are just visual representations of a processing workflow. They are stored in a JSON file, and can be imported and exported from Arkitekt.
+  You can also import them from this website, but we will get to that later.
+
+- About the `Nodes`.
+
+  Every `Node` has inputs and outputs that you connect to other nodes; the connections define the **flow of data**. The special
+  `Input` and `Output` nodes are the entry and exit points of the workflow, which is why a workflow is itself just a node
+  (see [Workflows are just nodes](/docs/concepts/terminology#workflows-are-just-nodes)).
+
+- About their colors:
+
+  If you have connected the website and followed the tutorial until now, the nodes are yellow: we have not yet installed apps
+  that provide their functionality. Workflow design is separate from execution, so you can design and share a workflow
+  regardless of which apps end up running it.
+
+- About the data as a stream:
+
+  Nodes process each item as it arrives and pass it on, rather than waiting for a batch (see
+  [Data flows as a stream](/docs/concepts/terminology#data-flows-as-a-stream)). The edges are labeled
+  `@mikro/representation` and `@mikro/metric`: the data types passed between nodes, where `@` marks a
+  [mikro](/docs/concepts/services/mikro) type. The first two nodes turn an image into an image, the last one returns a
+  `metric` (a scalar attached to an image, here the fraction), which is also the output of our workflow.
+
+## Enough talking
+
+Lets start by creating this workflow. First we need to install the apps that provide the functionality for the nodes in this workflow.
+We will need two new plugins for this workflow, so lets install them. One plugin will provide all of our functionality need to run this workflow in.
+The other plugin will be used to actually run the workflow in the background. So lets install them.
+
+## New plugins
+
+First we need to install the apps that provide the functionality for the nodes in this workflow.
+We will need two new plugins for this workflow, so lets install them. One plugin will provide all of our functionality need to run this workflow in.
+
+Make sure to install the `stdlib` and `reaktor` apps. You can do that by clicking on the `Install` button below, or 
+the classic way by adding these Repositories to your plugin store.
+
+<div className="flex flex-row gap-2">
+  <InstallRepoButton repo={"stdlib"} user={"arkitektio-apps"} branch={"main"} />
+  <InstallRepoButton repo={"reaktor"} user={"arkitektio-apps"} branch={"master"} />
+</div>
+
+Now follow [previously outlined](/docs/tutorials/install-a-tool#installing-our-first-app) steps to `Appify` the latest `stdlib` and `reaktor` version, and deploy them to your server.
+You should now be able to search for `Otsu Threshold` in the dashboard search bar, and find the node we just installed.
+
+## Creating the workflow
+
+Now that we have the `Nodes` we need lets create the workflow. For this we can finally go to the `Workflow` tab in the sidebar.
+Here we can see a list of all our workflows, and we can create a new one by clicking on the "Create Workflow" button.
+
+You will be presented by the Arkitekt Workflow Designer, which is a drag and drop interface to create workflows.
+You can drag `Nodes` from the nodes sidebar into the workflow, and connect them by dragging the output of one `Node` to the input of another.
+
+Lets see the design in progress.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/introduction/first_steps/create_workflow.webm" />
+</video>
+
+1. Open the `Workflows` tab in the sidebar
+
+   The Worksflows tab is where you can create and manage your workflows, that you can create and run on your data.
+
+2. Click on `Create Workspace` on the bottom right.
+
+   Give it a Name like "Analysis Run" and click on "Create".
+   A workspace is a place to create and manage versions of your workflow. Workflows are automatically versioned, that means
+   if you change a workflow, you will create a new version of it. This is important for reproducibility and traceability of your analysis.
+
+3. You are now presented with the Arkitekt Workflow Designer.
+
+   The Arkitekt Workflow Designer is a drag and drop interface to create workflows. You can drag nodes from the nodes sidebar into the workflow,
+   and connect them by dragging the output of one node to the input of another. Just search for your nodes in the search bar, and drag them into the workflow.
+   Make sure to connect the `Input` and `Output` nodes to your workflow, as they are required for each workflow.
+
+4. Set necessary parameters on the sidebar.
+
+   Some nodes require you to specify parameters. You can do that by clicking on the node, and then setting the parameters in the sidebar. For example the `Otsu Threshold` node requires you to specify
+   if you want to use a gaussian blur before thresholding.This is not necessary for our workflow, so we can leave it at the default value. However you can change the value that should be measure
+   by the `Measure Fraction` node. You can do that by clicking on the node, and then setting the parameters in the sidebar. We are interested in the `Fraction` of the image that is below the threshold,
+   so we can change it at to the 0 value. Also we can rename the Metric key to "Background Fraction", to be more descriptive.
+
+5. Save the workflow
+
+   You can save the workflow by clicking on the "Save" button on the bottom right. This will save the workflow to your server.
+
+<Callout type="info" title="Ready to Run">
+
+Once saved, your workflow is immediately available to be run on your data. You don't need to deploy it manually anymore.
+
+</Callout>
+
+## Running the workflow
+
+Running the workflow on our data should seem quite straightforward. Lets see that in the next tutorial...
+
+<Quiz>
+  <Question q="What is a workflow in Arkitekt?">
+    It is a processing pipeline, a graph of nodes wired together so that data streams from one node to the next.
+  </Question>
+  <Question q="Why can you design and share a workflow before the apps that provide its nodes are installed?">
+    Because workflow design is separate from execution. The design does not depend on which apps end up running it.
+  </Question>
+  <Question q="What happens when you change a workflow, and why does that matter?">
+    A new version of the workflow is created. This matters for the reproducibility and traceability of your analysis.
+  </Question>
+</Quiz>
+
+**Next:** [Run your first workflow](/docs/tutorials/run-a-workflow)

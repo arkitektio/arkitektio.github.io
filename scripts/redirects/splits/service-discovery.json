@@ -1,0 +1,13 @@
+{
+  "source": "design/architecture/service-discovery.mdx",
+  "primary": "concepts/service-discovery.mdx",
+  "anchors": {
+    "step-0-discover-the-deployment": "reference/fakts-protocol.mdx#step-0-discover-the-deployment",
+    "step-1-register-and-request-device-authorization": "reference/fakts-protocol.mdx#step-1-register-and-request-device-authorization",
+    "step-2-the-user-approves-the-app": "reference/fakts-protocol.mdx#step-2-the-user-approves-the-app",
+    "step-3-poll-the-token-endpoint": "reference/fakts-protocol.mdx#step-3-poll-the-token-endpoint",
+    "step-4-refresh-and-pick-up-configuration-changes": "reference/fakts-protocol.mdx#step-4-refresh-and-pick-up-configuration-changes",
+    "the-envelope": "reference/fakts-protocol.mdx#the-envelope",
+    "aliases-one-service-many-addresses": "reference/fakts-protocol.mdx#aliases-one-service-many-addresses"
+  }
+}

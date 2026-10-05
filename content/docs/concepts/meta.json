@@ -1,0 +1,28 @@
+{
+  "title": "Concepts",
+  "pages": [
+    "index",
+    "philosophy",
+    "terminology",
+    "provenance",
+    "performance",
+    "comparisons",
+    "whats-changed",
+    "ai",
+    "basics",
+    "mobile-companion",
+    "topology",
+    "planning",
+    "security",
+    "versioning",
+    "why-build",
+    "python",
+    "service-discovery",
+    "durable-execution",
+    "graphql",
+    "backend-libraries",
+    "services",
+    "nextflow-integration",
+    "uc2"
+  ]
+}

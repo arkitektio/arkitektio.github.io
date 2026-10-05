@@ -1,0 +1,19 @@
+{
+  "title": "Tutorials",
+  "pages": [
+    "absolute-basics",
+    "connect-orkestrator",
+    "upload-data",
+    "install-a-tool",
+    "run-a-task",
+    "napari-and-fiji",
+    "why-so-many-steps",
+    "design-a-workflow",
+    "run-a-workflow",
+    "advanced",
+    "first-hub",
+    "python-first-app",
+    "rust-first-app",
+    "embedded-first-device"
+  ]
+}

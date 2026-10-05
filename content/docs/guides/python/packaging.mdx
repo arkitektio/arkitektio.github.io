@@ -1,0 +1,123 @@
+---
+title: Packaging
+description: "Package an app as a plugin: flavours, Dockerfiles, hardware selectors, multi-architecture builds, and the arkitekt plugin build, stage and publish commands."
+personas: [build]
+---
+
+
+This page turns an app into a **plugin**: a container image that any Arkitekt server can install
+and run through [Kabinet](/docs/concepts/services/kabinet), without you starting it by hand.
+
+## Prerequisites
+
+- An app that works with `arkitekt run prod` against your server
+  ([Your first app](/docs/tutorials/python-first-app)).
+- Docker, with the `buildx` plugin.
+- An account on a container registry you can push to (Docker Hub by default).
+
+## Flavours
+
+A plugin is published as one or more **flavours**. A flavour is a build recipe: a `Dockerfile` plus
+a `config.yaml` that says what hardware the image needs. One app can ship a `vanilla` CPU flavour
+and a `gpu` flavour side by side, and the server installing it picks the flavour that fits its
+hardware.
+
+```bash
+arkitekt plugin init --flavour vanilla
+```
+
+This creates:
+
+```text
+.arkitekt
+└── flavours
+    └── vanilla
+        ├── Dockerfile
+        └── config.yaml
+```
+
+Add more flavours with `arkitekt plugin flavour add --flavour gpu --description "CUDA build"`.
+
+### The Dockerfile
+
+Arkitekt makes only two demands of the Dockerfile. It must contain your code with the app's
+entrypoint (e.g. `app.py`) and the `.arkitekt` folder in the working directory, and it must have
+`arkitekt` installed. The generated file is a good starting point. Edit it to add system libraries,
+CUDA, model weights and so on. Paths in the Dockerfile are relative to the project root, not to the
+flavour folder.
+
+What `config.yaml` may contain, and the selector kinds, are listed in [Plugin configuration](/docs/reference/plugin-config).
+
+## Build, stage, publish
+
+```bash
+arkitekt plugin validate   # check every flavour's Dockerfile and config.yaml
+arkitekt plugin build      # build all flavours (or --flavour gpu)
+arkitekt plugin stage      # run the local image against your server, as a deployment would
+arkitekt plugin publish    # push the image(s) and record the release
+```
+
+- **`build`** builds each flavour's image. It then runs `arkitekt inspect` *inside* the image, so what
+  gets published is exactly what that image would register (skip with `--no-inspect`). With several
+  platforms, this machine's image is loaded locally and the others go to the build cache. A
+  dependency without a wheel for the other architecture therefore fails here, not after publishing.
+- **`stage`** runs the built image and connects it to your server, so you can test the container
+  before anybody else sees it.
+- **`publish`** pushes the images (as one multi-architecture manifest) and writes the release into
+  the `.arkitekt` folder. Commit and push that folder. A Kabinet pointed at your repository discovers
+  the release from it.
+
+<Callout type="info" title="Multi-architecture builds">
+
+Cross-building needs a `docker-container` buildx builder, which the CLI creates on first use as
+`arkitekt`, and emulation for the foreign architecture:
+`docker run --privileged --rm tonistiigi/binfmt --install all`. `publish` rebuilds from the current
+sources using the cache, so publish from the same tree you built.
+
+</Callout>
+
+### Add an "Open in Arkitekt" badge
+
+Put a badge at the top of the repository's README, so that anyone reading it can
+hand the repository to their own Arkitekt in one click:
+
+```markdown
+[![Open in Arkitekt](https://arkitekt.live/img/badge/open-in-arkitekt.svg)](https://arkitekt.live/deeplink?orkestrator=%2Fkabinet%2Frepos%2Finstall%3Frepo%3DYOUR-USER%252FYOUR-REPO)
+```
+
+Replace `YOUR-USER` and `YOUR-REPO`; the `%252F` between them is an encoded
+slash and has to stay encoded. The badge image is the same for every
+repository — what it opens is carried by the link, not by the picture.
+
+Clicking it opens the reader's own Orkestrator on the install prompt for your
+repository, where they can add it to their Kabinet. Readers without Orkestrator
+land on arkitekt.live instead, which tells them how to get it.
+
+<Callout type="info" title="Let Orkestrator write it for you">
+
+Orkestrator can produce the snippet: open the repository under **Kabinet →
+Repos** and use **Copy README badge**.
+
+</Callout>
+
+<Callout type="warn" title="On Versioning">
+
+One version of an app has exactly one release. To publish changes, bump the version in `App(...)`
+in your entrypoint, then build and publish again. [Why we version](/docs/concepts/versioning)
+explains why a version, once published, must not change.
+
+</Callout>
+
+<Callout type="info" title="On Registries">
+
+Images are pushed to Docker Hub by default. The release metadata lives in your repository's
+`.arkitekt` folder, so any server that can read the repository and pull the image can install the
+plugin. There is no central plugin index yet.
+
+</Callout>
+
+## Next
+
+The app is now installable. Readers of your repository can add it to their Kabinet in one click with
+the badge above. See [Kabinet](/docs/concepts/services/kabinet) for how servers pull and run plugin
+images.

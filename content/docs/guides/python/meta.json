@@ -1,0 +1,21 @@
+{
+  "title": "Python",
+  "pages": [
+    "installation",
+    "---Building apps---",
+    "types",
+    "state-lifecycle",
+    "---Orchestration---",
+    "workflows",
+    "durable-execution",
+    "---Calling & tooling---",
+    "scripts",
+    "packaging",
+    "bloks",
+    "graphql",
+    "agent-skill",
+    "---Paper-era---",
+    "testing",
+    "training-example"
+  ]
+}

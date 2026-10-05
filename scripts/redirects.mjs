@@ -1,133 +1,85 @@
-// Generates static redirect stubs for URLs of the old Docusaurus site
-// (arkitekt.live before the Fumadocs rewrite). The site is a static export on
-// GitHub Pages, which has no server-side redirects, so every legacy path gets a
-// `public/<path>.html` file that forwards the browser to the new location.
+// Generates static redirect stubs for URLs that used to exist: the old
+// Docusaurus site, earlier Fumadocs layouts and pages moved by the persona
+// restructure. The site is a static export on GitHub Pages, which has no
+// server-side redirects, so every old path gets an `<path>.html` file in `out/`
+// that forwards the browser to the new location.
 //
-// Usage: `pnpm redirects` (re-run after editing the table, commit the output).
-import { mkdirSync, writeFileSync, existsSync, rmSync } from 'node:fs';
+// Runs after `next build` (see the `build` script). The tables live in
+// `scripts/redirects/`: add an entry to `legacy.json` (old URL -> new URL) when a
+// page moves. Fails when a stub would shadow a page or point at a missing one.
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { loadRedirects, outDir, splitUrl } from './lib/doc-links.mjs';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const publicDir = join(root, 'public');
-const manifest = join(root, 'scripts', 'redirects.manifest.json');
+const base = process.env.PAGES_BASE_PATH || '';
+const { legacy, moved, follow } = loadRedirects();
 
-// old path (without .html) -> new path. Keep this sorted by area.
-const hyphenate = (p) => p.replaceAll('_', '-');
+if (!existsSync(outDir)) {
+  console.error('redirects: out/ not found, run `next build` first');
+  process.exit(1);
+}
 
-const firstSteps = [
-  '', 'brief_interlude', 'done', 'first_app', 'first_run', 'first_task',
-  'first_tool', 'first_workflow', 'interface', 'upload',
-];
+const htmlFile = (path) => join(outDir, path === '/' ? 'index.html' : `${path}.html`);
+const errors = [];
 
-export const redirects = {
-  // top level pages
-  '/privacy': '/docs/privacy',
-  '/markdown-page': '/',
+/** The target must be a built page, and its anchor a heading on that page. */
+function checkTarget(from, to) {
+  const { path, hash } = splitUrl(to);
+  const file = htmlFile(path);
+  if (!existsSync(file)) return errors.push(`${from} -> ${to}: target page does not exist`);
+  if (!hash) return;
+  const html = readFileSync(file, 'utf8');
+  if (!html.includes(`id="${hash}"`) && !html.includes(`\\"id\\":\\"${hash}\\"`)) {
+    errors.push(`${from} -> ${to}: target has no #${hash}`);
+  }
+}
 
-  // docs root
-  '/docs/intro': '/docs',
-  '/docs/category/introduction': '/docs',
-  '/docs/category/troubleshooting': '/docs/troubleshooting',
-
-  // introduction (underscore -> hyphen)
-  ...Object.fromEntries(
-    firstSteps.map((s) => {
-      const p = `/docs/introduction/first_steps${s ? `/${s}` : ''}`;
-      return [p, hyphenate(p)];
-    }),
-  ),
-  '/docs/introduction/advanced/deep_learning': '/docs/introduction/advanced/deep-learning',
-  '/docs/introduction/advanced/local_workflows': '/docs/introduction/advanced/local-workflows',
-
-  // showcases (the paper links!)
-  '/docs/showcases/paper/interactive_workflow': '/docs/showcases/paper/interactive-workflow',
-  '/docs/showcases/paper/smart_microscopy_workflow': '/docs/showcases/paper/smart-microscopy-workflow',
-  '/docs/showcases/paper/streaming_workflow': '/docs/showcases/paper/streaming-workflow',
-  '/docs/showcases/advanced/fiji_workflow': '/docs/showcases/advanced/fiji-workflow',
-  '/docs/showcases/advanced/omero_sink': '/docs/showcases/advanced/omero-sink',
-
-  // design
-  '/docs/design/various/lazy_loading': '/docs/design/various/lazy-loading',
-  '/docs/design/deployment/on_premise': '/docs/introduction/installation/starting-new#other-installation-strategies',
-  '/docs/design/deployment/on_premise/cli': '/docs/introduction/installation/starting-new#cli',
-  '/docs/design/deployment/on_premise/testing': '/docs/design/deployment/testing',
-  '/docs/design/deployment/on_premise/Konstruktor': '/docs/apps/standalones/konstruktor',
-  '/docs/design/api': '/docs/design/various/graphql',
-  '/docs/design/middleman': '/docs/design/philosophy/middleman',
-  '/docs/design/version': '/docs/design/philosophy/version',
-  '/docs/design/real-time': '/docs/design/philosophy/realtime',
-  '/docs/design/why': '/docs/design',
-  '/docs/design/scheduling': '/docs/design',
-  '/docs/design/configuration': '/docs/design',
-  '/docs/design/vs': '/docs/design/comparisons',
-  '/docs/design/why-not': '/docs/design/comparisons',
-  '/docs/design/vs/nextflow': '/docs/design/comparisons/nextflow',
-  '/docs/design/why-not/kafka': '/docs/design/comparisons/kafka',
-  '/docs/design/why-not/rest': '/docs/design/comparisons/rest',
-  '/docs/design/services/next': '/docs/design/services',
-  '/docs/design/services/next/kabinet': '/docs/design/services/kabinet',
-  '/docs/design/services/next/kluster': '/docs/design/services/kluster',
-  '/docs/design/services/next/omeroark': '/docs/design/services/omeroark',
-  '/docs/design/terminology/node': '/docs/design/terminology/action',
-  '/docs/design/terminology/template': '/docs/design/terminology/implementation',
-  '/docs/design/terminology/assignation': '/docs/design/terminology/task',
-  '/docs/design/terminology/provision': '/docs/design/terminology',
-  '/docs/design/terminology/reservation': '/docs/design/terminology',
-
-  // developers
-  '/docs/developers/contribute/next': '/docs/developers/contribute',
-  '/docs/developers/python/classical': '/docs/developers/python/scripts',
-  '/docs/developers/python/classical/Usage': '/docs/developers/python/scripts',
-  '/docs/developers/python/classical/read-write': '/docs/developers/python/types',
-  '/docs/developers/python/plugin/getting-started': '/docs/developers/python/first-app',
-  '/docs/developers/python/plugin/build': '/docs/developers/python/build',
-  '/docs/developers/python/plugin/more': '/docs/developers/python/state-lifecycle',
-
-  // roadmap
-  '/docs/roadmap/thoughts/app': '/docs/roadmap/thoughts',
-  // merged pages (duplicate explanations folded into one canonical page)
-  '/docs/developers/javascript/usage': '/docs/developers',
-  // the JavaScript client docs were removed until the client is published again
-  '/docs/developers/javascript': '/docs/developers',
-  '/docs/developers/javascript/installation': '/docs/developers',
-  '/docs/developers/python/classic-usage': '/docs/developers/python/scripts',
-  '/docs/developers/python/plugin-usage': '/docs/developers/python/first-app',
-  '/docs/design/comparisons/why-not': '/docs/design/comparisons',
-  '/docs/design/philosophy/api': '/docs/design/various/graphql',
-  '/docs/apps/standalones/mikroj': '/docs/apps/standalones/imagej-plugin',
-  '/docs/design/philosophy/against-the-machine': '/docs/design/ai',
-  '/docs/design/deployment/gui': '/docs/introduction/installation/starting-new#graphical-installer-recommended',
-  '/docs/design/deployment/on-premise': '/docs/introduction/installation/starting-new#other-installation-strategies',
-  '/docs/design/deployment/cli': '/docs/introduction/installation/starting-new#cli',
-  // Python section rewrite for the arkitekt package (arkitekt-next pages folded in)
-  '/docs/developers/python/classic': '/docs/developers/python/scripts',
-  '/docs/developers/python/plugin': '/docs/developers/python/first-app',
-  '/docs/developers/python/read-write': '/docs/developers/python/types',
-  '/docs/developers/python/more': '/docs/developers/python/state-lifecycle',
-};
-
-const stub = (to) => `<!doctype html>
+// The script picks the target for the incoming hash (pages that were split send
+// each heading to its new page), keeps the query string and emits a single `#`.
+const stub = ({ to, anchors }) => {
+  const data = JSON.stringify({ to: base + to, anchors }).replaceAll('<', '\\u003c');
+  return `<!doctype html>
 <meta charset="utf-8">
 <title>Redirecting…</title>
-<link rel="canonical" href="${to}">
-<meta http-equiv="refresh" content="0; url=${to}">
-<script>location.replace(${JSON.stringify(to)} + location.hash)</script>
-<a href="${to}">Redirecting…</a>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="${base + to}">
+<script id="arkitekt-redirect" type="application/json">${data}</script>
+<script>(function(){var d=JSON.parse(document.getElementById('arkitekt-redirect').textContent),
+h=decodeURIComponent(location.hash.slice(1)),o=h&&d.anchors&&d.anchors[h],t=o||d.to;
+var i=t.indexOf('#'),p=i<0?t:t.slice(0,i),g=i<0?(h&&!o?'#'+h:''):t.slice(i);
+location.replace(p+location.search+g)})()</script>
+<noscript><meta http-equiv="refresh" content="0; url=${base + to}"></noscript>
+<a href="${base + to}">Redirecting…</a>
 `;
+};
 
-// Remove stubs from a previous run so renamed entries don't linger.
-if (existsSync(manifest)) {
-  const { default: previous } = await import(manifest, { with: { type: 'json' } });
-  for (const p of previous) rmSync(join(publicDir, `${p}.html`), { force: true });
+const stubs = [];
+for (const from of new Set([...Object.keys(legacy), ...Object.keys(moved)])) {
+  const { to, anchors = {} } = follow(from);
+  if (splitUrl(to).path === from) continue;
+  // a stub from an earlier run of this script may be replaced, a page may not
+  const existing = existsSync(htmlFile(from)) && readFileSync(htmlFile(from), 'utf8');
+  if (existing && !existing.includes('id="arkitekt-redirect"')) {
+    errors.push(`${from}: a page exists at this URL, the redirect would shadow it`);
+    continue;
+  }
+  checkTarget(from, to);
+  for (const target of Object.values(anchors)) checkTarget(`${from}#…`, target);
+  stubs.push({
+    from,
+    to,
+    anchors: Object.fromEntries(Object.entries(anchors).map(([a, t]) => [a, base + t])),
+  });
 }
 
-const written = [];
-for (const [from, to] of Object.entries(redirects)) {
-  const file = join(publicDir, `${from}.html`);
+if (errors.length > 0) {
+  console.error(`redirects: ${errors.length} problem(s)\n  ${errors.join('\n  ')}`);
+  process.exit(1);
+}
+
+for (const entry of stubs) {
+  const file = htmlFile(entry.from);
   mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, stub(to));
-  written.push(from);
+  writeFileSync(file, stub(entry));
 }
-writeFileSync(manifest, `${JSON.stringify(written.sort(), null, 2)}\n`);
-console.log(`wrote ${written.length} redirect stubs into public/`);
+console.log(`redirects: wrote ${stubs.length} stubs into out/`);

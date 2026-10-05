@@ -1,0 +1,21 @@
+{
+  "source": "introduction/installation/starting-new.mdx",
+  "primary": "tutorials/first-hub.mdx",
+  "anchors": {
+    "konstruktor": "reference/konstruktor.mdx#konstruktor",
+    "system-requirements": "reference/requirements.mdx",
+    "cli": "guides/install-cli.mdx",
+    "install-the-cli": "guides/install-cli.mdx#install-the-cli",
+    "create-a-hub-1": "guides/install-cli.mdx#create-a-hub",
+    "run-it": "guides/install-cli.mdx#run-it",
+    "plugin-engine": "guides/hub.mdx#add-a-plugin-engine",
+    "updating": "guides/hub.mdx#update-a-hub",
+    "mesh": "guides/hub.mdx#join-the-mesh",
+    "advertising": "guides/hub.mdx#advertising",
+    "other-installation-strategies": "guides/other-installation-strategies.mdx",
+    "custom-compose": "guides/other-installation-strategies.mdx#custom-compose",
+    "docker-compose": "guides/other-installation-strategies.mdx#docker-compose",
+    "helm-charts": "guides/other-installation-strategies.mdx#helm-charts",
+    "custom-installation": "guides/other-installation-strategies.mdx#custom-installation"
+  }
+}

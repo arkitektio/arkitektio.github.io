@@ -1,0 +1,233 @@
+---
+title: Train a Deep Learning Model
+description: How to train and use your own deep learning model in Arkitekt with CARE, using Contexts to relate datasets for image restoration.
+personas: [use]
+---
+
+import { DisplayWorkflow } from "@/components/arkitekt";
+import { InstallRepoButton } from "@/components/arkitekt";
+
+Deep Learning powered methods in Bioimage analysis have changed the way we analysis images, however they are still not widely used in the community.
+This is arguabley due to the lack of easy to use tools and the inability to adapt a published model to a new paradigm, such as a new microscope or a new cell type.
+
+With Arkitekt we aimed to make it easy to both use already trained deep learning models in your analysis pipeline, and to make it easy to adapt a model to your specific needs.
+In this tutorial we will show you how to train your own deep learning model using CARE, a popular method for image restoration, and how to use it in your analysis pipeline.
+We advise you to first read the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7) to understand the methodology of care, as well as following both the
+first steps of the [Arkitekt tutorial](/docs/tutorials/connect-orkestrator) and the [Deep Learning Bridge tutorial](/docs/tutorials/advanced/deep-learning).
+
+<Prerequisites>
+
+- Read the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7)
+- Followed the first steps of the [Arkitekt tutorial](/docs/tutorials/connect-orkestrator)
+- Followed the [Deep Learning Bridge tutorial](/docs/tutorials/advanced/deep-learning)
+
+</Prerequisites>
+
+<Learn>
+
+- Understand how Arkitekt thinks about deep learning training
+- Know what a training `Context` is and how to use it
+- Relate two images in a `Context` to form a training dataset
+- Train a CARE model and use it to make predictions
+
+</Learn>
+
+## What we are trying to achieve
+
+In this tutorial we would like to train a deep learning model that can be used to restore images that have been acquired with a confocal microscope. We are using the training
+dataset from the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7), which is a dataset of confocal images of the Tribolium Castaneum embryo, that vary in
+their signal-to-roise ratio. We here will aim to train a model that will help us in a second step to restore images that have been acquired with the same microscope.
+
+<Callout type="warn">
+
+For the purpose of this tutorial we will only train a model on a subset of the data, and we will use the `same` data for training and validation. This is _NOT AT ALL_ how you should train a model,
+and we are doing this only for the purpose of this tutorial. Training, Testing, and Validation should always be done on different datasets. This is just a demo.
+
+</Callout>
+
+## Training with Arkitekt
+
+With Arkitekt we wanted to make it easy to train deep learning models, but also to give developers the flexibility to adapt their full training process to their needs. This is why
+we have a very simple conceptional understanding of training, which is that training a deep learning model is simply an `Action` that returns a `Model` that in a second step can be used to
+make predictions (in a `Prediction Action`). This means that training a model is as simple as running an `Action` that returns a `Model`. The developer can then decide how to train the model, and to save it in
+a way that makes sense for their use case. Importantly with Arkitekt we didn't want to limit the developer to speicifc models like image-to-image, or classifications, but to give them the flexibility to
+interact with every datatype and model type. But with great power comes great responsibility, this is why we have developed `Contexts`
+
+### Training Context
+
+When training a deep learning model, we need data to train on, which often comes in the form of a dataset, that relates two specific datatypes. For example, in the case of CARE we need a dataset that relates
+`Image` and `Image`. This is where `Contexts` come in.
+
+`Context` in Arkitekt are a way to define **arbitrary** relationships between different Data Types inside the platform. This means that in a `Context` you **can** relate a `ROI` with an `Image`, an `Image` with a `Table`
+or a `Table` with a `Metric`, it all depends on the use case and what type of relationship you want to define. In the case of CARE we want to define a relationship between two `Image` datatypes, which is what we will
+do in this tutorial. We just want to note that `Contexts` are not limited to this use case, and can be used in many different ways. Importantly you can have also have multiple `Contexts` that relate the same images in different
+ways (for example a `Context` that relates `Image A ` and `Image B` and a `Context` that relates `Image A` and `Image C` or `Image B` and `Table A`).
+
+<Callout type="info">
+
+One more thing: Relationships inside a `Context` can be named, so that you can for example have a `Context` that relates `Image A` as `is High SNR` of `Image B` and a `Context` that relates `Image A` as `is Low SNR` of `Image B`.
+Developers can then use these names to define their training process.
+
+</Callout>
+
+### Lets get to this
+
+Lets see how we can train a CARE model using Arkitekt. Of course we will need `CARE` for that, but lets wait for a moment and first see how we can define a `Context` that relates two `Image` datatypes.
+Indeed this relationship has nothing to do with CARE, and we can use it for many different things. But lets start with the `Data` that we will use for training. We will use the same data as in the CARE pape,
+which you can download [here](/demos/nGFP_high_snr.tif) and [here](/demos/nGFP_low_snr.tif). We will use the `same` data for training and validation, but as we said before, this is just for the purpose of this tutorial.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/introduction/advanced/upload_train_data.webm" />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Uploading an converting the data</small>
+</div>
+
+This steps should seem [familiar](/docs/tutorials/connect-orkestrator), just a few notes:
+
+- We are batch uploading the data by selecting both files and `multi-dropping` them on the webinterface
+- Then we are batch converting the data through the `Convert Omero` action, which will convert the data to the `Image` datatype.
+- We now have two `Image` datatypes in our project, which we can see in the `Data` tab.
+
+### Creating a Context
+
+Now that we have our data, we can create a `Context` that relates the two `Image` datatypes. To do this we could either use the `Create Context` button, or have an `Action` that returns a `Context` datatype, and
+creates this `Context` for us. However we can of course do this also directly on the `Data` tab, using the similar pattern of drag-and-drop.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/introduction/advanced/create_context.webm" />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Creating a Context and a Relationship</small>
+</div>
+
+A few notes:
+
+- You can always relate items in the `Data` tab by dragging one item on top of the other. This will open a dialog that will ask you to relate the two items by specifying a `Context` and a `Relationship`.
+- You will see a _left_ to _right_ relationship displayed, and you can give an arbitrary name to the relationship. In this case we are using `gt` for `ground truth` as our high SNR image is our ground truth
+  for the low SNR image. Just read it out loud in your head: `Image A` is `ground truth` of `Image B` inside the context of `Tribolium Denoising`.
+- If the relationship or the Context did not exists before it will be created for you, otherwise you will find existing context in the dropdown.
+- Once submited your images are now related. You can see this by cliking on the newly created `Context` in the `Data` tab, and you will see the two images related by the relationship you specified.
+
+### Training a CARE model
+
+And thats it, you created a training dataset for CARE. You can of course relate more items in the same context, but for now lets leave it at that. Now we can train a CARE model (on the GPU if you have one).
+For this we will need the `KARE` app, which is just `CARE` but enabled as an Arkitekt app (this freaking K is for Arkitekt, get it?). You can install it by clicking on the `Install Repo` button below.
+
+<InstallRepoButton repo="kare" user="arkitektio-apps" branch="master" />
+<br />
+<br />
+
+Make sure to appify and deploy the plugin, as shown in [Installing our first App](/docs/tutorials/install-a-tool#installing-our-first-app).
+
+This app provides only two actions `Predict CARE` and `Train CARE`, which allow you to train and predict CARE models, with your data. The Train CARE action will take a `Context` as input, and will return a `Model` as output.
+and the `Predict CARE` action will take a `Model` and an `Image` as input and will return a `Predicted Image` as output. Actions all the way down. Lets see how we can train a CARE model.
+
+<Callout type="info">
+
+Sadly with modern deep learning frameworks there is not yet a _reliable_ way see if another process is using the GPU and some deep learning methods like Stardist and CARE sometimes still linger in the GPU memory even after
+the process has finished. So if you run into the problem that you can't train a CARE model, because the GPU is already in use, simply stop any other deep learning process that might be running. We are working on a more user
+friendly solution for this (also for better multi-gpu support).
+
+</Callout>
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/introduction/advanced/train_care.webm" />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Training a CARE Model</small>
+</div>
+
+A few notes:
+
+- You know the drill. Search for the `Train CARE` action and select it to make it available.
+- Navigate back to the `Data tab` and run it directly from your just created `Context`.
+- You will be prompted by the `Assign Dialog`, which will now ask you training parameters. These are specific to CARE, and you can read more about them in the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7).
+  We just leave the default parameters for now, but be aware that you can change them to your needs. The default paramters are not optimal for this dataset, but we are just doing this for the purpose of this tutorial.
+- Once you submit the dialog, the training will start. You can see the progress in the `Dashboard` tab, and you will see the `Train CARE` action turning green once the training is done.
+  You can also monitor the progress right there. Looking at the progress bar.
+
+### Inspecting the Model
+
+Training CARE with the default parameters can take a LOOOONG time, and depending on your hardware you might have to wait for a while until the progress bar moves. You can of course always
+check the output of the Deep Learning process in the `PluginApps` tab, by clicking on the running `kare` container and inspecting the output of the training process of the container
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/introduction/advanced/inspect_container.webm" />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Inpsecting the deep learning output</small>
+</div>
+
+<Callout type="info">
+
+While we are working on providing a few feedback graphs, that illustrate the training process, we are pretty much settled on the idea, that we don't want to provide a full fledged training
+interface inside Arkitekt. We think that this is best left to the deep learning frameworks and software projects like [wandb](https://wandb.ai/site) that are specifically designed for this purpose.
+We rather think Arkitekt should be seen as a tool for `transfer learning` and `model adaptation`, and not as a tool for developing deep learning models from scratch. But hey we are open to feedback,
+and you can always just integrate your favorite deep learning framework into Arkitekt and use it as you like.
+
+</Callout>
+
+## Using the Model
+
+Your training is going to take time. But at some point it will end, promise! Once it is done you can use the model to make predictions.
+For this we will now use the `Predict CARE` action, which in this case will take a `Model` and an `Image` as input and return an image.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/introduction/advanced/train_care.webm" />
+</video>
+<div className="text-gray-400 mb-2">
+  <small> Inpsecting the deep learning output</small>
+</div>
+
+And thats it, you trained a CARE model and used it to make predictions. You can now use this model in your analysis pipeline, and you can also use it to adapt it to your specific needs.
+Also of course you can download the model and share it with others, just like we did with the models that we are using in our [Showcases](/showcase).
+
+If you want to see the code behind the `Train CARE` and `Predict CARE` actions, read [Example: a training plugin](/docs/guides/python/training-example).
+
+<Quiz>
+  <Question q="How does Arkitekt conceptually model the training of a deep learning model?">
+    Training is simply an action that returns a model. That model can then be used in a prediction action.
+  </Question>
+  <Question q="What is a Context in Arkitekt?">
+    It is a way to define arbitrary relationships between different data types, for example between two images used for CARE training.
+  </Question>
+  <Question q="Why is using the same data for training and validation only acceptable in this demo?">
+    Training, testing and validation should always be done on different datasets. The tutorial reuses the data only to keep the demo short.
+  </Question>
+</Quiz>

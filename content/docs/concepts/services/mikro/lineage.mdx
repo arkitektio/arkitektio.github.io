@@ -1,0 +1,227 @@
+---
+title: Lineage and Derived Data
+description: How Mikro remembers what every result was computed from, and why a crop, a deconvolution or a segmentation lands exactly where its raw image is without anyone registering it again.
+personas: [build]
+---
+
+import { MikroLineage, MikroSpaceValues, MikroPlacementTrust } from "@/components/docs";
+
+## The folder full of `_decon_crop_seg_final2.tif`
+
+You know this folder. A raw stack, a cropped version of it, a deconvolved version of the crop, a
+mask, a spreadsheet of measurements and a maximum projection made for the figure. The only thing
+connecting them is the file name, and the only thing saying where the crop sat in the original
+stack is your memory.
+
+This breaks in three well-known ways:
+
+- **The link to the raw data is lost.** Six months later, nobody can say for certain which stack a
+  mask was made from, or whether it was made before or after the deconvolution.
+- **The calibration is lost, or copied.** Either the result has no pixel size at all, or it carries
+  its own copy, which stays wrong when the original is corrected.
+- **Overlaying means re-aligning.** To see the mask on the raw image, or the crop in the overview,
+  someone has to line them up again by hand.
+
+Mikro treats all three as one problem. When an analysis writes a result, it also writes **one edge
+back to the data it was computed from**. That edge is the *lineage*, and it is also what puts the
+result in the right place.
+
+## One edge, two jobs
+
+The [coordinate systems](/docs/concepts/services/mikro/coordinate-systems) page explains that every
+piece of data in Mikro lives in a space of its own, and that spaces are connected by
+transformations. A derived dataset follows the same rule. It does **not** move into its parent's
+space. It gets its own pixel grid, and an edge from that grid back to the source:
+
+<MikroLineage />
+
+Follow the arrows from the mask, and you have its history: it came from the deconvolved crop, which
+came from the crop, which came from the tile.
+
+Read as a route, it is the mask's place in the world: follow the arrows and you arrive on the
+slide, in millimetres. Nobody registered the mask. It reaches the slide through the edges of the
+data it was made from, and the pixel size and stage position still exist exactly once, on the tile.
+
+That is the whole idea: **a result ends up where its source is, because the record of where it
+came from is the map.**
+
+## A day at the microscope, step by step
+
+**You crop the interesting region out of the tile.** The crop is a new dataset. Its edge back to
+the tile says "same pixels, shifted by this much". Open the crop in the overview scene and it sits
+on the spot it was cut from. Because a crop only cuts and does not compute, your contrast settings
+and histogram from the tile are still valid for it.
+
+**You deconvolve the crop.** Same grid, so the edge is an identity: no pixel moved. The values did
+change, though. They are still intensities, but they are new numbers, so the contrast limits you
+set on the raw crop no longer apply.
+
+**You segment it.** Again no pixel moved, so again an identity. But the values now mean something
+else entirely: pixel value 7 is not "brightness 7", it is "cell number 7". Mikro records this, so
+when it sets up a scene for the mask it shows a label map, instead of a very dark grayscale
+picture.
+
+**You measure every cell.** The result is a table with one row per cell. It was clearly made from
+the mask, so it has an edge back to it. But a row is a cell, and a cell is not a point: asking
+"where is row 7" has no answer. Mikro records the lineage and states honestly that there is no
+geometry to go with it.
+
+**You make a maximum projection for the figure.** The projection keeps `y` and `x` and drops `z`.
+Its edge says exactly that: these two axes correspond, the third one is gone. It still lines up
+with the stack from above, and it makes no claim about depth.
+
+**You fuse two channels acquired on different cameras.** A result can have several sources. They
+are recorded in order, and the first one is the one that places the result.
+
+## Space and values are two separate questions
+
+Each derivation edge answers two questions independently. Keeping them apart is what lets a viewer
+do the right thing without being told.
+
+<MikroSpaceValues />
+
+| What you did | What happened to space | What happened to the values | What you notice |
+|---|---|---|---|
+| Crop | shifted | identical | sits where it was cut from, contrast settings still fit |
+| Downsample | rescaled | (as stated by the tool) | overlays at the right size |
+| Deconvolve, denoise, normalize | nothing | transformed | overlays exactly, needs its own contrast |
+| Threshold, segment | nothing | categorized | overlays exactly, staged as a label map |
+| Project, line profile | some axes dropped | (as stated by the tool) | lines up along the axes that remain |
+| Measure per object | no correspondence | transformed | appears as a table, linked to the mask, not drawn anywhere |
+
+The three answers to the values question are worth remembering:
+
+- **identical**: the numbers are the same numbers. Anything computed on the source's values,
+  histograms and contrast limits included, still holds.
+- **transformed**: the same kind of quantity with new numbers. Still an intensity, but nothing you
+  tuned on the source carries across.
+- **categorized**: the values became labels. Colormaps and gamma are meaningless on them.
+
+## When there is no "where"
+
+Not every result has a position, and Mikro does not pretend otherwise. A measurement table is
+related to its mask, but no point of one maps to a point of the other. Recording that as "same
+place" would be a lie, and recording nothing would lose the lineage. So there is a third option: an
+edge that says *related, with no point correspondence*.
+
+This matters when you try to put something into a scene and it does not appear. Mikro tells you
+which of two very different situations you are in:
+
+- **Not registered yet.** Nothing relates this data to the scene so far. This is a gap, and
+  somebody can close it by registering the data.
+- **Cannot be placed.** The data lost its geometry in the step that produced it. There is no
+  missing registration to look for. This is a fact about the result, not a mistake.
+
+A table that cannot be drawn is still fully usable. Hover a cell in the mask and its row shows up,
+because the mask's pixel values are keyed to the table's rows. This lookup even works when you
+hover the *raw image*: Mikro follows the derivation from the image to the mask that was made from
+it, and from there into the table. See
+[attribute plans](/docs/concepts/services/mikro/coordinate-systems#attribute-plans-what-is-under-my-cursor)
+for how that works.
+
+## Derived is a fact, registered is a claim
+
+There are two reasons two datasets can line up, and they are not equally certain.
+
+A **derivation** is written by the step that made the data. The crop tool knows where it cut. That
+knowledge is a fact about the data, it is the same in every scene, and it travels with the dataset.
+It is exactly as reliable as the tool that wrote it.
+
+A **registration** is someone's statement about how two independent things relate: this tile sits
+here on the slide, this electron micrograph matches that fluorescence image. It may be read from
+metadata, drawn by hand or computed by an algorithm, and it can be refined later.
+
+Mikro keeps the two apart and shows you how much to trust the combination. Every placement in a
+scene reports:
+
+- **how well it is known**: guessed, read from acquisition metadata, authored by someone, or
+  checked against the data. A chain is only as good as its weakest link, so one guessed
+  registration marks everything that depends on it.
+- **what survives the trip**: whether a distance measured in this view is a real distance. Through
+  a plain shift or rotation it is. Through a uniform rescale, shapes and angles hold and lengths
+  need one factor. Through a general affine registration, angles and distances no longer mean what
+  they appear to.
+
+<MikroPlacementTrust />
+
+When a registration is refined, every result derived from that image moves with it. None of them
+had a copy to go stale.
+
+## Questions you can now ask
+
+- **Where did this come from?** Every dataset lists the data it was computed from. Following
+  those steps one by one leads back to an acquisition.
+- **What was made from this?** Every dataset lists what was computed from it: other images, and
+  also the tables, meshes and annotations.
+- **Show me only what the microscope produced.** Datasets can be filtered to those that were
+  acquired rather than computed.
+- **Is this overlay trustworthy?** The placement says how it is known, and through which steps.
+- **Are my micrometres still micrometres here?** The placement says which measurements survive.
+
+## What lineage is not
+
+Three neighbouring ideas are recorded elsewhere, on purpose:
+
+- **Which file it was imported from.** A dataset converted from a `.czi` remembers the file and the
+  series inside it. That says which *bytes* were read. It relates to no space, because a file has
+  none. A dataset can have both a source file and a source dataset.
+- **Who ran it, and why.** The edge says *what* a result was computed from. Which person, app and
+  task produced it is recorded in the
+  [provenance audit trail](/docs/concepts/provenance), for every change.
+- **What it means biologically.** That cell 7 is a neuron of a given type in a given animal belongs
+  in the knowledge graph, [Kraph](/docs/concepts/services/kraph).
+
+<Callout type="info" title="One thing to remember">
+
+A result does not need to be told where it is. It needs to say what it was made from, and how.
+Everything else, its pixel size, its place on the slide, its overlay on the raw image, follows from
+the data it came from.
+
+</Callout>
+
+## For the people writing the analysis
+
+Lineage is recorded by the tool that creates the result, in one argument. If you write analysis
+apps, this is the part that is your job:
+
+```python
+# same grid, new numbers: a deconvolution, a denoise
+derived_from=[volume.derive_identity(value_relation="TRANSFORMED")]
+
+# same grid, values became labels: a segmentation
+derived_from=[volume.derive_identity(value_relation="CATEGORIZED")]
+
+# a crop: the result's first voxel lands at `origin` in the source
+derived_from=[volume.derive_translation(origin)]
+
+# a projection that keeps y and x
+derived_from=[volume.derive_projection(["y", "x"])]
+```
+
+An identity edge is a promise that the result really is on the source's grid, and the server does
+not re-check it, so compare shapes and axis order before you make it.
+
+A per-object measurement table needs two things. Its lineage names the mask and leaves the
+transform out, which is what records "related, no geometry". Separately, its id column says which
+mask's pixel values it is identified by. Only that second statement makes the rows show up on
+hover:
+
+```python
+mikro.create_table_dataset(
+    name="cell measurements",
+    data=df,
+    derived_from=[
+        DatasetDerivedFromInput(dataset=mask.id, value_relation="TRANSFORMED")
+    ],
+    columns=[
+        ColumnInput(
+            name="instance",
+            axis_type=AxisType.INDEX,
+            identified_by=[DatasetIdentifiesInput(kind="DATASET", dataset=mask.id)],
+        )
+    ],
+)
+```
+
+The [Python guide on reading and writing data](/docs/guides/python/types)
+shows a complete action.

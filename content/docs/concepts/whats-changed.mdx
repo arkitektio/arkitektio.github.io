@@ -1,0 +1,300 @@
+---
+title: What's changed
+description: "What is different between the Paper version of Arkitekt, frozen for the publication, and the Next version these docs describe: installing, accounts, connecting apps, and what stayed the same."
+---
+
+Arkitekt exists in two versions you will run into. The **Paper** version is the platform as it was
+for the original publication. It is a frozen channel that will stay available so the results can
+be reproduced. The **Next** version is what these docs describe and what you get when you install
+Arkitekt today. Most of what you know from Paper still applies: the hub, apps, workflows, and the
+data model are the same ideas. What changed is mostly *how the pieces find and trust each other*,
+and *how you install and run them*. This section collects those changes in one place.
+
+<Callout type="info" title="About the Paper showcases">
+  The examples in the [Showcase](/showcase) that carry a **Paper** badge were run with the Paper
+  version of the platform. The workflows and apps they describe still apply, but the installer,
+  the login and the connection flow they show are the Paper ones described on these pages.
+</Callout>
+
+## At a glance
+
+| Area | Paper | Next |
+|---|---|---|
+| **Accounts** | Every deployment kept its own users and an admin account created at install time | Users, organizations and permissions live on a coordination server (go.arkitekt.live by default); a hub keeps no accounts of its own |
+| **Installing** | Konstruktor with a channel picker and an admin-user form; `arkitekt-next` CLI underneath | Konstruktor as a desktop app *and* a `konstruktor` CLI writing a plain Docker Compose project; no channel picker, no admin form |
+| **Channels** | Chosen in the installer (`paper`, `next`) | The set of image tags in `hub_config.yaml`; edit and pull to move |
+| **Finding a deployment** | Local-network advertising (UDP broadcast) | Addresses the hub advertises, and the mesh across networks |
+| **Connecting an app** | Custom `start`, `challenge`, `claim` sequence, then a second OAuth2 grant through Herre | One OAuth2 device-authorization grant; the token response carries the configuration |
+| **Client libraries** | `fakts` for configuration and `herre` for tokens, as two packages | One flow; the packages keep the `fakts` name |
+| **App manifest** | Name, version, scopes | Also declares service `requirements`, which the user approves per instance |
+| **Reaching across networks** | Not built in | The mesh, optional and experimental |
+
+The sections below go through each of these:
+
+- [Installing and running](/docs/concepts/whats-changed#installing-and-running): Konstruktor, accounts,
+  channels, advertising and the mesh.
+- [Connecting apps](/docs/concepts/whats-changed#connecting-apps): the Fakts protocol, step by step,
+  and how to tell a Paper deployment apart from a Next one.
+- [New in Next](/docs/concepts/whats-changed#new-in-next): the features that arrived with Next.
+
+## What stayed the same
+
+- **The shape of the platform.** A central hub made of services, apps that connect only to the hub,
+  and workflows that span apps. See [Concepts & Design](/docs/concepts).
+- **Your data.** Updates within a channel are meant to keep your data intact, and the Paper
+  channel itself is frozen, so a Paper deployment keeps working as it is.
+- **Reproducibility.** The Paper version remains installable so that the publication's results can
+  be reproduced. New work should start on Next.
+
+## And the features
+
+Most of this page is about plumbing: how things are installed, found and trusted. What you can do
+differently on Next, such as direct task assignment, the knowledge graph, views and protocols, is under
+[New in Next](/docs/concepts/whats-changed#new-in-next).
+
+## Installing and running
+
+### Konstruktor
+
+In Paper, Konstruktor was a desktop installer that asked you to pick a **channel** (`paper` or
+`next`), fill in an **admin user**, and then drove the `arkitekt-next` command line tool to bring
+the platform up. Updating meant a "Danger" button in its dashboard.
+
+In Next, Konstruktor comes as a desktop app *and* a `konstruktor` CLI, both writing a plain Docker
+Compose project (see [What Konstruktor is](/docs/reference/konstruktor#konstruktor)).
+The old `arkitekt server init` command line tool from the `arkitekt[cli]` package is retired; the
+`konstruktor` CLI replaces it. The wizard asks about the folder, the coordination server, services,
+ports, storage, addresses and the mesh, and nothing else.
+
+| | Paper | Next |
+|---|---|---|
+| Front ends | Desktop app | Desktop app and `konstruktor` CLI |
+| Channel | Picked in the installer | Not asked; see [Channels](#channels) |
+| Admin user | Form in the installer | Not asked; see [Accounts](#accounts) |
+| What it writes | Driven through `arkitekt-next` | A plain `docker-compose.yaml`, `hub_config.yaml` and `configs/` |
+| Headless install | No | `install.sh` and `konstruktor hub create --yes` |
+| Updating the platform | "Danger" then Update | **Pull images** then Start, or `konstruktor pull` and `konstruktor up` |
+| Updating Konstruktor | Built-in updater | Re-run the install script or download the new installer |
+
+### Accounts
+
+In Paper, every deployment kept its own users. The installer created an admin account, and users
+were made on that deployment. Signing in to an app meant signing in to that one deployment.
+
+In Next, **a hub keeps no accounts of its own**. Users, organizations and permissions live on a
+**coordination server**, by default our hosted one at [go.arkitekt.live](https://go.arkitekt.live),
+or your institute's own, and a hub is [authorized against that
+server](/docs/tutorials/first-hub#authorize-the-hub) before it exists on disk.
+Service-level superusers are still created per service from the dashboard when you need them. What
+the coordinator is and why it is a separate piece is explained in
+[The Coordinator](/docs/concepts#the-coordinator) and [Identity & Access](/docs/concepts/security/identity).
+
+### Channels
+
+In Paper, a channel was something you chose in the installer, and the whole deployment ran on it.
+In Next, **the channel is the set of image tags** in a hub's `hub_config.yaml`, per service, and
+the Paper channel itself is frozen for reproducibility; see
+[About channels](/docs/guides/hub#update-a-hub) and
+[How we version Arkitekt](/docs/concepts/versioning).
+
+### Finding the platform
+
+In Paper, a deployment could **advertise** itself on the local network with a UDP broadcast; that
+feature has been [removed](/docs/guides/hub#advertising). In Next, a
+hub **advertises a list of addresses** you choose at install time, and across networks it can join
+the [mesh](/docs/guides/hub#join-the-mesh), which did not exist in Paper. What
+the mesh is and why it is the secure default is explained in [The Mesh](/docs/concepts/security/mesh).
+
+### No web application
+
+In Paper, a web version of Orkestrator was deployed alongside the platform and reachable on the
+deployment itself. In Next, Orkestrator is the desktop app, and connects to any hub through the
+coordination server. See [Orkestrator](/docs/guides/apps/orkestrator).
+
+## Connecting apps
+
+The [Fakts protocol](/docs/concepts/service-discovery) is how an app finds a deployment,
+proves who it is, and learns where the services are. In the **Next** version it is a standard
+OAuth2 device-authorization flow. In the **Paper** version it was a custom sequence that was
+*inspired by* OAuth2 but not OAuth2. This page only covers what moved; the current protocol itself
+is described in [Service Discovery](/docs/concepts/service-discovery).
+
+### One protocol instead of two packages
+
+In Paper, connecting an app was two separate concerns handled by two separate
+client packages:
+
+- **Fakts** retrieved the configuration. It ran a custom `start`, `challenge`
+  and `claim` sequence against the Fakts server and came back with a config that
+  included an `auth` block holding a `client_id`, a `client_secret` and a token
+  URL.
+- **Herre** was an asynchronous OAuth2 client. It took that `auth` block and ran
+  a second, ordinary OAuth2 grant (usually client credentials) against Lok to
+  obtain the tokens the app actually used, and refreshed them from then on.
+
+In Next these collapse into one flow. The device authorization grant *is* the
+app's login, and the token response carries the configuration as its envelope.
+There is no `auth` block to hand from one library to the other, no client
+secret to store, and no second grant. The Python and TypeScript packages still
+carry the `fakts` name, but they now do what Fakts and Herre did together.
+
+### Step by step
+
+Each row maps one Paper step to its Next counterpart. The Next column is the flow described in
+Service Discovery, from [discovery](/docs/reference/fakts-protocol#step-0-discover-the-deployment)
+through [registration](/docs/reference/fakts-protocol#step-1-register-and-request-device-authorization),
+[approval](/docs/reference/fakts-protocol#step-2-the-user-approves-the-app),
+[polling](/docs/reference/fakts-protocol#step-3-poll-the-token-endpoint) and
+[refresh](/docs/reference/fakts-protocol#step-4-refresh-and-pick-up-configuration-changes),
+plus [the envelope](/docs/reference/fakts-protocol#the-envelope).
+
+| Paper                                                                    | Next                                                                                                              |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `.well-known/fakts` listed `base_url`, `frontend_url` and a `claim` URL  | `.well-known/fakts` lists `configure`, `device_authorization_endpoint`, `token_endpoint` and OAuth2 server metadata |
+| `POST {base_url}start/` with the manifest, returned a single `code`      | `POST device_authorization_endpoint` with the manifest, returns `device_code`, `user_code` and a minted `client_id` |
+| User opened `{frontend_url}configure/{code}`                             | User opens `verification_uri_complete`, built by the server from its own template                                  |
+| `POST {base_url}challenge/` polled; "still waiting" was HTTP 200 `pending` | `POST token_endpoint` with the device-code grant; "still waiting" is HTTP 400 `authorization_pending`             |
+| `POST {base_url}claim/` with the challenge token to fetch the config     | Gone. The configuration is appended to the token response                                                         |
+| Config carried an `auth` block: `client_id`, `client_secret`, `token_url`, `client_token` | Gone. `access_token`, `refresh_token` and `client_id` are the standard token-response members          |
+| Second grant through Herre (`client_credentials`) to get usable tokens   | Gone. The device-code grant already returns the tokens                                                            |
+| Confidential client with a secret                                        | Public client, `client_id` only                                                                                   |
+| Refresh handled by Herre against `token_url`                             | Same `token_endpoint`, `grant_type=refresh_token`, refresh token rotates, envelope re-rendered                     |
+| Alias health reported with the opaque `client_token` to `report_url`     | Reported to `{base_url}report/` with the Bearer access token                                                      |
+| Manifest listed `name`, `version`, `scopes`                              | Manifest also lists `requirements` with `key`, `service` and `optional`, which the user sees and approves per instance |
+| Envelope had `instances` and `self`                                      | Envelope adds `statuses` per requirement and an optional `challenge_key` per instance                             |
+
+### Telling the two apart
+
+The best signal that a deployment is still on Paper is the well-known document:
+if it lacks `configure`, `device_authorization_endpoint` and `token_endpoint`,
+stop there and report a protocol mismatch rather than a connection failure. A
+Next client cannot talk to a Paper deployment, and a Paper client cannot talk to
+a Next deployment. A stored Paper session (a token without `client_id`, an
+endpoint without `token_endpoint`) fails to load under a Next client, which is
+intended: the user approves the app once more under the new grant.
+
+## New in Next
+
+The sections above cover the plumbing: how a deployment is installed, how accounts
+work, and how apps connect. This one is about what you can *do* differently on Next. It grew out
+of the roadmap we published while Next was in development; now that Next is what you install, the
+roadmap has become this list. Where something is still a work in progress we say so.
+
+### Using the platform
+
+#### A redesigned Orkestrator
+
+Orkestrator, the desktop control app, was rebuilt for Next. The Paper version boasted a lot of
+functionality but was not very friendly; the new interface streamlines the layout and the flows
+around it. It is an Electron desktop app, and connects to any hub through the coordination server
+rather than to one deployment. Why it is a desktop app and not a website is explained on the
+[Orkestrator](/docs/guides/apps/orkestrator) page.
+
+#### Assign tasks directly
+
+Next lets you assign a task to an action directly: point your data at an action and an available
+agent runs it immediately. In Paper, starting a task went through several dialogs and had a whole
+class of confusing edge cases; those went away with the direct path.
+
+#### Reworked workflow design
+
+Designing visual workflows in the Paper Orkestrator was complex and not very intuitive. The
+workflow editor was reworked with patterns users know from tools like Blender or Unreal Engine,
+and includes automatic node suggestion and automatic repair of broken workflows. It continues to
+be iterated on.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/roadmap/workflow.mp4" />
+</video>
+
+### Data management
+
+#### The knowledge graph and ontologies
+
+A vision of Arkitekt was to capture the reality of biological systems in a database that lets you
+create arbitrary measurements and link them to each other. Paper could not capture those
+relationships intuitively. Next introduces the **knowledge graph**, backed by a graph database
+(Apache AGE) in the [Kraph](/docs/concepts/services/kraph) service, which lets you assign meaning to
+analyzed data in your own vocabulary ("this ROI delineates an axon") and link it to other data
+("this axon is connected to this dendrite"). Programmers and database-savvy users can query it with
+standard graph query languages; everyone else gets an interactive interface for exploring the
+relationships.
+
+<video
+  autoPlay
+  muted
+  loop
+  controls
+  className="rounded-sm rounded-md"
+  width={"100%"}
+>
+  <source src="/docs/roadmap/knowledge.mp4" />
+</video>
+
+The video shows a very manual way of labelling ROIs and assigning meaning to them. Ideally that is
+automated, but it gives an idea of what the graph is for.
+
+<Callout type="info" title="On ontologies">
+
+  Ontologies and knowledge graphs are a huge topic and are not coverable here. The knowledge graph
+  is still evolving, and we are working on integrating it tightly with views and protocols.
+
+</Callout>
+
+#### Views
+
+Metadata gets lost when the metadata system is too rigid for what users need. Next introduces
+**views**: flexible descriptions attached to your data. The first channel of an image should be
+shown in a certain colour? Add an RGB view to that channel. You want to record acquisition
+parameters? Add an acquisition view. The pixel values are labels of a segmentation? Add a pixel
+view and map the labels to entities in the knowledge graph. The image data never changes; how you
+describe it can be as flexible as you need.
+
+#### Protocols
+
+**Protocols** describe the steps of sample preparation, image acquisition and analysis in a
+structured way, and link specific steps to your image data. If the antibody used in the primary
+staining is part of the protocol, you can filter all images by it through their protocol views.
+
+### Stability
+
+#### Failures cascade on the server
+
+Apps can run code that depends on other apps: a workflow on one app calls a plugin on another, or a
+plugin calls a plugin. In Paper, when an app failed, propagating that failure to the tasks that
+depended on it was done on the client side, and was not as reliable as it should have been. Next
+handles the cascading failure of tasks on the server.
+
+#### Apps declare what they need
+
+Arkitekt is modular by design: do not care about Mikro? Do not install it. But Paper apps had no
+way to say which services and versions they needed before connecting, so an app could be installed
+against a deployment that could not serve it. In Next the app [manifest](/docs/reference/manifest)
+declares **requirements**, one per service the app needs, and the user sees and approves them per
+instance when the app connects. This was the biggest breaking change for Paper-era apps; see
+[Connecting apps](/docs/concepts/whats-changed#connecting-apps).
+
+### Under the hood
+
+- **Backend stack.** Paper services were built on Graphene, Django and Postgres. Next keeps Django
+  and Postgres and replaces Graphene with Strawberry, a more type-safe GraphQL library. Everything
+  you see on Next already runs on it.
+- **API design.** The Next APIs follow GraphQL best practices more consistently than the Paper ones
+  did. See [GraphQL](/docs/concepts/graphql).
+- **Security.** Paper was secure by design but enforced little. Next enforces more by default; scope
+  enforcement is still being rolled out, see [Scopes](/docs/concepts/security/identity#scopes).
+- **Performance.** Task assignment in Rekuest is being tuned. Ephemeral tasks, which would skip the
+  database and go straight to a worker, are planned but do not exist yet.
+
+### Ideas, not features
+
+Some things we have thought about but not built live under [Various](/docs/concepts):
+[Nextflow integration strategies](/docs/concepts/nextflow-integration) and
+[UC2 open-source microscopes](/docs/concepts/uc2).

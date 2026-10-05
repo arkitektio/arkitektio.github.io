@@ -1,0 +1,13 @@
+{
+  "title": "Reference",
+  "pages": [
+    "requirements",
+    "konstruktor",
+    "plugin-config",
+    "rust",
+    "embedded",
+    "fakts-protocol",
+    "manifest",
+    "projects"
+  ]
+}

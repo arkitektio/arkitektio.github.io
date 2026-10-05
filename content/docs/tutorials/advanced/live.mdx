@@ -1,0 +1,112 @@
+---
+title: Live Analysis
+description: How to build and run a streaming (live) analysis workflow in Arkitekt using generator actions to process images as they are acquired.
+personas: [use]
+---
+
+import { DisplayWorkflow } from "@/components/arkitekt";
+import { InstallRepoButton } from "@/components/arkitekt";
+
+With Arkitekt we wanted to provide new ways of performing and scheduling our analysis. Today analysis is often done in
+batch mode, where we run scripts and tools are run on a set of images a long time after the initial production. This is such a common approach that
+most of the tools we use are designed around this workflow. However, this is not the only way to do analysis, and in many
+cases, you might (need to) consider doing analysis in a live mode, where your results are generated as your images are acquired, in
+a continous stream-like fashion.
+
+In this tutorial we will show you how to build a [Streaming Analysis Workflow](/docs/concepts/philosophy#everything-everywhere-all-at-once) in Arkitekt, and how to run it on live data.
+For a full example on a real microscope, see the [Streaming Analysis showcase](/showcase/streaming-workflow).
+
+<Prerequisites>
+
+- Followed the [Deep Learning](/docs/tutorials/advanced/deep-learning) tutorial
+- Followed the [First Steps](/docs/tutorials/connect-orkestrator) tutorial
+- The [Gucker](/docs/guides/apps/gucker) app and the omero, reaktor and segmentor plugins installed
+
+</Prerequisites>
+
+<Learn>
+
+- Understand why streaming analysis is useful
+- See how Arkitekt models streaming analysis with generator actions
+- Tell functional actions apart from stream actions
+- Plan a streaming workflow fed by a watched folder
+
+</Learn>
+
+### Why Streaming Analysis?
+
+Live cell imaging that needs immediate feedback, high-content screens that should flag hits as they appear, and adaptive experiments that change course
+based on the data being collected all benefit from results arriving while the acquisition is still running. We lay out the reasoning in
+[Real-time](/docs/concepts/philosophy#everything-everywhere-all-at-once).
+
+### Streaming Analysis in Arkitekt
+
+Arkitekt was conceptualized and specifically build around the idea of [Streaming Analysis](/docs/concepts/philosophy#everything-everywhere-all-at-once). We wanted to make it easy to build analysis workflows that can
+be adapted from batch to streaming analysis. To do this, we needed to make sure that the analysis workflows are compatible and manageable in both modes, and that the platform can handle the multifold challenges of streaming analysis.
+
+Every Arkitekt [workflow](/docs/concepts/terminology#data-flows-as-a-stream) is a streaming workflow: data flows node to node as it
+arrives, even in a basic pipeline where the real-time aspect does not matter. To take real advantage of that, we need to understand how
+Arkitekt handles streaming data.
+
+### Stream Actions
+
+So far we got to know `Functional Actions`, that get their name from programming function that take item(s) and return item(s) _once_. There is however another type of action, that is called a `Stream Action` or `Generator Action`,
+and which is an action that can take an item and returns (yields) item(s) _multiple times_ and importantly **over time** (see
+[Action can establish Streams](/docs/concepts/terminology#action-can-establish-streams)).
+
+![Functional Actions vs Stream Actions](/docs/design/terminology/node-stream.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+  <small>
+    {" "}
+    Functional Actions vs Stream Actions also with their programming equivalent
+  </small>
+</div>
+
+This means when a stream action is called within a workflow, it will return a stream of items, **each of which** will be processed by the next node in the workflow, at the time they are generated.
+Imaging a workflow that runs a timeseries on the microscope, and once started will pipe the images directly to the analysis action, which will then generate results for each image as it is acquired.
+
+### Lets not imaging, lets do it!
+
+Well, lets do exactly that. For this tutorial we will use a simple workflow that takes images that are put into a folder and then pipes them through a small analysis
+pipeline. This pipeline will for now just consist of a simple segmentation and a measurement of the area of the segmented objects. We will use the same deep learning
+action that we know from our Deep Learning tutorial.
+
+But first things first, how to we get the images into the workflow? And especially how to we get them of the microscope, onto our analysis machine? Well, there is an App
+for that. [**Gucker**](/docs/guides/apps/gucker) is a simple app that watches a folder and then puts any images that are put into that folder into the workflow. So lets install it
+and get started.
+
+### Other Requirements
+
+If you followed both the [Deep Learning](/docs/tutorials/advanced/deep-learning) and the [First Steps](/docs/tutorials/connect-orkestrator) tutorial,
+you should have all the requirements installed. If not, please install the following:
+
+<div className="flex flex-row gap-2">
+  <InstallRepoButton repo={"omero"} user={"arkitektio-apps"} branch={"master"} />
+  <InstallRepoButton repo={"reaktor"} user={"arkitektio-apps"} branch={"master"} />
+  <InstallRepoButton repo={"segmentor"} user={"arkitektio-apps"} branch={"master"} />
+</div>
+
+Of course you can also use any other action that you have installed, but for this tutorial we will construct the following
+workflow:
+
+<DisplayWorkflow />
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+  <small>
+    {" "}
+    This is the workflow we would like to create. Stream our Files, Convert them
+    to Images, Segment them and Measure them.{" "}
+  </small>
+</div>
+
+<Quiz>
+  <Question q="How does a stream action differ from a functional action?">
+    A functional action returns items once. A stream action yields items multiple times and over time.
+  </Question>
+  <Question q="What happens to the items a stream action yields inside a workflow?">
+    Each item is processed by the next node in the workflow at the time it is generated.
+  </Question>
+  <Question q="What is the Gucker app used for in this tutorial?">
+    It watches a folder and puts any images placed in that folder into the workflow.
+  </Question>
+</Quiz>
