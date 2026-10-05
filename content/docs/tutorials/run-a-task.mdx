@@ -1,10 +1,16 @@
 ---
-title: Your first Task
+title: Run your first task
 description: Convert your first file with an action, inspect the result, and mark a ROI to understand the Arkitekt Data Graph.
 personas: [use]
 ---
 
-Four steps in an we still haven't performed anything useful on our data. But that's about to change. In this section we will:
+<Callout type="info" title="Before you start">
+
+The example image is in the hub ([Upload your first images](/docs/tutorials/upload-data)) and the converter plugin is installed ([Install your first tool](/docs/tutorials/install-a-tool)).
+
+</Callout>
+
+So far the data just sits in the hub. Time to do something with it. In this tutorial we will:
 
 - Convert our first File
 - Inspect the result in Orkestrator
@@ -13,7 +19,7 @@ Four steps in an we still haven't performed anything useful on our data. But tha
 ## Convert our first File
 
 We will start by converting our first file, utilizing our "Convert Omero" action. Lets perform this conversion on our
-first file. The one we uploaded in the previous section.
+first file. The one we uploaded in the previous tutorial.
 
 <video
   autoPlay
@@ -120,7 +126,7 @@ in the next few steps.
 </video>
 
 A few words about the `Data Graph` in Arkitekt: it is the graph of relationships between data elements and their metadata, here the one kept by the `Mikro` service
-that stores our microscopy data. We explain it properly, and how it differs from the provenance graph, in [Your first Workflow Run](/docs/tutorials/first-steps/first-run).
+that stores our microscopy data. We explain it properly, and how it differs from the provenance graph, in [Your first Workflow Run](/docs/tutorials/run-a-workflow).
 For now it lives from interlinking data points, and we have already created a few: our original file, our converted image and our ROI, linked in the following way
 
 ```text
@@ -143,3 +149,5 @@ via GraphQL.
 ## Before we start our analysis!
 
 Looking at our Data on the Website might be fun. But lets first inspect our Image in a GUI app of our choice. We prefer [Napari](https://napari.org/), but you can also use [Fiji](https://fiji.sc/).
+
+**Next:** [Open your data in napari and Fiji](/docs/tutorials/napari-and-fiji)

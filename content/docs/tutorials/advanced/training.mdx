@@ -13,7 +13,7 @@ This is arguabley due to the lack of easy to use tools and the inability to adap
 With Arkitekt we aimed to make it easy to both use already trained deep learning models in your analysis pipeline, and to make it easy to adapt a model to your specific needs.
 In this tutorial we will show you how to train your own deep learning model using CARE, a popular method for image restoration, and how to use it in your analysis pipeline.
 We advise you to first read the [CARE paper](https://www.nature.com/articles/s41592-018-0216-7) to understand the methodology of care, as well as following both the
-first steps of the [Arkitekt tutorial](/docs/tutorials/first-steps/interface) and the [Deep Learning Bridge tutorial](/docs/tutorials/advanced/deep-learning).
+first steps of the [Arkitekt tutorial](/docs/tutorials/connect-orkestrator) and the [Deep Learning Bridge tutorial](/docs/tutorials/advanced/deep-learning).
 
 This tutorial aims to cover the following topics:
 
@@ -81,7 +81,7 @@ which you can download [here](/demos/nGFP_high_snr.tif) and [here](/demos/nGFP_l
   <small> Uploading an converting the data</small>
 </div>
 
-This steps should seem [familiar](/docs/tutorials/first-steps/interface), just a few notes:
+This steps should seem [familiar](/docs/tutorials/connect-orkestrator), just a few notes:
 
 - We are batch uploading the data by selecting both files and `multi-dropping` them on the webinterface
 - Then we are batch converting the data through the `Convert Omero` action, which will convert the data to the `Image` datatype.
@@ -123,7 +123,7 @@ For this we will need the `KARE` app, which is just `CARE` but enabled as an Ark
 <br />
 <br />
 
-Make sure to appify and deploy the plugin, as shown in [Installing our first App](/docs/tutorials/first-steps/first-tool#installing-our-first-app).
+Make sure to appify and deploy the plugin, as shown in [Installing our first App](/docs/tutorials/install-a-tool#installing-our-first-app).
 
 This app provides only two actions `Predict CARE` and `Train CARE`, which allow you to train and predict CARE models, with your data. The Train CARE action will take a `Context` as input, and will return a `Model` as output.
 and the `Predict CARE` action will take a `Model` and an `Image` as input and will return a `Predicted Image` as output. Actions all the way down. Lets see how we can train a CARE model.

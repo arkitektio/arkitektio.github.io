@@ -17,7 +17,7 @@ by showing you how to create a simple "deep learning enabled" workflow, that you
 To get started with deep learning and Arkitekt you should:
 
 - Have a basic understanding of deep learning, in the sense of what the words "Training" and "Inference" mean.
-- Have gone through the [basics of Arkitekt](/docs/tutorials/first-steps).
+- Have gone through the [basics of Arkitekt](/docs/tutorials/absolute-basics).
 - Have a CUDA capable GPU. If you don't have a GPU, you should still be able to follow along, but the prediction
   will be very slow.
 - Either Mikro-Napari or Fiji with the [ImageJ Arkitekt plugin](/docs/guides/apps/imagej-plugin) installed. If you don't have either of these, you can still follow along, but you won't be able to run the workflow.
@@ -26,7 +26,7 @@ To get started with deep learning and Arkitekt you should:
 
 We would like to create a workflow that can take an image of nuclei in a cell culture and predict the segmentation of the nuclei.
 We will be using a deep learning model based on [Stardist](https://github.com/stardist/stardist) to do the prediction.
-We will be using the same dataset that we have used in the [basics of Arkitekt](/docs/tutorials/first-steps).
+We will be using the same dataset that we have used in the [basics of Arkitekt](/docs/tutorials/absolute-basics).
 
 ![Nuclei segmentation](/docs/introduction/advanced/segmentation.png)
 
@@ -39,7 +39,7 @@ that you might encounter when trying to create your own deep learning workflows.
 
   That's a perfect fit for `PluginApps`. Arkitekt plugins are containerized, so developers can already add in
   all of the software requirements that are needed for their specific deep learning algorithm. No need to install anything on your computer
-  (see [Why do we go through this hurdles](/docs/tutorials/first-steps/first-tool#why-do-we-go-through-this-hurdles)).
+  (see [Why do we go through this hurdles](/docs/tutorials/install-a-tool#why-do-we-go-through-this-hurdles)).
 
 - How to **integrate** deep learning into your favourite bioimage analysis app.
 
@@ -70,7 +70,7 @@ So how do we install Stardist? Well just like any other plugin. You can add the 
 <br />
 <br />
 
-And then you can install the latest version of segmentor by deploying it as an plugin, as you learned in the [basics of Arkitekt](/docs/tutorials/first-steps/first-tool).
+And then you can install the latest version of segmentor by deploying it as an plugin, as you learned in the [basics of Arkitekt](/docs/tutorials/install-a-tool).
 For the rest of this tutorial we will assume that you have installed the `segmentor` plugin.
 
 #### Testing the plugin
@@ -93,8 +93,8 @@ where it will be processed by the `Segment Fluo2` action of the `segmentor` plug
   </small>
 </div>
 
-Just import this workflow into your Arkitekt instance, and deploy it on the `reaktor` scheduler just like you did in the [basics of Arkitekt](/docs/tutorials/first-steps/first-workflow).
-Note that in current versions a saved workflow is runnable right away, see [Your first Workflow Run](/docs/tutorials/first-steps/first-run) for how runs are started now.
+Just import this workflow into your Arkitekt instance, and deploy it on the `reaktor` scheduler just like you did in the [basics of Arkitekt](/docs/tutorials/design-a-workflow).
+Note that in current versions a saved workflow is runnable right away, see [Your first Workflow Run](/docs/tutorials/run-a-workflow) for how runs are started now.
 Feel free to also create that workflow on your own, if you want to get some more practice.
 
 Once it is deployed, you can run the workflow directly from the `Dashboard` of Orkestrator. Just make sure that you have an image open in Fiji, and then click on the `Run` button of the workflow.

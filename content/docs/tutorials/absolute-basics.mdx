@@ -1,0 +1,60 @@
+---
+title: Absolute Basics
+description: What Arkitekt does with your data, in the simplest terms. Read this before you install or click anything.
+---
+
+Before you install or click anything, one question is worth five minutes: **what does Arkitekt
+actually do with your data?**
+
+## One place for your data: the hub
+
+Arkitekt is built around a central data storage. We call it the **hub**.
+
+The hub is a program that runs on one computer: a server in your lab or facility, or your own
+workstation. Everything else in Arkitekt connects to it. It does two things for you:
+
+1. **It stores your data.** Your images, the results of your analyses and the notes you make about
+   them live in the hub, in one place, instead of in folders spread over several computers.
+2. **It lets you look at your data.** Because everything is in one place, you can browse it, open
+   an image and inspect it from any computer that can reach the hub.
+
+That is the whole idea. The rest of Arkitekt builds on it.
+
+## What happens to an image
+
+Follow one image through the hub:
+
+1. **You put it in.** You drag a file from your computer into Arkitekt. The hub now keeps it, and
+   remembers who uploaded it and which dataset it belongs to.
+2. **You look at it.** You open the image in Orkestrator, the Arkitekt desktop app, and inspect it
+   there. If you prefer napari or Fiji, they open the same image
+   straight from the hub. You do not download or copy anything.
+3. **Tools work on it.** An analysis tool takes the image from the hub, does its work and puts the
+   result back. The result sits next to the original, and the hub remembers how it was made.
+
+<Callout type="info" title="The hub does not analyse anything">
+
+The hub stores and shows your data and passes work around. The analysis itself is done by **apps**
+that connect to it, such as napari, Fiji or a script somebody wrote. You will meet them in the next
+tutorials.
+
+</Callout>
+
+## What you need to continue
+
+A running hub. Either somebody runs one for you and you [join it](/docs/guides/joining), or you
+[install your own](/docs/tutorials/first-hub).
+
+## Where to go from here
+
+Each of these tutorials stands on its own, and together they take you from an empty hub to your
+first analysis:
+
+1. [Connect with Orkestrator](/docs/tutorials/connect-orkestrator): sign in to a hub and find your way around.
+2. [Upload your first images](/docs/tutorials/upload-data): put data into the hub and organise it.
+3. [Install your first tool](/docs/tutorials/install-a-tool): add an app that can do something with your data.
+4. [Run your first task](/docs/tutorials/run-a-task): let that app work on an image and look at the result.
+5. [Open your data in napari and Fiji](/docs/tutorials/napari-and-fiji): view the same image in the tools you already know.
+6. [Why so many steps?](/docs/tutorials/why-so-many-steps): a short read on why Arkitekt is split into small apps.
+7. [Design your first workflow](/docs/tutorials/design-a-workflow): chain several steps into one analysis.
+8. [Run your first workflow](/docs/tutorials/run-a-workflow): run it and see what came out.

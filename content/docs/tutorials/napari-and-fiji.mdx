@@ -1,15 +1,21 @@
 ---
-title: Visualize in Napari/Fiji
+title: Open your data in napari and Fiji
 description: Learn how to connect Napari or Fiji to your Arkitekt server and visualize your data directly from the platform.
 personas: [use]
 ---
+
+<Callout type="info" title="Before you start">
+
+The hub holds an image that has been converted, as in [Run your first task](/docs/tutorials/run-a-task).
+
+</Callout>
 
 Every analysis starts with the visualization of our data. And we have a great selection of tools in the bioimage world to help us.
 But how do we get our data into these tools? How do we get our data from our server into Napari or Fiji? Well, we could download it, and then open it in the tool.
 But that is not really what we want. We want to be able to use our data directly from the server, and we want to be able to save our results back to the server.
 
 So lets see how we can do that.
-In this section you will learn:
+In this tutorial you will learn:
 
 - How to connect both Napari or Fiji to your Arkitekt server.
 - How to visualize your data in Napari or Fiji.
@@ -33,7 +39,7 @@ features that we will show you here are only available in Napari. So if you are 
 First lets see how we can get napari to work with Arkitekt. Napari is our go to choice for large data visualization and can take advantage of all of the [lazy loading](/docs/concepts/performance#lazy-loading)
 capabilities of Arkitekt, so that you can easily visualize terabyte sized datasets. To enable Napari to work with Arkitekt we need to install a plugin.
 
-The goal of this part of the tutorial is simple: get the image we converted in the previous section open in Napari. Install the `mikro-napari` plugin
+The goal of this part of the tutorial is simple: get the image we converted in the previous tutorial open in Napari. Install the `mikro-napari` plugin
 as described in [Mikro-Napari: Installation](/docs/guides/apps/mikro-napari#installation), then click the `Provide` button that appeared in Napari and
 walk through the connection process, explained in [Mikro-Napari: Usage](/docs/guides/apps/mikro-napari#usage). Once connected, your Napari instance
 appears on the Dashboard and the `Show on Napari` action shows up in the bottom right corner of the image pane. Run it on your image (leave "show roi layer"
@@ -72,3 +78,5 @@ where it will appear in the bottom right corner.
 
 Unlike Napari, Fiji downloads the whole image into its memory, so you can close Orkestrator and keep working on it. ROIs are synced with Fiji's ROI manager
 in both directions, and whatever alterations you make in Fiji stay in Fiji until you save them back with the `Upload from ImageJ` action. More on that in the advanced tutorial.
+
+**Next:** [Why so many steps?](/docs/tutorials/why-so-many-steps)
