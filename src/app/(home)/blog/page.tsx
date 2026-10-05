@@ -33,7 +33,7 @@ export default function BlogPage() {
           <h2 className="text-xl font-semibold tracking-tight">Nothing here yet</h2>
           <p className="max-w-md text-sm text-fd-muted-foreground">
             We have not published any posts. Until we do, the{' '}
-            <Link href="/docs/design/whats-changed" className="text-fd-primary underline underline-offset-4">
+            <Link href="/docs/concepts/whats-changed" className="text-fd-primary underline underline-offset-4">
               What&apos;s changed
             </Link>{' '}
             section is the closest thing to release notes.

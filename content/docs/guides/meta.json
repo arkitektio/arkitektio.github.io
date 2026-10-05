@@ -1,0 +1,15 @@
+{
+  "title": "Guides",
+  "pages": [
+    "joining",
+    "apps",
+    "troubleshooting",
+    "install-cli",
+    "hub",
+    "other-installation-strategies",
+    "python",
+    "rust",
+    "koherent",
+    "contribute"
+  ]
+}

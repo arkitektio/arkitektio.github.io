@@ -1,29 +1,114 @@
 ---
-title: Arkitekt Docs
-description: Documentation for the Arkitekt bioimage analysis platform. Get started, learn the design, follow tutorials, and build apps.
+title: Hello you :)
+description: "Welcome to the Arkitekt docs: what Arkitekt is for, what it is in a nutshell, and where to go from here."
 ---
 
+## Welcome
 
-Arkitekt is an open-source platform for bioimage analysis. It is a "middleman" that
-sits between your data, your tools and your team. These docs cover installing the
-platform, understanding how it works, and building your own apps.
+Glad you are here, and welcome to our Arkitekt docs! Here you will find everything you need to know about Arkitekt, 
+from the [big picture](/docs/concepts/philosophy) to the nitty-gritty [details](/docs/concepts)
 
-## Where to start
 
-- **[Get started](/docs/introduction/installation)**. Install the platform and
-  connect your first instance with the Installation Guide.
-- **[What drives us](/docs/design/philosophy)**. Curious how it fits together? This
-  section covers what the middleman does and why.
-- **[Tutorials](/docs/introduction/first-steps)**. Spend your first few minutes
-  with Arkitekt: data management, analysis execution and dashboarding.
-- **[Developer guide](/docs/developers)**. Go deeper and start building bioimage
-  apps on top of the platform.
+## Arkitekt in a nutshell
 
-## Community & support
+Arkitekt is an open-source platform for bioimage analysis. It does not replace your microscope
+software, napari or Fiji. It is the "middleman" that connects them:
 
-Arkitekt is developed in the open. Get help, follow development, and contribute
-back:
+- A **hub** sits in the middle. It is a server that your lab runs: it stores your images and
+  results, and it passes work between your tools.
+- **Apps** connect to the hub: Orkestrator (the desktop interface), napari, Fiji, a microscope, or a
+  script you wrote. Apps never talk to each other directly, only through the hub.
+- **Workflows** chain what those apps can do, across machines and in real time.
 
-- **[Troubleshooting](/docs/troubleshooting)**. Stuck? Start here.
-- **[Contribute](/docs/developers/contribute)**. Help improve the platform.
-- **[What's changed](/docs/design/whats-changed)**. Coming from the Paper version? See what is different on Next.
+[Design](/docs/concepts) has the longer version.
+
+## I want to…
+
+Given that, there is a lot to learn for everyone, we structured the documentation to help you find what you need. Pick the profile that best matches your role.You can change it any time at the top of the sidebar.
+
+<Cards>
+  <PersonaCard
+    persona="use"
+    title="Use Arkitekt"
+    description="Your lab or facility already runs Arkitekt. Connect, follow the tutorials and run your first workflows."
+  />
+  <PersonaCard
+    persona="run"
+    title="Run Arkitekt"
+    description="Nobody runs Arkitekt for you yet. Set up your own server with Konstruktor, in one line or with a desktop app."
+  />
+  <PersonaCard
+    persona="build"
+    title="Build with Arkitekt"
+    description="Go deeper and start building bioimage apps on top of the platform."
+  />
+  <Card
+    title="Understand Arkitekt"
+    description="Arkitekt in depth: how it fits together, what the middleman does and why, and the vocabulary everyone shares."
+    href="/docs/concepts"
+  />
+</Cards>
+
+<PersonaSection persona="use">
+
+## Using Arkitekt
+
+Somebody in your lab or facility already runs Arkitekt, and you want to work with it. You will learn to:
+
+- **Get connected.** Install Orkestrator and [join their server](/docs/guides/joining).
+- **Find your way around.** Upload data, run a tool and build your first workflow in
+  [First Steps](/docs/tutorials/absolute-basics).
+- **Go further.** Deep learning, local workflows and live analysis in
+  [A bit more advanced](/docs/tutorials/advanced).
+- **Pick your apps.** What Orkestrator, napari, Fiji and the others do, in [Apps](/docs/guides/apps).
+- **Get unstuck.** Common problems and where to ask, in [Troubleshooting](/docs/guides/troubleshooting).
+- **Understand the ideas.** [Basics](/docs/concepts/basics) and the
+  [Terminology](/docs/concepts/terminology) the rest of the docs use.
+
+As a platform **by humans, for humans**, we suggest you start with one of our guided tutorials, made
+by our team and the tutorials community. They are designed to get you up and running quickly, and to give you a feel for what Arkitekt can do.
+
+
+</PersonaSection>
+
+<PersonaSection persona="run">
+
+## Running Arkitekt
+
+Nobody runs Arkitekt for you yet, so you set up a hub of your own. You will learn to:
+
+- **Install a hub.** With the Konstruktor desktop app in [Install your first hub](/docs/tutorials/first-hub),
+  or [from the command line](/docs/guides/install-cli).
+- **Keep it running.** Plugin engines, updates, the mesh and the GPU in [Running a hub](/docs/guides/hub).
+- **Plan a deployment.** [Where Arkitekt runs](/docs/concepts/topology), what to
+  [consider before you deploy](/docs/concepts/planning) and
+  [other installation strategies](/docs/guides/other-installation-strategies).
+- **Keep it safe.** Identity, data and the mesh in [Security & Privacy](/docs/concepts/security).
+- **Look things up.** [Requirements](/docs/reference/requirements) and
+  [Konstruktor](/docs/reference/konstruktor).
+- **Get unstuck.** [Help! My server doesn't start up](/docs/guides/troubleshooting/deployment).
+
+</PersonaSection>
+
+<PersonaSection persona="build">
+
+## Building with Arkitekt
+
+You write code and want it to become part of the platform. You will learn to:
+
+- **Write your first app.** In [Python](/docs/tutorials/python-first-app),
+  [Rust](/docs/tutorials/rust-first-app) or on an
+  [embedded device](/docs/tutorials/embedded-first-device).
+- **Know the model.** The [core concepts](/docs/concepts/python#core-concepts) of the Python
+  library, and [why you would build on Arkitekt](/docs/concepts/why-build) at all.
+- **Build real apps.** [Types and data](/docs/guides/python/types),
+  [state and lifecycle](/docs/guides/python/state-lifecycle),
+  [workflows](/docs/guides/python/workflows) and [packaging](/docs/guides/python/packaging).
+- **Understand the hub.** Its [services](/docs/concepts/services),
+  [service discovery](/docs/concepts/service-discovery) and [GraphQL](/docs/concepts/graphql).
+- **Look things up.** The [manifest](/docs/reference/manifest), the
+  [Fakts protocol](/docs/reference/fakts-protocol) and
+  [plugin configuration](/docs/reference/plugin-config).
+- **Contribute.** How to [get involved](/docs/guides/contribute).
+
+</PersonaSection>

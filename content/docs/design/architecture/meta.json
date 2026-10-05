@@ -1,8 +1,0 @@
-{
-  "title": "Architecture",
-  "pages": [
-    "service-discovery",
-    "durable-execution",
-    "provenance"
-  ]
-}

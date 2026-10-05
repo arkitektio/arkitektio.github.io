@@ -214,3 +214,85 @@ html[data-brand-hue-animate] {
 .bg-grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/* ----------------------------------------------------------------------------
+   Persona filter. The sidebar switch puts the picked persona on <html data-persona>
+   (src/components/site/persona.tsx), and every sidebar label that is not for
+   everyone carries `data-personas` (src/lib/page-tree.tsx). A row whose label
+   lacks the picked persona folds away: pages and headings on their own, a
+   folder as a whole. The page being read, and the folders around it, stay.
+   The selectors follow the sidebar markup of fumadocs-ui: a folder is a
+   `div[data-state]` holding its trigger and its content.
+   ------------------------------------------------------------------------- */
+/* Unlayered on purpose: the rows are styled with utilities, which a layer would lose to. */
+html[data-persona='use'] :is(#nd-sidebar, #nd-sidebar-mobile) :is(
+    :is(a, p):has(> [data-personas]:not([data-personas~='use'])):not(div[data-state] > a, [data-active='true']),
+    div[data-state]:has(> :is(a, button) > [data-personas]:not([data-personas~='use'])):not(:has([data-active='true']))
+  ),
+html[data-persona='run'] :is(#nd-sidebar, #nd-sidebar-mobile) :is(
+    :is(a, p):has(> [data-personas]:not([data-personas~='run'])):not(div[data-state] > a, [data-active='true']),
+    div[data-state]:has(> :is(a, button) > [data-personas]:not([data-personas~='run'])):not(:has([data-active='true']))
+  ),
+html[data-persona='build'] :is(#nd-sidebar, #nd-sidebar-mobile) :is(
+    :is(a, p):has(> [data-personas]:not([data-personas~='build'])):not(div[data-state] > a, [data-active='true']),
+    div[data-state]:has(> :is(a, button) > [data-personas]:not([data-personas~='build'])):not(:has([data-active='true']))
+  ) {
+  height: 0;
+  min-height: 0;
+  margin-block: 0;
+  padding-block: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Rows glide only right after a pick, not on a page that loads filtered.
+   Where `interpolate-size` is missing, they switch without the glide. */
+html[data-persona-animate] {
+  interpolate-size: allow-keywords;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-persona-animate] :is(#nd-sidebar, #nd-sidebar-mobile) :is(
+      :is(a, p):has(> [data-personas]),
+      div[data-state]:has(> :is(a, button) > [data-personas])
+    ) {
+    overflow: hidden;
+    transition:
+      height 0.35s ease,
+      margin 0.35s ease,
+      padding 0.35s ease,
+      opacity 0.25s ease,
+      visibility 0.35s;
+  }
+}
+
+/* The same pick on a page: the "I want to…" card of the picked persona is marked,
+   and a <PersonaSection> for another persona is left out (see
+   src/components/site/persona.tsx). */
+html[data-persona='use'] [data-for-persona]:not([data-for-persona='use']),
+html[data-persona='run'] [data-for-persona]:not([data-for-persona='run']),
+html[data-persona='build'] [data-for-persona]:not([data-for-persona='build']) {
+  display: none;
+}
+
+html[data-persona='use'] [data-persona-card='use'],
+html[data-persona='run'] [data-persona-card='run'],
+html[data-persona='build'] [data-persona-card='build'] {
+  border-color: var(--color-fd-primary);
+  background-color: color-mix(in oklab, var(--color-fd-primary) 8%, var(--color-fd-card));
+  box-shadow: 0 0 0 1px var(--color-fd-primary);
+}
+html[data-persona='use'] [data-persona-card='use']::after,
+html[data-persona='run'] [data-persona-card='run']::after,
+html[data-persona='build'] [data-persona-card='build']::after {
+  content: '✓ Selected';
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border-radius: 9999px;
+  background-color: var(--color-fd-primary);
+  color: var(--color-fd-primary-foreground);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}

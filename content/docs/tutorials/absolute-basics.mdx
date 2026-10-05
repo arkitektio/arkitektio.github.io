@@ -1,0 +1,140 @@
+---
+title: Absolute Basics
+description: "Before you install or click anything, one question is worth five minutes what does Arkitekt actually do with your data?"
+
+---
+
+import { HubSharing } from "@/components/docs";
+
+
+<Prerequisites>
+
+Nothing. There is nothing to install and no account to create for this tutorial. You only read.
+
+</Prerequisites>
+
+<Learn>
+
+- Say what the **hub** is, and what it does with your data
+- Follow an image from the moment you upload it
+- Explain why you can open your data from anywhere, and share it with a colleague
+- Explain why Arkitekt asks you for an **account**, and what that account does *not* hold
+
+</Learn>
+
+## One place for your data: the hub
+
+Arkitekt is built around a central data storage. We call it the **hub**.
+
+The hub is a program that runs on one computer: a server in your lab or facility, or your own
+workstation. Everything else in Arkitekt connects to it. It does two things for you:
+
+1. **It stores your data.** Your images, the results of your analyses and the notes you make about
+   them live in the hub, in one place, instead of in folders spread over several computers.
+2. **It lets you look at your data.** Because everything is in one place, you can browse it, open
+   an image and inspect it from any computer that can reach the hub.
+
+That is the whole idea. The rest of Arkitekt builds on it.
+
+## What happens to an image
+
+Follow one image through the hub:
+
+1. **You put it in.** You drag a file from your computer into Arkitekt. The hub now keeps it, and
+   remembers who uploaded it and which dataset it belongs to.
+2. **You look at it.** You open the image in Orkestrator, the Arkitekt desktop app, and inspect it
+   there. If you prefer napari or Fiji, they open the same image
+   straight from the hub. You do not download or copy anything.
+3. **Tools work on it.** An analysis tool takes the image from the hub, does its work and puts the
+   result back. The result sits next to the original, and the hub remembers how it was made.
+
+<Callout type="info" title="The hub does not analyse anything">
+
+The hub stores and shows your data and passes work around. The analysis itself is done by **apps**
+that connect to it, such as napari, Fiji or a script somebody wrote. You will meet them in the next
+tutorials.
+
+</Callout>
+
+## From anywhere, and together
+
+<HubSharing />
+
+Because the image lives in the hub and not on one laptop, you reach it from any computer that can
+reach the hub: at the microscope, in your office, at home. You upload it once, on the left of the
+picture, and open it wherever you are.
+
+So can other people. Arkitekt is a **collaborative platform**: to show an image to a colleague you
+do not send them a copy, you give them access to it. They open the very same image, from their own
+computer, in the app they like.
+
+## Who gets in, and why you need an account
+
+Sharing only works if **you decide who gets access to your data**. And to let somebody in, or keep
+somebody out, the hub first has to know *who they are*, and who you are.
+
+Something has to answer that question: an account. In Arkitekt, whoever hosts your hub can provide
+the accounts, for example your institute. To make things easy we provide them too, on
+[go.arkitekt.live](https://go.arkitekt.live). That is why the next tutorial asks you to create an
+account.
+
+<Callout type="warn" title="Your data is never stored with us">
+
+The account holds only what a login needs: your e-mail address, and your name if you give one (see
+the [privacy policy](/docs/privacy#tier-2-an-account-on-goarkitektlive)). Your images, results and
+notes stay on your hub, on the computer of whoever runs it. They do not pass through us.
+
+We do one more thing for you: we make your hub easier to find on the internet. When you sign in from
+another network, your app learns from your account where your hub is. From then on the app and the
+hub talk to each other directly.
+
+The one exception is `demo.arkitekt.live`, a public playground hub that we host so you can try
+Arkitekt without installing it. Whatever you upload there is on our server, so treat it as public.
+
+</Callout>
+
+The concepts behind this, for when you want the details:
+
+- [Identity & Access](/docs/concepts/security/identity): how accounts and logins work, and how to
+  host them yourself.
+- [Data & Privacy](/docs/concepts/security/data-privacy): where your data lives, and what we store.
+- [Organization](/docs/concepts/terminology#organization): the group of people that shares a hub's
+  data.
+- [Where Arkitekt runs](/docs/concepts/topology): how apps find a hub across networks.
+
+## What you need to continue
+
+A running hub. Either somebody runs one for you and you [join it](/docs/guides/joining), or you
+[install your own](/docs/tutorials/first-hub).
+
+## Where to go from here
+
+Each of these tutorials stands on its own, and together they take you from an empty hub to your
+first analysis:
+
+1. [Connect with Orkestrator](/docs/tutorials/connect-orkestrator): sign in to a hub and find your way around.
+2. [Upload your first images](/docs/tutorials/upload-data): put data into the hub and organise it.
+3. [Install your first tool](/docs/tutorials/install-a-tool): add an app that can do something with your data.
+4. [Run your first task](/docs/tutorials/run-a-task): let that app work on an image and look at the result.
+5. [Open your data in napari and Fiji](/docs/tutorials/napari-and-fiji): view the same image in the tools you already know.
+6. [Why so many steps?](/docs/tutorials/why-so-many-steps): a short read on why Arkitekt is split into small apps.
+7. [Design your first workflow](/docs/tutorials/design-a-workflow): chain several steps into one analysis.
+8. [Run your first workflow](/docs/tutorials/run-a-workflow): run it and see what came out.
+
+<Quiz>
+  <Question q="Where is an image after you uploaded it?">
+    In the hub, on the computer of whoever runs it. Not on your laptop, and not with us.
+  </Question>
+  <Question q="Who analyses your data?">
+    Apps that connect to the hub, such as napari, Fiji or a script. The hub itself only stores and
+    shows your data and passes work around.
+  </Question>
+  <Question q="How does a colleague get to see one of your images?">
+    You give them access. They then open the very same image from the hub, on their own computer.
+    Nothing is copied or sent around.
+  </Question>
+  <Question q="What is the account for, and what does it not hold?">
+    It tells the hub who you are, so that you can decide who gets access. It does not hold your
+    data.
+  </Question>
+</Quiz>

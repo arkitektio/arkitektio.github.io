@@ -1,0 +1,7 @@
+{
+  "source": "developers/python/build.mdx",
+  "primary": "guides/python/packaging.mdx",
+  "anchors": {
+    "configyaml-and-selectors": "reference/plugin-config.mdx#configyaml-and-selectors"
+  }
+}

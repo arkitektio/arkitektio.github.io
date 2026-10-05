@@ -1,0 +1,189 @@
+---
+title: Connect with Orkestrator
+description: Learn how to connect and log in to your Arkitekt server using the Orkestrator app and get familiar with its interface.
+personas: [use]
+---
+
+import { OrkestratorGrid, OrkestratorConnect } from "@/components/docs";
+
+Our first step into the Arkitekt world will be to get familiar with its non-developer interface.
+
+
+
+<Prerequisites>
+
+- A running hub that you can reach: one you [joined](/docs/guides/joining) or one you [installed yourself](/docs/tutorials/first-hub)
+
+</Prerequisites>
+
+<Learn>
+
+- Sign in to your first app, `Orkestrator`, with your account
+- Explain why signing in happens in your browser, and what you approve there
+- Understand the basics of authentication and authorization
+- Find your way around the `Orkestrator` interface
+
+</Learn>
+
+Small steps to get you started!
+
+### About Orkestrator
+
+With a hub to connect to, you can start using our default interface `Orkestrator`,
+which will be your main tool to interact with the Arkitekt server.
+
+As previously mentioned all interaction with the Arkitekt server happens through apps, and `Orkestrator` is the default app that comes with the Arkitekt server. `Orkestrator` is a
+desktop app: you download it, install it on your computer, and it connects to your Arkitekt server from there. There is no browser version. So let's get started!
+
+<OrkestratorConnect />
+
+You can download the desktop app from the github release page of the Arkitekt server. You can find the latest release [here](https://github.com/arkitektio/orkestrator/releases/latest).
+Or just click on the button below, depending on your operating system. More about the app itself on the [Orkestrator page](/docs/guides/apps/orkestrator).
+
+<OrkestratorGrid />
+
+
+<Callout type="info" title="What, I cannot use my browser? 🤨">
+
+No, and we know how that sounds. Arkitekt is a web platform, so you would expect its interface to be a website. But a browser restricts what a web page may reach:
+a page from the internet is not allowed to talk to a hub in your lab network. `Orkestrator` is therefore a desktop app, which has no such restrictions and can find
+and talk to any hub. You install it once, and trust us it is worth it, and comes with some goodies that a website cannot provid...
+
+</Callout>
+
+
+
+### Lets Finally get started
+
+After you have installed the desktop app, you should see the following screen, when you open the app.
+Allow us to guide you through this tutorial, as it will give you a first impression of how Arkitekt `Apps` work,
+and how we ensure that your data is [safe and secure](/docs/concepts/security#security-measures)
+
+<div className="mt-2 p-6">
+
+![The Orkestrator sign-in screen: "Let's get you started", with a "Sign in with go.arkitekt.live" button and "More Options" below it](/docs/introduction/first_steps/sign_in.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+<small>The Orkestrator sign-in screen, as you see it when no account has been added on this computer yet</small>
+</div>
+</div>
+
+This is the `Sign-in Screen` of the Orkestrator app. There is no hub on it yet, and that is on purpose: before `Orkestrator` can show you
+any data, Arkitekt needs to understand **who you are**. So the first thing we do is not to connect to a hub, but to sign in with an account.
+The screen has only two things on it:
+
+- **Sign in with go.arkitekt.live** is the big button in the center, and the one we will use. [go.arkitekt.live](https://go.arkitekt.live) is the
+  account service that we host, the one the [Absolute Basics](/docs/tutorials/absolute-basics#who-gets-in-and-why-you-need-an-account) told you about.
+  If you do not have an account there yet, do not worry, you can create one on the way.
+- **More Options** hides everything you will not need today: **Connect to Custom Coordination Server**, if your accounts are not with us but for
+  example with your institute, **Diagnose connection**, if signing in fails, and a link that explains what Arkitekt is.
+
+The text above the button already tells you what is about to happen, and we will go through it in three small steps.
+
+#### 1. Click "Sign in with go.arkitekt.live"
+
+`Orkestrator` will not ask you for a password. Instead it opens a webpage in your default **webbrowser** and waits there for you. While it waits,
+the button is replaced by two small ones: **Open browser again**, in case you closed the page or it never showed up, and **Cancel**.
+
+<Callout type="info" title="Why the browser, and not the app?">
+
+Your password is something only you and the account service should ever see. If every app had its own login form, you would have to trust every app
+with your password. So an Arkitekt app never sees it: you type it into the page of the account service, in your browser, and the app only
+learns that *you allowed it in*. Every app that connects to Arkitekt signs in this way. More in [Identity & Access](/docs/concepts/security/identity).
+
+</Callout>
+
+<Callout type="info" title="On the login process">
+
+If you are using the `Orkestrator` app for the first time you may be prompted by your firewall to allow access to network.
+This is a security feature of your operating system and you should allow access to the network. Don't worry Arkitekt will not send any data to the internet,
+just check out the [source code](/docs/guides/contribute), if you are worried 😉.
+
+</Callout>
+
+#### 2. Sign in and approve the app, in your browser
+
+In the browser, log in with your [go.arkitekt.live](https://go.arkitekt.live) account, or create one if this is your first time.
+Once Arkitekt knows who you are, it greets you by name and asks you one more question: do you want to let **this app** in, and into **which hub**?
+
+<div className="mt-2 p-6 rounded-sm rounded-md">
+
+![The approval page on go.arkitekt.live: the app live.arkitekt.orkestrator on the left; on the right its requested permissions, the "Join the organization's mesh" switch, the "Assign to hub" selection and the buttons "Deny" and "Allow access"](/docs/introduction/first_steps/approve.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+<small>The approval page in your browser. Here the app has been approved on this computer before, which is why it is marked <b>Previously authorized</b>. The first time you will not see that badge.</small>
+</div>
+</div>
+
+This is the `Authorization` screen, and every App that connects to Arkitekt has to go through it. Nothing on it is hidden from you, so let us read it from top to bottom:
+
+- **Who is asking.** On the left you see the app that wants in: `live.arkitekt.orkestrator` and its version. This is the app you just clicked the button in.
+  If you ever see this page without having started an app yourself, press **Deny**.
+- **Requested permissions.** What the app may do on **your behalf**, the so called `Scopes`. `Orkestrator` only asks for `openid`, which means: tell me who this user is.
+- **Optional services.** The parts of a hub the app can make use of when they are there. You can unfold the list, but there is nothing to decide here.
+- **Join the organization's mesh.** Leave this switched on. If your organization has a [mesh](/docs/concepts/security/mesh), this lets your computer
+  reach the hub from another network, without a second sign-in. If it has none, the switch does nothing.
+- **Assign to hub.** This is where the hub finally appears. An app is always let into *one* hub, and here you pick which: the list shows the hubs
+  of your [organizations](/docs/concepts/terminology#organization). If you only have one hub, it is already selected.
+
+To finish, click **Allow access**. You can then close the page and go back to the Orkestrator app, which has been waiting for you, and you are finally good to go.
+At the very bottom **Not you?**, **Log out** and **Change user** are there for the case that the browser is signed in as somebody else, for example on a shared computer.
+
+#### 3. Back in Orkestrator
+
+`Orkestrator` notices that you allowed it in and connects to the hub you picked. Two things are worth knowing about what just happened:
+
+- **The account stays on this computer.** That is the last half sentence on the sign-in screen: *the accounts you add stay on this computer*. `Orkestrator`
+  remembers the login, so the next time you open the app you will not see this screen, and you do not have to go through the browser again.
+  If you sign out, the screen comes back as **Welcome back**, with your account as a card to pick, and a plus to add another one.
+- **You never typed an address.** Your account knows the hubs of your organization, and told `Orkestrator` where to find the one you picked.
+  More in the [Service Discovery section](/docs/concepts/service-discovery) of the documentation.
+
+<Callout type="warn" title="I don't see a hub">
+
+If the **Assign to hub** list is empty, nothing is broken: no hub has been connected to your account yet. A hub always belongs to an
+[organization](/docs/concepts/terminology#organization), so there are two ways to get one, and neither is hard:
+
+- **Join an organization** that already runs a hub. Ask the person who runs it to add you, as described in [Joining somebody's server](/docs/guides/joining).
+- **Start your own.** [Install a hub](/docs/tutorials/first-hub) on your computer, and it is connected to your account while you set it up.
+
+Then come back to this page and the hub is in the list.
+
+</Callout>
+
+### Welcome to Orkestrator
+
+And now you are finally ready to use the Orkestrator app. Quite a few steps. But trust us, its worth it! You should now see the following screen in the Orkestrator app.
+
+<div className="mt-2 p-6 rounded-sm rounded-md">
+
+![Orkestrator data pane](/docs/introduction/first_steps/data.png)
+
+<div className="mt-2 mb-2 text-sm text-fd-muted-foreground">
+<small>The data pane view. The first view that we will use</small>
+</div>
+</div>
+
+Before we go any further. Just explore this webinterface. No worries you cannot break anything (thats not already broken 😉). You can click on the different buttons and see what happens.
+Three things are important to know:
+
+- `Navigation` throughout the app is done through the sidebar on the left. Here the main sections of the app are listed (which we will explore in the next tutorials). The bottom left item is
+  your user account, which you can use to logout from the app or the server
+- The `Main View` of the app is displayed in the center of the screen. This is where you will see the data/workflow/etc that you are working with.
+- Each `Main View has multipe _sidebars_ that can be opened both on the left and the right side of the screen. These sidebars can be used to display additional information or to configure the main view.
+  Left Sidebars are often used to search for data, while right sidebars are often used to configure the view or provide more details about the data.
+- In the bottom right corner of the screen you will find the `Action Buttons`. These buttons provide access to the most important actions that can be performed in the current view. Importantly these
+  actions are context sensitive, so they will change depending on the data you are currently working with, and can also display functionality that will be executed on an connected app.
+
+Lets explore the different views in the next tutorials.
+
+<Quiz>
+  <Question q="Why is Orkestrator a desktop app and not a website?">
+    Browsers restrict what a web page may reach in your local network. A desktop app does not have these restrictions and can find and talk to any Arkitekt server.
+  </Question>
+  <Question q="What do you decide on the Authorization screen?">
+    Whether this app is let in, what it may do on your behalf, and which of your hubs it connects to.
+  </Question>
+</Quiz>
+
+**Next:** [Upload your first images](/docs/tutorials/upload-data)

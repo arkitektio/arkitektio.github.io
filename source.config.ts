@@ -68,7 +68,12 @@ function rehypeBasePath() {
 export const docs = defineDocs({
   dir: 'content/docs',
   docs: {
-    schema: pageSchema,
+    // who a page is for; empty means everyone (see src/lib/persona.ts)
+    schema: pageSchema.extend({
+      personas: z.array(z.enum(['use', 'run', 'build'])).default([]),
+      // who guides a tutorial, a key of src/lib/team.ts (optional)
+      steward: z.string().optional(),
+    }),
     postprocess: {
       includeProcessedMarkdown: true,
     },

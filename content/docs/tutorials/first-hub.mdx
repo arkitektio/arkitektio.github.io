@@ -1,0 +1,125 @@
+---
+title: Install your first hub
+description: You are the best for giving us a chance!
+personas: [run]
+---
+
+import { DownloadGrid } from "@/components/docs";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+
+You will run an Arkitekt **hub** yourself, on a machine with Docker. The fastest way, on Linux or
+macOS, is one line in a terminal:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/arkitektio/konstruktor/master/install.sh | sh
+```
+
+It installs Konstruktor, asks for a name, and creates and starts a hub. When it shows you a code,
+approve it in your browser with your account. Prefer clicking, or on Windows? Use the
+[desktop app](#graphical-installer-recommended). This page walks through the desktop app in detail;
+the terminal route is in [Install from the command line](/docs/guides/install-cli), and
+[updating](/docs/guides/hub#update-a-hub), [the mesh](/docs/guides/hub#join-the-mesh) and
+[the advanced options](/docs/guides/other-installation-strategies) have their own pages.
+
+<Prerequisites>
+
+- A machine with Docker
+- Checked the [Requirements](/docs/reference/requirements)
+- An account on the coordination server, go.arkitekt.live by default
+
+</Prerequisites>
+
+<Learn>
+
+- Install Konstruktor and let it check Docker
+- Create a hub with the deployment wizard
+- Authorize the hub on the coordination server with your account
+- Start the hub and manage it from its dashboard
+
+</Learn>
+
+## Graphical installation [#graphical-installer-recommended]
+
+<Steps>
+<Step>
+
+### Download and install Konstruktor
+
+Konstruktor is available for Windows, macOS (one universal build for Intel and Apple Silicon) and
+Linux (`.deb`, `.rpm` and AppImage). Pick your platform and install it like any other desktop app.
+
+<DownloadGrid />
+
+</Step>
+<Step>
+
+### Let it check Docker
+
+When Konstruktor opens it checks for a container engine. If Docker is ready you are through to the
+home screen. If not, it tells you what is missing and offers to install the recommended engine
+(macOS, Windows) or shows the commands to run (Linux). The check repeats until Docker is ready.
+
+</Step>
+<Step>
+
+### Create a hub
+
+Choose **New deployment** and then **Hub**. The wizard walks you through the following steps. For
+the standard install you can accept the defaults everywhere except the folder and the identifier.
+
+| Step | What you decide | Default |
+|---|---|---|
+| **Docker** | Nothing, this is the engine check again. | |
+| **Folder** | Where the deployment lives, and its display name. The folder name seeds the identifier. | `~/MyHub` |
+| **Coordination** | Which coordination server the hub trusts for accounts, and the hub's **identifier** (2 to 60 characters, letters, digits, `.`, `_`, `-`). Pick **go.arkitekt.live** (marked *Recommended*) or **Another server** for your institute's own. | go.arkitekt.live |
+| **Services** | Which services the hub runs, and whether Rekuest runs here or on a remote host. Per service you can opt to run from source. | rekuest, mikro, fluss, kabinet, kraph |
+| **Ports** | The HTTP and HTTPS ports the gateway publishes. Every service is routed behind them (`/rekuest`, `/mikro`, and so on). | 7080 / 7443 |
+| **Storage** | Docker volumes (recommended) or the deployment folder for the database and uploaded files. | Docker volumes |
+| **Addresses** | How far the hub is reachable (local only, this network, public) and which addresses it advertises to apps. At least one is required. | This network |
+| **Mesh** | Whether the hub joins a mesh. See [Mesh](/docs/guides/hub#join-the-mesh). | No mesh |
+| **Review** | A summary of every choice and a preview of the files that will be written. | |
+
+</Step>
+<Step>
+
+### Authorize the hub
+
+A hub manages no accounts of its own. Users, organizations and permissions live on the coordination
+server, and the hub has to be accepted there before it exists on disk. Konstruktor shows a short code
+and a link. Open the link, sign in with your **go.arkitekt.live** account, pick the organization the
+hub should belong to, and accept. Only when that grant comes back does Konstruktor write the
+deployment. This is the same device-code flow apps use to connect, described in
+[Service Discovery](/docs/concepts/service-discovery).
+
+</Step>
+<Step>
+
+### Start it
+
+The wizard writes the deployment and hands you over to the hub's **dashboard**. Press **Start**.
+Docker pulls the images on first start, which takes a while depending on your connection. The
+dashboard also lets you stop the hub, read logs, open the folder, edit the compose file, pull
+updates, back up and restore data, and re-authorize.
+
+The hub is seeded with an `admin` account whose password Konstruktor generated for you; **Copy
+admin password** in the dashboard menu puts it on the clipboard. To create your own user, use the
+**superuser** dialog on the dashboard once the hub is running, it creates the account in each
+service.
+
+Konstruktor also lives in the system tray, listing every hub and engine with its run state. Closing
+the window does not stop anything.
+
+</Step>
+</Steps>
+
+<Quiz>
+  <Question q="Why does a hub have to be accepted on the coordination server before it is written to disk?">
+    A hub manages no accounts of its own. Users, organizations and permissions live on the coordination server.
+  </Question>
+  <Question q="Why can the first start of a hub take a while?">
+    Docker pulls the images on first start, and how long that takes depends on your connection.
+  </Question>
+  <Question q="Does closing the Konstruktor window stop your hub?">
+    No. Konstruktor keeps living in the system tray and closing the window does not stop anything.
+  </Question>
+</Quiz>
