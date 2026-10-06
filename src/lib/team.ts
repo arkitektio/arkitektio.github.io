@@ -19,6 +19,14 @@ export const team = {
     url: 'https://github.com/jhnnsrs',
     steward: true,
   },
+  willhelmi: {
+    name: 'Alexander Willhelmi',
+    role: 'Contributor',
+  },
+  golden: {
+    name: 'Artemiy Golden',
+    role: 'Contributor',
+  },
 } satisfies Record<string, TeamMember>;
 
 export type TeamMemberId = keyof typeof team;

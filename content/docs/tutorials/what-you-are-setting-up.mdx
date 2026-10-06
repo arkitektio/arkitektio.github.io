@@ -1,0 +1,144 @@
+---
+title: What you are setting up
+description: "Before you install anything, five minutes on what a hub is made of, what ends up on your machine, and what Konstruktor does for you after the first start."
+personas: [run]
+---
+
+You are about to run Arkitekt for other people, or for yourself. This page is not about what
+Arkitekt does with an image. It is about what you put on a machine, what you are responsible for
+afterwards, and which tool helps you with it.
+
+<Prerequisites>
+
+Nothing. There is nothing to install and no account to create for this tutorial. You only read.
+
+</Prerequisites>
+
+<Learn>
+
+- Say what a **hub** is made of, and what lands on your machine when you install one
+- Tell apart what lives on your hub and what lives on the **coordination server**
+- Explain what **Konstruktor** does after the first start: run, update, back up, restore and migrate a hub
+- Explain why you are not locked in: a hub is a set of ordinary **containers**
+
+</Learn>
+
+## A hub is a set of containers
+
+The people who use Arkitekt see one thing: a **hub** that stores their data and passes work between
+their apps. You see what it is made of. A hub is a handful of **containers** that Docker runs on
+one machine, behind a single gateway:
+
+| Part | What it is for |
+|---|---|
+| **Services** | The parts of Arkitekt itself. [Rekuest](/docs/concepts/services/rekuest) knows the connected apps and assigns tasks to them, [Mikro](/docs/concepts/services/mikro) manages the microscopy data, [Fluss](/docs/concepts/services/fluss) holds the workflows, [Kabinet](/docs/concepts/services/kabinet) is the app store, and [Kraph](/docs/concepts/services/kraph) is the knowledge graph. You choose which of them your hub runs. |
+| **Infrastructure** | What the services stand on: a Postgres database, an object store for the image data, and a cache. |
+| **Gateway** | The one door. It publishes an HTTP and an HTTPS port, and every service is reached behind them (`/rekuest`, `/mikro`, and so on). |
+
+There is no program called "Arkitekt" that you install on the host. Besides Konstruktor, the tool
+that sets the hub up, only a container engine has to be on the machine.
+
+## What ends up on your machine
+
+Installing a hub leaves two things behind:
+
+1. **A deployment folder**, in a place you choose. It is an ordinary Docker Compose project: the
+   hub's profile (`hub_config.yaml`), the generated `docker-compose.yaml`, one config file per
+   service, and the hub's secrets.
+2. **The data.** The database and the object store, by default in Docker volumes, or inside the
+   deployment folder if you ask for that.
+
+The data is the part that matters. The folder can be generated again; the images and results your
+users uploaded cannot. Everything they put into the hub is on this machine, and from now on it is
+yours to keep safe.
+
+## What does not live on your hub
+
+A hub manages no accounts of its own. Users, organizations and permissions live on a
+**coordination server**. By default that is [go.arkitekt.live](https://go.arkitekt.live), which we
+host; an institute can run its own.
+
+This is why installing a hub has a step that using it does not: the hub has to be **authorized**.
+Somebody with an account accepts it into an organization, and from then on the hub trusts that
+server to say who a user is. The coordination server also tells apps where your hub can be reached.
+It never sees the data, see [Data & Privacy](/docs/concepts/security/data-privacy).
+
+## Konstruktor looks after the hub, not only its start
+
+You do not write the compose file by hand. [Konstruktor](/docs/reference/konstruktor) does, and it
+is easy to take it for an installer that you use once. It is the admin tool for the whole life of a
+hub. It comes as a desktop app and as a `konstruktor` command line tool. Both do the same things
+and share the same list of deployments.
+
+| When | What Konstruktor does |
+|---|---|
+| **Create** | Checks the container engine, asks what the hub should run and how far it should be reachable, authorizes it on the coordination server, and writes the deployment folder. |
+| **Run** | Starts and stops the hub, shows what is running, reads the logs, checks that every service answers, and creates admin accounts in the services. |
+| **Change** | Adds or removes services, re-authorizes the hub when its addresses change, and lets you edit the compose file while keeping the previous version. |
+| **Update** | Finds out which images have moved and replaces only those. It backs the hub up first, because a service migrates its own database forward when a new version starts, and that cannot be undone. A rollback puts the previous images back. |
+| **Back up** | Copies the database, the object store and the hub's configuration into a folder, together with a manifest of which services ran at which versions. |
+| **Restore and migrate** | Puts a backup back, into the hub it came from or into any other. That is also how you migrate a hub to a new machine: install a hub there and restore the backup into it. Konstruktor compares the backup with the target first, and afterwards checks that every service works. |
+| **Remove** | Three separate commands, from least to most destructive: forget the hub, delete its data, or destroy it altogether. |
+
+<Callout type="warn" title="Backups are your job">
+
+Konstruktor makes a backup before an update, and whenever you ask for one. It does not make them on
+a schedule, and a backup on the same disk as the hub does not survive that disk. Decide where your
+backups go before your users depend on the hub.
+
+</Callout>
+
+## Containers all the way down: use it your own way
+
+Konstruktor is a convenience, not a requirement. What it creates is a plain Docker Compose project
+in a folder, with no helper process and nothing hidden. So you can:
+
+- open the folder, read the compose file and run `docker compose` against it yourself,
+- edit what Konstruktor generated, to fit your reverse proxy, your storage or your network,
+- start from a maintained compose file without Konstruktor, or take the containers to another
+  orchestrator such as Kubernetes.
+
+These routes are described in
+[Other installation strategies](/docs/guides/other-installation-strategies). The further you move
+away from Konstruktor, the more of the table above becomes your own work, and our
+[troubleshooting](/docs/guides/troubleshooting/deployment) assumes a hub that Konstruktor manages.
+For a first hub, let Konstruktor do it.
+
+## What you need to continue
+
+A machine with Docker that meets the [requirements](/docs/reference/requirements), and an account
+on the coordination server.
+
+## Where to go from here
+
+1. [Install your first hub](/docs/tutorials/first-hub): create and start a hub with Konstruktor.
+2. [Running a hub](/docs/guides/hub): plugin engines, updates, the mesh and the GPU.
+3. [Deployment](/docs/concepts/planning) and [Where Arkitekt runs](/docs/concepts/topology): what
+   to think about before more people depend on it.
+4. [Security & Privacy](/docs/concepts/security): identity, data and the mesh.
+
+What your users will do with the hub once it runs is the other side of the docs. It starts with
+[Absolute Basics](/docs/tutorials/absolute-basics).
+
+<Quiz>
+  <Question q="What is a hub, seen from the machine it runs on?">
+    A set of containers behind one gateway: the Arkitekt services, and the database, object store
+    and cache they stand on. On disk it is a Docker Compose project in a folder, plus the data.
+  </Question>
+  <Question q="Where do the accounts of your users live?">
+    On the coordination server, not on your hub. That is why a hub has to be authorized before it
+    is created. The data is the other way round: it lives on your hub only.
+  </Question>
+  <Question q="You have to migrate your hub to a new machine. How?">
+    Back it up with Konstruktor, install a hub on the new machine, and restore the backup into it.
+    A backup can be restored into any hub, not only the one it came from.
+  </Question>
+  <Question q="Why does Konstruktor back the hub up before an update?">
+    A service migrates its own database forward when a new version starts, and that is one-way. A
+    rollback brings the old images back, the backup brings the old data back.
+  </Question>
+  <Question q="Do you have to use Konstruktor?">
+    No. A hub is an ordinary Docker Compose project, so you can run and change it with your own
+    tools. Konstruktor does the lifecycle work for you, and it is what we recommend for a first hub.
+  </Question>
+</Quiz>
