@@ -19,13 +19,30 @@ export const team = {
     url: 'https://github.com/jhnnsrs',
     steward: true,
   },
-  willhelmi: {
-    name: 'Alexander Willhelmi',
+  wilhelmi: {
+    name: 'Alexander Wilhelmi',
     role: 'Contributor',
+    url: 'https://github.com/alexschroeter',
   },
   golden: {
     name: 'Artemiy Golden',
     role: 'Contributor',
+    url: 'https://github.com/artgolden',
+  },
+  schmidt: {
+    name: 'Deborah Schmidt',
+    role: 'Contributor',
+    url: 'https://github.com/frauzufall',
+  },
+  diederich: {
+    name: 'Benedict Diederich',
+    role: 'Contributor',
+    url: 'https://github.com/beniroquai',
+  },
+  niemeyer: {
+    name: 'Franziska Niemeyer',
+    role: 'Contributor',
+    url: 'https://github.com/Franzili',
   },
 } satisfies Record<string, TeamMember>;
 
