@@ -1,0 +1,356 @@
+---
+title: A device with live state
+description: "Walk through microscope_stage.py and typed_context.py: publishing live state with @app.state, setting it up in @app.startup, keeping it updated from @app.background, and handing per-installation configuration to an app with app_context."
+personas: [build]
+---
+
+The examples on the previous page were stateless: each call started from nothing. Apps that control
+hardware are different. A stage has a position, and that position exists between calls. This page
+shows how an app keeps such things around and makes them visible to others.
+
+<Prerequisites>
+
+- [Actions from functions](/docs/tutorials/python-examples/actions)
+
+</Prerequisites>
+
+<Learn>
+
+- Publish live values with `@app.state`, instead of writing getter actions
+- Create long-lived objects once in an `@app.startup` hook
+- Run a loop next to your actions with `@app.background`
+- Pass per-installation settings with `App(app_context=...)` and `run(app, context=...)`
+
+</Learn>
+
+## `microscope_stage.py`: a simulated stage
+
+```python title="microscope_stage.py"
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["arkitekt[rekuest]>=5", "koil>=3.3.4", "numpy>=1.26"]
+# ///
+"""Stateful: a simulated microscope stage others can watch and drive.
+
+Run:  uv run --script examples/microscope_stage.py
+
+``@app.state`` declares a class whose instances the platform publishes — the UI
+shows the live position without polling an action for it. ``@app.startup``
+builds it once when the app starts providing, ``@app.background`` keeps it
+moving, and every action annotated with the class is handed the same instance.
+
+Swap the sleeps for your stage's serial calls and this is a real device app.
+"""
+
+from typing import Annotated
+
+import koil
+import numpy as np
+
+from arkitekt import App, Description, Task, run
+
+app = App("microscope-stage", "0.1.0")
+
+
+@app.state
+class StagePosition:
+    """Where the stage is, in micrometers, and whether it is settled."""
+
+    x_um: float = 0.0
+    y_um: float = 0.0
+    z_um: float = 0.0
+    moving: bool = False
+
+
+@app.startup
+def home_the_stage() -> StagePosition:
+    """Home the stage when the app starts providing."""
+    print("Homing stage...")
+    return StagePosition()
+
+
+@app.action
+def move_to(
+    state: StagePosition,
+    x_um: Annotated[float, Description("Target x, in micrometers")],
+    y_um: Annotated[float, Description("Target y, in micrometers")],
+    z_um: Annotated[float, Description("Target z, in micrometers")] = 0.0,
+    *,
+    task: Task,
+) -> float:
+    """Drives the stage there in 20 steps and returns the distance travelled.
+    """
+    start = np.array([state.x_um, state.y_um, state.z_um])
+    target = np.array([x_um, y_um, z_um])
+    state.moving = True
+    for step in range(1, 21):
+        state.x_um, state.y_um, state.z_um = start + (target - start) * step / 20
+        task.progress(step * 5, f"At {state.x_um:.1f}, {state.y_um:.1f}")
+        koil.sleep(0.05)
+    state.moving = False
+    return float(np.linalg.norm(target - start))
+
+
+@app.background
+def report_drift(state: StagePosition) -> None:
+    """Add the thermal drift a real stage would have, once a second."""
+    rng = np.random.default_rng(0)
+    while True:
+        if not state.moving:
+            state.x_um += float(rng.normal(0, 0.01))
+            state.y_um += float(rng.normal(0, 0.01))
+        koil.sleep(1)
+
+
+if __name__ == "__main__":
+    run(app)
+```
+
+### State instead of getters
+
+A first attempt at a stage app often has an action like `get_position()`. The UI would then have
+to call it over and over to show where the stage is, and two apps asking at once would both trigger
+it. Arkitekt uses a different model:
+
+```python
+@app.state
+class StagePosition:
+    x_um: float = 0.0
+    y_um: float = 0.0
+    z_um: float = 0.0
+    moving: bool = False
+```
+
+A class marked `@app.state` is **published**. The platform keeps a live copy of it. Orkestrator
+shows it, other apps can watch it, and workflows can check it. You never send it explicitly:
+**assigning to a field publishes the change.** In `move_to`, the line
+
+```python
+state.x_um, state.y_um, state.z_um = start + (target - start) * step / 20
+```
+
+updates the position that everyone watching sees, twenty times over the course of the move.
+
+That is also why `move_to` returns the distance travelled and not the new position. The position
+is already in the state. An action returns what it produced. It doesn't repeat what the state
+already shows.
+
+### Building it once: `@app.startup`
+
+```python
+@app.startup
+def home_the_stage() -> StagePosition:
+    print("Homing stage...")
+    return StagePosition()
+```
+
+The startup hook runs once, when the app starts providing, before any task arrives. **Its return
+type decides what it sets up.** It returns a `StagePosition`, so that instance becomes the app's
+state. In a real app this is where you open the serial port and home the hardware.
+
+### Getting it into an action
+
+```python
+def move_to(state: StagePosition, x_um: ..., y_um: ..., z_um: ... = 0.0, *, task: Task) -> float:
+```
+
+`state: StagePosition` works like `task: Task` on the previous page: the annotation tells arkitekt
+to inject it. Every action and hook that asks for `StagePosition` gets **the same instance**, the
+one the startup hook returned. It is not an input, so the form only shows `x_um`, `y_um` and `z_um`.
+
+### Work that never ends: `@app.background`
+
+```python
+@app.background
+def report_drift(state: StagePosition) -> None:
+    while True:
+        if not state.moving:
+            state.x_um += float(rng.normal(0, 0.01))
+        ...
+        koil.sleep(1)
+```
+
+A background function starts with the app and runs for as long as the app does. Here it simulates
+thermal drift. On a real device it might poll a sensor or watch for a button press. It asks for the
+state in the same way an action does, and its changes are published in the same way too.
+
+<Callout type="info" title="Why koil.sleep?">
+
+`koil.sleep` is a sleep that can be cancelled. Inside an action or a background function it is
+interrupted as soon as that work is cancelled, instead of blocking until the time is up. Outside
+arkitekt it behaves like `time.sleep`. Use it in place of `time.sleep` in long-running actions and
+background loops.
+
+</Callout>
+
+## Try it
+
+```bash
+uv run --with "arkitekt[rekuest]" arkitekt call local move_to examples/microscope_stage.py -a x_um=100 -a y_um=50
+```
+
+```
+Homing stage...
+111.80339887498948
+```
+
+The startup hook ran first ("Homing stage..."), then the action returned the distance from the
+origin to (100, 50).
+
+Against a server, run the script and open the app in Orkestrator. Its state panel shows `x_um`,
+`y_um`, `z_um` and `moving`. Leave it open: the x and y values drift slightly every second. Now run
+**Move To**, and watch the numbers count up to the target while `moving` is `true`.
+
+## `typed_context.py`: settings that belong to the installation [#typed-context]
+
+Some values should not be inputs at all. Which folder this microscope saves to, or the pixel size of
+its camera, are properties of the machine the app runs on. A user calling the action should not have
+to type them in, and might get them wrong.
+
+```python title="typed_context.py"
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["arkitekt[rekuest]>=5", "tifffile>=2024.5.22", "numpy>=1.26"]
+# ///
+"""Offering: configuration that belongs to the run, not to the caller.
+
+Run:  uv run --script examples/typed_context.py /path/to/images 0.325
+
+The scope a microscope app runs in — which directory this machine writes to,
+what its pixel size is — is not something a caller should pass per call. Declare
+it as the app context and hand it to `run` once:
+
+    app = App("acquire", app_context=Setup)   # -> App[Setup]
+    run(app, context=Setup(...))              # context= is now required
+
+Every action (and startup hook) annotated with `Setup` is handed that instance.
+Leave `context=` out and the run refuses before it connects — and a type checker
+flags it, because `App[Setup]` narrows `run`.
+"""
+
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Annotated
+
+import numpy as np
+import tifffile
+
+from arkitekt import App, Description, run
+
+
+@dataclass
+class Setup:
+    """What this particular installation is."""
+
+    image_dir: Path
+    pixel_size_um: float
+
+
+app = App("typed-context", "0.1.0", app_context=Setup)
+
+
+@app.action
+def list_images(setup: Setup) -> list[str]:
+    """The TIFFs in this installation's image directory.
+    """
+    return sorted(p.name for p in setup.image_dir.glob("*.tif"))
+
+
+@app.action
+def physical_size(
+    setup: Setup,
+    name: Annotated[str, Description("A file name from `list_images`")],
+) -> float:
+    """The width of an image in micrometers, using this installation's pixel size.
+    """
+    array = np.asarray(tifffile.imread(setup.image_dir / name))
+    return float(array.shape[-1] * setup.pixel_size_um)
+
+
+if __name__ == "__main__":
+    image_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()
+    pixel_size = float(sys.argv[2]) if len(sys.argv) > 2 else 0.1
+    run(app, context=Setup(image_dir=image_dir, pixel_size_um=pixel_size))
+```
+
+### Declaring the context
+
+```python
+@dataclass
+class Setup:
+    image_dir: Path
+    pixel_size_um: float
+
+
+app = App("typed-context", "0.1.0", app_context=Setup)
+```
+
+`app_context=Setup` says that this app cannot run without a `Setup`. The class can be any class.
+A dataclass is the usual choice.
+
+### Supplying it
+
+```python
+run(app, context=Setup(image_dir=image_dir, pixel_size_um=pixel_size))
+```
+
+You build the context yourself, here from the command-line arguments, and pass it to `run` once.
+After that, every action annotated with `Setup` receives it, just like the state above. `list_images`
+takes no input from the user: its only parameter is injected.
+
+If you forget `context=`, the run refuses before it connects. Type checkers catch it even earlier:
+`App(..., app_context=Setup)` is typed as `App[Setup]`, and that makes `context=` a required
+argument of `run`.
+
+### State, or context?
+
+| | `@app.state` | `app_context` |
+|---|---|---|
+| Created by | an `@app.startup` hook | you, before calling `run` |
+| Visible to others | yes, published live | no |
+| Changes while running | yes, that's the point | normally not |
+| Good for | positions, flags, what a device is doing | paths, pixel sizes, serial port names |
+
+For heavy objects that should be shared between actions but kept private (a loaded model, an open
+device handle) there is a third option, `@app.context`. It is explained in
+[State & lifecycle](/docs/guides/python/state-lifecycle).
+
+## Try it
+
+Without a context, the local call refuses, just like `run` would:
+
+```bash
+uv run --with "arkitekt[rekuest]" --with tifffile arkitekt call local list_images examples/typed_context.py
+```
+
+```
+Error: App 'typed-context' declares an app context (Setup). Pass --context module:attr or --context-file config.yaml.
+```
+
+The script itself builds the context from its arguments. Point it at a folder of TIFFs and give it a
+pixel size:
+
+```bash
+uv run --script examples/typed_context.py ~/images 0.325
+```
+
+In Orkestrator, **List Images** has no fields to fill in, and **Physical Size** only asks for a file
+name. The folder and the pixel size come from the installation.
+
+## Next
+
+- All the lifecycle options in one place: [State & lifecycle](/docs/guides/python/state-lifecycle)
+- Next example: [Arrays between actions](/docs/tutorials/python-examples/in-memory)
+
+<Quiz>
+  <Question q="Why does the stage app publish its position as state instead of offering a get_position action?">
+    State is pushed to everyone watching as it changes. Nobody has to poll an action, and the UI, other apps and workflows all see the same live value.
+  </Question>
+  <Question q="How does arkitekt know that home_the_stage sets up the StagePosition state?">
+    From its return type. A startup hook that returns an instance of an `@app.state` class sets up that state.
+  </Question>
+  <Question q="Where should the folder a microscope saves images to come from?">
+    From the app context, passed once to `run(app, context=...)`. It is a property of the installation, not an input of each call.
+  </Question>
+</Quiz>

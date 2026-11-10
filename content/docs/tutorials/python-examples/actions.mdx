@@ -1,0 +1,292 @@
+---
+title: Actions from functions
+description: "Walk through hello.py and measure_nuclei.py: how a typed Python function becomes an action with a generated form, how to report progress, and how to return a structured record with @app.model."
+personas: [build]
+---
+
+This page covers the two smallest examples. `hello.py` is the minimum an app needs. `measure_nuclei.py`
+does real image analysis behind the same kind of signature, and returns a structured result.
+
+<Learn>
+
+- Declare an app and turn a function into an action
+- See how type hints, defaults and docstrings become the form in Orkestrator
+- Report progress from inside an action
+- Return several named values with `@app.model`
+
+</Learn>
+
+## `hello.py`: the smallest app
+
+```python title="hello.py"
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["arkitekt[rekuest]>=5"]
+# ///
+"""Offering: the smallest possible app — one action, offered until you stop it.
+
+Run:  uv run --script examples/hello.py
+
+The script connects to the Arkitekt server in ``$FAKTS_URL`` (or the public
+deployment), authenticates once in your browser, and then `greet` is callable
+from the UI, from a workflow, or from any other app.
+"""
+
+from typing import Annotated
+
+from arkitekt import App, Description, run
+
+app = App("hello", "0.1.0")
+
+
+@app.action
+def greet(
+    name: Annotated[str, Description("Who to greet")] = "world",
+    times: Annotated[int, Description("How often to say it")] = 1,
+) -> str:
+    """Says hello. The function's name is the action's title ("Greet"), the
+    docstring its description — this is the whole UI, generated from the signature.
+    """
+    return " ".join([f"Hello {name}!"] * times)
+
+
+if __name__ == "__main__":
+    # Nothing above this line connects: an App is a declaration. `run` is what
+    # authenticates, registers the action and blocks.
+    run(app)
+```
+
+### The declaration
+
+```python
+app = App("hello", "0.1.0")
+```
+
+An `App` is a **declaration**: an identifier, a version, and the actions it offers. Creating it does
+not connect to anything. That matters more than it looks. The `arkitekt` CLI imports this file to
+inspect it, to run it with hot reloading and to package it into a container. All of that works
+because importing the module has no side effects.
+
+### The action
+
+`@app.action` registers `greet` as an action. Arkitekt reads everything it needs from the function
+itself:
+
+| In the code | On the platform |
+|---|---|
+| the function name `greet` | the action's title, "Greet" (pass `name=` to choose another) |
+| the docstring | the action's description |
+| `name: str`, `times: int` | two inputs, a text field and a number field |
+| `= "world"`, `= 1` | default values, which make both inputs optional |
+| `Description("Who to greet")` | the help text shown under each field |
+| `-> str` | one text output |
+
+`Annotated[str, Description(...)]` is standard Python. To the type checker it is still `str`.
+Arkitekt reads the extra metadata. Other metadata such as validators and widgets go in the same
+place.
+
+### Running it
+
+```python
+if __name__ == "__main__":
+    run(app)
+```
+
+`run(app)` is where the network starts. It logs in (opening your browser the first time), registers
+`greet` with the server and then waits for tasks until you press Ctrl+C.
+
+## Try it
+
+**Without a server.** Call the action locally:
+
+```bash
+uv run --with "arkitekt[rekuest]" arkitekt call local greet examples/hello.py -a name=Ada -a times=2
+```
+
+```
+"Hello Ada! Hello Ada!"
+```
+
+**See what would be registered.** `arkitekt inspect` loads the app without connecting and shows the
+ports it found:
+
+```bash
+uv run --with "arkitekt[rekuest]" arkitekt inspect implementations examples/hello.py
+```
+
+```
+action   takes                        returns           hash
+greet    name: STRING?, times: INT?   return0: STRING   b5fbd9879168
+```
+
+The `?` marks the two inputs as optional, because both have defaults.
+
+**On a server.** Run `uv run --script examples/hello.py`, open Orkestrator, and find the *hello* app.
+Open **Greet**: the form has a text field and a number field, prefilled with `world` and `1`. Run it,
+and a task appears with your greeting as its result.
+
+## `measure_nuclei.py`: real work, structured results
+
+The second example has the same shape, but its action segments an image and returns several
+numbers at once.
+
+```python title="measure_nuclei.py"
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["arkitekt[rekuest]>=5", "scikit-image>=0.24", "numpy>=1.26", "pooch>=1.8"]
+# ///
+"""Offering: a real bioimage computation behind a plain signature.
+
+Run:  uv run --script examples/measure_nuclei.py
+
+The image never leaves the agent — segmentation happens locally on one of
+scikit-image's own sample images, and only the numbers travel. The result is an
+``@app.model``: a class whose fields become the ports of the return value, so
+the caller gets a typed record rather than a blob.
+
+The first run may download the sample image through ``pooch`` (~2 MB).
+"""
+
+from typing import Annotated
+
+import numpy as np
+from skimage import data, measure
+from skimage.filters import threshold_otsu
+
+from arkitekt import App, Description, Task, run
+
+app = App("measure-nuclei", "0.1.0")
+
+
+@app.model
+class NucleiMeasurement:
+    """What a segmented field of nuclei amounts to."""
+
+    count: int
+    mean_area_px: float
+    median_area_px: float
+    covered_fraction: float
+
+
+@app.action
+def measure_nuclei(
+    min_size: Annotated[int, Description("Objects smaller than this are noise")] = 20,
+    *,
+    task: Task,
+) -> NucleiMeasurement:
+    """Segments scikit-image's `human_mitosis` field by Otsu thresholding and
+    reports what the connected components add up to.
+    """
+    image = data.human_mitosis()
+    task.progress(30, "Thresholding")
+
+    mask = image > threshold_otsu(image)
+    task.progress(60, "Labelling")
+
+    labels = measure.label(mask)
+    # Filter on the measured areas rather than on the mask: one pass, and no
+    # dependence on which skimage version spells the size filter how.
+    areas = np.array(
+        [r.area for r in measure.regionprops(labels) if r.area >= min_size], dtype=float
+    )
+    task.progress(90, f"Found {areas.size} nuclei")
+
+    return NucleiMeasurement(
+        count=int(areas.size),
+        mean_area_px=float(areas.mean()) if areas.size else 0.0,
+        median_area_px=float(np.median(areas)) if areas.size else 0.0,
+        covered_fraction=float(mask.mean()),
+    )
+
+
+if __name__ == "__main__":
+    run(app)
+```
+
+### A result with named fields
+
+```python
+@app.model
+class NucleiMeasurement:
+    count: int
+    mean_area_px: float
+    ...
+```
+
+An action can return one plain value, like `greet` does. When the result is several values that
+belong together, declare an `@app.model`. Its fields become the fields of the result, so the caller
+gets a typed record with `count`, `mean_area_px` and so on, instead of an unnamed tuple. A workflow
+can wire `count` into the next step on its own.
+
+Models are sent **by value**, so keep them small: a handful of numbers, strings and flags. Images
+and tables do not belong in a model. They go in a data service, which later pages cover.
+
+### Asking for the task
+
+```python
+def measure_nuclei(
+    min_size: Annotated[int, Description("Objects smaller than this are noise")] = 20,
+    *,
+    task: Task,
+) -> NucleiMeasurement:
+```
+
+`task: Task` is not an input the user fills in. Arkitekt sees the `Task` annotation and **injects**
+the running task. Parameters are matched by their type annotation, not by their name. Putting it
+after the `*` (keyword-only) is a common convention to keep injected parameters apart from the
+real inputs. The form in Orkestrator only shows `min_size`.
+
+The task is how an action talks back while it runs:
+
+```python
+task.progress(30, "Thresholding")
+```
+
+Each call sends a percentage and a message to whoever is watching, so a long action shows a moving
+progress bar instead of hanging silently.
+
+### Where the data lives
+
+The image never leaves your machine. The action loads scikit-image's `human_mitosis` sample,
+segments it, and returns only four numbers. This is a common pattern: compute where the data is,
+send only the summary.
+
+## Try it
+
+```bash
+uv run --with "arkitekt[rekuest]" --with scikit-image --with pooch \
+  arkitekt call local measure_nuclei examples/measure_nuclei.py
+```
+
+```
+{
+  "count": 285,
+  "mean_area_px": 104.26666666666667,
+  "median_area_px": 88.0,
+  "covered_fraction": 0.11360549926757812,
+  "__identifier": "@measure-nuclei/nuclei_measurement"
+}
+```
+
+The `__identifier` is the model's identity on the platform: the app's identifier plus the class
+name. Pass `-a min_size=200` to drop the smaller objects and watch the count fall.
+
+When you run the script against a server and start the action in Orkestrator, the task's progress
+bar steps through "Thresholding", "Labelling" and "Found … nuclei" before the result appears.
+
+## Next
+
+- More about ports, models and data types: [Types & data](/docs/guides/python/types)
+- Next example: [A device with live state](/docs/tutorials/python-examples/device-state)
+
+<Quiz>
+  <Question q="Why can the arkitekt CLI safely import hello.py to inspect it?">
+    Declaring an `App` connects nothing. Only `run(app)` connects, and it is guarded by `if __name__ == "__main__"`.
+  </Question>
+  <Question q="Why does `task` not appear as a field in the form for Measure Nuclei?">
+    It is annotated with `Task`, so arkitekt injects the running task instead of treating it as an input.
+  </Question>
+  <Question q="When should an action return an `@app.model` instead of a single value?">
+    When the result is a few named values that belong together. Large data like images goes into a data service instead.
+  </Question>
+</Quiz>

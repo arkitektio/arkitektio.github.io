@@ -20,13 +20,15 @@ const config: RevealConfig = {
   height: DECK_HEIGHT,
   margin: 0.03,
   // Embedded decks share the page with the site nav, so reveal must not grab
-  // the arrow keys until the deck is actually focused, and must not rewrite
-  // the URL hash out from under the Next router.
+  // the arrow keys until the deck is actually focused.
   embedded: true,
   keyboardCondition: 'focused',
-  hash: false,
+  // Keep the current slide (and fragment step) in the URL hash, so a reload
+  // or a shared link lands on the same slide. Reveal writes it with
+  // history.replaceState, which leaves the Next router alone.
+  hash: true,
   respondToHashChanges: true,
-  fragmentInURL: false,
+  fragmentInURL: true,
   controls: true,
   controlsLayout: 'bottom-right',
   controlsTutorial: false,

@@ -21,6 +21,16 @@ export type Presentation = {
 
 export const presentations: Presentation[] = [
   {
+    slug: 'smart-microscopy',
+    title: 'Infrastructure for smart microscopy',
+    description:
+      'From workflows to optics: Kim’s AI-built organoid loop works, and still leaves the same debt behind. Arkitekt pays it down line by line, with openUC2 and Optikit as the outlook.',
+    topic: 'Arkitekt',
+    tags: ['Smart microscopy', 'Workflows', 'openUC2'],
+    slides: 56,
+    minutes: 45,
+  },
+  {
     slug: 'mikro-coordinate-system',
     title: 'The Mikro coordinate system',
     description:

@@ -13,3 +13,4 @@ export {
 } from './slide';
 export { MikroCoordinateSystemDeck } from './decks/mikro-coordinate-system';
 export { VolumeViewerDeck } from './decks/volume-viewer';
+export { SmartMicroscopyDeck } from './decks/smart-microscopy';
