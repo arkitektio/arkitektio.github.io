@@ -109,7 +109,7 @@ const linkClass = 'underline underline-offset-4 hover:text-fd-primary';
 // One button for the app that fits the reader's device: Pokket on a phone or
 // tablet, the matching Orkestrator installer on a computer. Everything else
 // stays reachable in the line below it.
-export function AccessAppDownload({ className }: { className?: string }) {
+export function cercer({ className }: { className?: string }) {
   const platform = usePlatform();
   const { release, find, releases } = useOrkestratorRelease();
 

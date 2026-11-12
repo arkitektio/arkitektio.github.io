@@ -2484,9 +2484,10 @@ section.present .${u}-slam { animation: ${u}-slam 0.45s cubic-bezier(.2,1.4,.4,1
 
 const fraktur = UnifrakturMaguntia({ weight: '400', subsets: ['latin'] });
 
-type HorsemanKind = 'connection' | 'errors' | 'data' | 'repro';
+type HorsemanKind = 'connection' | 'errors' | 'data' | 'repro' | 'ai';
 
-export const HORSEMEN: Record<keyof typeof NIGHTS, { kind: HorsemanKind; ordinal: string; name: string; epithet: string; horse: string; mane: string; cloak: string; aura: string }> = {
+/** The four of Kim's nights, and a fifth who rides in on the hype. */
+export const HORSEMEN: Record<keyof typeof NIGHTS | 'ai', { kind: HorsemanKind; ordinal: string; name: string; epithet: string; horse: string; mane: string; cloak: string; aura: string }> = {
   communication: {
     kind: 'connection',
     ordinal: 'The first horseman',
@@ -2527,7 +2528,19 @@ export const HORSEMEN: Record<keyof typeof NIGHTS, { kind: HorsemanKind; ordinal
     cloak: '#2a2f26',
     aura: 'rgba(190,242,100,0.35)',
   },
+  ai: {
+    kind: 'ai',
+    ordinal: 'And a fifth horseman',
+    name: 'The AI Horse',
+    epithet: 'who answers everything, confidently',
+    horse: '#c4b5fd',
+    mane: '#22d3ee',
+    cloak: '#312e81',
+    aura: 'rgba(196,181,253,0.5)',
+  },
 };
+
+export type HorsemanKey = keyof typeof HORSEMEN;
 
 /** What each horseman carries. Hand at (222,135) unless noted. */
 function HorsemanEmblem({ kind, u }: { kind: HorsemanKind; u: string }) {
@@ -2555,6 +2568,22 @@ function HorsemanEmblem({ kind, u }: { kind: HorsemanKind; u: string }) {
         <text x={196} y={84} fontFamily="ui-monospace, monospace" fontSize={8} fontWeight={700} fill="#7f1d1d" transform="rotate(-66 196 84)">
           Traceback
         </text>
+      </g>
+    );
+  if (kind === 'ai')
+    return (
+      <g>
+        <path d="M222 135 L196 58" stroke="#78350f" strokeWidth={6} strokeLinecap="round" />
+        <rect x={136} y={10} width={112} height={50} rx={14} fill="#fff" stroke="#111" strokeWidth={2.5} />
+        <path d="M184 60 L196 74 L200 60 Z" fill="#fff" stroke="#111" strokeWidth={2.5} strokeLinejoin="round" />
+        <path d="M186 59 L198 59" stroke="#fff" strokeWidth={4} />
+        {[166, 192, 218].map((x) => (
+          <circle key={x} className={`${u}-glow`} cx={x} cy={35} r={6} fill="#6d28d9" />
+        ))}
+        <g className={`${u}-spark`}>
+          <path d="M120 20 L124 30 L134 34 L124 38 L120 48 L116 38 L106 34 L116 30 Z" fill="#facc15" stroke="#a16207" strokeWidth={1.2} />
+          <path d="M262 4 L265 11 L272 14 L265 17 L262 24 L259 17 L252 14 L259 11 Z" fill="#facc15" stroke="#a16207" strokeWidth={1.2} />
+        </g>
       </g>
     );
   if (kind === 'data')
@@ -2601,9 +2630,42 @@ export function horsemanAmbientCss(u: string) {
 `;
 }
 
+/** Reviewer 2, as a caricature big enough to read at corner size: grey hair,
+    one eyebrow up, eyes over reading glasses, the frown. Same look as the
+    meme panel. */
+function ReviewerFace() {
+  return (
+    <g>
+      <ellipse cx={284} cy={108} rx={23} ry={26} fill="#eab08c" stroke="#000" strokeWidth={2.5} />
+      <path d="M261 104 C 258 78, 310 76, 307 104 C 302 92, 294 88, 284 93 C 274 88, 266 92, 261 104 Z" fill="#a3aab5" stroke="#000" strokeWidth={1.5} />
+      <path d="M266 101 L 280 106" stroke="#4b5563" strokeWidth={4} strokeLinecap="round" />
+      <path d="M288 102 Q 296 95 304 99" stroke="#4b5563" strokeWidth={4} strokeLinecap="round" fill="none" />
+      <circle cx={273} cy={110} r={2.6} fill="#1f2937" />
+      <circle cx={295} cy={108} r={2.6} fill="#1f2937" />
+      <rect x={264} y={113} width={17} height={10} rx={3} fill="#fff" fillOpacity={0.3} stroke="#1f2937" strokeWidth={2.4} />
+      <rect x={287} y={112} width={17} height={10} rx={3} fill="#fff" fillOpacity={0.3} stroke="#1f2937" strokeWidth={2.4} />
+      <path d="M281 117 L 287 117" stroke="#1f2937" strokeWidth={2} />
+      <path d="M275 128 Q 285 123 295 126" stroke="#7c3f2a" strokeWidth={3} fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
 /** The horseman himself: horse, rider and what he carries. Class names are
     scoped by `u`; `horsemanAmbientCss(u)` makes him breathe. */
-export function HorsemanArt({ night, u, width, className }: { night: keyof typeof NIGHTS; u: string; width: number; className?: string }) {
+export function HorsemanArt({
+  night,
+  u,
+  width,
+  className,
+  face = 'hood',
+}: {
+  night: HorsemanKey;
+  u: string;
+  width: number;
+  className?: string;
+  /** Under the hood: the dark with glowing eyes, or Reviewer 2. */
+  face?: 'hood' | 'reviewer';
+}) {
   const h = HORSEMEN[night];
   const outline = h.kind === 'data' ? '#000' : '#111';
   const leg = (hip: [number, number], d: string, a: number) => (
@@ -2630,6 +2692,11 @@ export function HorsemanArt({ night, u, width, className }: { night: keyof typeo
           <path d="M184 100 C 208 112, 220 146, 242 176 C 222 162, 212 128, 196 116 C 200 134, 190 120, 184 100 Z" fill={h.mane} stroke={outline} strokeWidth={2.5} />
           <circle className={`${u}-glow`} cx={142} cy={128} r={5} fill="#ef4444" />
           <circle cx={110} cy={152} r={2.5} fill={outline} />
+          {h.kind === 'ai' ? (
+            <text x={290} y={236} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontSize={40} fontWeight={900} fill="#6d28d9" stroke="#fff" strokeWidth={4} paintOrder="stroke">
+              AI ✦
+            </text>
+          ) : null}
           {/* near legs */}
           {leg([190, 246], 'M190 246 L 150 286 L 118 298', -18)}
           {leg([340, 236], 'M340 236 L 392 284 L 432 294', 18)}
@@ -2637,9 +2704,15 @@ export function HorsemanArt({ night, u, width, className }: { night: keyof typeo
           <path className={`${u}-cape`} d="M312 126 C 360 118, 392 140, 428 116 C 410 152, 374 168, 322 172 Z" fill={h.cloak} stroke="#000" strokeWidth={2} />
           <path d="M234 178 C 238 122, 298 100, 320 132 C 336 166, 330 200, 320 216 L 238 216 Z" fill={h.cloak} stroke="#000" strokeWidth={2.5} />
           <path d="M262 112 C 260 80, 306 76, 306 112 C 306 128, 296 136, 284 136 C 270 136, 262 128, 262 112 Z" fill={h.cloak} stroke="#000" strokeWidth={2.5} />
-          <ellipse cx={279} cy={114} rx={12} ry={14} fill="#000" />
-          <circle className={`${u}-glow`} cx={274} cy={112} r={2.6} fill="#ef4444" />
-          <circle className={`${u}-glow`} cx={284} cy={112} r={2.6} fill="#ef4444" />
+          {face === 'reviewer' ? (
+            <ReviewerFace />
+          ) : (
+            <>
+              <ellipse cx={279} cy={114} rx={12} ry={14} fill="#000" />
+              <circle className={`${u}-glow`} cx={274} cy={112} r={2.6} fill="#ef4444" />
+              <circle className={`${u}-glow`} cx={284} cy={112} r={2.6} fill="#ef4444" />
+            </>
+          )}
           <HorsemanEmblem kind={h.kind} u={u} />
           <path d={arm} stroke={h.cloak} strokeWidth={13} strokeLinecap="round" />
           <path d={arm} stroke="#000" strokeWidth={13} strokeLinecap="round" opacity={0.25} />
@@ -2650,7 +2723,7 @@ export function HorsemanArt({ night, u, width, className }: { night: keyof typeo
 }
 
 /** The banner under a horseman. */
-export function HorsemanBanner({ night, className, small = false, tiny = false }: { night: keyof typeof NIGHTS; className?: string; small?: boolean; tiny?: boolean }) {
+export function HorsemanBanner({ night, className, small = false, tiny = false }: { night: HorsemanKey; className?: string; small?: boolean; tiny?: boolean }) {
   const h = HORSEMEN[night];
   if (tiny)
     return (

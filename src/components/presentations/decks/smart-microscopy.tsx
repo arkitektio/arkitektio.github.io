@@ -19,7 +19,18 @@ import { cn } from '@/lib/cn';
 import { DeckFrame } from '../deck-frame';
 import { Caption, DeckSlide, Eyebrow, Panel } from '../slide';
 import { AnimStyles, delay } from './smart-microscopy-anim';
-import { ConnectionWinFigure, DataWinFigure, DefeatFrame, HoldWinFigure, RecordWinFigure, ShareWinFigure } from './smart-microscopy-defeat-figures';
+import {
+  CoordinationWinFigure,
+  DataWinFigure,
+  DefeatFrame,
+  HoldWinFigure,
+  HorsemanDuelFigure,
+  LineageFigure,
+  RecordWinFigure,
+  ShareCodeFigure,
+  ShareDataFigure,
+  SharingFigure,
+} from './smart-microscopy-defeat-figures';
 import {
   BetterFigure,
   ClaudeChatFigure,
@@ -53,6 +64,7 @@ import {
   ReplayFigure,
   ShareFigure,
 } from './smart-microscopy-arkitekt-figures';
+import { AgentRightsFigure, BlokChatFigure, PitchFigure } from './smart-microscopy-llm-figures';
 
 const MEDIA = '/presentations/smart-microscopy';
 
@@ -159,15 +171,18 @@ function DebtList({
     point when there is no video at all. */
 function Clip({
   n,
+  label,
   file,
   shows,
   length,
   height = 440,
 }: {
-  n: number;
+  /** The clip's number in the running order, or a `label` instead. */
+  n?: number;
+  label?: string;
   file: string;
   shows: string;
-  length: string;
+  length?: string;
   /** Height in slide pixels. */
   height?: number;
 }) {
@@ -182,7 +197,7 @@ function Clip({
     >
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-16 text-center">
         <span className="font-mono text-[13px] font-bold uppercase tracking-[0.18em] text-fd-primary">
-          Video {n} · {length}
+          {[label ?? `Video ${n}`, length].filter(Boolean).join(' · ')}
         </span>
         <span className="text-[24px] font-semibold leading-snug">{shows}</span>
         <span className="font-mono text-[13px] text-fd-muted-foreground">{src}</span>
@@ -201,6 +216,33 @@ function Clip({
       >
         <source src={src} />
       </video>
+    </div>
+  );
+}
+
+/** A YouTube segment. reveal.js loads it when its slide comes up
+    (`data-src`), starts it there (`data-autoplay`) and pauses it on the way
+    out; `start`/`end` cut the segment. Needs the venue's network. */
+function YouTubeClip({ id, start, end, label, shows, height = 440 }: { id: string; start: number; end: number; label: string; shows: string; height?: number }) {
+  const ts = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  const src = `https://www.youtube.com/embed/${id}?start=${start}&end=${end}&rel=0&enablejsapi=1`;
+  return (
+    <div className="relative mx-auto aspect-video overflow-hidden rounded-2xl border border-dashed border-fd-border bg-fd-card/40" style={{ height }}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-16 text-center">
+        <span className="font-mono text-[13px] font-bold uppercase tracking-[0.18em] text-fd-primary">
+          {label} · {ts(start)}–{ts(end)}
+        </span>
+        <span className="text-[24px] font-semibold leading-snug">{shows}</span>
+        <span className="font-mono text-[13px] text-fd-muted-foreground">youtube.com/watch?v={id}&amp;t={start}</span>
+      </div>
+      <iframe
+        data-src={src}
+        data-autoplay=""
+        title={shows}
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowFullScreen
+        className="absolute inset-0 size-full"
+      />
     </div>
   );
 }
@@ -562,18 +604,26 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
+      <Slide notes="The first horseman rides in: Connection, wearing Reviewer 2’s face. He rears and has his say: “You still need to connect to the hub!” Don’t explain anything here: the next slide is the first blow.">
+        <HorsemanDuelFigure night="communication" />
+      </Slide>
+
       <DeckSlide
         eyebrow="Defeating the first horseman"
-        title="Arkitekt sets up the network for you"
-        lead="Every app connects to the hub: directly on the same network, through a WireGuard tunnel from anywhere else. When a link drops, it comes back on its own."
-        notes="The first horseman, Connection, from night 1. Not a mesh of machines talking to each other: a star. Every app connects to the hub, and nothing else. On the institute network that is a direct connection (the microscope PC, the GPU server); from anywhere else (Kim’s laptop at home, the ESP32 on its own Wi-Fi) Arkitekt sets up a WireGuard tunnel with Tailscale. Nobody types an IP address or opens a port. Then watch the pump: its Wi-Fi drops, the link goes red, Arkitekt keeps retrying, and two seconds later it is back and the pump call that was waiting gets delivered. Kim’s script would have died on a TimeoutError. Click: strike him down."
+        title="No IPs, just coordination"
+        lead="Nobody types an IP address. An app asks a coordination server where its hub is, once, and from then on talks to the Arkitekt server directly."
+        notes="The first horseman, Connection, from night 1. First the IP address Kim used to paste into every script: struck out, nobody types one any more, and nobody opens a port. Instead the app asks a coordination server (the hub registered there too) where its hub is, and gets back a route and keys. That is the only thing the coordination server does: it steps aside, and the app talks to the Arkitekt server directly, over a WireGuard tunnel, wherever either of them is. Click: strike him down."
       >
         <div className="flex flex-1 items-center">
-          <DefeatFrame night="communication" weapon="the mesh">
-            <ConnectionWinFigure />
+          <DefeatFrame night="communication" weapon="coordination">
+            <CoordinationWinFigure />
           </DefeatFrame>
         </div>
       </DeckSlide>
+
+      <Slide notes="The second horseman: Error handling & Observability, wearing Reviewer 2’s face again. His line: “If your connection fails, your workflow fails. lol”. This fight takes two slides.">
+        <HorsemanDuelFigure night="threads" />
+      </Slide>
 
       <DeckSlide
         eyebrow="Defeating the second horseman · 1 of 2"
@@ -602,6 +652,20 @@ export function SmartMicroscopyDeck() {
       </DeckSlide>
 
       <DeckSlide
+        eyebrow="mikro coordinate systems"
+        title="Smart microscopy isn’t an MDA"
+        notes="The tiles on the right are the ones from the demo, on top of the overview. Link to the Mikro coordinate system deck for anyone who wants the details."
+      >
+        <div className="flex flex-1 items-center">
+          <CoordsFigure />
+        </div>
+      </DeckSlide>
+
+      <Slide notes="The third horseman: Data Management, Reviewer 2 once more: “lol, on your server you still just have folders. You don’t solve that.” One blow this time.">
+        <HorsemanDuelFigure night="data" />
+      </Slide>
+
+      <DeckSlide
         eyebrow="Defeating the third horseman"
         title="Data with coordinates, not filenames"
         lead="Every image goes into mikro with its pixel size, its place on the stage and the calls that made it. Overview and detail share one coordinate system."
@@ -615,14 +679,69 @@ export function SmartMicroscopyDeck() {
       </DeckSlide>
 
       <DeckSlide
-        eyebrow="Defeating the fourth horseman"
-        title="Share the script and the data with a link"
-        lead="Publish the workflow, its data and its record together. Whoever opens the link gets the exact script, versions and inputs, and can run it again on their own hub."
-        notes="The fourth horseman, Reproducibility. On arrival: Kim publishes three things as one link: the exact workflow script, the images with their coordinates, and the record of run 41 (model version, threshold, seed). The link goes to another lab’s hub (yes, Reviewer 2’s). They press run again and get the same number. Reviewer 2: …fine. Click: strike him down. That’s all four."
+        eyebrow="Data management, up close"
+        title="A lineage graph, on one coordinate system"
+        lead="Every item of the run knows what made it and where it sits: the overview, the organoid it found, the detail image, its labels and the measurements, all on the same stage."
+        notes="Stay on the third horseman for one more slide. Left, the lineage graph, read in a zigzag: snap made the overview; find_largest made an ROI on it; move_to and snap made the detail image; segmentation (on the GPU server) made the labels; measure made the table. Right, the same items on the stage, each one placed the moment it appears in the graph: the overview, the ROI on it, the detail inside the ROI, the labels on the detail, and the measurements at the organoid’s centroid. Two questions Kim could never answer from a folder, now one click each: where did this number come from, and where on the slide is it?"
       >
         <div className="flex flex-1 items-center">
-          <DefeatFrame night="repro" weapon="a link">
-            <ShareWinFigure />
+          <LineageFigure />
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="Live demo"
+        title="Arkitekt, live"
+        notes="Live demo slot: drop the recording in as public/presentations/smart-microscopy/live-arkitekt.mp4 and it plays here; until then the slot says what goes in it. Straight after the lineage slide, so show the real thing: a run of the workflow, then its lineage graph and the images on the stage in Orkestrator."
+      >
+        <div className="flex flex-1 items-center justify-center">
+          <Clip
+            label="Live demo"
+            file="live-arkitekt.mp4"
+            shows="Arkitekt live: the workflow runs, then its lineage graph and the images on the stage in Orkestrator."
+          />
+        </div>
+      </DeckSlide>
+
+      <Slide notes="The last horseman: Reproducibility. Reviewer 2’s favourite: “You still need to run the code somewhere. How should we reproduce these environments?” This fight takes three slides: sharing is caring, then code, then data.">
+        <HorsemanDuelFigure night="repro" />
+      </Slide>
+
+      <DeckSlide
+        eyebrow="Defeating the fourth horseman"
+        title="Sharing is caring"
+        lead="To check a result, someone else needs both halves: the code that made it and the data it ran on."
+        notes="The fourth horseman, Reproducibility. Sharing is caring, and it takes both: code without the data has nothing to run on, data without the code doesn’t say how it was made. Two slides, one for each half; the strike comes at the end of the second."
+      >
+        <div className="flex flex-1 items-center">
+          <DefeatFrame night="repro" weapon="sharing" kill={false}>
+            <SharingFigure />
+          </DefeatFrame>
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="Defeating the fourth horseman · 1 of 2"
+        title="Share code: publish it as an app"
+        lead="Bundle the script as an app, publish it to GitHub, and every other hub can install it, with the versions it ran with."
+        notes="Half one, the code. Kim’s script is a folder: app.py with her three actions, and pyproject.toml pinning stardist. arkitekt plugin build bundles it as an app: a container image, the declared actions, CPU and CUDA flavours. arkitekt plugin publish puts the release on GitHub. From there it is installable: another lab’s hub finds organoid-tools, presses install, and gets the same three actions, picking the CUDA flavour because it has a GPU. No README with twelve setup steps."
+      >
+        <div className="flex flex-1 items-center">
+          <DefeatFrame night="repro" weapon="sharing" kill={false}>
+            <ShareCodeFigure />
+          </DefeatFrame>
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="Defeating the fourth horseman · 2 of 2"
+        title="Share data: press share"
+        lead="Pick the dataset and who gets it. When they accept, their hub gets a WireGuard connection to yours, with access to that data and nothing else."
+        notes="Half two, the data. The clip on the left autoplays: Kim presses share on organoids / B4 and picks the other lab. Nothing is exported or uploaded. Click: the other lab accepts. A WireGuard connection opens between the two hubs, the same kind of tunnel as on the connection slide, but scoped: it reaches organoids / B4, read-only, and nothing else. B5 and her drafts aren’t even visible. Click again: strike him down. That’s all four."
+      >
+        <div className="flex flex-1 items-center">
+          <DefeatFrame night="repro" weapon="sharing" killIndex={2}>
+            <ShareDataFigure src={`${MEDIA}/share-data.mp4`} />
           </DefeatFrame>
         </div>
       </DeckSlide>
@@ -639,6 +758,62 @@ export function SmartMicroscopyDeck() {
             length="60 s"
             shows="Find, centre, capture on the UC2: Orkestrator plus a phone camera on the stage."
           />
+        </div>
+      </DeckSlide>
+
+      {/* “just tell Claude to run it”: two problems ------------------------- */}
+
+      <Slide notes="One more rider, and he’s new: the AI Horse, Reviewer 2 in the saddle again, shouting “LLMs will make all of that obsolete! WHERE IS THE CHAT INTERFACE?” No strike here; the next slides are the answer, starting with Kim, who has had the same idea.">
+        <HorsemanDuelFigure night="ai" />
+      </Slide>
+
+      <DeckSlide
+        eyebrow="Kim, the week after"
+        title="Just tell Claude to run it?"
+        notes="Kim is bored again, and she has a plan: skip the workflow, tell Claude to run the experiment, and let the user chat with it. Let Arkitekt answer: two problems with that. One, what is it allowed to do? Two, what does the user actually chat with? The clip comes first, then one slide per problem."
+      >
+        <div className="flex flex-1 items-center">
+          <PitchFigure />
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="Clip · Bloomberg Originals, The Circuit with Emily Chang"
+        title="The Rise and Reckoning of Jensen Huang"
+        notes="YouTube, 23:13 to 24:15; it starts when the slide comes up and stops at 24:15. Needs the venue’s network: if YouTube is blocked, say what the clip shows and move on."
+      >
+        <div className="flex flex-1 items-center justify-center">
+          <YouTubeClip id="JW5s9Md4U2U" start={1393} end={1455} label="Clip" shows="The Circuit with Emily Chang: Jensen Huang, 23:13 to 24:15." />
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="Problem one · Arkitekt and LLMs"
+        title="The agent asks for rights, like any app"
+        lead="An LLM on Arkitekt is just another app: it asks for the scopes it needs, calls typed actions with them, asks again for anything more, and every call is on the record."
+        notes="Problem one: what is it allowed to do? On Arkitekt, Claude is just another app. It can’t touch the microscope until it asks: call find_centre_capture on the scope, read B4. Not laser power above 50 %, not deleting data. Kim approves those scopes, until six. Then it needs the GPU server for segmentation, which it wasn’t granted, so it asks again and Kim allows it once. The record shows both calls, and who allowed each of them."
+      >
+        <div className="flex flex-1 items-center">
+          <AgentRightsFigure />
+        </div>
+      </DeckSlide>
+
+      <StatementSlide
+        eyebrow="Problem two"
+        sub="So let the chat answer with something better than text."
+        notes="Problem two: what does the user chat with? People would like to chat with that, and that’s fine. But typing “a bit more exposure… no, less” to a microscope forty times a day is not an interface."
+      >
+        People would like to chat with that.
+      </StatementSlide>
+
+      <DeckSlide
+        eyebrow="Problem two · Bloks as interfaces"
+        title="The chat answers with a blok"
+        lead="People do want to chat. But for an instrument the answer should be an interface: the blok the app ships, typed and recorded, not text and not a generated UI."
+        notes="Kim asks to tune the exposure herself. Claude doesn’t write a UI and doesn’t ask her to type numbers: it hands over the capture blok that ships with the uc2-scope app. She turns the exposure to 35 ms and captures; the preview brightens, and that press is a recorded call like any other. Then she types 900: outside the action’s range, so the blok says no before anything reaches the laser. More on bloks later in the talk."
+      >
+        <div className="flex flex-1 items-center">
+          <BlokChatFigure />
         </div>
       </DeckSlide>
 
@@ -731,16 +906,6 @@ export function SmartMicroscopyDeck() {
         <div className="flex flex-1 flex-col justify-center gap-5">
           <DebtList paid={[...MESH, ...REPLAY]} justPaid={REPLAY} now={COORDS} answer="coordinate systems" />
           <KimSays>Should I really write all the metadata in the filename? It’s 260 characters now.</KimSays>
-        </div>
-      </DeckSlide>
-
-      <DeckSlide
-        eyebrow="mikro coordinate systems"
-        title="Smart microscopy isn’t an MDA"
-        notes="The tiles on the right are the ones from the demo, on top of the overview. Link to the Mikro coordinate system deck for anyone who wants the details."
-      >
-        <div className="flex flex-1 items-center">
-          <CoordsFigure />
         </div>
       </DeckSlide>
 
