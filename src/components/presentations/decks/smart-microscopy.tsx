@@ -34,6 +34,7 @@ import {
 import {
   BetterFigure,
   ClaudeChatFigure,
+  ChromogenicRoundFigure,
   CollapseFigure,
   DistributedMemeFigure,
   CoverFigure,
@@ -44,12 +45,13 @@ import {
   KimSays,
   MacroChainFigure,
   NightmareFigure,
-  OrganoidFigure,
+  OverworkedKimFigure,
   PaperCard,
   ResultsChart,
-  SadOrganoidFigure,
+  SerialSectionsFigure,
   YearsFigure,
 } from './smart-microscopy-figures';
+import { DreamLab3D } from './smart-microscopy-dream-3d';
 import {
   BloksFigure,
   CoordsFigure,
@@ -340,18 +342,18 @@ export function SmartMicroscopyDeck() {
         </div>
       </Slide>
 
-      <Slide notes="Kim is a persona (from the Lisbon hackathon talk), not a real person: say so. She images organoids on a lightsheet, and they keep dying before she can even add the drugs. Let both organoids play out before you say the rule: same signal, two fates; the only difference is whether growth factor arrives in time. Opening total is about 8 minutes; if short on time, drop “The lab’s reality” first.">
+      <Slide notes="Kim is a persona, not a real person: say so. She is a pathologist, and she wants several antibodies on the same tumor: CD3, CD20, Ki-67, PanCK. The classic way is one antibody per section: cut the block into serial sections and stain each one with its own antibody. Let it play: the cuts go through the block, each section gets its antibody, and the tumor shrinks from section to section. The fourth cut falls outside the tumor, and that is the PanCK section, the one that was meant to find it. Even where the tumor is there, every section has different cells, so you can never ask what one cell carries. Next slide is her way out.">
         <div className="flex h-[600px] w-full items-center gap-8">
           <div className="flex flex-1 flex-col gap-7">
             <div className="sm-in flex flex-col gap-2" style={delay(0.2)}>
               <h2 className="text-[52px] font-bold leading-[1.05] tracking-[-0.025em]">Meet Kim</h2>
               <span className="text-[22px] leading-snug text-fd-muted-foreground">
-                organoid biologist · lightsheet
+                pathologist · one antibody per section
               </span>
             </div>
             <div className="flex items-start gap-3">
               <div className="shrink-0 pt-10">
-                <KimFigure size={150} />
+                <KimFigure size={150} mood="worried" />
               </div>
               <div className="relative flex-1">
                 {/* thought trail: small to large, rising from her head */}
@@ -361,23 +363,47 @@ export function SmartMicroscopyDeck() {
                   className="sm-pop ml-8 rounded-[40px] border-2 border-fd-border bg-fd-card px-8 py-6 text-[28px] font-bold leading-[1.22] tracking-[-0.015em] shadow-sm"
                   style={delay(1.1)}
                 >
-                  My organoids keep on dying…{' '}
-                  <span className="sm-in inline" style={delay(2)}>
-                    <Hl>but if I add growth factor A, this seems reversible?</Hl>
+                  Four antibodies, four sections…{' '}
+                  <span className="sm-in inline" style={delay(5.6)}>
+                    <Hl>and on the last one, the tumor is gone.</Hl>
                   </span>
                 </div>
               </div>
             </div>
           </div>
-          <OrganoidFigure />
+          <SerialSectionsFigure />
+        </div>
+      </Slide>
+
+      <Slide notes="Her way out: Kim reads about chromogenic cycling and tries it out, by hand. Keep every antibody on the same slide: stain, look, wash the chromogen off, stain the next one. The tumor can’t wander off, and every cell carries the whole panel. Let the loop play once and narrate the four trips. One: stain 1 goes on, she carries the slide to the microscope and takes image 1. Two: wash 1, back to the microscope, and the stain is not completely gone; she writes that down. Three: wash 2, and now it is completely gone. Four: stain 2, a different antibody from its own bottle, in its own colour, on other cells of the same tissue; she takes image 2, and on the computer the two images are overlaid. That overlay is the multi-staining: two antibodies, one slide, the same cells. What she discovers: if she does it exactly right, and the cells come out of the wash unstained (the cells, not the artifacts: a fold or a speck of debris keeps the chromogen forever and means nothing), she can reliably stain again. Opening total is about 9 minutes; if short on time, drop “The lab’s reality” first.">
+        <div className="flex h-[600px] w-full items-center gap-8">
+          <div className="flex flex-1 flex-col gap-7">
+            <div className="sm-in flex flex-col gap-2" style={delay(0.2)}>
+              <Eyebrow>Meet Kim</Eyebrow>
+              <h2 className="text-[52px] font-bold leading-[1.05] tracking-[-0.025em]">Chromogenic cycling</h2>
+              <span className="text-[22px] leading-snug text-fd-muted-foreground">
+                stain 1 · wash until it is gone · stain 2, on one slide
+              </span>
+            </div>
+            <div
+              className="sm-pop rounded-[40px] border-2 border-fd-border bg-fd-card px-8 py-6 text-[28px] font-bold leading-[1.22] tracking-[-0.015em] shadow-sm"
+              style={delay(1.1)}
+            >
+              Stain 1, wash until it is completely gone, stain 2…{' '}
+              <span className="sm-in inline" style={delay(2)}>
+                <Hl>overlay the two images: multi-staining.</Hl>
+              </span>
+            </div>
+          </div>
+          <ChromogenicRoundFigure />
         </div>
       </Slide>
 
       <DeckSlide
         eyebrow="Meet Kim"
         title="The knowledge exists"
-        lead="It lives in an ImageJ macro, and a DOI: “just install it and run it. Do you see the same results?”"
-        notes="Opens on the organoid from the previous slide and pulls back: it is one image in a z stack. Then the macro runs: max projection, Otsu threshold, analyse particles, verdict. Everyone in the room has written this macro."
+        lead="It lives in a Fiji macro, and a DOI: “just install it and run it. Do you see the same results?”"
+        notes="Opens on the tissue from the previous slide and pulls back: it is one tile of a tiled slide. Then the macro runs: stitch the tiles, segment the cells, measure the stain in every cell, verdict: this round didn’t take, stain again. Everyone in the room has written this macro."
       >
         <div className="flex flex-1 items-center justify-center">
           <MacroChainFigure />
@@ -388,7 +414,7 @@ export function SmartMicroscopyDeck() {
         eyebrow="Meet Kim"
         title="She publishes"
         lead="Macro on a DOI, numbers in a figure. It works, and every run is still done by hand."
-        notes="Kim’s first paper: the macro goes into the methods and onto a DOI, and the statistics hold up. Let her enjoy it. Persona numbers (18 % vs 83 %, n = 48, p < 0.01) are illustrative, not from a real study; say so if asked. Then: the catch is that it’s all manual."
+        notes="Kim’s first paper: the protocol and the macro go into the methods and onto a DOI, and the statistics hold up: with the per-cell check after every round, most panels make it to the fifth stain. Let her enjoy it. Persona numbers (31 % vs 88 %, n = 48 slides) are illustrative, not from a real study; say so if asked. Then: the catch is that it’s all manual."
       >
         <div className="grid flex-1 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-6">
           <div className="flex flex-col items-center gap-3">
@@ -402,7 +428,7 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
-      <Slide notes="The paper is out, and the organoids in her incubator keep dying: the macro tells her what happened afterwards, never in time to act. Pause on the question; the next slide is her answer.">
+      <Slide notes="The paper is out, and now everyone wants their slides done this way. Every slide is five rounds, and every round is Kim: carry it to the stainer, wait, carry it to the microscope, tile it, run the macro, decide, carry it back. She runs between the bench and the scope all day, and the timer never stops ringing. Pause on the line; the next slide is her answer.">
         <div className="flex h-[600px] w-full items-center gap-10">
           <div className="flex flex-1 flex-col gap-6">
             <Eyebrow>Meet Kim</Eyebrow>
@@ -413,22 +439,77 @@ export function SmartMicroscopyDeck() {
                   className="sm-in rounded-[40px] border-2 border-fd-border bg-fd-card px-8 py-6 text-[34px] font-bold italic leading-[1.15] tracking-[-0.02em]"
                   style={delay(1)}
                 >
-                  But how can I save my <Hl>poor organoids?</Hl>
+                  Round three of five, slide nine of twenty. <Hl>I can’t run any faster.</Hl>
                 </p>
                 <span className="sm-pop absolute -left-[22px] bottom-[-14px] size-[22px] rounded-full border-2 border-fd-border bg-fd-card" style={delay(0.85)} />
                 <span className="sm-pop absolute -left-[44px] bottom-[-38px] size-[13px] rounded-full border-2 border-fd-border bg-fd-card" style={delay(0.7)} />
               </div>
             </div>
           </div>
-          <SadOrganoidFigure />
+          <OverworkedKimFigure />
+        </div>
+      </Slide>
+
+      <Slide notes="A beat between “I can’t run any faster” and the workflow: Kim dreams. Let it turn for a moment and name the three things in the dream, because they are real devices and come back all talk: the robot arm (a Fairino FR5) carries the slide, the Opentrons OT-2 stains and washes it, the openUC2 FRAME images it. In the dream the arm takes the slide to the OT-2, whose head moves over the deck, then on to the microscope, whose stage scans under its light, and comes home. It sparkles because it is a dream; the next slide is what it would take.">
+        <div className="relative flex h-[600px] w-full items-stretch gap-2">
+          <div className="flex w-[330px] shrink-0 flex-col justify-between">
+            <div className="sm-in flex flex-col gap-3" style={delay(0.2)}>
+              <Eyebrow>Automation to the rescue</Eyebrow>
+              <h2 className="text-[46px] font-bold leading-[1.05] tracking-[-0.025em]">
+                What if a robot <Hl>did the running?</Hl>
+              </h2>
+              <span className="text-[20px] leading-snug text-fd-muted-foreground">
+                an arm to carry the slide, an OT-2 to stain it, a microscope that images it on its own
+              </span>
+            </div>
+            <div className="relative self-start">
+              <KimFigure size={170} mood="happy" />
+              {/* thought trail: small to large, rising towards the dream */}
+              <span className="sm-pop absolute left-[150px] top-[24px] size-4 rounded-full border-2 border-fd-border bg-fd-card" style={delay(0.7)} />
+              <span className="sm-pop absolute left-[184px] top-[-10px] size-6 rounded-full border-2 border-fd-border bg-fd-card" style={delay(0.85)} />
+              <span className="sm-pop absolute left-[228px] top-[-52px] size-9 rounded-full border-2 border-fd-border bg-fd-card" style={delay(1)} />
+            </div>
+          </div>
+          <div
+            className="sm-pop relative flex-1 overflow-hidden rounded-[130px] border-2 border-fd-border bg-fd-card shadow-sm"
+            style={{
+              ...delay(1.1),
+              backgroundImage:
+                'radial-gradient(circle at 28% 22%, rgba(253,230,138,0.4), transparent 55%), radial-gradient(circle at 78% 82%, rgba(244,114,182,0.3), transparent 55%), radial-gradient(circle at 64% 28%, rgba(167,139,250,0.32), transparent 60%)',
+            }}
+          >
+            <DreamLab3D className="absolute inset-0" />
+            {/* a few stars on the cloud itself */}
+            {(
+              [
+                [9, 20, 30, 0],
+                [86, 14, 38, 0.7],
+                [92, 62, 26, 1.3],
+                [14, 78, 34, 0.4],
+                [50, 7, 22, 1.8],
+                [70, 90, 24, 1],
+                [30, 92, 20, 2.1],
+                [5, 48, 22, 1.5],
+              ] as const
+            ).map(([x, y, size, d], i) => (
+              <span
+                key={i}
+                aria-hidden
+                className="sm-pulse pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 leading-none text-amber-400"
+                style={{ ...delay(d), left: `${x}%`, top: `${y}%`, fontSize: size, textShadow: '0 0 12px rgba(251,191,36,0.9)' }}
+              >
+                ✦
+              </span>
+            ))}
+          </div>
         </div>
       </Slide>
 
       <DeckSlide
         eyebrow="Automation to the rescue"
         title="Her dream workflow"
-        lead="Image, segment, decide, pump, and round again, without her: no thresholds by eye, no liquids by hand."
-        notes="Her answer to “how can I save them?”: close the loop. The microscope acquires, StarDist segments, the rule checks the core, and an ESP32 runs a peristaltic pump that sends growth factor into the well; a second sensor reads the temperature. Point at the pump: that is the part no macro can do."
+        lead="Stain, image, segment, measure, decide, and round again, without her: no running between the bench and the scope."
+        notes="Her answer to “I can’t run any faster”: close the loop, and let a robot do the running. The arm carries the slide to the OT-2, which runs the staining protocol; the arm carries it on to the openUC2, which images it in tiles; StarDist segments the cells and the per-cell rule decides: below target, back to the OT-2 for the same stain; reached, on to the next stain; panel done, back to the rack. Point at the arm and the OT-2: that is the part no macro can do."
       >
         <div className="flex flex-1 items-center">
           <DreamWorkflowFigure />
@@ -438,8 +519,8 @@ export function SmartMicroscopyDeck() {
       <DeckSlide
         eyebrow="Meet Kim"
         title="The lab’s reality"
-        lead="The same loop, in the building she actually works in: the microscope and the pump in the imaging room, the GPU and her laptop down the hall."
-        notes="Arrives as the dream, unchanged and still running. One press and it rearranges into the real building: the pump moves next to the plate, segmentation and the decision move to the office down the hall, and every step shows the computer it runs on. The acquisition PC has no GPU, so segmentation runs on the GPU server. “Can we buy another GPU for the acquisition computer?” “No.” Every connection now crosses between rooms and machines. That is the problem she takes to Claude next. First slide to drop if the opening runs long."
+        lead="The same loop, in the building she actually works in: the arm, the OT-2 and the microscope in the imaging room, the GPU and her laptop down the hall."
+        notes="Arrives as the dream, unchanged and still running. One press and it rearranges into the real building: the arm and the OT-2 share a bench with the openUC2 and its acquisition PC in the imaging room, segmentation and the decision move to the office down the hall, and every step shows the computer it runs on. The acquisition PC has no GPU, so segmentation runs on the GPU server. “Can we buy another GPU for the acquisition computer?” “No.” Five machines, two rooms, and every connection crosses between them. That is the problem she takes to Claude next. First slide to drop if the opening runs long."
       >
         <div className="flex flex-1 items-center">
           <DreamWorkflowFigure variant="lab" />
@@ -449,7 +530,7 @@ export function SmartMicroscopyDeck() {
       <DeckSlide
         eyebrow="So she asks"
         title="Kim asks for help"
-        notes="Let it build: Kim’s prompt, a beat of typing, then the answer streams in without a single doubt. Read the confidence out: “Absolutely!”, “just use HTTP APIs”, “that’s it, really”, “your organoids are safe now”, and the badges. No code yet; nobody asked what happens when an address changes, a call hangs, or a run has to be explained. That is the next part of the talk."
+        notes="Let it build: Kim’s prompt, a beat of typing, then the answer streams in without a single doubt. Read the confidence out: “Absolutely!”, “just use HTTP APIs”, “that’s it, really”, “your slides will stain themselves now”, and the badges. No code yet; nobody asked what happens when an address changes, a call hangs, or a run has to be explained. That is the next part of the talk."
       >
         <div className="flex flex-1 items-center">
           <ClaudeChatFigure />
@@ -459,7 +540,7 @@ export function SmartMicroscopyDeck() {
       <DeckSlide
         eyebrow="Night 1 · Connection"
         title="The nightmare begins"
-        notes="Let it play, it tells itself. Kim falls asleep dreaming of her macro. Claude’s tip: give every device an HTTP API and send JSON. Line by line the macro becomes requests to hard-coded IP addresses, a 2 GB json.dumps, a pump call with a 3-second timeout. On her laptop you pass a numpy array to StarDist; over a network, memory pointers don’t exist, and everything becomes a message to serialise. Her worries are from Lisbon: numpy as JSON? gRPC, SiLA2, ROS? I didn’t secure my server. And in the morning: this is okay, everybody does this. Click: the first horseman of the lab apocalypse, Connection."
+        notes="Let it play, it tells itself. Kim falls asleep dreaming of her macro. Claude’s tip: give every device an HTTP API and send JSON. Line by line the macro becomes requests to hard-coded IP addresses, a 2 GB json.dumps, an OT-2 protocol call with a 3-second timeout (the protocol takes twenty minutes). On her laptop you pass a numpy array to StarDist; over a network, memory pointers don’t exist, and everything becomes a message to serialise. Her worries are from Lisbon: numpy as JSON? gRPC, SiLA2, ROS? I didn’t secure my server. And in the morning: this is okay, everybody does this. Click: the first horseman of the lab apocalypse, Connection."
       >
         <div className="flex flex-1 items-center">
           <NightmareFigure night="communication" />
@@ -538,16 +619,32 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
-      <StatementSlide notes="Short beat, then into Arkitekt. About 8 minutes in." figure={<BetterFigure />} sub="“I want my ImageJ back.”">
-        Can we do better?
-      </StatementSlide>
+      <Slide notes="Short beat, then into Arkitekt. About 8 minutes in. This is what Kim actually wants, and it is the bar for the rest of the talk: she writes the protocol once, the way she would write an ImageJ macro for one machine (pick up the slide, stain 1, image, wash until gone, stain 2, image, overlay), presses Run, and it runs on the machines: the arm, the OT-2, the microscope. And the answer is not a folder of files on three computers; it is “yes, here’s your data”. The question mark is whatever has to sit in the middle to make that true. Next: Arkitekt.">
+        <div className="flex h-[600px] w-full items-center gap-8">
+          <div className="flex flex-1 flex-col justify-center gap-5">
+            <p className="sm-in text-[44px] font-bold leading-[1.1] tracking-[-0.025em]" style={delay(0.1)}>
+              Can we do better?
+            </p>
+            <div className="sm-in flex items-end gap-2" style={delay(0.35)}>
+              <KimFigure size={150} mood="happy" />
+              <p className="relative mb-16 rounded-3xl rounded-bl-sm border-2 border-fd-border bg-fd-card px-5 py-4 text-[24px] font-medium leading-snug shadow-sm">
+                <span className="sr-only">Kim: </span>“Can you do this for me, and <Hl>run it on the machines?</Hl>”
+              </p>
+            </div>
+            <p className="sm-in text-[21px] italic leading-snug text-fd-muted-foreground" style={delay(0.7)}>
+              like an ImageJ script: write it once, press Run
+            </p>
+          </div>
+          <BetterFigure />
+        </div>
+      </Slide>
 
       {/* 2. What is Arkitekt (about 6 min) --------------------------------- */}
 
       <DeckSlide
         eyebrow="What is Arkitekt"
         title="Every step is a typed action on a shared lab hub"
-        notes="One mental model is enough to start. Lab infrastructure for microscopy workflows that span more than one device. Point at robots and clusters: we come back to them at the end. Section total: about 6 minutes."
+        notes="One mental model is enough to start. Lab infrastructure for microscopy workflows that span more than one device: in Kim’s case a robot arm, a liquid handler, a microscope and a GPU server. Section total: about 6 minutes."
       >
         <div className="flex flex-1 items-center">
           <HubFigure />
@@ -556,9 +653,9 @@ export function SmartMicroscopyDeck() {
 
       <DeckSlide
         eyebrow="Microscope as an app"
-        title="Find, centre, capture: three actions"
-        lead="Kim’s loop at UC2 scale: image, decide, act. Each step becomes an action the hub knows by its types."
-        notes="Same shape as Kim’s loop; the demo uses the UC2 because nobody has a microfluidics pump on stage. No code, just the contract. On arrival: the app offers its actions, with names, inputs and outputs, and the hub registers them; then it opens one websocket to the hub and listens. It never needs an open port or a known IP. Click: the hub moves aside and Orkestrator appears; the form for snap is built from its types, Kim types 20 ms. Click: assign. The task goes to the hub, and the hub sends it down the app’s socket; the scope runs it. Click: the image goes to the hub first (stored, with provenance), and only then on to Kim’s browser. Those types are what Orkestrator shows and what can be wired together."
+        title="Stain, image, measure: every device is an app"
+        lead="The arm, the OT-2, the openUC2 and the analysis each offer their steps as actions the hub knows by their types."
+        notes="No code yet, just the contract. On arrival: each app in Kim’s lab offers its actions, with names, inputs and outputs, and the hub registers them: the OT-2 run_protocol, the arm run_trajectory, the openUC2 acquire_image, each on its own machine (StarDist and the analyzer on the GPU server work the same way). Then each opens one websocket to the hub and listens. None of them needs an open port or a known IP. Click: the hub moves aside and Orkestrator appears; the form for run_protocol is built from its types, and the protocol list comes straight from the OT-2’s own state; Kim picks stain_cd20. Click: assign. The task goes to the hub, and the hub sends it down the OT-2’s socket. Click: the result goes to the hub first (stored, with provenance), and only then on to Kim’s browser. Those types are what Orkestrator shows and what can be wired together."
       >
         <div className="flex flex-1 items-center">
           <OfferFigure />
@@ -568,8 +665,8 @@ export function SmartMicroscopyDeck() {
       <DeckSlide
         eyebrow="Microscope as an app"
         title="And now: a workflow"
-        lead="The three actions, wired by their types in Orkestrator. Press Run, and the hub does the rest."
-        notes="On arrival: the actions on the hub sit in the palette; snap, find_largest, move_to and snap again are dragged out and wired. Point at the edge chips: an edge only connects if the output type fits the input (image into image, x, y into x, y). This is Kim’s loop at UC2 scale: overview, decide, centre, capture. Click: Run. The hub assigns each node to uc2-scope in turn (the same assign/done from the last slide, four times) and the final image lands on the hub. Click: the big red X. “That is so 2023.” Nobody wants to drag boxes any more; next slide."
+        lead="The actions of six apps, wired by their types in Orkestrator. Press Run, and the hub does the rest."
+        notes="On arrival: the actions on the hub sit in the palette; the arm’s move, the OT-2’s run_protocol, the openUC2’s acquire, stitch, segment and measure are dragged out and wired, with one edge looping back: below target, stain again. Point at the edge chips: an edge only connects if the output type fits the input (image into image, labels into labels). This is Kim’s loop, for real: six apps on five machines in two rooms. Click: Run. The hub assigns each node to the app that offers it (the same assign/done from the last slide, once per step) and every image lands on the hub. Click: the big red X. “That is so 2023.” Nobody wants to drag boxes any more; next slide."
       >
         <div className="flex flex-1 items-center">
           <WorkflowFigure />
@@ -580,7 +677,7 @@ export function SmartMicroscopyDeck() {
         eyebrow="Microscope as an app"
         title="Or just ask for it"
         lead="Kim describes the workflow; the AI writes it as a short Python script against the actions her hub already knows."
-        notes="Same workflow as the editor, but generated. The point is what the AI writes against: not sockets, IP addresses and retry loops, but four typed calls on a declared protocol (uc2-scope’s snap, find_largest, move_to). The hub checks the declaration when the app starts, assigns each call to the scope, and records every one of them. Nineteen lines, all of them about the experiment. This is the same AI that wrote Kim’s 10,000 lines of plumbing; the difference is what it had to build on."
+        notes="Same workflow as the editor, but generated. The point is what the AI writes against: not sockets, IP addresses and retry loops, but typed calls on declared protocols: the arm’s run_trajectory, the OT-2’s run_protocol, the openUC2’s acquire_image, stitch, segment, measure. The hub checks the declarations when the app starts, assigns each call to the app that offers it, and records every one of them. About twenty lines, all of them about the experiment: for each stain, stain until it takes. This is the same AI that wrote Kim’s 10,000 lines of plumbing; the difference is what it had to build on."
       >
         <div className="flex flex-1 items-center">
           <AiWorkflowFigure />
@@ -629,7 +726,7 @@ export function SmartMicroscopyDeck() {
         eyebrow="Defeating the second horseman · 1 of 2"
         title="Everything is recorded, and workflows resume"
         lead="The hub keeps a log of every call, input, output and log line. If a workflow’s process dies, it resumes: finished calls come back from the record instead of running again."
-        notes="The second horseman, Error handling & Observability, part one. On arrival: the record of run 41 fills in, calls and log lines and progress alike; this is what Kim never had, a log of everything that happened, on every machine, in one place. Then the workflow’s process dies (Kim closes her laptop). Instead of starting over, it is resumed in a new process: the calls that already finished are replayed from the record (the stage does not snap again), and the run carries on with move_to and the final snap. Same run, same answers, nothing ran twice. The horseman is still standing: next slide."
+        notes="The second horseman, Error handling & Observability, part one. On arrival: the record of run 41 fills in, calls and log lines and progress alike; this is what Kim never had, a log of everything that happened, on every machine, in one place. Then the workflow’s process dies (Kim closes her laptop). Instead of starting over, it is resumed in a new process: the calls that already finished are replayed from the record, so a slide that was stained is not stained twice, and the run carries on where it was. Same run, same answers, nothing ran twice. The horseman is still standing: next slide."
       >
         <div className="flex flex-1 items-center">
           <DefeatFrame night="threads" weapon="the record" kill={false}>
@@ -642,7 +739,7 @@ export function SmartMicroscopyDeck() {
         eyebrow="Defeating the second horseman · 2 of 2"
         title="When it goes wrong, ask a person"
         lead="Some errors aren’t for code to fix. A workflow can stop and ask: someone fixes the real world, and the run carries on where it stopped."
-        notes="Part two. Not every error is a crash: sometimes the slide has drifted and there is simply nothing in view. Kim’s workflow checks for that and calls task.hold with a message. The run pauses, Orkestrator shows Kim the message (readjust the slide, then resume), she nudges the slide, presses resume, and the code carries on after the hold: snap, find the organoid, centre it, capture. The hold is recorded, so if the workflow is ever resumed after a crash, it won’t stop there again. Click: strike him down."
+        notes="Part two. Not every error is a crash: sometimes the stain just won’t take. Three rounds of CD20 and the uptake is still at 52 %: no code can fix an old reagent bottle. Kim’s workflow checks for that and calls task.hold with a message. The run pauses, Orkestrator shows Kim the message (swap the CD20 bottle, then resume), she swaps it, presses resume, and the code carries on after the hold: the next stain, Ki-67. The hold is recorded, so if the workflow is ever resumed after a crash, it won’t stop there again. Click: strike him down."
       >
         <div className="flex flex-1 items-center">
           <DefeatFrame night="threads" weapon="the record, and Kim">
@@ -654,7 +751,7 @@ export function SmartMicroscopyDeck() {
       <DeckSlide
         eyebrow="mikro coordinate systems"
         title="Smart microscopy isn’t an MDA"
-        notes="The tiles on the right are the ones from the demo, on top of the overview. Link to the Mikro coordinate system deck for anyone who wants the details."
+        notes="The tiles on the right are the ones from the demo, placed on the stage they were taken on. For sequential staining this is the whole game: every round of the same slide has to land on the same coordinates, or the stains don’t overlay cell by cell. Link to the Mikro coordinate system deck for anyone who wants the details."
       >
         <div className="flex flex-1 items-center">
           <CoordsFigure />
@@ -668,8 +765,8 @@ export function SmartMicroscopyDeck() {
       <DeckSlide
         eyebrow="Defeating the third horseman"
         title="Data with coordinates, not filenames"
-        lead="Every image goes into mikro with its pixel size, its place on the stage and the calls that made it. Overview and detail share one coordinate system."
-        notes="The third horseman, Data Management. On arrival: the overview image sits on the stage; the detail image flies into exactly the place where the organoid is, because both live in the same stage coordinate system in mikro. On the right, everything the 260-character filename used to carry, as data: pixel size, stage position, channel and time, the calls that made it, the dataset. Click: strike him down."
+        lead="Every image goes into mikro with its pixel size, its place on the stage and the calls that made it. Tiles, mosaic and every staining round share one coordinate system."
+        notes="The third horseman, Data Management. On arrival: the tiles land on the stage and form the mosaic of slide HE-07; then the next staining round lands on exactly the same place, because every round lives in the same stage coordinate system in mikro, so the stains overlay cell by cell. On the right, everything the 260-character filename used to carry, as data: pixel size, stage position, channel and time, the calls that made it, the dataset. Click: strike him down."
       >
         <div className="flex flex-1 items-center">
           <DefeatFrame night="data" weapon="mikro">
@@ -681,8 +778,8 @@ export function SmartMicroscopyDeck() {
       <DeckSlide
         eyebrow="Data management, up close"
         title="A lineage graph, on one coordinate system"
-        lead="Every item of the run knows what made it and where it sits: the overview, the organoid it found, the detail image, its labels and the measurements, all on the same stage."
-        notes="Stay on the third horseman for one more slide. Left, the lineage graph, read in a zigzag: snap made the overview; find_largest made an ROI on it; move_to and snap made the detail image; segmentation (on the GPU server) made the labels; measure made the table. Right, the same items on the stage, each one placed the moment it appears in the graph: the overview, the ROI on it, the detail inside the ROI, the labels on the detail, and the measurements at the organoid’s centroid. Two questions Kim could never answer from a folder, now one click each: where did this number come from, and where on the slide is it?"
+        lead="Every item of the run knows what made it and where it sits: the tiles, the mosaic, its cells, the uptake per cell and the next round, all on the same stage."
+        notes="Stay on the third horseman for one more slide. Left, the lineage graph, read in a zigzag: acquire_image made the tiles; stitch_images made the mosaic; segmentation (on the GPU server) made the labels; the analyzer measured the uptake, 41 %, below target; so run_protocol stained CD20 again, and round two measured 86 %. Right, the same items on the stage, each one placed the moment it appears in the graph: the tiles, the mosaic, the labels on it, the uptake on its cells, and round two on top. Two questions Kim could never answer from a folder, now one click each: where did this number come from, and why was this slide stained twice?"
       >
         <div className="flex flex-1 items-center">
           <LineageFigure />
@@ -724,7 +821,7 @@ export function SmartMicroscopyDeck() {
         eyebrow="Defeating the fourth horseman · 1 of 2"
         title="Share code: publish it as an app"
         lead="Bundle the script as an app, publish it to GitHub, and every other hub can install it, with the versions it ran with."
-        notes="Half one, the code. Kim’s script is a folder: app.py with her three actions, and pyproject.toml pinning stardist. arkitekt plugin build bundles it as an app: a container image, the declared actions, CPU and CUDA flavours. arkitekt plugin publish puts the release on GitHub. From there it is installable: another lab’s hub finds organoid-tools, presses install, and gets the same three actions, picking the CUDA flavour because it has a GPU. No README with twelve setup steps."
+        notes="Half one, the code. Kim’s script is a folder: app.py with her process_slides workflow, and pyproject.toml pinning stardist. arkitekt plugin build bundles it as an app: a container image, the declared actions and what it needs from other apps, CPU and CUDA flavours. arkitekt plugin publish puts the release on GitHub. From there it is installable: another lab’s hub finds stainstorm, presses install, and gets the same workflow, picking the CUDA flavour because it has a GPU. It runs against their own arm, liquid handler and microscope, as long as those offer the same actions. No README with twelve setup steps."
       >
         <div className="flex flex-1 items-center">
           <DefeatFrame night="repro" weapon="sharing" kill={false}>
@@ -737,7 +834,7 @@ export function SmartMicroscopyDeck() {
         eyebrow="Defeating the fourth horseman · 2 of 2"
         title="Share data: press share"
         lead="Pick the dataset and who gets it. When they accept, their hub gets a WireGuard connection to yours, with access to that data and nothing else."
-        notes="Half two, the data. The clip on the left autoplays: Kim presses share on organoids / B4 and picks the other lab. Nothing is exported or uploaded. Click: the other lab accepts. A WireGuard connection opens between the two hubs, the same kind of tunnel as on the connection slide, but scoped: it reaches organoids / B4, read-only, and nothing else. B5 and her drafts aren’t even visible. Click again: strike him down. That’s all four."
+        notes="Half two, the data. The clip on the left autoplays: Kim presses share on slides / HE-07 and picks the other lab. Nothing is exported or uploaded. Click: the other lab accepts. A WireGuard connection opens between the two hubs, the same kind of tunnel as on the connection slide, but scoped: it reaches HE-07, every round of it, read-only, and nothing else. HE-08 and her drafts aren’t even visible. Click again: strike him down. That’s all four."
       >
         <div className="flex flex-1 items-center">
           <DefeatFrame night="repro" weapon="sharing" killIndex={2}>
@@ -748,15 +845,15 @@ export function SmartMicroscopyDeck() {
 
       <DeckSlide
         eyebrow="Video 2"
-        title="The workflow running on the UC2"
-        notes="Record this one first; videos 3 to 7 reuse the same run. Narrate the four steps as they happen: overview, threshold and label, largest object, stage moves, better image."
+        title="The workflow running in the lab"
+        notes="Record this one first; videos 3 to 7 reuse the same run. Narrate the steps as they happen: the arm picks up the slide, the OT-2 stains, the arm carries it to the openUC2, tiles, stitch, segment, measure; one round comes out below target and goes back for another."
       >
         <div className="flex flex-1 items-center justify-center">
           <Clip
             n={2}
             file="02-workflow-run.mp4"
             length="60 s"
-            shows="Find, centre, capture on the UC2: Orkestrator plus a phone camera on the stage."
+            shows="process_slides in the lab: Orkestrator next to a camera on the arm, the OT-2 and the openUC2."
           />
         </div>
       </DeckSlide>
@@ -791,7 +888,7 @@ export function SmartMicroscopyDeck() {
         eyebrow="Problem one · Arkitekt and LLMs"
         title="The agent asks for rights, like any app"
         lead="An LLM on Arkitekt is just another app: it asks for the scopes it needs, calls typed actions with them, asks again for anything more, and every call is on the record."
-        notes="Problem one: what is it allowed to do? On Arkitekt, Claude is just another app. It can’t touch the microscope until it asks: call find_centre_capture on the scope, read B4. Not laser power above 50 %, not deleting data. Kim approves those scopes, until six. Then it needs the GPU server for segmentation, which it wasn’t granted, so it asks again and Kim allows it once. The record shows both calls, and who allowed each of them."
+        notes="Problem one: what is it allowed to do? On Arkitekt, Claude is just another app. It can’t touch the lab until it asks: call process_slides on stainstorm, read slides / HE-07. Not moving the arm by hand, not deleting data. Kim approves those scopes, until six. Then it needs the GPU server for segmentation, which it wasn’t granted, so it asks again and Kim allows it once. The record shows both calls, and who allowed each of them."
       >
         <div className="flex flex-1 items-center">
           <AgentRightsFigure />
@@ -810,7 +907,7 @@ export function SmartMicroscopyDeck() {
         eyebrow="Problem two · Bloks as interfaces"
         title="The chat answers with a blok"
         lead="People do want to chat. But for an instrument the answer should be an interface: the blok the app ships, typed and recorded, not text and not a generated UI."
-        notes="Kim asks to tune the exposure herself. Claude doesn’t write a UI and doesn’t ask her to type numbers: it hands over the capture blok that ships with the uc2-scope app. She turns the exposure to 35 ms and captures; the preview brightens, and that press is a recorded call like any other. Then she types 900: outside the action’s range, so the blok says no before anything reaches the laser. More on bloks later in the talk."
+        notes="Kim asks to tune the exposure herself. Claude doesn’t write a UI and doesn’t ask her to type numbers: it hands over the capture blok that ships with the openuc2 app. She turns the exposure to 35 ms and captures; the preview brightens, and that press is a recorded call like any other. Then she types 900: outside the action’s range, so the blok says no before anything reaches the laser. More on bloks later in the talk."
       >
         <div className="flex flex-1 items-center">
           <BlokChatFigure />
@@ -871,14 +968,14 @@ export function SmartMicroscopyDeck() {
       <DeckSlide eyebrow="Paying down the debt · 2 of 5" title="Nobody knows what the microscope decided">
         <div className="flex flex-1 flex-col justify-center gap-5">
           <DebtList paid={MESH} justPaid={MESH} now={REPLAY} answer="replay + provenance" />
-          <KimSays>The pump didn’t fire. The microscope says timeout, the GPU says nothing.</KimSays>
+          <KimSays>Why was HE-07 stained twice? The OT-2 says timeout, the GPU says nothing.</KimSays>
         </div>
       </DeckSlide>
 
       <DeckSlide
         eyebrow="Replay + provenance"
         title="Every call is recorded"
-        notes="Expect: does replay re-image the sample? Physical actions are not idempotent. Be precise about what replay does with acquisition steps versus analysis steps."
+        notes="Expect: does replay re-stain or re-image the slide? Physical actions are not idempotent, and a slide that was stained is not stained twice. Be precise about what replay does with staining and acquisition steps versus analysis steps."
       >
         <div className="flex flex-1 items-center">
           <ReplayFigure />
@@ -891,7 +988,7 @@ export function SmartMicroscopyDeck() {
             n={4}
             file="04-replay.mp4"
             length="60–90 s"
-            shows="Open the run, walk its decisions, re-run the analysis with another threshold."
+            shows="Open the run, walk its decisions (why CD20 went round twice), re-run the analysis with another target."
           />
         </div>
       </DeckSlide>
@@ -909,13 +1006,13 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
-      <DeckSlide eyebrow="Video 5" title="From the overview to the detail">
+      <DeckSlide eyebrow="Video 5" title="Every round on the same slide">
         <div className="flex flex-1 items-center justify-center">
           <Clip
             n={5}
             file="05-coordinates.mp4"
             length="30 s"
-            shows="The overview: click an object, jump to its high-res image."
+            shows="The mosaic of HE-07: flip through the staining rounds, click a cell, see its uptake in every stain."
           />
         </div>
       </DeckSlide>
@@ -1002,9 +1099,9 @@ export function SmartMicroscopyDeck() {
 
       <DeckSlide
         eyebrow="Outlook"
-        title="Beyond microscopes"
-        lead="The same actions and workflows drive robots and clusters."
-        notes="Pay off the teaser from the hub slide. Section total: about 6 minutes."
+        title="Beyond one lab"
+        lead="The arm and the OT-2 were already apps. The same actions and workflows reach clusters and other labs."
+        notes="Kim’s lab already ran a robot arm and a liquid handler next to the microscope: to the hub they are just more apps. The same goes for a cluster, or another lab’s hub. Section total: about 6 minutes."
       >
         <div className="flex flex-1 items-center">
           <HubFigure beyond />
@@ -1049,7 +1146,7 @@ export function SmartMicroscopyDeck() {
         eyebrow="Kim’s loop, again"
         title="Same loop, on infrastructure"
         lead="Each step is an action where it belongs. The run is recorded, the images are placed, the result can be shared, and the UI is a blok."
-        notes="Pay off the story: nothing about Kim’s science changed. The plumbing moved out of her script and into the lab."
+        notes="Pay off the story: nothing about Kim’s science changed. Same protocol, same per-cell rule, five stains on one slide. The plumbing moved out of her script and into the lab, and Kim stopped running between the bench and the scope."
       >
         <div className="flex flex-1 items-center">
           <KimLoopFigure variant="arkitekt" />

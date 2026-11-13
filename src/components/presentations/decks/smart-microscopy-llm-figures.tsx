@@ -134,9 +134,9 @@ export function AgentRightsFigure() {
     `section.present .${u}-p2 { animation: ${u}-press 0.35s ease-out ${t.once}s both; }`,
   ].join('\n');
   const scopes: { text: string; ok: boolean }[] = [
-    { text: 'call find_centre_capture · uc2-scope', ok: true },
-    { text: 'read organoids / B4', ok: true },
-    { text: 'laser power above 50 %', ok: false },
+    { text: 'call process_slides · stainstorm', ok: true },
+    { text: 'read slides / HE-07', ok: true },
+    { text: 'move the arm by hand', ok: false },
     { text: 'delete data', ok: false },
   ];
   const card = 'rounded-2xl border-2 bg-fd-card shadow-sm';
@@ -145,20 +145,20 @@ export function AgentRightsFigure() {
     <div
       className="relative mx-auto h-[440px] w-[1180px]"
       role="img"
-      aria-label="A user asks Claude to run the organoid experiment. Claude asks Kim's hub for rights: to call find_centre_capture on the scope and read organoids B4, but not laser power above 50 percent or deleting data. Kim approves; Claude runs the workflow. For segmentation it asks again, to use the GPU server once, and Kim allows it. Both calls are on the record with who allowed them."
+      aria-label="Kim asks Claude to run the four-stain panel on slide HE-07. Claude asks Kim's hub for rights: to call process_slides on the stainstorm app and read the slides HE-07 dataset, but not to move the arm by hand or delete data. Kim approves; Claude runs the workflow. To segment CD20 again it asks once more, to use the GPU server once, and Kim allows it. Both calls are on the record with who allowed them."
     >
       <LoopStyles css={css} />
 
       {/* the chat */}
       <div className="sm-fade absolute left-0 top-0 flex h-[430px] w-[560px] flex-col gap-3 rounded-2xl border border-fd-border bg-fd-card/70 p-4" style={delay(0.1)}>
-        <Say who="kim" at={0.4}>Run the organoid experiment on plate B4.</Say>
+        <Say who="kim" at={0.4}>Run the four-stain panel on slide HE-07.</Say>
         <Say who="claude" at={t.ask}>I need a few rights on Kim’s hub first. Asking.</Say>
         <Say who="claude" at={t.run}>
-          Thanks. Running <code className="font-mono text-[14px] font-semibold">find_centre_capture</code> on uc2-scope…
+          Thanks. Running <code className="font-mono text-[14px] font-semibold">process_slides</code> on stainstorm…
         </Say>
-        <Say who="claude" at={t.more}>To segment I need the GPU server. That’s new, so I’m asking again.</Say>
+        <Say who="claude" at={t.more}>CD20 looks patchy. To segment it again I need the GPU server. That’s new, so I’m asking again.</Say>
         <Say who="claude" at={t.done}>
-          Done: 1 organoid, 0.21 mm². It’s all on the record.
+          Done: four stains, CD20 took two rounds. It’s all on the record.
         </Say>
       </div>
 
@@ -195,7 +195,7 @@ export function AgentRightsFigure() {
           <Lock className="size-[18px] shrink-0 text-amber-600" strokeWidth={2.4} />
           <span className="flex flex-col">
             <span className="text-[14px] font-semibold">Claude asks for one more</span>
-            <span className="font-mono text-[12px] text-fd-muted-foreground">call segment · gpu-server</span>
+            <span className="font-mono text-[12px] text-fd-muted-foreground">call segment_image · gpu-server</span>
           </span>
           <div className="relative ml-auto h-[30px] w-[170px]">
             <span className={cn(`${u}-once-b ${u}-p2 absolute inset-0 bg-fd-primary text-fd-primary-foreground`, btn)}>Allow once</span>
@@ -211,8 +211,8 @@ export function AgentRightsFigure() {
             <ScrollText className="size-[15px] text-fd-primary" strokeWidth={2} /> the record
           </span>
           {[
-            { at: t.run + 0.3, time: '14:21', call: 'find_centre_capture', on: 'uc2-scope', who: 'Claude, granted by Kim' },
-            { at: t.once + 0.6, time: '14:22', call: 'segment', on: 'gpu-server', who: 'Claude, allowed once by Kim' },
+            { at: t.run + 0.3, time: '14:21', call: 'process_slides', on: 'stainstorm', who: 'Claude, granted by Kim' },
+            { at: t.once + 0.6, time: '15:02', call: 'segment_image', on: 'gpu-server', who: 'Claude, allowed once by Kim' },
           ].map((r) => (
             <span key={r.call} className="sm-in grid grid-cols-[44px_1fr_auto] items-center gap-2 border-t border-fd-border py-1.5 font-mono text-[12px]" style={delay(r.at)}>
               <span className="text-fd-muted-foreground">{r.time}</span>
@@ -234,7 +234,7 @@ const PREVIEW = (bright: number) =>
   `radial-gradient(circle at 50% 50%, rgba(233,251,255,${bright}) 0, rgba(122,216,242,${bright * 0.9}) 16%, rgba(40,150,200,${bright * 0.7}) 34%, transparent 62%), #06101b`;
 
 /** People do want to chat; the chat just shouldn't answer with text or a
-    generated UI. Claude hands over the capture blok the uc2-scope app ships:
+    generated UI. Claude hands over the capture blok the openuc2 app ships:
     Kim turns the exposure up and captures, then tries 900 ms, which the
     action's own range stops before anything reaches the laser. */
 export function BlokChatFigure() {
@@ -260,7 +260,7 @@ export function BlokChatFigure() {
     `@media (prefers-reduced-motion: reduce) { section.present :is(.${u}-knob) { animation: none; } }`,
   ].join('\n');
   const points: { title: string; text: string; at: number }[] = [
-    { title: 'Shipped with the action', text: 'The uc2-scope app brings its capture blok. The agent hands it over; nobody generates a UI.', at: t.blok + 0.6 },
+    { title: 'Shipped with the action', text: 'The openuc2 app brings its capture blok. The agent hands it over; nobody generates a UI.', at: t.blok + 0.6 },
     { title: 'Every press is a call', text: 'capture(35 ms), by Kim, through the blok: on the record like any other call.', at: t.capture + 0.6 },
     { title: 'Typed, so it says no', text: '900 ms is outside the action’s range, so it stops in the blok and never reaches the laser.', at: t.typo + 0.4 },
   ];
@@ -268,19 +268,19 @@ export function BlokChatFigure() {
     <div
       className="relative mx-auto h-[440px] w-[1180px]"
       role="img"
-      aria-label="Kim asks to tune the exposure herself. Claude answers with the capture blok that ships with the uc2-scope app. She turns the exposure from 20 to 35 milliseconds and captures; the preview gets brighter and the call is recorded. Then she types 900 milliseconds, which is outside the action's range of 1 to 500, and the blok refuses it."
+      aria-label="Kim asks to tune the exposure herself. Claude answers with the capture blok that ships with the openuc2 app. She turns the exposure from 20 to 35 milliseconds and captures; the preview gets brighter and the call is recorded. Then she types 900 milliseconds, which is outside the action's range of 1 to 500, and the blok refuses it."
     >
       <LoopStyles css={css} />
 
       {/* the chat, answering with a blok */}
       <div className="sm-fade absolute left-0 top-0 flex h-[430px] w-[640px] flex-col gap-3 rounded-2xl border border-fd-border bg-fd-card/70 p-4" style={delay(0.1)}>
-        <Say who="kim" at={0.4}>Let me tune the exposure on B4 myself.</Say>
+        <Say who="kim" at={0.4}>Let me tune the exposure on HE-07 myself.</Say>
         <Say who="claude" at={1.0} className="w-[520px]">
-          Here’s the capture blok for uc2-scope:
+          Here’s the capture blok for openuc2:
           <div className="sm-pop mt-2.5 rounded-xl border-2 border-fd-primary/60 bg-fd-primary/5 p-3" style={delay(t.blok)}>
             <div className="mb-2 flex items-center gap-2">
               <span className="text-[15px] font-semibold">Capture</span>
-              <span className="font-mono text-[11.5px] text-fd-muted-foreground">uc2-scope</span>
+              <span className="font-mono text-[11.5px] text-fd-muted-foreground">openuc2</span>
               <span className="ml-auto rounded-full bg-fd-primary px-2 py-0.5 font-mono text-[10.5px] font-bold uppercase tracking-wide text-fd-primary-foreground">blok</span>
             </div>
             <div className="flex gap-3">

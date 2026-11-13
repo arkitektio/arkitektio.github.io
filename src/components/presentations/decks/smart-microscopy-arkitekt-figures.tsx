@@ -11,7 +11,7 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 import { Fragment } from '@revealjs/react';
-import { Bot, Check, Layers, Microscope, Network, NotebookPen, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
+import { Bot, Check, FlaskConical, Layers, Microscope, Network, NotebookPen, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
 import { cn } from '@/lib/cn';
@@ -44,8 +44,8 @@ type HubNode = { name: string; what: string; icon: LucideIcon; teaser?: boolean 
 
 const HUB_DEVICES: HubNode[] = [
   { name: 'Microscopes', what: 'acquire · move stage', icon: Microscope },
-  { name: 'Robots', what: 'pipette · pump', icon: Bot, teaser: true },
-  { name: 'Clusters', what: 'segment · train', icon: Server, teaser: true },
+  { name: 'Robots', what: 'carry · stain', icon: Bot },
+  { name: 'Clusters', what: 'train · scale out', icon: Server, teaser: true },
 ];
 const HUB_APPS: HubNode[] = [
   { name: 'Fiji', what: 'macros become actions', icon: ScanSearch },
@@ -95,8 +95,9 @@ function HubCard({ node, x, y, w, at, tone = 'default', tag }: { node: HubNode; 
   );
 }
 
-/** Hub in the middle, apps around it, calls flowing through. `beyond` turns
-    the robot and cluster teasers into first-class devices for the outlook. */
+/** Hub in the middle, apps around it, calls flowing through. Microscopes and
+    robots (the arm and the OT-2 of the running example) are first-class from
+    the start; `beyond` turns the cluster teaser into one for the outlook. */
 export function HubFigure({ beyond = false }: { beyond?: boolean }) {
   const u = useUid();
   const W = 1000;
@@ -120,7 +121,7 @@ export function HubFigure({ beyond = false }: { beyond?: boolean }) {
     ...below.map(([x, y]) => [x, y, false] as [number, number, boolean]),
   ];
   return (
-    <div className="relative mx-auto h-[420px] w-[1000px]" role="img" aria-label="Arkitekt in the middle; microscopes, robots and clusters on one side, Fiji, napari and notebooks on the other, Orkestrator and the mesh below">
+    <div className="relative mx-auto h-[420px] w-[1000px]" role="img" aria-label={`Arkitekt in the middle; microscopes, robots ${beyond ? 'and clusters' : 'and, later, clusters'} on one side, Fiji, napari and notebooks on the other, Orkestrator and the mesh below`}>
       <LoopStyles
         css={`
           .${u}-halo { transform-box: fill-box; transform-origin: center; opacity: 0; }
@@ -212,14 +213,17 @@ export function HubFigure({ beyond = false }: { beyond?: boolean }) {
 
 /* --- the app ---------------------------------------------------------------- */
 
-/* The implicit contract, without code: an app offers its actions (name,
-   inputs, outputs) to the hub, then opens one websocket and listens. From
-   then on the hub assigns and the app answers. */
+/* The implicit contract, without code: each app in Kim's lab offers its
+   actions (name, inputs, outputs) to the hub, then opens one websocket and
+   listens. From then on the hub assigns and the app answers. */
 const OFFERS = [
-  { name: 'snap', ins: 'exposure · float', out: 'image', assign: 'exposure 20 ms', done: 'image' },
-  { name: 'find_largest', ins: 'image', out: 'x, y', assign: 'that image', done: 'x 120 · y 48' },
-  { name: 'move_to', ins: 'x, y · µm', out: '–', assign: 'x 120 · y 48', done: 'arrived' },
+  { app: 'ot2', name: 'run_protocol', ins: 'protocol · choice', out: '–' },
+  { app: 'arkirino', name: 'run_trajectory', ins: 'name · choice', out: '–' },
+  { app: 'openuc2', name: 'acquire_image', ins: '–', out: 'image' },
 ];
+
+/** The OT-2's `run.available_protocols` state: what the protocol dropdown offers. */
+const PROTOCOLS = ['stain_cd3', 'stain_cd20', 'stain_ki67', 'stain_panck'];
 
 function TypeLine({ ins, out }: { ins: string; out: string }) {
   return (
@@ -229,18 +233,28 @@ function TypeLine({ ins, out }: { ins: string; out: string }) {
   );
 }
 
-/** A tiny fluorescence snapshot: a few soft cells on black. */
-function MiniShot({ size = 44 }: { size?: number }) {
+/** A tiny stained slide: frosted label end, a counterstain, a few cells that
+    took the stain. What a finished `run_protocol` leaves on the deck. */
+function MiniSlide({ size = 44 }: { size?: number }) {
+  const cells: [number, number, number, boolean][] = [
+    [17, 20, 2.6, true],
+    [23, 24, 2.2, false],
+    [28, 19, 2.4, true],
+    [33, 25, 2, true],
+    [38, 21, 2.3, false],
+    [21, 27, 1.8, true],
+    [31, 28, 1.9, false],
+  ];
   return (
-    <span
-      className="block shrink-0 rounded-md shadow-inner"
-      style={{
-        width: size,
-        height: size,
-        background:
-          'radial-gradient(circle at 30% 34%, #c6f6ff 0, #5fd3f0 9%, transparent 20%), radial-gradient(circle at 68% 58%, #b4f0ff 0, #3fb8e0 11%, transparent 24%), radial-gradient(circle at 42% 78%, #8fe3f7 0, transparent 13%), radial-gradient(circle at 80% 22%, #6fcbe8 0, transparent 10%), #07111d',
-      }}
-    />
+    <svg width={size} height={size} viewBox="0 0 44 44" className="block shrink-0" aria-hidden>
+      <rect x={0.5} y={0.5} width={43} height={43} rx={7} fill={SURFACE} stroke={BORDER} />
+      <rect x={4} y={13} width={36} height={18} rx={2} fill="#eef6fb" stroke="#9fb6c6" strokeWidth={0.8} />
+      <rect x={4.4} y={13.4} width={8} height={17.2} rx={1.6} fill="#c9d4dc" />
+      <ellipse cx={27} cy={23} rx={12} ry={6.5} fill="#b9a7d6" fillOpacity={0.55} />
+      {cells.map(([cx, cy, r, took], i) => (
+        <circle key={i} cx={cx} cy={cy} r={r} fill={took ? '#8a5a2b' : '#5b4b8a'} fillOpacity={took ? 0.9 : 0.75} />
+      ))}
+    </svg>
   );
 }
 
@@ -253,11 +267,12 @@ function Pointer() {
   );
 }
 
-/** An app offers its actions to the hub; then, one click at a time, the hub
-    moves aside for Orkestrator, Kim assigns `snap` there, the task goes down
-    the app's socket, and the image flows back to the hub and on to her.
-    Steps are reveal fragments: empty markers whose `.visible` class drives
-    the sibling selectors below. */
+/** The apps of Kim's lab offer their actions to the hub; then, one click at a
+    time, the hub moves aside for Orkestrator, Kim picks `stain_cd20` for
+    `run_protocol` there (the dropdown is fed by the OT-2's state) and assigns
+    it, the task goes down the ot2 app's socket, and the OT-2's "done" flows
+    back to the hub and on to her. Steps are reveal fragments: empty markers
+    whose `.visible` class drives the sibling selectors below. */
 export function OfferFigure() {
   const u = useUid();
   const W = 1180;
@@ -304,25 +319,27 @@ section.present .${u}-ring { animation: ${u}-ring 1.8s ease-out ${socketAt + 0.4
   85% { opacity: 1; transform: translateX(calc(var(--dx) * 1px)); }
   100% { opacity: 0; transform: translateX(calc(var(--dx) * 1px)); }
 }
-@keyframes ${u}-type { from { width: 0; } to { width: 6ch; } }
 @keyframes ${u}-press { 0%, 100% { transform: scale(1); } 45% { transform: scale(0.93); } }
 @keyframes ${u}-cur1 {
   0% { opacity: 0; transform: translate(250px, 372px); }
-  8% { opacity: 1; transform: translate(250px, 372px); }
-  30% { transform: translate(200px, 113px) scale(1); }
-  33% { transform: translate(200px, 113px) scale(0.8); }
-  36% { transform: translate(200px, 113px) scale(1); }
-  56% { transform: translate(150px, 279px) scale(1); }
-  59% { transform: translate(150px, 279px) scale(0.8); }
-  62% { transform: translate(150px, 279px) scale(1); }
-  88%, 100% { opacity: 1; transform: translate(180px, 324px); }
+  7% { opacity: 1; transform: translate(250px, 372px); }
+  24% { transform: translate(200px, 113px) scale(1); }
+  26.5% { transform: translate(200px, 113px) scale(0.8); }
+  29% { transform: translate(200px, 113px) scale(1); }
+  45% { transform: translate(150px, 279px) scale(1); }
+  47.5% { transform: translate(150px, 279px) scale(0.8); }
+  50% { transform: translate(150px, 279px) scale(1); }
+  66% { transform: translate(120px, 328px) scale(1); }
+  68.5% { transform: translate(120px, 328px) scale(0.8); }
+  71% { transform: translate(120px, 328px) scale(1); }
+  90%, 100% { opacity: 1; transform: translate(180px, 324px); }
 }
 @keyframes ${u}-cur2 {
   0%, 100% { opacity: 1; transform: translate(180px, 324px) scale(1); }
   45% { opacity: 1; transform: translate(180px, 324px) scale(0.78); }
 }
 
-/* step 1: the hub moves aside, Orkestrator appears, Kim fills in snap */
+/* step 1: the hub moves aside, Orkestrator appears, Kim picks a protocol */
 .${u}-hub { transition: transform 1s cubic-bezier(.6,0,.2,1) 0.1s; }
 ${on(1, `.${u}-hub`)} { transform: translateX(${hubTo - hubFrom}px); }
 .${u}-wide { transition: opacity 0.35s; }
@@ -330,25 +347,29 @@ ${on(1, `.${u}-wide`)} { opacity: 0; }
 ${on(1, `.${u}-offer`)} { visibility: hidden; }
 :is(.${u}-narrow, .${u}-front, .${u}-tok, .${u}-row, .${u}-sel, .${u}-form, .${u}-cur, .${u}-cap1, .${u}-cap2, .${u}-cap3,
   .${u}-asgA, .${u}-asgB, .${u}-task, .${u}-b-asg, .${u}-b-run, .${u}-b-done, .${u}-thumb, .${u}-s-run, .${u}-s-done,
-  .${u}-imgA, .${u}-imgB, .${u}-btn2, .${u}-result) { opacity: 0; }
-.${u}-typed { width: 0; }
+  .${u}-imgA, .${u}-imgB, .${u}-btn2, .${u}-result, .${u}-list, .${u}-hl, .${u}-pick) { opacity: 0; }
 ${run(1, 'narrow', k('fadein', 0.5, 1))}
 ${run(1, 'front', k('pop', 0.5, 0.9))}
 ${run(1, 'tok', `${u}-travel 0.55s ease-in-out var(--d) both`)}
 ${run(1, 'row', `${u}-in 0.35s ease-out var(--d) both`)}
-${run(1, 'sel', k('fadein', 0.2, 2.75))}
+${run(1, 'sel', k('fadein', 0.2, 2.9))}
 ${run(1, 'form', k('in', 0.4, 3.05))}
-${run(1, 'typed', `${u}-type 0.6s steps(6) 3.75s both`)}
-${run(1, 'cur', k('cur1', 3.2, 1.9, 'ease-in-out'))}
+${run(1, 'list', `${k('fadein', 0.15, 3.7)}, ${k('fadeout', 0.15, 4.55, 'ease-out', 'forwards')}`)}
+${run(1, 'hl', k('fadein', 0.1, 4.35))}
+${run(1, 'ph', k('fadeout', 0.1, 4.55))}
+${run(1, 'pick', k('fadein', 0.15, 4.55))}
+${run(1, 'cur', k('cur1', 3.8, 1.9, 'ease-in-out'))}
 ${run(1, 'cap1', k('in', 0.4, 0.4))}
 
-/* step 2: assign → the hub → down the socket to the app */
+/* step 2: assign → the hub → down the ot2 app's socket */
 ${run(2, 'cap1', k('fadeout', 0.2, 0))}
 ${run(2, 'cap2', k('in', 0.4, 0.2))}
 ${run(2, 'cur', k('cur2', 0.4, 0.1, 'ease-in-out'))}
 ${run(2, 'form', 'none; opacity: 1')}
 ${run(2, 'sel', 'none; opacity: 1')}
-${run(2, 'typed', 'none; width: 6ch')}
+${run(2, 'list', 'none; opacity: 0')}
+${run(2, 'ph', 'none; opacity: 0')}
+${run(2, 'pick', 'none; opacity: 1')}
 ${run(2, 'btn', k('press', 0.4, 0.1))}
 ${run(2, 'btn1', k('fadeout', 0.15, 0.3))}
 ${run(2, 'btn2', k('fadein', 0.15, 0.3))}
@@ -360,13 +381,15 @@ ${run(2, 'asgB', `${u}-travel 0.9s ease-in-out 1.6s both`)}
 ${run(2, 's-run', k('fadein', 0.25, 2.4))}
 ${run(2, 'b-run', k('fadein', 0.25, 2.5))}
 
-/* step 3: the image flows to the hub, then on to Orkestrator */
+/* step 3: the OT-2's "done" flows to the hub, then on to Orkestrator */
 ${run(3, 'cap2', k('fadeout', 0.2, 0))}
 ${run(3, 'cap3', k('in', 0.4, 0.2))}
 ${run(3, 'cur', k('fadeout', 0.3, 0))}
 ${run(3, 'form', 'none; opacity: 1')}
 ${run(3, 'sel', 'none; opacity: 1')}
-${run(3, 'typed', 'none; width: 6ch')}
+${run(3, 'list', 'none; opacity: 0')}
+${run(3, 'ph', 'none; opacity: 0')}
+${run(3, 'pick', 'none; opacity: 1')}
 ${run(3, 'btn1', 'none; opacity: 0')}
 ${run(3, 'btn2', `${k('fadein', 0.01, 0)}, ${k('fadeout', 0.25, 2.6, 'ease-out', 'forwards')}`)}
 ${run(3, 'chips', 'none; opacity: 0')}
@@ -394,7 +417,7 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
     </div>
   );
   return (
-    <div className="relative mx-auto h-[440px] w-[1180px]" role="img" aria-label="An app offers its three actions, with their inputs and outputs, to the Arkitekt hub and opens a socket. Then the hub moves aside for Orkestrator, where Kim fills in snap and assigns it; the task goes through the hub and down the socket to the app, and the image flows back to the hub and on to Orkestrator.">
+    <div className="relative mx-auto h-[440px] w-[1180px]" role="img" aria-label="The apps of Kim’s lab, the OT-2, the robot arm and the openUC2 microscope, offer their actions with inputs and outputs to the Arkitekt hub and open a socket each. Then the hub moves aside for Orkestrator, where Kim opens run_protocol, picks stain_cd20 from a dropdown filled by the OT-2’s state and assigns it; the task goes through the hub and down the socket to the OT-2 app, and the OT-2’s done flows back to the hub and on to Orkestrator.">
       {marker(1)}
       {marker(2)}
       {marker(3)}
@@ -413,7 +436,7 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
         <g className={`${u}-narrow`}>
           <line x1={gapA[0]} y1={ySocket} x2={gapA[1]} y2={ySocket} stroke={PRIMARY} strokeOpacity={0.7} strokeWidth={2.4} strokeDasharray="8 6" />
           <text x={(gapA[0] + gapA[1]) / 2} y={ySocket + 22} textAnchor="middle" fontFamily="var(--font-mono, monospace)" fontSize={12} fill={MUTED}>
-            socket
+            ot2’s socket
           </text>
           <line x1={gapB[0]} y1={yFront} x2={gapB[1]} y2={yFront} stroke={BORDER} strokeWidth={2.4} />
           {[gapA[0], gapA[1]].map((x) => (
@@ -435,34 +458,37 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
       <div className={`${u}-wide absolute left-[338px] top-[160px]`}>
         <span className="sm-in block text-[16px] font-semibold" style={delay(socketAt)}>
           <span className="text-fd-primary">② listen</span>
-          <span className="ml-2 font-normal text-fd-muted-foreground">one websocket, kept open</span>
+          <span className="ml-2 font-normal text-fd-muted-foreground">one websocket per app, kept open</span>
         </span>
       </div>
       <div className={`${u}-wide absolute left-[338px] top-[318px]`}>
         <span className="sm-in block text-[16px] text-fd-muted-foreground" style={delay(socketAt + 0.8)}>
-          then it waits for work
+          then they wait for work
         </span>
       </div>
 
-      {/* the app */}
+      {/* the apps of Kim's lab */}
       <div className="absolute left-0 top-[6px]" style={{ width: pw }}>
         <div className={cn('sm-pop flex h-[388px] flex-col gap-2.5 p-3.5', card)} style={delay(0.15)}>
           <div className="flex items-center gap-3">
             <span className="flex size-[44px] items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
-              <Microscope className="size-[25px]" strokeWidth={1.8} />
+              <FlaskConical className="size-[25px]" strokeWidth={1.8} />
             </span>
             <span className="flex flex-col">
-              <span className="font-mono text-[19px] font-semibold leading-tight">uc2-scope</span>
-              <span className="text-[13px] text-fd-muted-foreground">an app on the microscope PC</span>
+              <span className="text-[19px] font-semibold leading-tight">Kim’s lab</span>
+              <span className="text-[13px] text-fd-muted-foreground">three apps, on three machines</span>
             </span>
           </div>
           {OFFERS.map((o, i) => (
-            <div key={o.name} className="relative flex items-center justify-between rounded-xl border border-fd-border bg-fd-background/60 px-3 py-2">
+            <div key={o.name} className="relative flex items-center justify-between gap-2 rounded-xl border border-fd-border bg-fd-background/60 px-3 py-2">
               <span className="flex flex-col gap-1">
                 <span className="font-mono text-[16px] font-semibold">{o.name}</span>
                 <TypeLine ins={o.ins} out={o.out} />
               </span>
-              <Check className="sm-pop size-[18px] text-fd-primary" strokeWidth={2.6} style={delay(offerAt(i))} />
+              <span className="flex flex-col items-end gap-1">
+                <span className="font-mono text-[12px] text-fd-muted-foreground">{o.app}</span>
+                <Check className="sm-pop size-[18px] text-fd-primary" strokeWidth={2.6} style={delay(offerAt(i))} />
+              </span>
               {i === 0 ? (
                 <>
                   <span className={`${u}-s-run pointer-events-none absolute inset-[-2px] flex items-start justify-end rounded-xl border-2 border-fd-primary bg-fd-primary/10 p-1.5`}>
@@ -482,7 +508,7 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
               </svg>
               <span className="size-[10px] rounded-full bg-fd-primary" />
             </span>
-            <span className="font-mono text-[14px] font-semibold">listening</span>
+            <span className="font-mono text-[14px] font-semibold">3 apps · listening</span>
             <Radio className="ml-auto size-[18px]" strokeWidth={2} />
           </div>
         </div>
@@ -499,15 +525,16 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
             </span>
             <span className="flex flex-col">
               <span className="text-[19px] font-semibold leading-tight">Arkitekt hub</span>
-              <span className="text-[13px] text-fd-muted-foreground">registered from uc2-scope</span>
+              <span className="text-[13px] text-fd-muted-foreground">registered from three apps</span>
             </span>
           </div>
           {OFFERS.map((o, i) => (
-            <div key={o.name} className="sm-in relative flex items-center justify-between rounded-xl border border-l-4 border-fd-border border-l-fd-primary/70 bg-fd-background/60 px-3 py-2" style={delay(arriveAt(i))}>
+            <div key={o.name} className="sm-in relative flex items-center justify-between gap-2 rounded-xl border border-l-4 border-fd-border border-l-fd-primary/70 bg-fd-background/60 px-3 py-2" style={delay(arriveAt(i))}>
               <span className="flex flex-col gap-1">
                 <span className="font-mono text-[16px] font-semibold">{o.name}</span>
                 <TypeLine ins={o.ins} out={o.out} />
               </span>
+              <span className="self-start font-mono text-[12px] text-fd-muted-foreground">{o.app}</span>
             </div>
           ))}
           <div className="relative mt-auto h-[64px]">
@@ -523,15 +550,15 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
             </div>
             <div className={`${u}-task absolute inset-0 flex items-center gap-3 rounded-xl border-2 border-fd-primary/40 bg-fd-primary/5 px-3`}>
               <span className="flex min-w-0 flex-1 flex-col gap-1.5">
-                <span className="font-mono text-[14px] font-semibold">task · snap(20 ms)</span>
+                <span className="font-mono text-[14px] font-semibold">task · run_protocol</span>
                 <span className="relative h-[20px]">
                   <span className={`${u}-b-asg absolute left-0 top-0 rounded-full bg-fd-muted px-2 py-0.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-fd-muted-foreground`}>assigned</span>
                   <span className={`${u}-b-run absolute left-0 top-0 rounded-full bg-fd-primary px-2 py-0.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-fd-primary-foreground`}>running</span>
-                  <span className={`${u}-b-done absolute left-0 top-0 whitespace-nowrap rounded-full bg-emerald-500 px-2 py-0.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-white`}>done · image stored</span>
+                  <span className={`${u}-b-done absolute left-0 top-0 whitespace-nowrap rounded-full bg-emerald-500 px-2 py-0.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-white`}>done · recorded</span>
                 </span>
               </span>
               <span className={`${u}-thumb`}>
-                <MiniShot size={44} />
+                <MiniSlide size={44} />
               </span>
             </div>
           </div>
@@ -558,33 +585,45 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
               style={{ top: 92 + i * 44, ...({ '--d': `${1.55 + i * 0.15}s` } as CSSProperties) }}
             >
               <span className="font-mono text-[15px] font-semibold">{o.name}</span>
-              <span className="rounded bg-fd-primary/12 px-1.5 py-px font-mono text-[11.5px] text-fd-primary">→ {o.out}</span>
+              <span className="rounded bg-fd-muted px-1.5 py-px font-mono text-[11.5px] text-fd-muted-foreground">{o.app}</span>
               {i === 0 ? <span className={`${u}-sel pointer-events-none absolute inset-[-2px] rounded-lg border-2 border-fd-primary bg-fd-primary/10`} /> : null}
             </div>
           ))}
           <div className={`${u}-form absolute inset-x-3.5 rounded-xl border border-fd-border bg-fd-background/60`} style={{ top: form, height: 140 }}>
-            <span className="absolute left-3 top-2.5 font-mono text-[12px] text-fd-muted-foreground">
-              snap · exposure <span className="rounded bg-fd-muted px-1">float</span>
+            <span className="absolute left-3 top-2.5 whitespace-nowrap font-mono text-[12px] text-fd-muted-foreground">
+              protocol <span className="rounded bg-fd-muted px-1">choice</span> ← ot2 state
             </span>
             <div className="absolute inset-x-3 top-[32px] flex h-[34px] items-center rounded-lg border-2 border-fd-border bg-fd-card px-2.5 font-mono text-[15px]">
-              <span className={`${u}-typed inline-block overflow-hidden whitespace-nowrap`}>20 ms</span>
-              <span className="ml-px h-[18px] w-[2px] bg-fd-primary/70" />
+              <span className="relative flex-1">
+                <span className={`${u}-ph text-[14px] text-fd-muted-foreground`}>pick a protocol</span>
+                <span className={`${u}-pick absolute inset-y-0 left-0`}>stain_cd20</span>
+              </span>
+              <span className="text-[12px] text-fd-muted-foreground">▼</span>
             </div>
             <div className={`${u}-btn absolute inset-x-3 top-[76px] h-[38px]`}>
               <span className={`${u}-btn1 absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-fd-primary text-[15px] font-semibold text-fd-primary-foreground shadow-sm`}>Assign ▶</span>
               <span className={`${u}-btn2 absolute inset-0 flex items-center justify-center gap-2 rounded-lg border-2 border-fd-primary/50 bg-fd-primary/10 text-[15px] font-semibold text-fd-primary`}>assigned · waiting…</span>
             </div>
             <div className={`${u}-result absolute inset-x-3 top-[72px] flex items-center gap-3`}>
-              <MiniShot size={56} />
+              <MiniSlide size={56} />
               <span className="flex flex-col">
-                <span className="font-mono text-[14px] font-semibold">image_0042</span>
+                <span className="font-mono text-[14px] font-semibold">stain_cd20 · ran</span>
                 <span className="flex items-center gap-1 text-[13px] font-semibold text-emerald-600">
                   <Check className="size-[15px]" strokeWidth={2.8} /> done, from the hub
                 </span>
               </span>
             </div>
+            {/* the dropdown, filled from the OT-2's state */}
+            <div className={`${u}-list absolute inset-x-3 top-[68px] z-10 rounded-lg border-2 border-fd-border bg-fd-card p-0.5 shadow-lg`}>
+              {PROTOCOLS.map((p) => (
+                <div key={p} className="relative flex h-[19px] items-center rounded px-2 font-mono text-[13px]">
+                  {p === 'stain_cd20' ? <span className={`${u}-hl absolute inset-0 rounded bg-fd-primary/15`} /> : null}
+                  <span className="relative">{p}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <span className={`${u}-cur pointer-events-none absolute left-0 top-0 z-10`}>
+          <span className={`${u}-cur pointer-events-none absolute left-0 top-0 z-20`}>
             <Pointer />
           </span>
         </div>
@@ -611,39 +650,39 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
 
       {/* step 2: the assignment, Orkestrator → hub → app */}
       <div className={`${u}-asgA absolute`} style={{ left: gapB[1] - 62, top: yFront - 17, ...travel(gapB[0] - gapB[1]) }}>
-        <span className="flex h-[34px] w-[124px] items-center justify-center whitespace-nowrap rounded-full bg-fd-primary font-mono text-[13px] font-bold text-fd-primary-foreground shadow-md">← assign snap</span>
+        <span className="flex h-[34px] w-[124px] items-center justify-center whitespace-nowrap rounded-full bg-fd-primary font-mono text-[13px] font-bold text-fd-primary-foreground shadow-md">← run_protocol</span>
       </div>
       <div className={`${u}-asgB absolute`} style={{ left: gapA[1] - 62, top: ySocket - 17, ...travel(gapA[0] - gapA[1]) }}>
-        <span className="flex h-[34px] w-[124px] items-center justify-center whitespace-nowrap rounded-full bg-fd-primary font-mono text-[13px] font-bold text-fd-primary-foreground shadow-md">← snap 20 ms</span>
+        <span className="flex h-[34px] w-[124px] items-center justify-center whitespace-nowrap rounded-full bg-fd-primary font-mono text-[13px] font-bold text-fd-primary-foreground shadow-md">← stain_cd20</span>
       </div>
 
-      {/* step 3: the image, app → hub → Orkestrator */}
+      {/* step 3: the OT-2's done, app → hub → Orkestrator */}
       <div className={`${u}-imgA absolute`} style={{ left: gapA[0] - 30, top: ySocket - 58, ...travel(gapA[1] - gapA[0]) }}>
         <span className="flex flex-col items-center gap-0.5 rounded-lg border-2 border-emerald-500/70 bg-fd-card p-1 shadow-md">
-          <MiniShot size={48} />
-          <span className="font-mono text-[10px] font-bold text-emerald-600">image →</span>
+          <MiniSlide size={48} />
+          <span className="font-mono text-[10px] font-bold text-emerald-600">done →</span>
         </span>
       </div>
       <div className={`${u}-imgB absolute`} style={{ left: gapB[0] - 30, top: yFront - 40, ...travel(gapB[1] - gapB[0]) }}>
         <span className="flex flex-col items-center gap-0.5 rounded-lg border-2 border-emerald-500/70 bg-fd-card p-1 shadow-md">
-          <MiniShot size={48} />
-          <span className="font-mono text-[10px] font-bold text-emerald-600">image →</span>
+          <MiniSlide size={48} />
+          <span className="font-mono text-[10px] font-bold text-emerald-600">done →</span>
         </span>
       </div>
 
-      {caption(1, '③ pick', 'Orkestrator builds the form from the action’s types')}
-      {caption(2, '④ assign', 'through the hub, down the app’s socket: no open port, no IP')}
-      {caption(3, '⑤ result', 'the image goes to the hub first, then on to Kim')}
+      {caption(1, '③ pick', 'Orkestrator builds the form from the types: the protocols come from the OT-2’s state')}
+      {caption(2, '④ assign', 'through the hub, down the ot2 app’s socket: no open port, no IP')}
+      {caption(3, '⑤ result', 'the OT-2 reports done: to the hub first, then on to Kim')}
     </div>
   );
 }
 
-/** The three actions from the code slide registering with the hub. */
+/** Three of the lab's actions registering with the hub. */
 export function ActionRegistry() {
   const actions = [
-    { name: 'snap', sig: 'exposure_ms → image' },
-    { name: 'find_largest', sig: 'image → (x, y)' },
-    { name: 'move_to', sig: 'x_um, y_um → None' },
+    { name: 'run_protocol', sig: 'protocol → None' },
+    { name: 'run_trajectory', sig: 'name → None' },
+    { name: 'acquire_image', sig: '() → image' },
   ];
   return (
     <div className="flex flex-col gap-3">
@@ -693,7 +732,7 @@ export function MeshFigure() {
       </T>
 
       <Box className="sm-pop" style={delay(0.2)} x={440} y={10} w={220} h={64} title="Arkitekt hub" tone="solid" />
-      <Box className="sm-pop" style={delay(0.4)} x={70} y={208} w={230} h={84} title="Microscope PC" sub="UC2 · camera" />
+      <Box className="sm-pop" style={delay(0.4)} x={70} y={208} w={230} h={84} title="Acquisition PC" sub="openUC2 · camera" />
       <Box className="sm-pop" style={delay(0.6)} x={440} y={248} w={220} h={84} title="Storage" sub="object store" />
       <Box className="sm-pop" style={delay(0.8)} x={820} y={208} w={230} h={84} title="Laptop" sub="on a phone hotspot" tone="primary" />
 
@@ -722,20 +761,22 @@ export function MeshFigure() {
 /* --- nobody knows what it decided: replay + provenance ---------------------- */
 
 const RUN = [
-  { t: '14:15:06', call: 'snap()', out: '→ image #1', kind: 'acq', label: 'snap' },
-  { t: '14:15:07', call: 'threshold(image #1)', out: '→ otsu 0.42', kind: 'ana', label: 'threshold' },
-  { t: '14:15:07', call: 'find_largest(mask)', out: '→ object #3', kind: 'ana', label: 'find_largest' },
-  { t: '14:15:08', call: 'move_to(812, 344)', out: '→ done', kind: 'acq', label: 'move_to' },
-  { t: '14:15:10', call: 'snap()', out: '→ image #2', kind: 'acq', label: 'snap' },
+  { t: '14:15:06', call: 'run_protocol(stain_cd20)', out: '→ done', kind: 'acq', label: 'run_protocol' },
+  { t: '14:21:40', call: 'acquire_image() ×3', out: '→ tiles #1–3', kind: 'acq', label: 'acquire_image' },
+  { t: '14:21:52', call: 'stitch_images(tiles)', out: '→ mosaic #1', kind: 'ana', label: 'stitch_images' },
+  { t: '14:21:55', call: 'segment_image(mosaic)', out: '→ labels #1', kind: 'ana', label: 'segment_image' },
+  { t: '14:21:57', call: 'calculate_stain_percentage(…)', out: '→ 0.41', kind: 'ana', label: 'calculate_stain_percentage' },
 ] as const;
 
-/** The run as a timeline and an append-only record, then a replay that re-runs
-    the analysis with another threshold on the image that was recorded. */
+/** One round of HE-07 as a timeline and an append-only record, then a replay
+    that re-segments the recorded mosaic with another threshold and measures
+    again: analysis only, the slide is not stained or imaged again. */
 export function ReplayFigure() {
   const u = useUid();
-  const xs = [150, 330, 510, 690, 870];
+  const xs = [130, 300, 470, 640, 860];
+  const outX = 470;
   return (
-    <svg width={1100} height={400} viewBox="0 0 1100 400" role="img" aria-label="A run's calls on a timeline and in an append-only record; a replay re-runs the threshold and object finding with a fixed threshold on the recorded image" className="mx-auto block">
+    <svg width={1100} height={400} viewBox="0 0 1100 400" role="img" aria-label="One staining round's calls on a timeline and in an append-only record: run_protocol, acquire_image, stitch_images, segment_image, calculate_stain_percentage. A replay re-runs segmentation and the uptake measurement with another threshold on the recorded mosaic, without staining or imaging again" className="mx-auto block">
       <Arrowheads id={u} />
       <Path className="sm-draw" style={delay(0.1)} d="M60 70 L1040 70" stroke={BORDER} width={3} />
       {RUN.map((e, i) => (
@@ -753,7 +794,7 @@ export function ReplayFigure() {
       <g className="sm-fade" style={delay(1.8)}>
         <rect x={60} y={100} width={14} height={14} rx={3} fill={PRIMARY} />
         <T x={82} y={108} anchor="start" size={14} fill={MUTED}>
-          acquisition · recorded
+          stain, image · recorded
         </T>
         <circle cx={377} cy={107} r={7} fill={SURFACE} stroke={PRIMARY} strokeWidth={2.5} />
         <T x={392} y={108} anchor="start" size={14} fill={MUTED}>
@@ -781,14 +822,14 @@ export function ReplayFigure() {
           <T x={175} y={204 + i * 38} anchor="start" size={15} mono>
             {e.call}
           </T>
-          <T x={440} y={204 + i * 38} anchor="start" size={15} mono weight={700} fill={PRIMARY}>
+          <T x={outX} y={204 + i * 38} anchor="start" size={15} mono weight={700} fill={PRIMARY}>
             {e.out}
           </T>
         </g>
       ))}
 
       {/* the replay */}
-      <Path className="sm-draw" style={delay(2.5)} d="M330 84 L330 122 L860 122 L860 136" stroke={PRIMARY} width={2.5} head={`${u}-primary`} />
+      <Path className="sm-draw" style={delay(2.5)} d={`M${xs[3]} 84 L${xs[3]} 122 L860 122 L860 136`} stroke={PRIMARY} width={2.5} head={`${u}-primary`} />
       <g className="sm-in" style={delay(2.9)}>
         <rect x={660} y={140} width={400} height={250} rx={14} fill={PRIMARY} fillOpacity={0.07} stroke={PRIMARY} strokeOpacity={0.55} strokeWidth={1.6} />
         <T x={680} y={166} anchor="start" size={13} mono weight={700} fill={PRIMARY}>
@@ -796,23 +837,24 @@ export function ReplayFigure() {
         </T>
       </g>
       <T className="sm-in" style={delay(3.2)} x={680} y={206} anchor="start" size={15} mono>
-        threshold(image #1)
+        segment_image(mosaic #1)
       </T>
       <T className="sm-in" style={delay(3.4)} x={680} y={234} anchor="start" size={15} mono>
-        <tspan fill={MUTED} textDecoration="line-through">otsu 0.42</tspan>
+        <tspan fill={MUTED} textDecoration="line-through">prob_thresh 0.50</tspan>
         <tspan fill={MUTED}> → </tspan>
-        <tspan fill={WARN} fontWeight={700}>fixed 0.30</tspan>
+        <tspan fill={WARN} fontWeight={700}>0.35</tspan>
       </T>
       <T className="sm-in" style={delay(3.7)} x={680} y={278} anchor="start" size={15} mono>
-        find_largest(mask)
+        calculate_stain_percentage(…)
       </T>
       <T className="sm-in" style={delay(3.9)} x={680} y={306} anchor="start" size={15} mono>
-        <tspan fill={MUTED} textDecoration="line-through">object #3</tspan>
+        <tspan fill={MUTED} textDecoration="line-through">0.41</tspan>
         <tspan fill={MUTED}> → </tspan>
-        <tspan fill={WARN} fontWeight={700}>object #5</tspan>
+        <tspan fill={WARN} fontWeight={700}>0.44</tspan>
+        <tspan fill={MUTED}> · still stain again</tspan>
       </T>
       <T className="sm-in" style={delay(4.2)} x={680} y={354} anchor="start" size={14} italic fill={MUTED}>
-        on the recorded image #1, not re-imaged
+        on the recorded mosaic #1, not re-stained
       </T>
     </svg>
   );
@@ -850,7 +892,7 @@ export function CoordsFigure() {
     }
   }
   const tiles: [number, number, number, string?][] = [
-    [630, 70, 46, 'largest object'],
+    [630, 70, 46, 'patchy stain'],
     [790, 55, 30],
     [900, 135, 68, 'rare event'],
     [680, 215, 26],
@@ -1215,35 +1257,78 @@ export function OptikitSteps() {
 
 /* --- the workflow ------------------------------------------------------------ */
 
-type FlowNode = { name: string; tag: string; param: string; out: string; x: number; y: number; from: number };
+/** One node of the editor: an action, the app (and machine) it runs on, what
+    goes in, what comes out. `dir` is the way the row flows: the top row runs
+    left to right, the bottom row comes back right to left. */
+type FlowNode = { name: string; app: string; machine: string; param: string; out: string; x: number; y: number; dir: 1 | -1 };
 
-/** Orkestrator's editor: the three offered actions are dragged out of the
-    palette and wired by their types into find, centre, capture. One click on
-    Run, and the hub executes it node by node; the image ends up on the hub. */
+/** An action name that may wrap after an underscore, and nowhere else. */
+function ActionName({ name }: { name: string }) {
+  const parts = name.split('_');
+  return (
+    <>
+      {parts.map((p, i) => (
+        <span key={i}>
+          {p}
+          {i < parts.length - 1 ? (
+            <>
+              _<wbr />
+            </>
+          ) : null}
+        </span>
+      ))}
+    </>
+  );
+}
+
+/** Orkestrator's editor: the lab's actions are dragged out of the palette
+    and wired by their types into one staining round of `process_slides`:
+    arm to the OT-2, stain, image, stitch, segment, measure, with a loop back
+    while the uptake is below target. One click on Run, and the hub assigns
+    each node to its own app: round 1 measures 41 %, so the loop sends the
+    slide round again; round 2 reaches 86 % and the result lands on the hub. */
 export function WorkflowFigure() {
   const u = useUid();
-  const nw = 190;
-  const nh = 100;
-  const port = 64;
-  const palette = ['snap', 'find_largest', 'move_to'];
-  const palY = (i: number) => 92 + i * 50;
+  const nw = 216;
+  const nh = 116;
+  const port = 76;
+  const cols = [228, 522, 816];
+  const rows = [58, 232];
+  const palY = (i: number) => 84 + i * 46;
   const nodes: FlowNode[] = [
-    { name: 'snap', tag: 'overview', param: 'exposure 20 ms', out: 'image', x: 222, y: 100, from: 0 },
-    { name: 'find_largest', tag: 'decide', param: '← image', out: 'x, y', x: 462, y: 250, from: 1 },
-    { name: 'move_to', tag: 'centre', param: '← x, y', out: 'done', x: 702, y: 100, from: 2 },
-    { name: 'snap', tag: 'capture', param: 'exposure 100 ms', out: 'image', x: 942, y: 250, from: 0 },
+    { name: 'run_trajectory', app: 'arkirino', machine: 'bench', param: '"to_ot2"', out: 'done', x: cols[0], y: rows[0], dir: 1 },
+    { name: 'run_protocol', app: 'ot2', machine: 'bench', param: 'stain_cd20', out: 'done', x: cols[1], y: rows[0], dir: 1 },
+    { name: 'acquire_image', app: 'openuc2', machine: 'acquisition PC', param: '× 3 tiles', out: 'tiles', x: cols[2], y: rows[0], dir: 1 },
+    { name: 'stitch_images', app: 'stitcher', machine: 'acquisition PC', param: 'tiles ←', out: 'mosaic', x: cols[2], y: rows[1], dir: -1 },
+    { name: 'segment_image', app: 'stardist', machine: 'GPU server', param: 'mosaic ←', out: 'labels', x: cols[1], y: rows[1], dir: -1 },
+    { name: 'calculate_stain_percentage', app: 'analyzer', machine: 'GPU server', param: 'labels ←', out: 'uptake', x: cols[0], y: rows[1], dir: -1 },
   ];
+  const outPort = (n: FlowNode) => [n.dir === 1 ? n.x + nw : n.x, n.y + port] as const;
+  const inPort = (n: FlowNode) => [n.dir === 1 ? n.x : n.x + nw, n.y + port] as const;
   const edges = nodes.slice(1).map((b, i) => {
     const a = nodes[i];
-    const [x1, y1, x2, y2] = [a.x + nw, a.y + port, b.x, b.y + port];
-    return { d: `M${x1} ${y1} C ${x1 + 60} ${y1}, ${x2 - 60} ${y2}, ${x2} ${y2}`, mx: (x1 + x2) / 2, my: (y1 + y2) / 2 - 6, type: a.out };
+    const [x1, y1] = outPort(a);
+    const [x2, y2] = inPort(b);
+    if (a.dir === b.dir) {
+      const c = 40 * a.dir;
+      return { d: `M${x1} ${y1} C ${x1 + c} ${y1}, ${x2 - c} ${y2}, ${x2} ${y2}`, mx: (x1 + x2) / 2, my: y1 - 6, type: a.out };
+    }
+    // the turn at the right edge, from the top row down into the bottom one
+    return { d: `M${x1} ${y1} C ${x1 + 60} ${y1}, ${x2 + 60} ${y2}, ${x2} ${y2}`, mx: x1 + 45, my: (y1 + y2) / 2, type: a.out };
   });
-  const last = nodes[3];
+  const last = nodes[5];
+  const [lx1, ly1] = outPort(last);
+  const [lx2, ly2] = inPort(nodes[0]);
+  const loopD = `M${lx1} ${ly1} C ${lx1 - 40} ${ly1}, ${lx2 - 40} ${ly2}, ${lx2} ${ly2}`;
   const outX = last.x + nw / 2;
-  const outD = `M${outX} ${last.y} L${outX} ${last.y - 38}`;
-  const runAt = (i: number) => 0.5 + i * 1.1;
-  const runLen = 0.7;
-  const doneAt = runAt(3) + runLen + 0.45;
+  const outD = `M${outX} ${last.y + nh} L${outX} ${last.y + nh + 12}`;
+  const step = 0.6;
+  const runLen = 0.3;
+  const pass2 = 4.25;
+  const runAt = (pass: number, i: number) => (pass === 0 ? 0.5 : pass2) + i * step;
+  const loopAt = runAt(0, 5) + runLen;
+  const exitAt = runAt(1, 5) + runLen;
+  const doneAt = exitAt + 0.4;
   const t = (s: number) => `${s}s`;
   const css = `
 .${u}-drag { transform: none; }
@@ -1258,14 +1343,14 @@ section.present .${u}-drag { animation: ${u}-drag 0.7s cubic-bezier(.5,0,.2,1) v
 @keyframes ${u}-pop { 0% { opacity: 0; transform: scale(0.6); } 70% { opacity: 1; transform: scale(1.12); } 100% { opacity: 1; transform: none; } }
 @keyframes ${u}-press { 0%, 100% { transform: none; } 45% { transform: scale(0.9); } }
 @keyframes ${u}-move { 0% { opacity: 0; offset-distance: 0%; } 10%, 100% { opacity: 1; } 100% { offset-distance: 100%; } }
-:is(.${u}-run, .${u}-ok, .${u}-tok, .${u}-img, .${u}-busy, .${u}-fin) { opacity: 0; }
-.${u}-go.visible ~ * :is(.${u}-run, .${u}-busy) { animation: ${u}-fadein 0.2s ease-out var(--d) both, ${u}-fadeout 0.25s ease-out var(--e) forwards; }
+:is(.${u}-run, .${u}-val, .${u}-ok, .${u}-tok, .${u}-img, .${u}-busy, .${u}-fin) { opacity: 0; }
+.${u}-go.visible ~ * :is(.${u}-run, .${u}-val, .${u}-busy) { animation: ${u}-fadein 0.2s ease-out var(--d) both, ${u}-fadeout 0.25s ease-out var(--e) forwards; }
 .${u}-go.visible ~ * :is(.${u}-ok, .${u}-fin), .${u}-go.visible ~ :is(.${u}-fin) { animation: ${u}-pop 0.35s ease-out var(--d) both; }
 .${u}-go.visible ~ * .${u}-img { animation: ${u}-pop 0.45s ease-out var(--d) both; }
 .${u}-go.visible ~ * .${u}-ghost { animation: ${u}-fadeout 0.2s ease-out var(--d) both; }
 .${u}-go.visible ~ * .${u}-idle { animation: ${u}-fadeout 0.1s ease-out 0.1s both; }
 .${u}-go.visible ~ * .${u}-btn { animation: ${u}-press 0.35s ease-out 0.05s both; }
-.${u}-go.visible ~ .${u}-tok { animation: ${u}-move 0.4s ease-in-out var(--d) both, ${u}-fadeout 0.15s ease-out var(--e) forwards; }
+.${u}-go.visible ~ .${u}-tok { animation: ${u}-move var(--m) ease-in-out var(--d) both, ${u}-fadeout 0.15s ease-out var(--e) forwards; }
 /* click 2: so 2023 */
 .${u}-dim, .${u}-stamp { opacity: 0; }
 .${u}-x { stroke-dasharray: 1; stroke-dashoffset: 1; }
@@ -1277,8 +1362,14 @@ section.present .${u}-drag { animation: ${u}-drag 0.7s cubic-bezier(.5,0,.2,1) v
 @media (prefers-reduced-motion: reduce) { section.present .${u}-drag { animation: none; } }
 `;
   const vars = (d: number, e?: number) => ({ '--d': t(d), ...(e === undefined ? {} : { '--e': t(e) }) }) as CSSProperties;
+  // every token: its path, colour, start and how long it travels
+  const tokens = [
+    ...[0, 1].flatMap((pass) => edges.map((e, i) => ({ d: e.d, warn: false, at: runAt(pass, i) + runLen, m: 0.3 }))),
+    { d: loopD, warn: true, at: loopAt, m: 0.4 },
+    { d: outD, warn: false, at: exitAt, m: 0.3 },
+  ];
   return (
-    <div className="relative mx-auto h-[430px] w-[1180px]" role="img" aria-label="Orkestrator's workflow editor: snap, find_largest, move_to and snap are dragged out of the palette of actions on the hub and wired by their types. On Run, the hub executes them in turn and the final image is stored on the hub.">
+    <div className="relative mx-auto h-[430px] w-[1180px]" role="img" aria-label="Orkestrator's workflow editor: run_trajectory on the robot arm, run_protocol on the OT-2, acquire_image on the openUC2, stitch_images, segment_image with StarDist and calculate_stain_percentage are dragged out of the palette and wired by their types, with a loop back to the arm while the uptake is below target. On Run, the hub assigns each node to its own app: round 1 measures 41 percent and goes round again, round 2 reaches 86 percent and the result is stored on the hub.">
       <Fragment as="span" index={1} className={`${u}-go absolute`} />
       <Fragment as="span" index={2} className={`${u}-nope absolute`} />
       <LoopStyles css={css} />
@@ -1291,7 +1382,7 @@ section.present .${u}-drag { animation: ${u}-drag 0.7s cubic-bezier(.5,0,.2,1) v
           <span className="size-3 rounded-full bg-fd-muted-foreground/30" />
           <Workflow className="ml-3 size-[18px] text-fd-primary" strokeWidth={2} />
           <span className="text-[15px] font-semibold">Orkestrator</span>
-          <span className="font-mono text-[13px] text-fd-muted-foreground">· find-centre-capture</span>
+          <span className="font-mono text-[13px] text-fd-muted-foreground">· process_slides</span>
         </div>
         <div
           className="absolute bottom-3 left-[200px] right-3 top-[52px] rounded-xl"
@@ -1301,7 +1392,7 @@ section.present .${u}-drag { animation: ${u}-drag 0.7s cubic-bezier(.5,0,.2,1) v
 
       {/* Run button */}
       <div className="absolute right-[14px] top-[7px] h-[28px] w-[178px]">
-        <div className={`${u}-btn sm-pop relative size-full`} style={delay(3.9)}>
+        <div className={`${u}-btn sm-pop relative size-full`} style={delay(4.2)}>
           <span className={`${u}-idle absolute inset-0 flex items-center justify-center rounded-lg bg-fd-primary text-[14px] font-semibold text-fd-primary-foreground shadow-sm`}>▶ Run</span>
           <span className={`${u}-busy absolute inset-0 flex items-center justify-center whitespace-nowrap rounded-lg border-2 border-fd-primary/60 bg-fd-primary/10 text-[13px] font-semibold text-fd-primary`} style={vars(0.1, doneAt)}>
             running on the hub…
@@ -1313,89 +1404,123 @@ section.present .${u}-drag { animation: ${u}-drag 0.7s cubic-bezier(.5,0,.2,1) v
       </div>
 
       {/* palette: what the hub knows */}
-      <span className="sm-fade absolute left-[16px] top-[64px] font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-fd-muted-foreground" style={delay(0.25)}>
+      <span className="sm-fade absolute left-[16px] top-[60px] font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-fd-muted-foreground" style={delay(0.25)}>
         actions on the hub
       </span>
-      {palette.map((p, i) => (
-        <div key={p} className="sm-in absolute left-[14px] flex h-[40px] w-[170px] flex-col justify-center rounded-lg border border-fd-border bg-fd-background/70 px-3" style={{ top: palY(i), ...delay(0.3 + i * 0.1) }}>
-          <span className="font-mono text-[14px] font-semibold leading-tight">{p}</span>
-          <span className="text-[11px] leading-tight text-fd-muted-foreground">uc2-scope</span>
+      {nodes.map((n, i) => (
+        <div key={n.name} className="sm-in absolute left-[14px] flex min-h-[38px] w-[170px] flex-col justify-center rounded-lg border border-fd-border bg-fd-background/70 px-3 py-1" style={{ top: palY(i), ...delay(0.3 + i * 0.08) }}>
+          <span className="font-mono text-[13px] font-semibold leading-[1.25]">
+            <ActionName name={n.name} />
+          </span>
+          <span className="text-[11px] leading-tight text-fd-muted-foreground">{n.app}</span>
         </div>
       ))}
-      <span className="sm-fade absolute left-[16px] top-[252px] w-[170px] text-[13px] leading-snug text-fd-muted-foreground" style={delay(0.6)}>
-        Drag them in. An edge only snaps if the types fit.
+      <span className="sm-fade absolute left-[16px] top-[378px] w-[170px] text-[13px] leading-snug text-fd-muted-foreground" style={delay(0.6)}>
+        Edges connect only where the types fit.
       </span>
 
-      {/* edges, their types, and the output */}
+      {/* edges, the loop back, and the output */}
       <svg width={1180} height={430} viewBox="0 0 1180 430" className="pointer-events-none absolute inset-0" aria-hidden>
         <Arrowheads id={u} />
         {edges.map((e, i) => (
-          <Path key={i} className="sm-draw" style={delay(2.9 + i * 0.2)} d={e.d} stroke={PRIMARY} width={2.6} />
+          <Path key={i} className="sm-draw" style={delay(3 + i * 0.15)} d={e.d} stroke={PRIMARY} width={2.6} />
         ))}
-        <Path className="sm-draw" style={delay(3.6)} d={outD} stroke={PRIMARY} width={2.6} dash="5 5" head={`${u}-primary`} />
+        <Path className="sm-fade" style={delay(3.75)} d={loopD} stroke={WARN} width={2.6} dash="7 6" head={`${u}-warn`} />
+        <Path className="sm-draw" style={delay(3.9)} d={outD} stroke={PRIMARY} width={2.6} dash="5 5" head={`${u}-primary`} />
       </svg>
-      {edges.map((e, i) => (
-        <span
-          key={`c${i}`}
-          className="sm-pop absolute flex h-[24px] -translate-x-1/2 -translate-y-1/2 items-center gap-1 whitespace-nowrap rounded-full border border-emerald-500/60 bg-fd-card px-2 font-mono text-[11.5px] font-semibold text-emerald-600 shadow-sm"
-          style={{ left: e.mx, top: e.my, ...delay(3.2 + i * 0.2) }}
-        >
-          {e.type} <Check className="size-[12px]" strokeWidth={3} />
-        </span>
-      ))}
 
       {/* the output slot on the hub, filled by the run */}
-      <div className="absolute flex h-[76px] w-[220px] -translate-x-1/2 items-center" style={{ left: outX, top: last.y - 38 - 80 }}>
-        <div className="sm-pop relative size-full" style={delay(3.7)}>
-          <div className={`${u}-ghost absolute inset-0 flex items-center justify-center rounded-xl border-2 border-dashed border-fd-border font-mono text-[13px] text-fd-muted-foreground`} style={vars(doneAt - 0.2)}>
+      <div className="absolute h-[50px] w-[220px] -translate-x-1/2" style={{ left: outX, top: last.y + nh + 14 }}>
+        <div className="sm-pop relative size-full" style={delay(4)}>
+          <div className={`${u}-ghost absolute inset-0 flex items-center justify-center rounded-xl border-2 border-dashed border-fd-border font-mono text-[13px] text-fd-muted-foreground`} style={vars(doneAt - 0.1)}>
             output → hub
           </div>
-          <div className={`${u}-img absolute inset-0 flex items-center gap-3 rounded-xl border-2 border-emerald-500/60 bg-fd-card px-2.5 shadow-md`} style={vars(doneAt - 0.2)}>
-            <MiniShot size={56} />
+          <div className={`${u}-img absolute inset-0 flex items-center gap-2.5 rounded-xl border-2 border-emerald-500/60 bg-fd-card px-2 shadow-md`} style={vars(doneAt - 0.1)}>
+            <MiniSlide size={38} />
             <span className="flex flex-col">
-              <span className="font-mono text-[14px] font-semibold">image_0043</span>
-              <span className="text-[12.5px] text-fd-muted-foreground">on the hub, centred</span>
+              <span className="font-mono text-[13px] font-semibold leading-tight">CD20 · 86 % uptake</span>
+              <span className="text-[12px] leading-tight text-fd-muted-foreground">on the hub · next stain</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* the nodes, dragged in from the palette */}
-      {nodes.map((n, i) => (
-        <div key={`${n.name}${i}`} className="absolute" style={{ left: n.x, top: n.y, width: nw, height: nh }}>
-          <div
-            className={`${u}-drag relative size-full rounded-xl border-2 border-fd-border bg-fd-card shadow-md`}
-            style={{ ...delay(0.8 + i * 0.45), '--px': 14 - n.x, '--py': palY(n.from) - n.y } as CSSProperties}
-          >
-            <span className="absolute left-3 top-2.5 font-mono text-[14px] font-bold">{n.name}</span>
-            <span className="absolute right-3 top-3 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-fd-muted-foreground">{n.tag}</span>
-            <span className="absolute left-3 top-[36px] font-mono text-[12px] text-fd-muted-foreground">{n.param}</span>
-            <span className="absolute right-3 rounded bg-fd-primary/12 px-1.5 py-px font-mono text-[11.5px] text-fd-primary" style={{ top: port - 10 }}>
-              {n.out} →
-            </span>
-            {i > 0 ? <span className="absolute left-[-7px] size-[12px] rounded-full border-2 border-fd-primary bg-fd-card" style={{ top: port - 6 }} /> : null}
-            <span className="absolute right-[-7px] size-[12px] rounded-full border-2 border-fd-primary bg-fd-card" style={{ top: port - 6 }} />
-            <span className={`${u}-run pointer-events-none absolute inset-[-3px] rounded-xl border-[3px] border-fd-primary bg-fd-primary/10`} style={vars(runAt(i), runAt(i) + runLen)}>
-              <span className="absolute bottom-2 left-3 font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-fd-primary">running on uc2-scope</span>
-            </span>
-            <span className={`${u}-ok absolute right-[-10px] top-[-10px] flex size-[24px] items-center justify-center rounded-full bg-emerald-500 text-white shadow`} style={vars(runAt(i) + runLen)}>
-              <Check className="size-[15px]" strokeWidth={3} />
-            </span>
-          </div>
-        </div>
-      ))}
-
-      {/* tokens running along the edges */}
-      {[...edges.map((e) => e.d), outD].map((d, i) => {
-        const at = runAt(i) + runLen;
+      {nodes.map((n, i) => {
+        const inSide = n.dir === 1 ? 'left' : 'right';
+        const outSide = n.dir === 1 ? 'right' : 'left';
         return (
-          <span
-            key={`tok${i}`}
-            className={`${u}-tok absolute left-0 top-0 size-[14px] rounded-full bg-fd-primary shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-fd-primary)_25%,transparent)]`}
-            style={{ offsetPath: `path('${d}')`, ...vars(at, at + 0.4) }}
-          />
+          <div key={n.name} className="absolute" style={{ left: n.x, top: n.y, width: nw, height: nh }}>
+            <div
+              className={`${u}-drag relative size-full rounded-xl border-2 border-fd-border bg-fd-card shadow-md`}
+              style={{ ...delay(0.6 + i * 0.35), '--px': 14 - n.x, '--py': palY(i) - n.y } as CSSProperties}
+            >
+              <span className="absolute left-3 top-2 font-mono text-[11px] font-bold text-fd-primary">{n.app}</span>
+              <span className="absolute right-3 top-2.5 font-mono text-[9.5px] font-bold uppercase tracking-[0.12em] text-fd-muted-foreground">{n.machine}</span>
+              <span className="absolute inset-x-3 top-[22px] font-mono text-[14px] font-bold leading-[1.15]">
+                <ActionName name={n.name} />
+              </span>
+              <span className="absolute font-mono text-[12px] text-fd-muted-foreground" style={{ [inSide]: 12, top: port - 8 }}>
+                {n.param}
+              </span>
+              <span className="absolute rounded bg-fd-primary/12 px-1.5 py-px font-mono text-[11.5px] text-fd-primary" style={{ [outSide]: 12, top: port - 10 }}>
+                {n.dir === 1 ? `${n.out} →` : `← ${n.out}`}
+              </span>
+              <span className="absolute size-[12px] rounded-full border-2 border-fd-primary bg-fd-card" style={{ [inSide]: -7, top: port - 6 }} />
+              <span className="absolute size-[12px] rounded-full border-2 border-fd-primary bg-fd-card" style={{ [outSide]: -7, top: port - 6 }} />
+              {[0, 1].map((pass) => (
+                <span key={pass} className={`${u}-run pointer-events-none absolute inset-[-3px] rounded-xl border-[3px] border-fd-primary bg-fd-primary/10`} style={vars(runAt(pass, i), runAt(pass, i) + runLen)}>
+                  <span className="absolute bottom-2 left-3 whitespace-nowrap font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-fd-primary">
+                    {pass === 1 ? 'round 2 · ' : ''}on {n.app}
+                  </span>
+                </span>
+              ))}
+              {i === 5 ? (
+                <>
+                  <span className={`${u}-val absolute bottom-2 right-3 rounded-full bg-amber-500/15 px-2 py-0.5 font-mono text-[12px] font-bold text-amber-700 dark:text-amber-400`} style={vars(loopAt, runAt(1, 5))}>
+                    41 %
+                  </span>
+                  <span className={`${u}-ok absolute bottom-2 right-3 rounded-full bg-emerald-500/15 px-2 py-0.5 font-mono text-[12px] font-bold text-emerald-600`} style={vars(exitAt)}>
+                    86 % ✓
+                  </span>
+                </>
+              ) : null}
+              <span className={`${u}-ok absolute right-[-10px] top-[-10px] flex size-[24px] items-center justify-center rounded-full bg-emerald-500 text-white shadow`} style={vars(runAt(0, i) + runLen)}>
+                <Check className="size-[15px]" strokeWidth={3} />
+              </span>
+            </div>
+          </div>
         );
       })}
+
+      {/* the edge types, over the node borders */}
+      {edges.map((e, i) => (
+        <span
+          key={`c${i}`}
+          className="sm-pop absolute flex h-[24px] -translate-x-1/2 -translate-y-1/2 items-center gap-1 whitespace-nowrap rounded-full border border-emerald-500/60 bg-fd-card px-1.5 font-mono text-[11.5px] font-semibold text-emerald-600 shadow-sm"
+          style={{ left: e.mx, top: e.my, ...delay(3.2 + i * 0.15) }}
+        >
+          {e.type} <Check className="size-[12px]" strokeWidth={3} />
+        </span>
+      ))}
+      <span
+        className="sm-pop absolute flex h-[26px] items-center whitespace-nowrap rounded-full border border-amber-500/60 bg-fd-card px-2 font-mono text-[11.5px] font-semibold text-amber-700 shadow-sm"
+        style={{ left: cols[0] - 20, top: (rows[0] + nh + rows[1]) / 2 - 13, ...delay(3.9) }}
+      >
+        ↺ below target: stain again
+      </span>
+
+      {/* tokens running along the edges */}
+      {tokens.map((k, i) => (
+        <span
+          key={`tok${i}`}
+          className={cn(
+            `${u}-tok absolute left-0 top-0 size-[14px] rounded-full`,
+            k.warn ? 'bg-amber-500 shadow-[0_0_0_4px_rgb(245_158_11/0.25)]' : 'bg-fd-primary shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-fd-primary)_25%,transparent)]',
+          )}
+          style={{ offsetPath: `path('${k.d}')`, '--m': t(k.m), ...vars(k.at, k.at + k.m) } as CSSProperties}
+        />
+      ))}
 
       {/* click 2: a big red X, and the verdict */}
       <div className={`${u}-dim pointer-events-none absolute inset-0 rounded-2xl bg-fd-background/60`} />
@@ -1478,25 +1603,25 @@ export function DifferentFigure() {
 
 type Tok = [string, 'k' | 's' | 'c' | 'f' | 'd' | ''];
 const WF_CODE: Tok[][] = [
-  [['from', 'k'], [' typing ', ''], ['import', 'k'], [' Protocol', '']],
-  [['from', 'k'], [' arkitekt ', ''], ['import', 'k'], [' App', '']],
-  [['from', 'k'], [' mikro.arkitekt.specs ', ''], ['import', 'k'], [' SingleChannelImage ', ''], ['as', 'k'], [' Image', '']],
+  [['from', 'k'], [' arkitekt ', ''], ['import', 'k'], [' App, Task', '']],
+  [['from', 'k'], [' lab ', ''], ['import', 'k'], [' Slide  ', ''], ['# lab.py: one typed protocol per app on the hub', 'c']],
+  [['from', 'k'], [' lab ', ''], ['import', 'k'], [' ArmLike, OT2Like, ScopeLike, StitcherLike, SegmenterLike, AnalyzerLike', '']],
   [],
-  [['app = App(', ''], ['"find-centre-capture"', 's'], [', ', ''], ['"0.1.0"', 's'], [')', '']],
-  [],
-  [['@app.declare', 'd'], ['(app=', ''], ['"uc2-scope"', 's'], [', auto_resolvable=', ''], ['True', 'k'], [')', '']],
-  [['class', 'k'], [' Scope', 'f'], ['(Protocol):', '']],
-  [['    def', 'k'], [' snap', 'f'], ['(self, exposure_ms: float) -> Image: ...', '']],
-  [['    def', 'k'], [' find_largest', 'f'], ['(self, image: Image) -> tuple[float, float]: ...', '']],
-  [['    def', 'k'], [' move_to', 'f'], ['(self, x_um: float, y_um: float) -> None: ...', '']],
+  [['app = App(', ''], ['"stainstorm"', 's'], [', ', ''], ['"1.0.2"', 's'], [')', '']],
   [],
   [['@app.workflow', 'd']],
-  [['def', 'k'], [' find_centre_capture', 'f'], ['(scope: Scope) -> Image:', '']],
-  [['    """Find the biggest organoid, centre it, capture it."""', 'c']],
-  [['    overview = scope.snap(exposure_ms=', ''], ['20', 's'], [')', '']],
-  [['    x, y = scope.find_largest(overview)', '']],
-  [['    scope.move_to(x, y)', '']],
-  [['    ', ''], ['return', 'k'], [' scope.snap(exposure_ms=', ''], ['100', 's'], [')', '']],
+  [['def', 'k'], [' process_slides', 'f'], ['(robot: ArmLike, ot2: OT2Like, scope: ScopeLike, stitcher: StitcherLike,', '']],
+  [['                   stardist: SegmenterLike, analyzer: AnalyzerLike,', '']],
+  [['                   slide: Slide, panel: list[str], target: float = ', ''], ['0.8', 's'], [', *, task: Task):', '']],
+  [['    ', ''], ['for', 'k'], [' stain ', ''], ['in', 'k'], [' panel:', '']],
+  [['        ', ''], ['for', 'k'], [' attempt ', ''], ['in', 'k'], [' range(', ''], ['3', 's'], ['):  ', ''], ['# at most three rounds', 'c']],
+  [['            robot.run_trajectory(', ''], ['"to_ot2"', 's'], ['); ot2.run_protocol(', ''], ['f"stain_{stain}"', 's'], [')', '']],
+  [['            robot.run_trajectory(', ''], ['"to_scope"', 's'], [')', '']],
+  [['            tiles = [scope.acquire_image() ', ''], ['for', 'k'], [' _ ', ''], ['in', 'k'], [' slide.tiles]', '']],
+  [['            labels = stardist.segment_image(stitcher.stitch_images(tiles))', '']],
+  [['            ', ''], ['if', 'k'], [' analyzer.calculate_stain_percentage(labels) >= target: ', ''], ['break', 'k']],
+  [['        ', ''], ['else', 'k'], [':', '']],
+  [['            task.hold(', ''], ['f"{slide.name}: {stain} still below target. Swap the reagent."', 's'], [')', '']],
 ];
 const TOK_CLASS: Record<Tok[1], string> = {
   k: 'text-fd-primary font-semibold',
@@ -1507,26 +1632,33 @@ const TOK_CLASS: Record<Tok[1], string> = {
   '': '',
 };
 
+/** What the run prints, round by round: the stain, the round, the uptake, the verdict. */
+const WF_ROUNDS: [string, string, string, boolean][] = [
+  ['CD3', 'round 1', '84 %', true],
+  ['CD20', 'round 1', '41 %', false],
+  ['CD20', 'round 2', '86 %', true],
+];
+
 /** Kim asks for the workflow instead of drawing it: the AI writes a short
-    Python workflow against the actions the hub already knows, she runs it,
-    and the hub executes the same four calls as the editor did. */
+    Python workflow against the actions the hub already knows on her six apps,
+    she runs it, and the hub stains, images and measures round by round,
+    sending CD20 round again until it takes. */
 export function AiWorkflowFigure() {
   const lineAt = (i: number) => 2.4 + i * 0.13;
   const codeDone = lineAt(WF_CODE.length);
-  const calls = ['snap', 'find_largest', 'move_to', 'snap'];
   const runAt = codeDone + 0.6;
+  const code = 'font-mono text-[13.5px] text-fd-primary';
   return (
-    <div className="relative mx-auto grid h-[440px] w-[1180px] grid-cols-[380px_1fr] gap-5" role="img" aria-label="Kim asks an AI for a workflow that finds the biggest organoid, centres it and captures it. It writes a short Python workflow against the uc2-scope actions on the hub; she runs it, and the hub executes snap, find_largest, move_to and snap.">
+    <div className="relative mx-auto grid h-[440px] w-[1180px] grid-cols-[380px_1fr] gap-5" role="img" aria-label="Kim asks an AI for a workflow that stains her slide on the OT-2 for each stain in her panel, images it on the openUC2, segments and measures it per cell, and stains again until it takes. It writes a short Python workflow, process_slides, against the actions of her six apps on the hub; she runs it, and the run reports CD3 at 84 percent, CD20 at 41 percent so stain again, then CD20 at 86 percent.">
       {/* the conversation, and the run */}
       <div className="flex flex-col gap-3">
         <div className="sm-in self-end rounded-2xl rounded-br-md bg-fd-primary px-4 py-2.5 text-[16px] leading-snug text-fd-primary-foreground shadow-sm" style={delay(0.3)}>
-          Write me a workflow: find the biggest organoid, centre it, take a detailed image. Use the actions on my hub.
+          Write me a workflow: for each stain in my panel, stain the slide on the OT-2, image it on the openUC2, segment and measure per cell, and stain again until it takes. Use the actions on my hub.
         </div>
         <div className="sm-in flex items-start gap-2.5" style={delay(1.3)}>
           <span className="flex size-[30px] shrink-0 items-center justify-center rounded-lg bg-[#d97757] text-[18px] font-bold text-white">✻</span>
           <span className="rounded-2xl rounded-tl-md border border-fd-border bg-fd-card px-4 py-2.5 text-[15.5px] leading-snug shadow-sm">
-            Your hub already has <code className="font-mono text-[13.5px] text-fd-primary">snap</code>, <code className="font-mono text-[13.5px] text-fd-primary">find_largest</code> and{' '}
-            <code className="font-mono text-[13.5px] text-fd-primary">move_to</code> on uc2-scope. Here’s a workflow that uses just those:
+            Your hub has <code className={code}>run_protocol</code>, <code className={code}>acquire_image</code> and four more, on six apps. Here’s a workflow that uses just those:
           </span>
         </div>
         <div className="sm-in mt-auto flex flex-col gap-1.5 rounded-xl bg-[#0f172a] px-4 py-3 font-mono text-[13px] text-slate-200 shadow-md" style={delay(codeDone + 0.1)}>
@@ -1534,31 +1666,26 @@ export function AiWorkflowFigure() {
             <span className="text-emerald-400">$</span> arkitekt run dev
           </span>
           <span className="sm-fade text-slate-400" style={delay(codeDone + 0.4)}>
-            ✓ find_centre_capture is on the hub
+            ✓ process_slides is on the hub
           </span>
-          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            {calls.map((c, i) => (
-              <span key={`${c}${i}`} className="sm-pop inline-flex items-center gap-1 rounded bg-white/10 px-1.5 py-0.5" style={delay(runAt + i * 0.45)}>
-                {c} <span className="text-emerald-400">✓</span>
-              </span>
-            ))}
-          </span>
-          <span className="sm-in flex items-center gap-2.5 pt-1" style={delay(runAt + calls.length * 0.45 + 0.2)}>
-            <MiniShot size={34} />
-            <span className="text-slate-300">
-              image_0043 <span className="text-slate-500">· on the hub, recorded</span>
+          {WF_ROUNDS.map(([stain, round, uptake, took], i) => (
+            <span key={`${stain}${round}`} className="sm-in grid grid-cols-[44px_64px_48px_1fr] items-center" style={delay(runAt + i * 0.7)}>
+              <span>{stain}</span>
+              <span className="text-slate-400">{round}</span>
+              <span className={took ? 'text-emerald-400' : 'text-amber-400'}>{uptake}</span>
+              <span className={took ? 'text-emerald-400' : 'text-amber-400'}>{took ? '✓ next stain' : '↺ stain again'}</span>
             </span>
-          </span>
+          ))}
         </div>
       </div>
 
       {/* the generated workflow */}
       <div className="sm-pop flex flex-col overflow-hidden rounded-2xl border-2 border-fd-border bg-fd-card shadow-sm" style={delay(2.1)}>
         <div className="flex h-[36px] shrink-0 items-center gap-2 border-b border-fd-border px-4">
-          <span className="font-mono text-[13.5px] font-semibold">find_centre_capture.py</span>
+          <span className="font-mono text-[13.5px] font-semibold">stainstorm.py</span>
           <span className="ml-auto font-mono text-[12px] text-fd-muted-foreground">{WF_CODE.length} lines · no plumbing</span>
         </div>
-        <pre className="flex-1 px-4 py-2.5 font-mono text-[13.5px] leading-[1.48]">
+        <pre className="flex-1 px-4 py-2.5 font-mono text-[13px] leading-[1.48]">
           {WF_CODE.map((line, i) => (
             <span key={i} className="sm-fade block min-h-[1.48em] whitespace-pre" style={delay(lineAt(i))}>
               {line.map(([text, kind], j) => (

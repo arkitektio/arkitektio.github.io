@@ -321,37 +321,45 @@ section.present .${u}-reply { animation: ${u}-reply 0.8s ease-in-out ${at.reply}
 /* --- 2a · errors: a record of everything, and workflows that resume ------------------ */
 
 type RecordRow = { t: string; kind: 'call' | 'log'; text: string; on?: string; out?: string; replay?: boolean };
+/* Run 41 of process_slides on HE-07: CD20, round 1 comes back at 0.41, so
+   the arm carries the slide back and the OT-2 stains it again. Then the
+   process dies; on resume the round-2 stain comes back from the record. */
 const RECORD_BEFORE: RecordRow[] = [
-  { t: '14:02:11', kind: 'call', text: 'snap(exposure_ms=20)', on: 'uc2-scope', out: '→ image_0042', replay: true },
-  { t: '14:02:12', kind: 'log', text: 'log · overview taken, 3 candidates' },
-  { t: '14:02:13', kind: 'call', text: 'find_largest(image_0042)', on: 'uc2-scope', out: '→ x 1204 · y 830', replay: true },
-  { t: '14:02:14', kind: 'log', text: 'progress 50 % · centring' },
+  { t: '14:02:11', kind: 'call', text: 'run_protocol("stain_cd20")', on: 'ot2', out: '→ round 1', replay: true },
+  { t: '14:08:40', kind: 'call', text: 'acquire_image() ×3', on: 'openuc2', out: '→ 3 tiles', replay: true },
+  { t: '14:09:02', kind: 'call', text: 'stitch_images(tiles)', on: 'stitcher', out: '→ mosaic', replay: true },
+  { t: '14:09:05', kind: 'call', text: 'segment_image(mosaic)', on: 'stardist', out: '→ 1 812 cells', replay: true },
+  { t: '14:09:08', kind: 'call', text: 'calculate_stain_percentage(labels)', on: 'analyzer', out: '→ 0.41', replay: true },
+  { t: '14:09:09', kind: 'log', text: 'log · HE-07 · CD20 at 41 %, below 0.8 · stain again' },
+  { t: '14:09:12', kind: 'call', text: 'grip() · run_trajectory("to_ot2")', on: 'arkirino', out: '→ at the OT-2', replay: true },
+  { t: '14:09:31', kind: 'call', text: 'run_protocol("stain_cd20")', on: 'ot2', out: '→ round 2', replay: true },
 ];
 const RECORD_AFTER: RecordRow[] = [
-  { t: '14:05:41', kind: 'call', text: 'move_to(1204, 830)', on: 'uc2-scope', out: '→ arrived' },
-  { t: '14:05:43', kind: 'call', text: 'snap(exposure_ms=100)', on: 'uc2-scope', out: '→ image_0043' },
+  { t: '14:17:41', kind: 'call', text: 'run_trajectory("to_scope")', on: 'arkirino', out: '→ on the stage' },
+  { t: '14:17:58', kind: 'call', text: 'acquire_image() ×3', on: 'openuc2', out: '→ 3 tiles' },
+  { t: '14:18:12', kind: 'log', text: 'progress 50 % · HE-07 · CD20 at 86 % · next stain: Ki-67' },
 ];
 
 function RecordLine({ r, at, replayAt }: { r: RecordRow; at: number; replayAt?: number }) {
-  const grid = 'grid grid-cols-[86px_1fr_100px_150px] items-center gap-x-3 px-4';
+  const grid = 'grid grid-cols-[76px_1fr_80px_150px] items-center gap-x-3 px-4';
   if (r.kind === 'log')
     return (
-      <div className={cn(grid, 'sm-in h-[32px] border-b border-fd-border bg-fd-muted/40')} style={delay(at)}>
+      <div className={cn(grid, 'sm-in h-[24px] border-b border-fd-border bg-fd-muted/40')} style={delay(at)}>
         <span className="font-mono text-[12px] text-fd-muted-foreground">{r.t}</span>
         <span className="col-span-3 font-mono text-[12.5px] italic text-fd-muted-foreground">{r.text}</span>
       </div>
     );
   return (
-    <div className={cn(grid, 'sm-in relative h-[40px] border-b border-fd-border')} style={delay(at)}>
+    <div className={cn(grid, 'sm-in relative h-[26px] border-b border-fd-border')} style={delay(at)}>
       <span className="font-mono text-[12.5px] text-fd-muted-foreground">{r.t}</span>
-      <span className="font-mono text-[14px] font-semibold">{r.text}</span>
+      <span className="whitespace-nowrap font-mono text-[14px] font-semibold">{r.text}</span>
       <span className="text-[13px] text-fd-muted-foreground">{r.on}</span>
-      <span className="flex items-center justify-end gap-2 font-mono text-[12.5px]">
+      <span className="flex items-center justify-end gap-2 whitespace-nowrap font-mono text-[12.5px]">
         {r.out}
         <Check className="size-[15px] text-emerald-600" strokeWidth={3} />
       </span>
       {r.replay && replayAt !== undefined ? (
-        <span className="sm-pop absolute left-[340px] top-[10px] flex items-center gap-1 rounded-full bg-fd-primary/12 px-2 py-0.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.08em] text-fd-primary" style={delay(replayAt)}>
+        <span className="sm-pop absolute left-[420px] top-[4px] flex items-center gap-1 rounded-full bg-fd-primary/12 px-2 py-0.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.08em] text-fd-primary" style={delay(replayAt)}>
           <RotateCcw className="size-[11px]" strokeWidth={2.6} /> replayed
         </span>
       ) : null}
@@ -360,18 +368,18 @@ function RecordLine({ r, at, replayAt }: { r: RecordRow; at: number; replayAt?: 
 }
 
 export function RecordWinFigure() {
-  const at = (i: number) => 0.6 + i * 0.4;
+  const at = (i: number) => 0.5 + i * 0.32;
   const crashAt = at(RECORD_BEFORE.length) + 0.2;
-  const resumeAt = crashAt + 1.6;
+  const resumeAt = crashAt + 1.5;
   return (
-    <div className="flex size-full flex-col gap-2 pt-1" role="img" aria-label="The hub's record of run 41: every call with its inputs and outputs, every log line and progress update. The workflow's process dies when Kim closes her laptop; it is resumed in a new process, the finished calls are replayed from the record without running again, and the run carries on.">
+    <div className="flex size-full flex-col gap-2 pt-1" role="img" aria-label="The hub's record of run 41 of process_slides on slide HE-07: every call on the OT-2, the microscope, the stitcher, StarDist, the analyzer and the robot arm, with its inputs and outputs, and every log line and progress update. CD20 comes back at 0.41, so the slide is stained again. Then the workflow's process dies when Kim closes her laptop. It is resumed in a new process, the finished calls come back from the record without running again, so the slide is not stained twice, and the run carries on: CD20 reaches 0.86 and the next stain is Ki-67.">
       <div className="sm-in flex items-center gap-3" style={delay(0.2)}>
         <span className="flex size-[32px] items-center justify-center rounded-lg bg-fd-primary">
           <span className="flex size-[26px] items-center justify-center rounded-md bg-white/95">
             <Logo className="size-[22px]" />
           </span>
         </span>
-        <span className="text-[18px] font-semibold">The record · find_centre_capture · run 41</span>
+        <span className="text-[18px] font-semibold">The record · process_slides · run 41</span>
         <ScrollText className="ml-auto size-[18px] text-fd-muted-foreground" strokeWidth={2} />
         <span className="font-mono text-[12px] text-fd-muted-foreground">every call, input, output, log line</span>
       </div>
@@ -379,18 +387,18 @@ export function RecordWinFigure() {
         {RECORD_BEFORE.map((r, i) => (
           <RecordLine key={r.t} r={r} at={at(i)} replayAt={resumeAt + 0.5 + i * 0.1} />
         ))}
-        <div className="sm-in flex h-[38px] items-center gap-2 border-b border-fd-border bg-red-500/8 px-4 font-mono text-[13px] font-semibold text-red-700" style={delay(crashAt)}>
-          ✕ 14:02:15 · the workflow’s process died: Kim closed her laptop
+        <div className="sm-in flex h-[30px] items-center gap-2 border-b border-fd-border bg-red-500/8 px-4 font-mono text-[13px] font-semibold text-red-700" style={delay(crashAt)}>
+          ✕ 14:15:02 · the workflow’s process died: Kim closed her laptop
         </div>
-        <div className="sm-in flex h-[38px] items-center gap-2 border-b border-fd-border bg-fd-primary/8 px-4 text-[14px] font-semibold text-fd-primary" style={delay(resumeAt)}>
-          <RotateCcw className="size-[16px]" strokeWidth={2.4} /> 14:05:40 · resumed in a new process · finished calls come back from the record
+        <div className="sm-in flex h-[30px] items-center gap-2 border-b border-fd-border bg-fd-primary/8 px-4 text-[14px] font-semibold text-fd-primary" style={delay(resumeAt)}>
+          <RotateCcw className="size-[16px]" strokeWidth={2.4} /> 14:17:40 · resumed in a new process · finished calls come back from the record
         </div>
         {RECORD_AFTER.map((r, i) => (
           <RecordLine key={r.t} r={r} at={resumeAt + 1.2 + i * 0.45} />
         ))}
       </div>
-      <div className="sm-pop self-start rounded-full bg-emerald-500 px-4 py-1.5 text-[15px] font-semibold text-white shadow-md" style={delay(resumeAt + 2.3)}>
-        Same run, same answers. Nothing ran twice.
+      <div className="sm-pop self-start rounded-full bg-emerald-500 px-4 py-1.5 text-[15px] font-semibold text-white shadow-md" style={delay(resumeAt + 2.6)}>
+        Same run, same answers. The slide is not stained twice.
       </div>
     </div>
   );
@@ -401,15 +409,30 @@ export function RecordWinFigure() {
 type CodeTok = [string, 'k' | 's' | 'f' | 'd' | 'h' | ''];
 const HOLD_CODE: CodeTok[][] = [
   [['@app.workflow', 'd']],
-  [['def', 'k'], [' find_centre_capture', 'f'], ['(scope: Scope, *, task: Task):', '']],
-  [['    overview = scope.snap(exposure_ms=', ''], ['20', 's'], [')', '']],
-  [['    spot = scope.find_largest(overview)', '']],
-  [['    ', ''], ['while', 'k'], [' spot ', ''], ['is None', 'k'], [':', '']],
-  [['        task.hold(', 'h'], ['"Nothing in view: readjust the slide."', 's'], [')', 'h']],
-  [['        overview = scope.snap(exposure_ms=', ''], ['20', 's'], [')', '']],
-  [['        spot = scope.find_largest(overview)', '']],
-  [['    scope.move_to(*spot)', '']],
-  [['    ', ''], ['return', 'k'], [' scope.snap(exposure_ms=', ''], ['100', 's'], [')', '']],
+  [['def', 'k'], [' process_slides', 'f'], ['(robot, ot2, scope, stitcher, stardist,', '']],
+  [['                   analyzer, slide, panel, *, task):', '']],
+  [['    ', ''], ['for', 'k'], [' stain ', ''], ['in', 'k'], [' panel:', '']],
+  [['        ', ''], ['for', 'k'], [' round ', ''], ['in', 'k'], [' range(MAX_ROUNDS):', '']],
+  [['            robot.run_trajectory(', ''], ['"to_ot2"', 's'], [')', '']],
+  [['            ot2.run_protocol(PROTOCOL[stain])', '']],
+  [['            robot.run_trajectory(', ''], ['"to_scope"', 's'], [')', '']],
+  [['            tiles = [scope.acquire_image() ', ''], ['for', 'k'], [' _ ', ''], ['in', 'k'], [' TILES]', '']],
+  [['            mosaic = stitcher.stitch_images(tiles)', '']],
+  [['            mask = stardist.segment_image(mosaic)', '']],
+  [['            pct = analyzer.calculate_stain_percentage(mask)', '']],
+  [['            ', ''], ['if', 'k'], [' pct >= TARGET: ', ''], ['break', 'k']],
+  [['        ', ''], ['else', 'k'], [':', '']],
+  [['            task.hold(', 'h'], ['f"{slide}: {stain} at {pct:.0%}. "', 's']],
+  [['                      ', ''], ['"Swap the bottle, then resume."', 's'], [')', 'h']],
+];
+/** The two lines of HOLD_CODE that ask Kim. */
+const HOLD_LINES = [14, 15];
+/** The OT-2's stain bottles; CD20 has run low. */
+const BOTTLES = [
+  { name: 'CD3', fill: 70 },
+  { name: 'CD20', fill: 10 },
+  { name: 'Ki-67', fill: 80 },
+  { name: 'PanCK', fill: 75 },
 ];
 const HOLD_TOK: Record<CodeTok[1], string> = {
   k: 'text-fd-primary font-semibold',
@@ -420,18 +443,33 @@ const HOLD_TOK: Record<CodeTok[1], string> = {
   '': '',
 };
 
+/** One of the OT-2's stain bottles: a cap, a glass body, the stain in it. */
+function StainBottle({ fill, low = false }: { fill: number; low?: boolean }) {
+  return (
+    <span className="relative block h-[84px] w-[44px]">
+      <span className="absolute left-1/2 top-0 h-[10px] w-[22px] -translate-x-1/2 rounded-sm bg-zinc-500" />
+      <span className={cn('absolute inset-x-0 bottom-0 top-[8px] overflow-hidden rounded-b-lg rounded-t-md border-2 bg-fd-card', low ? 'border-amber-500' : 'border-fd-border')}>
+        <span className="absolute inset-x-0 bottom-0 bg-[#8a5a2b]/80" style={{ height: `${fill}%` }} />
+      </span>
+    </span>
+  );
+}
+
 export function HoldWinFigure() {
   const u = useUid();
-  const holdAt = 1.9;
-  const nudgeAt = 3.3;
-  const resumeAt = 4.6;
+  const holdAt = 2.2;
+  const swapAt = 3.6;
+  const resumeAt = 5;
   const css = `
 .${u}-hl { opacity: 0; }
 section.present .${u}-hl { animation: ${u}-hl 0.5s ease-out ${holdAt - 0.4}s both; }
 @keyframes ${u}-hl { from { opacity: 0; } to { opacity: 1; } }
-.${u}-slide { transform: translateX(-62px); }
-section.present .${u}-slide { animation: ${u}-nudge 1s cubic-bezier(.5,0,.3,1) ${nudgeAt}s both; }
-@keyframes ${u}-nudge { from { transform: none; } to { transform: translateX(-62px); } }
+/* the empty CD20 bottle goes up and out, a full one comes down in its place */
+.${u}-out { opacity: 0; }
+section.present .${u}-out { animation: ${u}-out 0.8s ease-in ${swapAt}s both; }
+@keyframes ${u}-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-110px); } }
+section.present .${u}-in { animation: ${u}-in 0.8s cubic-bezier(.2,.7,.3,1) ${swapAt + 0.6}s both; }
+@keyframes ${u}-in { from { opacity: 0; transform: translateY(-110px); } to { opacity: 1; transform: none; } }
 section.present .${u}-press { animation: ${u}-press 0.35s ease-out ${resumeAt}s both; }
 @keyframes ${u}-press { 0%, 100% { transform: none; } 45% { transform: scale(0.9); } }
 .${u}-held, .${u}-go { opacity: 0; }
@@ -445,18 +483,19 @@ section.present .${u}-buzz { animation: ${u}-buzz 0.6s ease-in-out ${holdAt + 0.
 .${u}-tap { opacity: 0; transform-box: fill-box; transform-origin: center; }
 section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s both; }
 @keyframes ${u}-tap { 0% { opacity: 0; transform: scale(0.4); } 1% { opacity: 0.85; transform: scale(0.4); } 100% { opacity: 0; transform: scale(1.9); } }
-@media (prefers-reduced-motion: reduce) { section.present :is(.${u}-slide, .${u}-buzz, .${u}-tap) { animation: none; } }
+@media (prefers-reduced-motion: reduce) { section.present :is(.${u}-out, .${u}-in, .${u}-buzz, .${u}-tap) { animation: none; } }
 `;
+  const message = 'HE-07: CD20 at 52%. Swap the bottle, then resume.';
   return (
-    <div className="relative size-full" role="img" aria-label="Kim's workflow calls task.hold when no organoid is in view. The run pauses; Orkestrator and the Arkitekt app on Kim's phone both show the message to readjust the slide. She nudges it, taps resume on her phone, Orkestrator shows the run resumed, and it carries on from where it stopped.">
+    <div className="relative size-full" role="img" aria-label="Kim's process_slides workflow calls task.hold when a stain is still below target after the last round. The run pauses; Orkestrator and the Arkitekt app on Kim's phone both show the message: HE-07, CD20 at 52%, swap the bottle, then resume. She swaps the nearly empty CD20 bottle on the OT-2 for a full one and taps resume on her phone. Orkestrator shows the run resumed by Kim, and it carries on with the next stain, Ki-67.">
       <LoopStyles css={css} />
       {/* the code */}
-      <div className="sm-pop absolute left-0 top-[6px] w-[460px] overflow-hidden rounded-2xl border-2 border-fd-border bg-fd-card shadow-sm" style={delay(0.2)}>
-        <div className="flex h-[34px] items-center border-b border-fd-border px-4 font-mono text-[13px] font-semibold">find_centre_capture.py</div>
-        <pre className="relative px-4 py-2.5 font-mono text-[12px] leading-[1.65]">
+      <div className="sm-pop absolute left-0 top-[6px] w-[466px] overflow-hidden rounded-2xl border-2 border-fd-border bg-fd-card shadow-sm" style={delay(0.2)}>
+        <div className="flex h-[34px] items-center border-b border-fd-border px-4 font-mono text-[13px] font-semibold">process_slides.py</div>
+        <pre className="relative px-4 py-2.5 font-mono text-[12px] leading-[1.5]">
           {HOLD_CODE.map((line, i) => (
-            <span key={i} className="sm-fade relative block whitespace-pre" style={delay(0.4 + i * 0.1)}>
-              {i === 5 ? <span className={`${u}-hl absolute inset-y-0 -left-4 -right-4 bg-amber-400/25`} /> : null}
+            <span key={i} className="sm-fade relative block whitespace-pre" style={delay(0.4 + i * 0.08)}>
+              {HOLD_LINES.includes(i) ? <span className={`${u}-hl absolute inset-y-0 -left-4 -right-4 bg-amber-400/25`} /> : null}
               <span className="relative">
                 {line.map(([text, kind], j) => (
                   <span key={j} className={HOLD_TOK[kind]}>
@@ -468,8 +507,8 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
           ))}
         </pre>
       </div>
-      <span className="sm-in absolute left-0 top-[318px] w-[460px] text-[14px] leading-snug text-fd-muted-foreground" style={delay(holdAt + 0.3)}>
-        <code className="font-mono font-semibold text-fd-foreground">task.hold</code> pauses the run with your message. Resume and the code carries on after it; the hold is recorded, so a resumed run won’t stop there again.
+      <span className="sm-in absolute left-0 top-[364px] w-[466px] text-[14px] leading-snug text-fd-muted-foreground" style={delay(holdAt + 0.3)}>
+        <code className="font-mono font-semibold text-fd-foreground">task.hold</code> pauses the run and asks. Resume, and the code carries on after it; a resumed run won’t stop there again.
       </span>
 
       {/* Orkestrator asks Kim */}
@@ -489,7 +528,7 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
             <span className="flex items-center gap-2 text-[14px] font-semibold text-amber-700">
               <span className="flex size-[22px] items-center justify-center rounded-full bg-amber-500/20">⏸</span> run 42 is on hold
             </span>
-            <span className="text-[15px] font-semibold leading-snug">Nothing in view: readjust the slide.</span>
+            <span className="text-[15px] font-semibold leading-snug">{message}</span>
             <span className="mt-auto flex gap-2">
               <span className="flex h-[32px] flex-1 items-center justify-center rounded-lg bg-fd-primary text-[14px] font-semibold text-fd-primary-foreground">Resume</span>
               <span className="flex h-[32px] w-[90px] items-center justify-center rounded-lg border border-fd-border text-[14px] text-fd-muted-foreground">Cancel</span>
@@ -500,32 +539,45 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
               <RotateCcw className="size-[16px]" strokeWidth={2.4} /> resumed by Kim · 14:07:12
             </span>
             <span className="-mt-1 flex items-center gap-1 text-[12px] text-fd-muted-foreground">
-              <Smartphone className="size-[12px]" strokeWidth={2.4} /> from her phone
+              <Smartphone className="size-[12px]" strokeWidth={2.4} /> from her phone, after the swap
             </span>
             <span className="sm-in whitespace-nowrap font-mono text-[11.5px]" style={delay(resumeAt + 0.8)}>
-              snap ✓ · find_largest → x 1204 · y 830 ✓
+              next stain: Ki-67 · round 1
             </span>
             <span className="sm-in whitespace-nowrap font-mono text-[11.5px]" style={delay(resumeAt + 1.3)}>
-              move_to ✓ · snap(100 ms) → image_0043 ✓
+              run_protocol(&quot;stain_ki67&quot;) ✓
             </span>
           </div>
         </div>
         </div>
 
-        {/* the slide on the stage */}
-        <div className="sm-in relative mt-4 h-[170px] overflow-hidden rounded-2xl border-2 border-fd-border bg-[#0b1220]" style={delay(holdAt + 0.4)}>
-          <div className={`${u}-slide absolute left-[150px] top-[25px] h-[120px] w-[230px] rounded-md border border-white/40 bg-white/10`}>
-            <span className="absolute left-[46px] top-[36px] size-[48px] rounded-full" style={{ background: 'radial-gradient(circle, #c6f6ff 0, #4fc3e6 30%, rgba(40,140,190,0.5) 55%, transparent 72%)' }} />
-          </div>
-          <div className="absolute left-[118px] top-[41px] size-[96px] rounded-sm border-[3px] border-dashed border-amber-400" />
-          <span className="absolute left-[118px] top-[141px] font-mono text-[11px] text-amber-300">field of view</span>
-          <span className="sm-fade absolute right-3 top-2 text-[13px] font-semibold text-white/85" style={delay(nudgeAt)}>
-            Kim nudges the slide ←
+        {/* the stain bottles on the OT-2 */}
+        <div className="sm-in relative mt-4 h-[160px] overflow-hidden rounded-2xl border-2 border-fd-border bg-fd-muted/50" style={delay(holdAt + 0.4)}>
+          <span className="absolute left-3 top-2 font-mono text-[11px] font-semibold text-fd-muted-foreground">OT-2 deck</span>
+          <span className="sm-fade absolute right-3 top-2 text-[13px] font-semibold text-amber-700 dark:text-amber-500" style={delay(swapAt)}>
+            Kim swaps the CD20 bottle
           </span>
+          {BOTTLES.map((b, i) => (
+            <div key={b.name} className="absolute top-[36px] flex w-[44px] flex-col items-center gap-1.5" style={{ left: 34 + i * 74 }}>
+              {b.name === 'CD20' ? (
+                <span className="relative block h-[84px] w-[44px]">
+                  <span className={`${u}-out absolute inset-0`}>
+                    <StainBottle fill={b.fill} low />
+                  </span>
+                  <span className={`${u}-in absolute inset-0`}>
+                    <StainBottle fill={90} />
+                  </span>
+                </span>
+              ) : (
+                <StainBottle fill={b.fill} />
+              )}
+              <span className={cn('whitespace-nowrap font-mono text-[11px]', b.name === 'CD20' ? 'font-semibold text-fd-foreground' : 'text-fd-muted-foreground')}>{b.name}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* …and on Kim's phone, right beside the microscope */}
+      {/* …and on Kim's phone, in her pocket at the OT-2 */}
       <div className="absolute right-[-182px] top-[34px] flex w-[156px] flex-col items-center gap-2">
         <div className="sm-in" style={delay(holdAt - 0.3)}>
           <div className={`${u}-buzz relative h-[300px] w-[156px] overflow-hidden rounded-[28px] border-[5px] border-zinc-800 bg-gradient-to-b from-slate-700 to-slate-900 shadow-xl dark:border-zinc-600`}>
@@ -538,7 +590,7 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
                   <Logo className="size-[12px]" /> Arkitekt · now
                 </span>
                 <span className="mt-1 block text-[11px] font-bold leading-tight text-amber-700">⏸ run 42 is on hold</span>
-                <span className="mt-0.5 block text-[11px] leading-snug">Nothing in view: readjust the slide.</span>
+                <span className="mt-0.5 block text-[11px] leading-snug">{message}</span>
                 <span className="relative mt-2 flex gap-1">
                   <span className={`${u}-press flex h-[24px] flex-1 items-center justify-center rounded-md bg-fd-primary text-[11px] font-semibold text-fd-primary-foreground`}>Resume</span>
                   <span className="flex h-[24px] w-[44px] items-center justify-center rounded-md border border-zinc-300 text-[10px] text-zinc-500">Cancel</span>
@@ -554,7 +606,7 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
                 <span className="mt-1 flex items-center gap-1 text-[11px] font-bold leading-tight text-emerald-700">
                   <Check className="size-[12px]" strokeWidth={3} /> run 42 resumed
                 </span>
-                <span className="mt-0.5 block text-[11px] leading-snug text-zinc-600">carrying on after the hold</span>
+                <span className="mt-0.5 block text-[11px] leading-snug text-zinc-600">carrying on with Ki-67</span>
               </div>
             </div>
             <span className="absolute bottom-[7px] left-1/2 h-[4px] w-[56px] -translate-x-1/2 rounded-full bg-white/60" />
@@ -570,49 +622,79 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
 
 /* --- 3 · data: mikro and coordinates ---------------------------------------------- */
 
-const OVERVIEW_BG =
-  'radial-gradient(circle at 62% 38%, #c6f6ff 0, #4fc3e6 6%, rgba(40,140,190,0.6) 13%, transparent 21%), radial-gradient(circle at 26% 64%, #9ee8fb 0, #3aa9d4 4%, transparent 11%), radial-gradient(circle at 74% 76%, #8fe3f7 0, transparent 7%), radial-gradient(circle at 38% 24%, #7fd7f0 0, transparent 5%), radial-gradient(circle at 15% 30%, #6fcbe8 0, transparent 4%), #06101b';
-const DETAIL_BG =
-  'radial-gradient(circle at 50% 50%, #e9fbff 0, #7ad8f2 14%, rgba(40,150,200,0.85) 30%, rgba(20,80,120,0.5) 46%, transparent 62%), radial-gradient(circle at 34% 40%, #fff 0, transparent 6%), radial-gradient(circle at 60% 58%, #fff 0, transparent 5%), #06101b';
+/* H&E tissue as CSS backgrounds: eosin pink, with haematoxylin nuclei on two
+   offset grids. Every pattern takes the same (dx, dy) shift, so tiles cut
+   from one slide line up into one mosaic, and a later round's stain or
+   labels sit on exactly the same cells. The first nuclei grid (17 × 15 px,
+   centre at 8.5, 7.5) is the one the stain and the labels ring. */
+const HE_BG = (dx = 0, dy = 0) =>
+  [
+    `radial-gradient(circle, #4c2a7a 0 2.3px, rgba(76,42,122,0.5) 2.9px, transparent 3.4px) ${dx}px ${dy}px / 17px 15px`,
+    `radial-gradient(circle, #6b4596 0 1.6px, transparent 2.3px) ${dx + 5}px ${dy + 9}px / 23px 19px`,
+    `radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.35), transparent 60%) ${dx}px ${dy}px / 90px 70px`,
+    'linear-gradient(135deg, #f2b8cf, #e595b6)',
+  ].join(', ');
+const RING = (color: string, r: number) => `radial-gradient(circle, transparent 0 ${r - 1.5}px, ${color} ${r - 1}px ${r + 0.5}px, transparent ${r + 1}px)`;
+/** CD20 (DAB brown) on the membranes of some cells: every second cell of the
+    first grid, and every third one more. */
+const CD20_BG = (dx = 0, dy = 0) =>
+  [`${RING('rgba(122,72,24,0.92)', 4.9)} ${dx - 8.5}px ${dy - 7.5}px / 34px 30px`, `${RING('rgba(122,72,24,0.92)', 4.9)} ${dx}px ${dy}px / 51px 45px`].join(', ');
+/** StarDist's labels: a ring round every cell of the first grid. */
+const LABELS_BG = (dx = 0, dy = 0) => `${RING('rgba(52,211,153,0.95)', 5.6)} ${dx}px ${dy}px / 17px 15px`;
 
 export function DataWinFigure() {
   const stage = 360;
+  // the three tiles of HE-07, in stage pixels; they overlap by 8 px
+  const tile = 92;
+  const tiles = [76, 160, 244];
+  const mo = { x: 76, y: 134, w: 244 + tile - 76, h: tile };
+  const tileAt = (i: number) => 1 + i * 0.45;
+  const r2At = 3.3;
   const meta: [string, string][] = [
-    ['pixel size', '0.16 µm'],
-    ['stage position', 'x 1204.5 · y 830.0 · z 120 µm'],
-    ['coordinates', 'same stage system as image_0042'],
-    ['channel · time', 'GFP · 14:02:31'],
-    ['made by', 'snap(100 ms) ← move_to ← find_largest'],
-    ['dataset', 'organoids / 2025-11-10 / B4'],
+    ['pixel size', '0.5 µm'],
+    ['stage position', 'x 16.9 · y 29.8 mm'],
+    ['coordinates', 'same stage system as round 1'],
+    ['stain · round', 'CD20 · round 2'],
+    ['made by', 'stitch_images ← 3 tiles'],
+    ['dataset', 'slides / 2026-11-10 / HE-07'],
   ];
   return (
-    <div className="relative size-full" role="img" aria-label="On the stage, the overview image and the detail image sit in one coordinate system. The detail image, image_0043, is stored in mikro with its pixel size, stage position, channel, time and the calls that made it; the 260-character filename is no longer needed.">
+    <div className="relative size-full" role="img" aria-label="On the stage, three tiles of slide HE-07 land on their stage coordinates and form the stitched mosaic. The round-2 CD20 image lands on exactly the same coordinates, so the stains overlay cell by cell. It is stored in mikro with its pixel size, stage position, stain and round, the call that made it and its dataset, slides / 2026-11-10 / HE-07; the long filename is no longer needed.">
       {/* the stage */}
       <div className="absolute left-[30px] top-[18px]" style={{ width: stage, height: stage }}>
         <div
           className="sm-fade absolute inset-0 rounded-md border-2 border-fd-border"
           style={{ ...delay(0.2), backgroundImage: 'linear-gradient(var(--color-fd-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-fd-border) 1px, transparent 1px)', backgroundSize: '36px 36px' }}
         />
-        <div className="sm-in absolute inset-[34px] rounded shadow-md" style={{ ...delay(0.6), background: OVERVIEW_BG }} />
-        <span className="sm-fade absolute left-[38px] top-[38px] rounded bg-black/60 px-1.5 py-0.5 font-mono text-[11px] text-white" style={delay(1)}>
-          image_0042 · overview · 1.3 µm/px
+        {/* the slide, its label end on the left */}
+        <div className="sm-in absolute left-[14px] top-[100px] h-[162px] w-[332px] overflow-hidden rounded-md border-2 border-fd-border bg-fd-card/70 shadow-sm" style={delay(0.5)}>
+          <span className="absolute inset-y-0 left-0 flex w-[46px] items-center justify-center bg-fd-muted font-mono text-[11px] font-semibold">HE-07</span>
+        </div>
+        {/* the tiles, each landing on its own stage coordinates */}
+        {tiles.map((x, i) => (
+          <div key={x} className="sm-fade absolute" style={{ left: x, top: mo.y, width: tile, height: tile, ...delay(tileAt(i) - 0.05) }}>
+            <div className="sm-converge size-full shadow-md ring-1 ring-white/70" style={{ ...delay(tileAt(i)), background: HE_BG(mo.x - x, 0), '--x': '300px', '--y': '-90px' } as CSSProperties} />
+          </div>
+        ))}
+        <span className="sm-fade absolute whitespace-nowrap rounded bg-black/60 px-1.5 py-0.5 font-mono text-[11px] text-white" style={{ left: mo.x, top: mo.y - 24, ...delay(tileAt(2) + 0.9) }}>
+          HE-07 · mosaic · 3 tiles
         </span>
-        {/* the detail, flown in to where the organoid is */}
-        <div className="sm-fade absolute left-[176px] top-[90px] size-[76px]" style={delay(2.05)}>
-          <div className="sm-converge size-full rounded-sm border-[3px] border-fd-primary shadow-xl" style={{ ...delay(2.1), background: DETAIL_BG, '--x': '260px', '--y': '40px' } as CSSProperties} />
+        {/* round 2, on exactly the same coordinates */}
+        <div className="sm-fade absolute" style={{ left: mo.x, top: mo.y, width: mo.w, height: mo.h, ...delay(r2At - 0.05) }}>
+          <div className="sm-converge size-full shadow-xl ring-2 ring-fd-primary" style={{ ...delay(r2At), background: CD20_BG(), '--x': '0px', '--y': '-150px' } as CSSProperties} />
         </div>
         <svg width={stage} height={stage} className="pointer-events-none absolute inset-0" aria-hidden>
-          <g className="sm-fade" style={delay(2.9)}>
-            <path d="M214 60 L214 82 M214 176 L214 198 M146 128 L168 128 M260 128 L282 128" stroke={PRIMARY} strokeWidth={2.4} />
+          <g className="sm-fade" style={delay(r2At + 1.4)}>
+            <path d="M70 142 L70 128 L84 128 M328 128 L342 128 L342 142 M70 218 L70 232 L84 232 M328 232 L342 232 L342 218" stroke={PRIMARY} strokeWidth={2.4} fill="none" />
           </g>
         </svg>
-        <span className="sm-fade absolute left-[150px] top-[176px] whitespace-nowrap rounded bg-fd-primary px-1.5 py-0.5 font-mono text-[11px] font-semibold text-fd-primary-foreground" style={delay(3)}>
-          image_0043 · 0.16 µm/px
+        <span className="sm-fade absolute whitespace-nowrap rounded bg-fd-primary px-1.5 py-0.5 font-mono text-[11px] font-semibold text-fd-primary-foreground" style={{ left: mo.x, top: mo.y + mo.h + 8, ...delay(r2At + 1.5) }}>
+          round 2 · CD20 · same x, y
         </span>
         <span className="sm-fade absolute bottom-[-24px] left-0 right-0 flex justify-between font-mono text-[11px] text-fd-muted-foreground" style={delay(0.4)}>
           <span>0</span>
-          <span>stage x · µm</span>
-          <span>2000</span>
+          <span>stage x · mm</span>
+          <span>80</span>
         </span>
       </div>
 
@@ -623,7 +705,7 @@ export function DataWinFigure() {
             <Database className="size-[20px]" strokeWidth={2} />
           </span>
           <span className="flex flex-col">
-            <span className="font-mono text-[16px] font-semibold leading-tight">image_0043</span>
+            <span className="font-mono text-[16px] font-semibold leading-tight">image_0118</span>
             <span className="text-[12px] text-fd-muted-foreground">in mikro, on Kim’s hub</span>
           </span>
           <ImageIcon className="ml-auto size-[20px] text-fd-muted-foreground" strokeWidth={1.8} />
@@ -638,7 +720,7 @@ export function DataWinFigure() {
         </div>
       </div>
       <div className="sm-in absolute bottom-[14px] right-0 w-[390px]" style={delay(4.3)}>
-        <span className="block font-mono text-[11.5px] text-fd-muted-foreground line-through decoration-red-500 decoration-2">org3_B4_z120_dt20_gfA_t41_0.41_final.tif</span>
+        <span className="block font-mono text-[11.5px] text-fd-muted-foreground line-through decoration-red-500 decoration-2">HE07_CD20_r2_x16.9_y29.8_0.5um_final2.tif</span>
         <span className="text-[13px] font-semibold text-emerald-600">the filename doesn’t have to carry anything any more</span>
       </div>
     </div>
@@ -647,62 +729,71 @@ export function DataWinFigure() {
 
 /* --- 3b · data: the lineage graph, on one coordinate system ------------------------- */
 
-type LineageKind = 'call' | 'image' | 'roi' | 'labels' | 'table';
-type LineageNode = { name: string; sub: string; kind: LineageKind; col: number; row: number; thumb?: string };
+type LineageKind = 'call' | 'image' | 'labels' | 'value';
+type LineageNode = { name: string; sub: string; kind: LineageKind; col: number; row: number; thumb?: string; badge?: string };
 
-/** The example workflow, then the analysis after it, read in a zigzag:
-    row 0 left to right, row 1 back, row 2 left to right, row 3 back. The
-    order is also the build order, so each item appears on the stage the
-    moment it appears in the graph. */
+/** One CD20 round on HE-07 and the round after it, read in a zigzag: row 0
+    left to right, row 1 back, row 2 left to right, row 3 back. The order is
+    also the build order, so each item appears on the stage the moment it
+    appears in the graph. */
 const LINEAGE: LineageNode[] = [
-  { name: 'snap(20 ms)', sub: 'uc2-scope', kind: 'call', col: 0, row: 0 },
-  { name: 'image_0042', sub: 'overview · 1.3 µm/px', kind: 'image', col: 1, row: 0, thumb: OVERVIEW_BG },
-  { name: 'find_largest', sub: 'uc2-scope', kind: 'call', col: 2, row: 0 },
-  { name: 'organoid ROI', sub: 'x 1204 · y 830 µm', kind: 'roi', col: 2, row: 1 },
-  { name: 'move_to(ROI)', sub: 'uc2-scope', kind: 'call', col: 1, row: 1 },
-  { name: 'snap(100 ms)', sub: 'uc2-scope', kind: 'call', col: 0, row: 1 },
-  { name: 'image_0043', sub: 'detail · 0.16 µm/px', kind: 'image', col: 0, row: 2, thumb: DETAIL_BG },
-  { name: 'segment', sub: 'stardist 0.9.1 · gpu', kind: 'call', col: 1, row: 2 },
-  { name: 'labels_0043', sub: '1 object', kind: 'labels', col: 2, row: 2, thumb: DETAIL_BG },
-  { name: 'measure', sub: 'gpu-server', kind: 'call', col: 2, row: 3 },
-  { name: 'stats_0043', sub: 'area · ⌀ · GFP', kind: 'table', col: 1, row: 3 },
+  { name: 'acquire_image', sub: 'openuc2 · ×3', kind: 'call', col: 0, row: 0 },
+  { name: 'tiles ×3', sub: 'HE-07 · CD20 r1', kind: 'image', col: 1, row: 0, thumb: HE_BG(-4, -3) },
+  { name: 'stitch_images', sub: 'stitcher', kind: 'call', col: 2, row: 0 },
+  { name: 'mosaic', sub: '0.5 µm/px', kind: 'image', col: 2, row: 1, thumb: HE_BG() },
+  { name: 'segment_image', sub: 'stardist · gpu', kind: 'call', col: 1, row: 1 },
+  { name: 'labels', sub: '1 812 cells', kind: 'labels', col: 0, row: 1, thumb: `${LABELS_BG()}, ${HE_BG()}` },
+  { name: 'calculate_stain_\npercentage', sub: 'analyzer', kind: 'call', col: 0, row: 2 },
+  { name: '0.41', sub: 'CD20 · round 1', kind: 'value', col: 1, row: 2, badge: '41%' },
+  { name: 'run_protocol', sub: 'ot2 · stain_cd20 · round 2', kind: 'call', col: 2, row: 2 },
+  { name: 'acquire … measure', sub: 'the same calls, round 2', kind: 'call', col: 2, row: 3 },
+  { name: '0.86', sub: 'CD20 · next: Ki-67', kind: 'value', col: 1, row: 3, badge: '86%' },
 ];
 const L_STEP = 0.55;
 const lAt = (i: number) => 0.5 + i * L_STEP;
-const L_BLOB = 'M50 21 C67 19 80 33 79 51 C78 68 65 80 49 79 C32 78 20 66 22 49 C24 32 35 22 50 21 Z';
+const L_TARGET = 0.8;
 
 function LineageThumb({ node }: { node: LineageNode }) {
   if (node.kind === 'call') return null;
   const base = 'relative size-[40px] shrink-0 overflow-hidden rounded-md border border-fd-border';
-  if (node.kind === 'table') {
+  if (node.kind === 'value') {
+    const ok = Number(node.name) >= L_TARGET;
     return (
-      <span className={cn(base, 'flex items-center justify-center bg-fd-primary/10 text-fd-primary')}>
-        <Table2 className="size-[22px]" strokeWidth={1.8} />
+      <span className={cn(base, 'flex items-center justify-center font-mono text-[12px] font-bold', ok ? 'bg-emerald-500/15 text-emerald-700' : 'bg-amber-500/15 text-amber-700')}>
+        {node.badge}
       </span>
     );
   }
-  if (node.kind === 'roi') {
-    return (
-      <span className={cn(base, 'flex items-center justify-center bg-fd-muted')}>
-        <span className="size-[24px] rounded-sm border-2 border-dashed border-fd-primary" />
-      </span>
-    );
-  }
+  return <span className={base} style={{ background: node.thumb }} />;
+}
+
+/** The zoom on the mosaic: six cells, StarDist's outline round each, and the
+    CD20 uptake the analyzer measured per cell, round 1 and then round 2. */
+const L_CELLS = [
+  { x: 22, y: 28, r1: 0.91, r2: 0.91 },
+  { x: 62, y: 24, r1: 0.18, r2: 0.84 },
+  { x: 42, y: 52, r1: 0.22, r2: 0.88 },
+  { x: 84, y: 48, r1: 0.88, r2: 0.88 },
+  { x: 20, y: 76, r1: 0.12, r2: 0.8 },
+  { x: 64, y: 78, r1: 0.15, r2: 0.85 },
+];
+const DAB = '#7a4818';
+
+function UptakeTag({ x, y, v }: { x: number; y: number; v: number }) {
   return (
-    <span className={base} style={{ background: node.thumb }}>
-      {node.kind === 'labels' ? (
-        <svg viewBox="0 0 100 100" className="absolute inset-0 size-full" aria-hidden>
-          <path d={L_BLOB} fill="#34d399" fillOpacity={0.35} stroke="#34d399" strokeWidth={6} />
-        </svg>
-      ) : null}
-    </span>
+    <g>
+      <rect x={x - 9} y={y - 4.5} width={18} height={9} rx={2} fill={v >= L_TARGET ? '#059669' : '#b45309'} />
+      <text x={x} y={y + 0.3} textAnchor="middle" dominantBaseline="middle" fontSize={6.2} fontWeight={700} fill="#fff" fontFamily="ui-monospace, monospace">
+        {v.toFixed(2)}
+      </text>
+    </g>
   );
 }
 
-/** Left: the lineage graph of one run of the example workflow plus the
-    analysis after it: every image, ROI, label and table knows the call that
-    made it. Right: the same items on the stage, in one coordinate system,
-    each placed the moment it appears in the graph. */
+/** Left: the lineage graph of one staining round and the next: every image,
+    label mask and value knows the call that made it. Right: the same items on
+    the stage, in one coordinate system, each placed the moment it appears in
+    the graph. */
 export function LineageFigure() {
   const colX = [0, 198, 396];
   const rowY = [34, 130, 226, 322];
@@ -722,33 +813,37 @@ export function LineageFigure() {
   };
   // the stage, in figure coordinates
   const st = { x: 608, y: 34, s: 330 };
-  const ov = 15; // overview inset from the stage edge
-  const roi = { x: 166, y: 94, s: 70 }; // relative to the stage
+  // HE-07's three tiles on it, overlapping by 8 px, and the mosaic they make
+  const tile = 84;
+  const tiles = [58, 134, 210];
+  const mo = { x: 58, y: 116, w: 210 + tile - 58, h: tile };
+  const roi = { x: 146, y: 136, s: 44 }; // the zoomed patch, relative to the stage
   const inset = { x: 972, y: 34, s: 208 };
   const at = {
-    overview: lAt(1),
-    roi: lAt(3),
-    detail: lAt(6),
-    labels: lAt(8),
-    stats: lAt(10),
+    tiles: lAt(1),
+    mosaic: lAt(3),
+    labels: lAt(5),
+    value: lAt(7),
+    restain: lAt(8),
+    final: lAt(10),
   };
-  const stats: [string, string][] = [
-    ['area', '0.21 mm²'],
-    ['⌀', '512 µm'],
-    ['GFP mean', '1 840'],
-    ['centroid', '1204.5, 830.0 µm'],
+  const rows: [string, string, number][] = [
+    ['cells', '1 812', at.value + 0.2],
+    ['round 1', '0.41 · again', at.value + 0.35],
+    ['round 2', '0.86 · reached', at.final],
+    ['next stain', 'Ki-67', at.final + 0.2],
   ];
   return (
     <div
       className="relative mx-auto h-[440px] w-[1180px]"
       role="img"
-      aria-label="Left, the lineage graph of one run: snap makes the overview image_0042, find_largest makes an ROI on it, move_to and snap make the detail image_0043, segmentation makes labels_0043, and measure makes a table of organoid statistics. Right, the same items on the stage in one coordinate system: the overview, the ROI on it, the detail image inside the ROI, its labels, and the measurements at the organoid's position."
+      aria-label="Left, the lineage graph of one staining round of slide HE-07 and the next: acquire_image makes three tiles, stitch_images makes the mosaic, segment_image makes the labels, and calculate_stain_percentage gives a CD20 uptake of 0.41, below target. So run_protocol stains CD20 again in round 2, and the same calls give 0.86; the next stain is Ki-67. Right, the same items on the stage in one coordinate system: the tiles, the mosaic they form, the labels on it, the uptake of each cell, and round 2 landing on the same cells."
     >
       <span className="sm-fade absolute left-0 top-0 text-[12px] font-semibold uppercase tracking-[0.08em] text-fd-muted-foreground" style={delay(0.2)}>
         lineage graph · what made what
       </span>
       <span className="sm-fade absolute top-0 text-[12px] font-semibold uppercase tracking-[0.08em] text-fd-muted-foreground" style={{ left: st.x, ...delay(0.2) }}>
-        one coordinate system · stage <span className="normal-case">µm</span>
+        one coordinate system · stage <span className="normal-case">mm</span>
       </span>
 
       {/* edges */}
@@ -763,6 +858,7 @@ export function LineageFigure() {
       {LINEAGE.map((n, i) => {
         const { x, y } = box(n);
         const call = n.kind === 'call';
+        const twoLines = n.name.includes('\n');
         return (
           <div key={n.name} className="absolute" style={{ left: x, top: y, width: nw, height: nh }}>
             <div
@@ -774,7 +870,7 @@ export function LineageFigure() {
             >
               <LineageThumb node={n} />
               <span className={cn('flex min-w-0 flex-col', call && 'w-full items-center')}>
-                <span className={cn('truncate font-mono text-[13px] font-semibold leading-tight', call && 'text-fd-muted-foreground')}>{n.name}</span>
+                <span className={cn('font-mono text-[13px] font-semibold leading-tight', twoLines ? 'whitespace-pre-line text-center' : 'truncate', call && 'text-fd-muted-foreground')}>{n.name}</span>
                 <span className="truncate text-[10.5px] leading-tight text-fd-muted-foreground">{n.sub}</span>
               </span>
             </div>
@@ -798,58 +894,86 @@ export function LineageFigure() {
           className="sm-fade absolute inset-0 rounded-md border-2 border-fd-border"
           style={{ ...delay(0.3), backgroundImage: 'linear-gradient(var(--color-fd-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-fd-border) 1px, transparent 1px)', backgroundSize: '33px 33px' }}
         />
-        <div className="sm-in absolute rounded shadow-md" style={{ inset: ov, background: OVERVIEW_BG, ...delay(at.overview) }} />
-        <span className="sm-fade absolute rounded bg-black/60 px-1.5 py-0.5 font-mono text-[11px] text-white" style={{ left: ov + 4, top: ov + 4, ...delay(at.overview + 0.3) }}>
-          image_0042
-        </span>
-        {/* the ROI find_largest drew on the overview */}
-        <div className="sm-pop absolute rounded-sm border-2 border-dashed border-fd-primary" style={{ left: roi.x - 4, top: roi.y - 4, width: roi.s + 8, height: roi.s + 8, ...delay(at.roi) }} />
-        {/* the detail, flown in to the ROI */}
-        <div className="sm-fade absolute" style={{ left: roi.x, top: roi.y, width: roi.s, height: roi.s, ...delay(at.detail - 0.05) }}>
-          <div className="sm-converge relative size-full overflow-hidden rounded-sm border-2 border-fd-primary shadow-xl" style={{ ...delay(at.detail), background: DETAIL_BG, '--x': '-260px', '--y': '140px' } as CSSProperties}>
-            <svg viewBox="0 0 100 100" className="sm-fade absolute inset-0 size-full" style={delay(at.labels)} aria-hidden>
-              <path d={L_BLOB} fill="#34d399" fillOpacity={0.3} stroke="#34d399" strokeWidth={4} />
-            </svg>
-          </div>
+        {/* the slide, its label end on the left */}
+        <div className="sm-in absolute left-[8px] top-[100px] h-[132px] w-[314px] overflow-hidden rounded-md border-2 border-fd-border bg-fd-card/70 shadow-sm" style={delay(0.4)}>
+          <span className="absolute inset-y-0 left-0 flex w-[38px] items-center justify-center bg-fd-muted font-mono text-[10px] font-semibold">HE-07</span>
         </div>
-        <span className="sm-fade absolute whitespace-nowrap rounded bg-fd-primary px-1.5 py-0.5 font-mono text-[11px] font-semibold text-fd-primary-foreground" style={{ left: roi.x - 4, top: roi.y + roi.s + 8, ...delay(at.detail + 0.6) }}>
-          image_0043
+        {/* the tiles, each on its own coordinates; together, the mosaic */}
+        {tiles.map((x, i) => (
+          <div key={x} className="sm-in absolute ring-1 ring-white/70 shadow-md" style={{ left: x, top: mo.y, width: tile, height: tile, background: HE_BG(mo.x - x, 0), ...delay(at.tiles + i * 0.12) }} />
+        ))}
+        <div className="sm-fade absolute ring-2 ring-fd-primary" style={{ left: mo.x, top: mo.y, width: mo.w, height: mo.h, ...delay(at.mosaic) }} />
+        <span className="sm-fade absolute whitespace-nowrap rounded bg-black/60 px-1.5 py-0.5 font-mono text-[11px] text-white" style={{ left: mo.x, top: mo.y - 24, ...delay(at.mosaic + 0.3) }}>
+          mosaic
+        </span>
+        {/* StarDist's labels, then round 2's CD20, on exactly the same cells */}
+        <div className="sm-fade absolute" style={{ left: mo.x, top: mo.y, width: mo.w, height: mo.h, background: LABELS_BG(), ...delay(at.labels) }} />
+        <div className="sm-fade absolute" style={{ left: mo.x, top: mo.y, width: mo.w, height: mo.h, background: CD20_BG(), ...delay(at.restain + 0.2) }} />
+        {/* the zoomed patch */}
+        <div className="sm-pop absolute rounded-sm border-2 border-dashed border-white" style={{ left: roi.x, top: roi.y, width: roi.s, height: roi.s, ...delay(at.mosaic + 0.5) }} />
+        {/* the mosaic's uptake: round 1, then round 2 on top of it */}
+        <span className="sm-pop absolute whitespace-nowrap rounded bg-amber-700 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-white" style={{ left: mo.x, top: mo.y + mo.h + 8, ...delay(at.value) }}>
+          CD20 · 0.41 · round 1
+        </span>
+        <span className="sm-pop absolute whitespace-nowrap rounded bg-emerald-600 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-white" style={{ left: mo.x, top: mo.y + mo.h + 8, ...delay(at.final) }}>
+          CD20 · 0.86 · round 2
         </span>
         <span className="sm-fade absolute bottom-[-22px] left-0 right-0 flex justify-between font-mono text-[11px] text-fd-muted-foreground" style={delay(0.4)}>
           <span>0</span>
-          <span>stage x · µm</span>
-          <span>2000</span>
+          <span>stage x · mm</span>
+          <span>80</span>
         </span>
       </div>
 
-      {/* the zoom: detail, labels and the measurement, where they belong */}
+      {/* the zoom: cells, labels and the uptake of each, where they belong */}
       <svg width={1180} height={440} viewBox="0 0 1180 440" className="pointer-events-none absolute left-0 top-0" aria-hidden>
-        <g className="sm-fade" style={delay(at.detail + 0.5)}>
+        <g className="sm-fade" style={delay(at.mosaic + 0.6)}>
           <path d={`M${st.x + roi.x + roi.s} ${st.y + roi.y} L${inset.x} ${inset.y}`} stroke={PRIMARY} strokeWidth={1.4} strokeDasharray="4 4" fill="none" />
           <path d={`M${st.x + roi.x + roi.s} ${st.y + roi.y + roi.s} L${inset.x} ${inset.y + inset.s}`} stroke={PRIMARY} strokeWidth={1.4} strokeDasharray="4 4" fill="none" />
         </g>
       </svg>
-      <div className="sm-pop absolute overflow-hidden rounded-lg border-2 border-fd-primary shadow-lg" style={{ left: inset.x, top: inset.y, width: inset.s, height: inset.s, background: DETAIL_BG, ...delay(at.detail + 0.5) }}>
+      <div className="sm-pop absolute overflow-hidden rounded-lg border-2 border-fd-primary shadow-lg" style={{ left: inset.x, top: inset.y, width: inset.s, height: inset.s, background: 'linear-gradient(135deg, #f2b8cf, #e595b6)', ...delay(at.mosaic + 0.6) }}>
         <svg viewBox="0 0 100 100" className="absolute inset-0 size-full" aria-hidden>
-          <path className="sm-draw" style={delay(at.labels)} pathLength={1} strokeDasharray="1" d={L_BLOB} fill="none" stroke="#34d399" strokeWidth={1.8} />
-          <path className="sm-fade" style={delay(at.labels + 0.6)} d={L_BLOB} fill="#34d399" fillOpacity={0.22} />
-          <g className="sm-pop" style={delay(at.stats)}>
-            <path d="M50 44 L50 56 M44 50 L56 50" stroke="#fff" strokeWidth={1.6} />
+          {L_CELLS.map((c) => (
+            <g key={`${c.x}-${c.y}`}>
+              <circle cx={c.x} cy={c.y} r={9.5} fill="#f9dbe7" />
+              {c.r1 >= L_TARGET ? <circle cx={c.x} cy={c.y} r={8.6} fill="none" stroke={DAB} strokeWidth={2.4} /> : null}
+              <circle cx={c.x} cy={c.y} r={4.2} fill="#4c2a7a" />
+            </g>
+          ))}
+          {/* StarDist draws a label round every cell */}
+          {L_CELLS.map((c, i) => (
+            <circle key={`l${c.x}`} className="sm-draw" style={delay(at.labels + i * 0.06)} pathLength={1} strokeDasharray="1" cx={c.x} cy={c.y} r={11.2} fill="none" stroke="#34d399" strokeWidth={1.6} />
+          ))}
+          {/* round 2: the CD20 takes on the cells round 1 missed */}
+          <g className="sm-fade" style={delay(at.restain + 0.2)}>
+            {L_CELLS.filter((c) => c.r1 < L_TARGET).map((c) => (
+              <circle key={`r${c.x}`} cx={c.x} cy={c.y} r={8.6} fill="none" stroke={DAB} strokeWidth={2.4} />
+            ))}
+          </g>
+          {/* the uptake of each cell, round 1 */}
+          <g className="sm-fade" style={delay(at.value)}>
+            {L_CELLS.map((c) => (
+              <UptakeTag key={`v${c.x}`} x={c.x} y={c.y + 16} v={c.r1} />
+            ))}
+          </g>
+          {/* …and round 2, over it */}
+          <g className="sm-fade" style={delay(at.final)}>
+            {L_CELLS.filter((c) => c.r2 !== c.r1).map((c) => (
+              <UptakeTag key={`w${c.x}`} x={c.x} y={c.y + 16} v={c.r2} />
+            ))}
           </g>
         </svg>
-        <span className="sm-fade absolute left-1.5 top-1.5 rounded bg-black/60 px-1.5 py-0.5 font-mono text-[10.5px] text-white" style={delay(at.detail + 0.8)}>
-          image_0043
-        </span>
-        <span className="sm-fade absolute bottom-1.5 left-1.5 rounded bg-emerald-600/90 px-1.5 py-0.5 font-mono text-[10.5px] font-semibold text-white" style={delay(at.labels + 0.3)}>
-          + labels_0043
+        <span className="sm-fade absolute left-1.5 top-1.5 rounded bg-emerald-600/90 px-1.5 py-0.5 font-mono text-[10.5px] font-semibold text-white" style={delay(at.labels + 0.3)}>
+          + labels
         </span>
       </div>
-      <div className="sm-pop absolute rounded-xl border-2 border-fd-border bg-fd-card px-3 py-2 shadow-sm" style={{ left: inset.x, top: inset.y + inset.s + 12, width: inset.s, ...delay(at.stats) }}>
+      <div className="sm-pop absolute rounded-xl border-2 border-fd-border bg-fd-card px-3 py-2 shadow-sm" style={{ left: inset.x, top: inset.y + inset.s + 12, width: inset.s, ...delay(at.value) }}>
         <span className="flex items-center gap-1.5 font-mono text-[12px] font-semibold">
-          <Table2 className="size-[14px] text-fd-primary" strokeWidth={2} /> stats_0043 · row 1
+          <Table2 className="size-[14px] text-fd-primary" strokeWidth={2} /> uptake · CD20 · HE-07
         </span>
-        {stats.map(([k, v], i) => (
-          <span key={k} className="sm-in mt-1 flex justify-between gap-2 border-t border-fd-border pt-1 text-[11.5px]" style={delay(at.stats + 0.2 + i * 0.15)}>
+        {rows.map(([k, v, d]) => (
+          <span key={k} className="sm-in mt-1 flex justify-between gap-2 border-t border-fd-border pt-1 text-[11.5px]" style={delay(d)}>
             <span className="text-fd-muted-foreground">{k}</span>
             <span className="font-mono font-semibold">{v}</span>
           </span>
@@ -903,8 +1027,8 @@ section.present .${u}-beat { animation: ${u}-beat 1.4s ease-in-out 3.2s infinite
   return (
     <div className="relative size-full" role="img" aria-label="Code plus data makes a result someone else can check. Code alone has nothing to run on; data alone doesn't say how it was made.">
       <LoopStyles css={css} />
-      {half('left', Workflow, 'Code', ['find_centre_capture.py', 'segment · measure', 'stardist 0.9.1 · seed 42'], 'without the data: nothing to run it on', 0.2)}
-      {half('right', Database, 'Data', ['image_0042 · image_0043', 'labels_0043 · stats_0043', 'coordinates + lineage'], 'without the code: no idea how it was made', 0.8)}
+      {half('left', Workflow, 'Code', ['process_slides.py', 'stitch · segment · measure', 'stardist 0.9.1 · seed 42'], 'without the data: nothing to run it on', 0.2)}
+      {half('right', Database, 'Data', ['HE-07 · tiles · mosaics', 'labels · uptake per round', 'coordinates + lineage'], 'without the code: no idea how it was made', 0.8)}
       <span className="sm-pop absolute left-1/2 top-[110px] flex size-[64px] -translate-x-1/2 items-center justify-center rounded-full border-2 border-fd-border bg-fd-card shadow-sm" style={delay(1.5)}>
         <Plus className="size-[34px] text-fd-primary" strokeWidth={2.6} />
       </span>
@@ -946,12 +1070,12 @@ section.present .${u}-after { animation: ${u}-on 0.3s ease-out ${installAt + 0.3
       title: 'your script',
       body: (
         <div className="flex flex-col gap-1.5 font-mono text-[12px]">
-          <span className="font-semibold">organoid-tools/</span>
+          <span className="font-semibold">stainstorm/</span>
           <span className="flex items-center gap-1.5 pl-3">
             <ScrollText className="size-[13px] text-fd-primary" strokeWidth={2} /> app.py
           </span>
-          <span className="pl-7 text-[11px] text-fd-muted-foreground">find_centre_capture</span>
-          <span className="pl-7 text-[11px] text-fd-muted-foreground">segment · measure</span>
+          <span className="pl-7 text-[11px] text-fd-muted-foreground">process_slides</span>
+          <span className="pl-7 text-[11px] text-fd-muted-foreground">calls six apps</span>
           <span className="flex items-center gap-1.5 pl-3">
             <ScrollText className="size-[13px] text-fd-primary" strokeWidth={2} /> pyproject.toml
           </span>
@@ -965,8 +1089,8 @@ section.present .${u}-after { animation: ${u}-on 0.3s ease-out ${installAt + 0.3
         <div className={term}>
           <span className="block text-emerald-400">$ arkitekt plugin build</span>
           <span className="block">✓ image</span>
-          <span className="block pl-3 text-slate-400">organoid-tools:1.0.2</span>
-          <span className="block">✓ 3 actions declared</span>
+          <span className="block pl-3 text-slate-400">stainstorm:1.0.2</span>
+          <span className="block">✓ process_slides</span>
           <span className="block">✓ flavours</span>
           <span className="block pl-3 text-slate-400">cpu · cuda</span>
         </div>
@@ -982,7 +1106,7 @@ section.present .${u}-after { animation: ${u}-on 0.3s ease-out ${installAt + 0.3
           </div>
           <div className="rounded-lg border border-fd-border px-2.5 py-2">
             <span className="flex items-center gap-1.5 text-[12px] font-semibold">
-              <GitBranch className="size-[14px]" strokeWidth={2.2} /> kim-lab/organoid-tools
+              <GitBranch className="size-[14px]" strokeWidth={2.2} /> kim-lab/stainstorm
             </span>
             <span className="mt-1 block font-mono text-[11px] text-fd-muted-foreground">github.com · release v1.0.2</span>
           </div>
@@ -995,10 +1119,10 @@ section.present .${u}-after { animation: ${u}-on 0.3s ease-out ${installAt + 0.3
         <div className="relative h-[150px]">
           <div className={`${u}-before absolute inset-0 flex flex-col gap-1.5`}>
             <span className="flex items-center gap-1.5 text-[13px] font-semibold">
-              <Package className="size-[15px] text-fd-primary" strokeWidth={2} /> organoid-tools
+              <Package className="size-[15px] text-fd-primary" strokeWidth={2} /> stainstorm
             </span>
             <span className="font-mono text-[11px] text-fd-muted-foreground">v1.0.2 · by kim-lab</span>
-            <span className="text-[11.5px] leading-snug text-fd-muted-foreground">find, centre and capture organoids; segment and measure them</span>
+            <span className="text-[11.5px] leading-snug text-fd-muted-foreground">stains, images and measures slides until each stain takes</span>
             <span className={`${u}-press mt-auto flex h-[30px] items-center justify-center gap-1.5 rounded-lg bg-fd-primary text-[13px] font-semibold text-fd-primary-foreground`}>
               <Download className="size-[14px]" strokeWidth={2.4} /> Install
             </span>
@@ -1007,18 +1131,15 @@ section.present .${u}-after { animation: ${u}-on 0.3s ease-out ${installAt + 0.3
             <span className="flex items-center gap-1.5 text-[13px] font-semibold text-emerald-600">
               <Check className="size-[15px]" strokeWidth={3} /> installed · cuda
             </span>
-            {['find_centre_capture', 'segment', 'measure'].map((a) => (
-              <span key={a} className="rounded-md border border-fd-border px-2 py-1 font-mono text-[11.5px]">
-                {a}
-              </span>
-            ))}
+            <span className="rounded-md border border-fd-border px-2 py-1 font-mono text-[11.5px]">process_slides</span>
+            <span className="text-[11.5px] leading-snug text-fd-muted-foreground">runs on this lab’s own arm, OT-2, microscope, stitcher, StarDist and analyzer</span>
           </div>
         </div>
       ),
     },
   ];
   return (
-    <div className="relative size-full" role="img" aria-label="Kim's script becomes an app with arkitekt plugin build, is published to GitHub with arkitekt plugin publish, and from there another lab's hub installs it with one click, with its three actions and pinned versions.">
+    <div className="relative size-full" role="img" aria-label="Kim's script, stainstorm, becomes an app with arkitekt plugin build, is published to GitHub as kim-lab/stainstorm with arkitekt plugin publish, and from there another lab's hub installs it with one click: the process_slides workflow with its pinned versions, running on that lab's own arm, OT-2, microscope and analysis apps.">
       <LoopStyles css={css} />
       {steps.map((s, i) => (
         <div key={s.title} className="absolute" style={{ left: i * (cw + gap), top: 0, width: cw }}>
@@ -1085,14 +1206,14 @@ ${acc} .${u}-row { animation: ${u}-glow 0.6s ease-out 0.6s both; }
 }
 `;
   const datasets: { name: string; shared: boolean }[] = [
-    { name: 'organoids / B4', shared: true },
-    { name: 'organoids / B5', shared: false },
+    { name: 'slides / HE-07', shared: true },
+    { name: 'slides / HE-08', shared: false },
     { name: 'drafts / 2026-11', shared: false },
   ];
   const px = 490; // the right panel
   const pw = 320;
   return (
-    <div className="relative size-full" role="img" aria-label="Left, a recording of Kim pressing share on the dataset organoids / B4 and picking another lab. Right, the other lab accepts; a WireGuard connection opens between the two hubs that reaches organoids / B4 and nothing else on Kim's hub.">
+    <div className="relative size-full" role="img" aria-label="Left, a recording of Kim pressing share on the dataset slides / 2026-11-10 / HE-07 and picking another lab. Right, the other lab accepts; a WireGuard connection opens between the two hubs that reaches slide HE-07 and nothing else on Kim's hub. Slide HE-08 and her drafts stay private.">
       <Fragment as="span" index={1} className={`${u}-acc absolute`} />
       <LoopStyles css={css} />
 
@@ -1103,7 +1224,7 @@ ${acc} .${u}-row { animation: ${u}-glow 0.6s ease-out 0.6s both; }
             <span className="flex items-center gap-1.5 font-mono text-[12px] font-bold uppercase tracking-[0.18em] text-fd-primary">
               <Share2 className="size-[14px]" strokeWidth={2.4} /> Video · press share
             </span>
-            <span className="text-[18px] font-semibold leading-snug">Kim presses share on organoids / B4 and picks the other lab.</span>
+            <span className="text-[18px] font-semibold leading-snug">Kim presses share on slides / 2026-11-10 / HE-07 and picks the other lab.</span>
             <span className="font-mono text-[11px] text-fd-muted-foreground">{src}</span>
           </div>
           <video autoPlay muted loop playsInline onLoadedData={() => setReady(true)} className={cn('absolute inset-0 size-full bg-black object-contain', !ready && 'invisible')}>
@@ -1160,7 +1281,7 @@ ${acc} .${u}-row { animation: ${u}-glow 0.6s ease-out 0.6s both; }
           <span className="flex items-center gap-1.5 text-[12.5px] font-semibold">
             <Lock className="size-[12px] text-fd-primary" strokeWidth={2.6} /> WireGuard
           </span>
-          <span className="font-mono text-[11px] text-fd-muted-foreground">organoids / B4 · nothing else</span>
+          <span className="font-mono text-[11px] text-fd-muted-foreground">slides / HE-07 · nothing else</span>
         </span>
       </div>
 
@@ -1176,7 +1297,7 @@ ${acc} .${u}-row { animation: ${u}-glow 0.6s ease-out 0.6s both; }
           <div className="relative h-[92px]">
             <div className={`${u}-before absolute inset-0 flex flex-col gap-1.5`}>
               <span className="text-[13px] leading-snug">
-                <span className="font-semibold">Kim</span> shared <span className="font-mono font-semibold">organoids / B4</span> with you
+                <span className="font-semibold">Kim</span> shared <span className="font-mono font-semibold">slides / 2026-11-10 / HE-07</span> with you
               </span>
               <span className="mt-auto flex gap-2">
                 <span className={`${u}-press flex h-[30px] flex-1 items-center justify-center rounded-lg bg-fd-primary text-[13px] font-semibold text-fd-primary-foreground`}>Accept</span>
@@ -1188,10 +1309,10 @@ ${acc} .${u}-row { animation: ${u}-glow 0.6s ease-out 0.6s both; }
                 <Check className="size-[14px]" strokeWidth={3} /> accepted · connected to Kim’s hub
               </span>
               <div className="flex h-[30px] items-center gap-2 rounded-lg border border-fd-primary/70 bg-fd-primary/8 px-2.5 font-mono text-[12px] font-semibold">
-                <Database className="size-[13px]" strokeWidth={2} /> organoids / B4
+                <Database className="size-[13px]" strokeWidth={2} /> slides / HE-07
                 <span className="ml-auto font-sans text-[11px] font-normal text-fd-muted-foreground">read-only</span>
               </div>
-              <span className="text-[11.5px] text-fd-muted-foreground">B5 and drafts: not even visible</span>
+              <span className="text-[11.5px] text-fd-muted-foreground">HE-08 and drafts: not even visible</span>
             </div>
           </div>
         </div>

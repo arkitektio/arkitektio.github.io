@@ -1,10 +1,11 @@
 'use client';
 
 /* Animated figures for the opening of the smart microscopy deck: the cover,
-   and Kim, the persona from the Lisbon hackathon talk. Her organoids die
-   before she can treat them; she knows the rule that would save them, but it
-   lives in an ImageJ macro, and the loop that would act on it spans four
-   computers.
+   and Kim, the persona from the Lisbon hackathon talk. She stains one H&E
+   slide again and again, five stains on the same tissue, and a Fiji macro
+   checks every round cell by cell; but every round is still her, running
+   between the staining bench and the microscope, and the loop that would do
+   it for her spans a robot arm, an OT-2, an openUC2 and a GPU server.
 
    Every figure is plain SVG (or HTML) driven by the kit in
    `smart-microscopy-anim.tsx`: builds replay each time the slide is shown,
@@ -65,11 +66,11 @@ const CHAT_REPLY: [string, boolean][][] = [
   [
     ['Just use ', false],
     ['HTTP APIs.', true],
-    [' Put a small server on each computer: the microscope posts every stack to the GPU server, the GPU server posts the masks to your laptop, and your laptop tells the ESP32 to pump. That’s it, ', false],
+    [' Put a small server on each machine: the arm brings the slide, the OT-2 stains it, the openUC2 posts every tile to the GPU server, the GPU server posts the uptake to your laptop, and your laptop tells the arm where to go next. That’s it, ', false],
     ['really', true],
     ['.', false],
   ],
-  [['I can write the whole thing for you in a few minutes. ', false], ['Your organoids are safe now.', true]],
+  [['I can write the whole thing for you in a few minutes. ', false], ['Your slides will stain themselves now.', true]],
 ];
 
 /** Kim asks for help, and gets it: a chat that builds itself on arrival.
@@ -123,7 +124,7 @@ section.present .${u}-w { animation: sm-fade 0.25s ease-out var(--d) both; }
       {/* Kim */}
       <div className="sm-in flex items-start justify-end gap-3" style={delay(0.5)}>
         <p className="max-w-[720px] rounded-2xl rounded-tr-sm bg-fd-primary/12 px-5 py-3 text-[20px] leading-snug">
-          <span className="sr-only">Kim: </span>I need to run a distributed image analysis workflow on 4 computers and parallelize some tasks, can you help?
+          <span className="sr-only">Kim: </span>I need to wire a robot arm, an OT-2, an openUC2 and a GPU server into one staining loop, and parallelize some tasks. Can you help?
         </p>
         {kim}
       </div>
@@ -192,21 +193,21 @@ type Night = {
     management. */
 export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Night> = {
   communication: {
-    file: ['kim_organoid.ijm · it just works', 'kim_pipeline.py · 4 machines'],
+    file: ['kim_sequential.ijm · it just works', 'kim_pipeline.py · 5 machines'],
     lines: [
-      ['run("Z Project...", "projection=[Max Intensity]");', 'stack = requests.get("http://10.0.0.7:5000/stack")'],
-      ['setAutoThreshold("Otsu dark");', 'body = json.dumps(stack.tolist())  # 2 GB of JSON?'],
-      ['run("Convert to Mask");', 'masks = post("http://10.0.0.12:8000/stardist", body)'],
-      ['run("Analyze Particles...", "size=20-Infinity");', 'core = post("http://10.0.0.31:8080/decide", masks)'],
-      ['round = getResult("Round", 0);  // the core', 'requests.post("http://10.0.0.44/pump", timeout=3)'],
-      ['if (round < 0.5) print("needs growth factor");', '# TODO: what if the IPs change??'],
+      ['run("Grid/Collection stitching", "type=[Grid]");', 'tiles = requests.get("http://10.0.0.7:5000/tiles")'],
+      ['run("Colour Deconvolution", "vectors=[H AEC]");', 'body = json.dumps(mosaic.tolist())  # 2 GB of JSON?'],
+      ['run("StarDist 2D", "model=[Versatile (H&E nuclei)]");', 'labels = post("http://10.0.0.12:8000/stardist", body)'],
+      ['roiManager("Measure");', 'uptake = post("http://10.0.0.31:8080/uptake", labels)'],
+      ['uptake = getResult("Positive", 0);  // per cell', 'post("http://10.0.0.44/run_protocol", "stain_cd20")'],
+      ['if (uptake < 0.8) print("stain again");', '# TODO: what if the IPs change??'],
     ],
     tip: 'Give every device an HTTP API and send JSON. Easy!',
     errors: [
       'ConnectionRefusedError: 10.0.0.12:8000',
       'MemoryError in json.dumps',
-      'Max retries exceeded: /stack',
-      'ESP32 not found on network',
+      'Max retries exceeded: /tiles',
+      'OT-2 not found on network',
     ],
     worries: ['numpy arrays as JSON over the wire?', 'gRPC? SiLA2? ROS? What even is that?', 'I didn’t secure my server…'],
     clock: ['23:41', '01:52', '04:58'],
@@ -214,14 +215,14 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
     ending: 'This is okay. Everybody does this.',
   },
   threads: {
-    file: ['kim_pipeline.py · one stack at a time', 'kim_pipeline_threaded.py · 2 GPUs'],
+    file: ['kim_pipeline.py · one slide at a time', 'kim_pipeline_threaded.py · 2 GPUs'],
     lines: [
-      ['stack = acquire()', 't1 = Thread(target=segment, args=(left,))'],
-      ['masks = segment(stack)', 't2 = Thread(target=segment, args=(right,))'],
-      ['core = decide(masks)', 't1.start(); t2.start()'],
-      ['if core < 0.5:', 't1.join(); t2.join()  # hangs forever?'],
-      ['    pump()', 'time.sleep(1)  # wait for the server??'],
-      ['', 'results.append(core)  # race condition?'],
+      ['tiles = acquire()', 't1 = Thread(target=segment, args=(left,))'],
+      ['labels = segment(stitch(tiles))', 't2 = Thread(target=segment, args=(right,))'],
+      ['uptake = measure(labels)', 't1.start(); t2.start()'],
+      ['if uptake < 0.8:', 't1.join(); t2.join()  # hangs forever?'],
+      ['    run_protocol("stain_cd20")', 'time.sleep(1)  # wait for the server??'],
+      ['', 'results.append(uptake)  # race condition?'],
     ],
     tip: 'Use threads, and a join at the end. It’s easy!',
     errors: [
@@ -236,13 +237,13 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
     ending: 'Two nights, no sleep. That’s fine. It does work.',
   },
   data: {
-    file: ['kim_organoid.ijm · saves to C:\\data', 'collect_results_v4.py · 5 machines'],
+    file: ['kim_sequential.ijm · saves to C:\\data', 'collect_results_v4.py · 5 machines'],
     lines: [
-      ['saveAs("Tiff", "C:/data/organoid_01.tif");', 'np.save(f"/tmp/{uuid4()}.npy", masks)  # GPU disk'],
-      ['saveAs("Results", "C:/data/organoid_01.csv");', 'scp("kim@10.0.0.12:/tmp/*.npy", "D:/backup/")'],
-      ['', 'name = f"org3_B4_z120_dt20_gfA_t{t}_{core}_final.tif"'],
-      ['', 'tifffile.imwrite(name, stack)  # metadata: gone'],
-      ['', 'log.write(f"{time.time()} pump?")  # whose clock?'],
+      ['saveAs("Tiff", "C:/data/HE07_CD20_r2.tif");', 'np.save(f"/tmp/{uuid4()}.npy", labels)  # GPU disk'],
+      ['saveAs("Results", "C:/data/HE07_CD20_r2.csv");', 'scp("kim@10.0.0.12:/tmp/*.npy", "D:/backup/")'],
+      ['', 'name = f"HE07_CD20_r{r}_x{x}_y{y}_{uptake}_final.tif"'],
+      ['', 'tifffile.imwrite(name, mosaic)  # metadata: gone'],
+      ['', 'log.write(f"{time.time()} stained?")  # whose clock?'],
       ['', '# where is experiment_one???'],
     ],
     tip: 'Don’t worry, here’s another script that collects the data.',
@@ -258,21 +259,21 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
     ending: 'I’ll just redo the experiment. Next time it’ll work.',
   },
   repro: {
-    file: ['kim_organoid.ijm · v1.2 · has a DOI', 'kim_pipeline_FINAL_v7.py · run 41 of 76'],
+    file: ['kim_sequential.ijm · v1.2 · has a DOI', 'kim_pipeline_FINAL_v7.py · run 41 of 76'],
     lines: [
-      ['// organoid macro v1.2, doi:10.5281/zenodo.42', '# which version made run 41?  git log: "fix"'],
-      ['run("Z Project...", "projection=[Max Intensity]");', 'model = StarDist2D.from_pretrained("versatile")'],
-      ['setAutoThreshold("Otsu dark");', 'thresh = 0.47  # tuned at 3 am, by eye'],
-      ['run("Analyze Particles...", "size=20-Infinity");', 'np.random.seed()  # different every run'],
-      ['round = getResult("Round", 0);  // the core', 'cfg = load("C:/Users/kim/Desktop/cfg_old.json")'],
-      ['if (round < 0.5) print("needs growth factor");', '# pip freeze > requirements.txt  (too late)'],
+      ['// kim_sequential.ijm v1.2, doi:10.5281/zenodo.42', '# which version made run 41?  git log: "fix"'],
+      ['run("Grid/Collection stitching", "type=[Grid]");', 'model = StarDist2D.from_pretrained("2D_versatile_he")'],
+      ['run("Colour Deconvolution", "vectors=[H AEC]");', 'thresh = 0.47  # tuned at 3 am, by eye'],
+      ['run("StarDist 2D", "model=[Versatile (H&E nuclei)]");', 'np.random.seed()  # different every run'],
+      ['uptake = getResult("Positive", 0);  // per cell', 'cfg = load("C:/Users/kim/Desktop/cfg_old.json")'],
+      ['if (uptake < 0.8) print("stain again");', '# pip freeze > requirements.txt  (too late)'],
     ],
     tip: 'Just pin everything in a requirements.txt. Easy!',
     errors: [
       'ModuleNotFoundError: csbdeep',
       'CUDA 11.2 ≠ CUDA 12.1',
       'FileNotFoundError: cfg_old.json',
-      'run 41: 0.48 · run 42: 0.53',
+      'run 41: 0.78 · run 42: 0.83',
     ],
     worries: ['Docker? Conda? Nix? Pixi?', 'Did my PI’s rerun use the old model?', 'Which settings made run 41?'],
     clock: ['23:05', '02:22', '05:41'],
@@ -723,7 +724,7 @@ function CollapseHorrors({ u }: { u: string }) {
             </div>
           ))}
           <div className="sm-in whitespace-nowrap leading-[1.55] text-red-600" style={{ ...delay(1.05 + FOLDERS.length * 0.22), paddingLeft: FOLDERS.length * 12 }}>
-            stack_0042_t20s_z31_po…
+            HE07_CD20_r2_tile42_x…
           </div>
         </div>
       </div>
@@ -1031,279 +1032,719 @@ export function KimFigure({ size = 170, mood = 'neutral' }: { size?: number; moo
   );
 }
 
-/* --- Kim's organoid --------------------------------------------------------- */
+/* --- Kim's slide ------------------------------------------------------------ */
 
-type Fate = 'rescued' | 'lost';
-
-/** Two copies of the same organoid, told once per visit. Both grow, and in
-    both the core cells lose their roundness (Kim's signal). On the left,
-    growth factor arrives in time: the core rounds up again and the organoid
-    thrives. On the right nothing arrives: the cells die from the core
-    outwards, and the growth factor turns up too late. */
-export function OrganoidFigure() {
-  const u = useUid();
-  const W = 600;
-  const cy = 236;
-  const s = 0.6;
-  const at = { deform: 2.0, rescue: 2.7, recover: 3.6, dieFrom: 4.3, lost: 6.6, late: 7.2 };
-  const rings: [number, number][] = [
-    [0, 1],
-    [44, 6],
-    [88, 12],
-    [132, 18],
-    [172, 24],
-  ];
-  const cols: { fate: Fate; cx: number; head: string; color: string; status: [string, number, number][]; final: [string, number] }[] = [
-    {
-      fate: 'rescued',
-      cx: 150,
-      head: 'growth factor in time',
-      color: PRIMARY,
-      status: [
-        ['growing', 0.3, at.deform],
-        ['the core loses its shape', at.deform, at.rescue + 0.6],
-        ['growth factor A', at.rescue + 0.6, at.recover + 1.4],
-      ],
-      final: ['rescued: ready for the drugs', at.recover + 1.4],
-    },
-    {
-      fate: 'lost',
-      cx: 450,
-      head: 'no growth factor',
-      color: WARN,
-      status: [
-        ['growing', 0.3, at.deform],
-        ['the core loses its shape', at.deform, at.dieFrom],
-        ['dying', at.dieFrom, at.lost],
-      ],
-      final: ['lost before the drugs', at.lost],
-    },
-  ];
-
-  const css = cols
-    .map(({ fate, cx, status }) => {
-      const p = `${u}-${fate}`;
-      const rescued = fate === 'rescued';
-      return `
-    .${p}-pop, .${p}-die, .${p}-core { transform-box: fill-box; transform-origin: center; }
-    .${p}-all { transform-box: view-box; transform-origin: ${cx}px ${cy}px; }
-    section.present .${p}-pop { animation: sm-pop 0.5s cubic-bezier(.3,1.5,.5,1) var(--d) both; }
-    section.present .${p}-core { animation: ${u}-deform 0.9s ease-in-out ${at.deform}s both${rescued ? `, ${u}-recover 1s ease-in-out ${at.recover}s both` : ''}; }
-    ${rescued ? '' : `section.present .${p}-die { animation: ${u}-die 1.3s ease-in var(--k) both; }`}
-    section.present .${p}-all { animation: ${rescued ? `${u}-thrive 1.6s ease-out ${at.recover + 0.4}s` : `${u}-shrink 2.6s ease-in-out ${at.dieFrom + 0.3}s`} both; }
-    .${p}-ring { opacity: 0; }
-    section.present .${p}-ring { stroke-dasharray: 1; animation: sm-draw 0.9s ease-in-out ${at.deform + 0.4}s both, ${rescued ? `${u}-onoff 0.6s ease-out ${at.recover + 0.5}s` : `${u}-on 0.1s linear ${at.deform + 0.4}s`} both; }
-    .${p}-drop { opacity: 0; }
-    section.present .${p}-drop { animation: ${u}-drop 1.1s ease-in ${rescued ? at.rescue : at.late}s both; }
-    ${status
-      .map(
-        ([, from, to], i) => `.${p}-s${i} { opacity: 0; }
-    section.present .${p}-s${i} { animation: ${u}-window ${(to - from).toFixed(2)}s linear ${from}s both; }`,
-      )
-      .join('\n    ')}`;
-    })
-    .join('\n') +
-    `
-    @keyframes ${u}-deform { from { transform: none; fill: ${PRIMARY}; stroke: ${PRIMARY}; } to { transform: scale(1.4, 0.6); fill: ${WARN}; stroke: ${WARN}; } }
-    @keyframes ${u}-recover { to { transform: none; fill: ${PRIMARY}; stroke: ${PRIMARY}; } }
-    @keyframes ${u}-die { to { transform: scale(0.6); opacity: 0.75; filter: grayscale(1); } }
-    @keyframes ${u}-shrink { to { transform: scale(0.86); } }
-    @keyframes ${u}-thrive { to { transform: scale(1.1); } }
-    @keyframes ${u}-on { from { opacity: 1; } to { opacity: 1; } }
-    @keyframes ${u}-onoff { from { opacity: 1; } to { opacity: 0; } }
-    @keyframes ${u}-window { 0% { opacity: 0; } 8%, 90% { opacity: 1; } 100% { opacity: 0; } }
-    @keyframes ${u}-drop { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: 1; } 80% { opacity: 1; transform: translateY(${cy - 52}px); } 100% { opacity: 0; transform: translateY(${cy - 46}px); } }
-    section.present .${u}-clock { animation: sm-grow ${at.lost - 0.3}s linear 0.3s both; }
-    @media (prefers-reduced-motion: reduce) {
-      section.present [class*="${u}-"] { animation: none; }
-    }
-  `;
-
-  return (
-    <svg width={W} height={470} viewBox={`0 0 ${W} 470`} role="img" aria-label="The same organoid twice. Both grow and their core cells lose their round shape. Left: growth factor arrives in time, the core rounds up and the organoid thrives. Right: no growth factor, the organoid dies from the core outwards" className="shrink-0">
-      <LoopStyles css={css} />
-      <line x1={W / 2} y1={20} x2={W / 2} y2={410} stroke={BORDER} strokeWidth={1.4} strokeDasharray="6 6" />
-
-      {cols.map(({ fate, cx, head, color, status, final }) => {
-        const p = `${u}-${fate}`;
-        const cells = rings.flatMap(([r, n], k) =>
-          Array.from({ length: n }, (_, i) => {
-            const a = (i / n) * Math.PI * 2 + k * 0.3;
-            return { x: cx + r * s * cos(a), y: cy + r * s * sin(a), core: k < 2, k, i };
-          }),
-        );
-        return (
-          <g key={fate}>
-            <T x={cx} y={26} size={17} weight={700} fill={color}>
-              {head}
-            </T>
-            <g className={`${p}-all`}>
-              {cells.map((c) => {
-                const style = {
-                  ['--d' as string]: `${0.2 + c.k * 0.22 + c.i * 0.012}s`,
-                  ['--k' as string]: `${at.dieFrom + c.k * 0.42 + (c.i % 5) * 0.05}s`,
-                } as CSSProperties;
-                return (
-                  <g key={`${c.k}-${c.i}`} transform={`rotate(${(c.i * 47 + c.k * 20) % 180} ${c.x} ${c.y})`}>
-                    <g className={`${p}-pop`} style={style}>
-                      <g className={`${p}-die`} style={style}>
-                        <circle
-                          className={c.core ? `${p}-core` : undefined}
-                          cx={c.x}
-                          cy={c.y}
-                          r={15 * s}
-                          fill={PRIMARY}
-                          fillOpacity={c.core ? 0.3 : 0.16}
-                          stroke={PRIMARY}
-                          strokeWidth={1.3}
-                          strokeOpacity={0.8}
-                        />
-                      </g>
-                    </g>
-                  </g>
-                );
-              })}
-            </g>
-            <circle className={`${p}-ring`} pathLength={1} cx={cx} cy={cy} r={68 * s} fill="none" stroke={WARN} strokeWidth={2.2} />
-            <path
-              className={`${p}-drop`}
-              d={`M${cx} 46 C ${cx + 5} 56, ${cx + 10} 61, ${cx + 10} 68 A 10 10 0 1 1 ${cx - 10} 68 C ${cx - 10} 61, ${cx - 5} 56, ${cx} 46 Z`}
-              fill={PRIMARY}
-            />
-            {status.map(([text], i) => (
-              <T key={text} className={`${p}-s${i}`} x={cx} y={392} size={16} weight={600} fill={i === 0 ? PRIMARY : i === 1 ? WARN : color}>
-                {text}
-              </T>
-            ))}
-            <T className="sm-fade" style={delay(final[1])} x={cx} y={392} size={16} weight={700} fill={color}>
-              {final[0]}
-            </T>
-            {fate === 'lost' ? (
-              <T className="sm-fade" style={delay(at.late + 0.9)} x={cx} y={420} size={14} weight={600} fill={MUTED}>
-                growth factor A arrives: too late
-              </T>
-            ) : (
-              <T className="sm-fade" style={delay(at.recover + 1.6)} x={cx} y={420} size={14} weight={600} fill={MUTED}>
-                core cells round again
-              </T>
-            )}
-          </g>
-        );
-      })}
-
-      <rect x={60} y={452} width={480} height={4} rx={2} fill={BORDER} />
-      <rect className={`${u}-clock`} x={60} y={452} width={480} height={4} rx={2} fill={MUTED} />
-    </svg>
-  );
+/** A stable pseudo-random number in [0, 1) for a lattice point. Integer
+    arithmetic only, so server and browser agree to the last bit. */
+function hash2(i: number, j: number, k: number) {
+  let h = Math.imul(i + 0x3c6ef372, 0x9e3779b1) ^ Math.imul(j + 0x7f4a7c15, 0x85ebca6b) ^ Math.imul(k + 0x165667b1, 0xc2b2ae35);
+  h = Math.imul(h ^ (h >>> 15), 0x2c1b3c6d);
+  h = Math.imul(h ^ (h >>> 12), 0x297a2d39);
+  return ((h ^ (h >>> 15)) >>> 0) / 4294967296;
 }
 
-/* --- her macro -------------------------------------------------------------- */
+type StainKey = 'cd3' | 'cd20' | 'ki67' | 'panck';
 
-const ORGANOID_RINGS: [number, number][] = [
-  [0, 1],
-  [44, 6],
-  [88, 12],
-  [132, 18],
-  [172, 24],
-];
+/** The chromogens, one colour per stain. Fixed: a slide is a picture. */
+const STAIN: Record<StainKey | 'he', { name: string; color: string }> = {
+  he: { name: 'H&E', color: '#db2777' },
+  cd3: { name: 'CD3', color: '#92400e' },
+  cd20: { name: 'CD20', color: '#e11d48' },
+  ki67: { name: 'Ki-67', color: '#0d9488' },
+  panck: { name: 'PanCK', color: '#ca8a04' },
+};
+const EOSIN = '#f9a8c9';
+const EOSIN_EDGE = '#ec4899';
+const HEMATOXYLIN = '#5b21b6';
+const TISSUE_BG = '#fce7f3';
 
-/** A still organoid at the moment Kim's macro looks at it: round cells
-    outside, the misshapen core inside. `slide` is how slide 2 draws it,
-    `fluor` is how it looks as a fluorescence image. */
-function OrganoidGlyph({
+type Cell = {
+  n: number;
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  rot: number;
+  /** The nucleus, relative to the cell. */
+  nx: number;
+  ny: number;
+  /** Which membrane stain marks this cell, if any. */
+  kind: 'cd3' | 'cd20' | 'panck' | 'other';
+  ki67: boolean;
+  /** Whether CD20 took on the first try (the patchy round). */
+  took: boolean;
+};
+
+/** One tissue, everywhere: cells sit on a jittered hex lattice in field
+    units, so any window onto it (a tile, the stitched mosaic, a lens) shows
+    the same cells. */
+function tissueCells(x0: number, y0: number, x1: number, y1: number): Cell[] {
+  const step = 26;
+  const rowH = 22.5;
+  const r1 = (v: number) => Math.round(v * 10) / 10;
+  const cells: Cell[] = [];
+  for (let j = Math.floor(y0 / rowH) - 1; j <= Math.ceil(y1 / rowH) + 1; j++) {
+    for (let i = Math.floor(x0 / step) - 1; i <= Math.ceil(x1 / step) + 1; i++) {
+      const x = r1((i + (j & 1 ? 0.5 : 0)) * step + (hash2(i, j, 1) - 0.5) * 8);
+      const y = r1(j * rowH + (hash2(i, j, 2) - 0.5) * 8);
+      if (x < x0 || x >= x1 || y < y0 || y >= y1) continue;
+      const k = hash2(i, j, 3);
+      const size = hash2(i, j, 6);
+      cells.push({
+        n: Math.abs(i * 31 + j * 17),
+        x,
+        y,
+        rx: r1(10.5 + size * 2),
+        ry: r1(8.5 + size * 1.5),
+        rot: Math.round(hash2(i, j, 7) * 180),
+        nx: r1((hash2(i, j, 8) - 0.5) * 3),
+        ny: r1((hash2(i, j, 9) - 0.5) * 3),
+        kind: k < 0.24 ? 'cd3' : k < 0.48 ? 'cd20' : k < 0.78 ? 'panck' : 'other',
+        ki67: hash2(i, j, 4) < 0.28,
+        took: hash2(i, j, 5) < 0.41,
+      });
+    }
+  }
+  return cells;
+}
+
+type TissuePalette = 'he' | 'stained' | 'labels' | 'uptake';
+
+/** A small field of cells: Kim's tissue, as a tile or a disc.
+    - `he`: plain H&E, pink cytoplasm and purple nuclei;
+    - `stained`: H&E with the given stains on their cells (`patchy`: CD20
+      only took in some of them);
+    - `labels`: StarDist's outlines, one colour per nucleus;
+    - `uptake`: the macro's per-cell verdict on CD20, took or didn't.
+    `ox`/`oy`/`half` pick the window onto the tissue, in field units; `s`
+    scales field units to pixels. */
+function TissueGlyph({
   cx,
   cy,
   s,
   palette,
+  shape = 'square',
+  half = 100,
+  ox = 0,
+  oy = 0,
+  stains = ['cd3', 'cd20'],
+  patchy = true,
+  background = true,
   cellClass,
   cellDelay,
 }: {
   cx: number;
   cy: number;
   s: number;
-  /** `slide`: as on slide 2. `fluor`: a fluorescence image. `mask`: the
-      thresholded binary image. `labels`: one colour per analysed particle. */
-  palette: 'slide' | 'fluor' | 'mask' | 'labels';
-  /** Per-cell build, for the particle labelling. */
+  palette: TissuePalette;
+  shape?: 'square' | 'disc';
+  half?: number;
+  ox?: number;
+  oy?: number;
+  stains?: StainKey[];
+  patchy?: boolean;
+  background?: boolean;
+  /** Per-cell build, e.g. the verdicts popping in one by one. */
   cellClass?: string;
   cellDelay?: (index: number) => number;
 }) {
-  let idx = 0;
-  const paint = (core: boolean, n: number) => {
-    switch (palette) {
-      case 'slide':
-        return core ? { fill: WARN, fo: 0.3, stroke: WARN, sw: 1.2 } : { fill: PRIMARY, fo: 0.16, stroke: PRIMARY, sw: 1.2 };
-      case 'fluor':
-        return core ? { fill: '#fde725', fo: 0.9, stroke: '#fde725', sw: 1.2 } : { fill: '#35b779', fo: 0.6, stroke: '#a7f3d0', sw: 1.2 };
-      case 'mask':
-        return { fill: '#fde725', fo: 1, stroke: 'none', sw: 0 };
-      case 'labels':
-        return { fill: LABELS[(n * 7) % LABELS.length], fo: 0.95, stroke: core ? '#ffffff' : 'none', sw: core ? 1.2 : 0 };
-    }
-  };
+  const inside = (c: Cell) => shape === 'square' || (c.x - ox) ** 2 + (c.y - oy) ** 2 < (half - 8) ** 2;
+  const cells = tissueCells(ox - half, oy - half, ox + half, oy + half).filter(inside);
+  const X = (x: number) => Math.round((cx + (x - ox) * s) * 10) / 10;
+  const Y = (y: number) => Math.round((cy + (y - oy) * s) * 10) / 10;
+  const shown = palette === 'uptake' ? cells.filter((c) => c.kind === 'cd20') : cells;
+  const membrane = (c: Cell) =>
+    palette === 'stained' && c.kind !== 'other' && stains.includes(c.kind) && (c.kind !== 'cd20' || !patchy || c.took) ? STAIN[c.kind].color : EOSIN;
   return (
     <g>
-      {ORGANOID_RINGS.flatMap(([r, n], k) =>
-        Array.from({ length: n }, (_, i) => {
-          const a = (i / n) * Math.PI * 2 + k * 0.3;
-          const x = cx + r * s * cos(a);
-          const y = cy + r * s * sin(a);
-          const me = idx++;
-          const c = paint(k < 2, me);
-          const anim = cellClass ? { className: cellClass, style: delay(cellDelay?.(me) ?? 0) } : {};
-          return k < 2 ? (
-            <ellipse
-              key={`${k}-${i}`}
-              {...anim}
-              cx={x}
-              cy={y}
-              rx={15 * s * 1.4}
-              ry={15 * s * 0.6}
-              transform={`rotate(${(i * 47 + k * 20) % 180} ${x} ${y})`}
-              fill={c.fill}
-              fillOpacity={c.fo}
-              stroke={c.stroke}
-              strokeWidth={c.sw}
-            />
-          ) : (
-            <circle key={`${k}-${i}`} {...anim} cx={x} cy={y} r={15 * s} fill={c.fill} fillOpacity={c.fo} stroke={c.stroke} strokeWidth={c.sw} strokeOpacity={0.8} />
+      {background && palette !== 'labels' ? (
+        shape === 'disc' ? (
+          <circle cx={cx} cy={cy} r={half * s} fill={TISSUE_BG} />
+        ) : (
+          <rect x={cx - half * s} y={cy - half * s} width={2 * half * s} height={2 * half * s} fill={TISSUE_BG} />
+        )
+      ) : null}
+      {shown.map((c, i) => {
+        const x = X(c.x);
+        const y = Y(c.y);
+        const anim = cellClass ? { className: cellClass, style: delay(cellDelay?.(i) ?? 0) } : {};
+        if (palette === 'labels') {
+          const color = LABELS[(c.n * 7) % LABELS.length];
+          return <polygon key={i} {...anim} points={starPoly(x + c.nx * s, y + c.ny * s, 7.5 * s, c.n)} fill={color} fillOpacity={0.45} stroke={color} strokeWidth={Math.max(0.8, 2 * s)} />;
+        }
+        if (palette === 'uptake') {
+          return (
+            <g key={i} transform={`rotate(${c.rot} ${x} ${y})`}>
+              <ellipse {...anim} cx={x} cy={y} rx={c.rx * s} ry={c.ry * s} fill={c.took ? PRIMARY : WARN} fillOpacity={0.8} stroke="#ffffff" strokeWidth={Math.max(0.8, 1.5 * s)} />
+            </g>
           );
-        }),
-      )}
+        }
+        const nucleus = palette === 'stained' && stains.includes('ki67') && c.ki67 ? STAIN.ki67.color : HEMATOXYLIN;
+        const body = (
+          <>
+            <ellipse cx={x} cy={y} rx={c.rx * s} ry={c.ry * s} fill={membrane(c)} fillOpacity={0.8} stroke={EOSIN_EDGE} strokeOpacity={0.35} strokeWidth={Math.max(0.5, 1.2 * s)} />
+            <ellipse cx={x + c.nx * s} cy={y + c.ny * s} rx={4.8 * s} ry={3.9 * s} fill={nucleus} fillOpacity={0.85} />
+          </>
+        );
+        return (
+          <g key={i} transform={`rotate(${c.rot} ${x} ${y})`}>
+            {cellClass ? <g {...anim}>{body}</g> : body}
+          </g>
+        );
+      })}
     </g>
   );
 }
 
-/** Kim's ImageJ macro, step by step: stack, max projection, Otsu threshold,
-    analyse particles, verdict. Values from the Lisbon deck.
+/** Kim's problem, before any cycling: one antibody per section. On top, the
+    tissue block in 3D, with the tumor as a body inside it and four cutting
+    planes through it; each plane shows the tumor's cross-section where it
+    cuts. Underneath, the four sections, each on its own glass slide with its
+    own antibody. The tumor shrinks from section to section, and the fourth
+    cut (PanCK, the one meant to find it) falls outside the tumor. */
+export function SerialSectionsFigure() {
+  const u = useUid();
+  const W = 600;
+  const order: StainKey[] = ['cd3', 'cd20', 'ki67', 'panck'];
+  const r1 = (v: number) => Math.round(v * 10) / 10;
+  /* the block, in oblique projection: its long axis runs left to right, its
+     front face is flat on the screen, and depth goes up and to the right */
+  const bx0 = 40;
+  const bx1 = 520;
+  const yt = 62;
+  const yb = 142;
+  const DX = 40;
+  const DY = -28;
+  /* one unit of depth on screen (the block is as deep as it is tall) */
+  const ux = DX / (yb - yt);
+  const uy = DY / (yb - yt);
+  /* the tumor: an ellipsoid along the block, at mid-depth */
+  const tumor = { cx: 215, a: 165, r: 30 };
+  const mid = { x: DX / 2, y: (yt + yb) / 2 + DY / 2 };
+  const cuts = [200, 280, 360, 440];
+  const radiusAt = (x: number) => {
+    const d = (x - tumor.cx) / tumor.a;
+    return d * d < 1 ? r1(tumor.r * Math.sqrt(1 - d * d)) : 0;
+  };
+  /** A circle of radius `r` lying in the cutting plane at `x`, as drawn. */
+  const inPlane = (x: number, r: number) =>
+    Array.from({ length: 28 }, (_, k) => {
+      const t = (k / 28) * Math.PI * 2;
+      return `${r1(x + mid.x + r * sin(t) * ux)},${r1(mid.y - r * cos(t) + r * sin(t) * uy)}`;
+    }).join(' ');
+  const pts = (...p: [number, number][]) => p.map(([x, y]) => `${x},${y}`).join(' ');
+  /* the sections, in a row under their cuts */
+  const sw = 132;
+  const sh = 170;
+  const sy = 198;
+  const slotX = (i: number) => 12 + i * (sw + 16);
+  const shift = [
+    [-4, -2],
+    [0, 2],
+    [5, 3],
+    [4, 2],
+  ];
+  const cutAt = (i: number) => 0.6 + i * 0.3;
+  const slideAt = (i: number) => 1.6 + i * 0.35;
+  const stainAt = (i: number) => 3.2 + i * 0.45;
+  const gone = stainAt(3) + 1;
+  const css = `
+    section.present .${u}-blink { animation: sm-pulse 1.6s ease-in-out ${gone + 0.4}s 3 both; }
+    @media (prefers-reduced-motion: reduce) {
+      section.present [class*="${u}-"] { animation: none; }
+    }
+  `;
 
-    It opens zoomed in on the organoid from slide 2, at the size it had
-    there, misshapen core and all. The view pulls back until the organoid is
-    one image in a z stack, turning into fluorescence as it lands, and the
-    macro runs on it from there. */
+  return (
+    <svg
+      width={W}
+      height={470}
+      viewBox={`0 0 ${W} 470`}
+      role="img"
+      aria-label="A tissue block drawn in 3D with a tumor inside it, cut by four planes; each plane shows the tumor's cross-section. Underneath, the four serial sections, one antibody each: CD3, CD20, Ki-67, PanCK. The tumor shrinks from section to section, and the PanCK section was cut outside the tumor"
+      className="shrink-0"
+    >
+      <LoopStyles css={css} />
+      <defs>
+        <radialGradient id={`${u}-tumor`} cx="34%" cy="26%" r="80%">
+          <stop offset="0" stopColor="#c4b5fd" />
+          <stop offset="0.45" stopColor="#7c3aed" />
+          <stop offset="1" stopColor="#3b0764" />
+        </radialGradient>
+      </defs>
+
+      {/* the block, in 3D, with the tumor inside it */}
+      <g className="sm-fade" style={delay(0.1)}>
+        {/* the edges behind */}
+        <path
+          d={`M${bx0},${yb} L${bx0 + DX},${yb + DY} L${bx1 + DX},${yb + DY} M${bx0 + DX},${yb + DY} L${bx0 + DX},${yt + DY}`}
+          fill="none"
+          stroke={EOSIN_EDGE}
+          strokeOpacity={0.35}
+          strokeWidth={1.2}
+          strokeDasharray="4 4"
+        />
+        <polygon points={pts([bx0, yt], [bx0 + DX, yt + DY], [bx1 + DX, yt + DY], [bx1, yt])} fill={TISSUE_BG} fillOpacity={0.75} stroke={EOSIN_EDGE} strokeOpacity={0.55} strokeWidth={1.4} strokeLinejoin="round" />
+        <polygon points={pts([bx1, yt], [bx1 + DX, yt + DY], [bx1 + DX, yb + DY], [bx1, yb])} fill={EOSIN} fillOpacity={0.5} stroke={EOSIN_EDGE} strokeOpacity={0.55} strokeWidth={1.4} strokeLinejoin="round" />
+        <rect x={bx0} y={yt} width={bx1 - bx0} height={yb - yt} fill={TISSUE_BG} fillOpacity={0.45} stroke={EOSIN_EDGE} strokeOpacity={0.55} strokeWidth={1.4} />
+        {/* the tumor: a body, lit from the top left */}
+        <ellipse cx={tumor.cx + mid.x} cy={mid.y + 5} rx={tumor.a - 6} ry={tumor.r} fill="#3b0764" fillOpacity={0.12} />
+        <ellipse cx={tumor.cx + mid.x} cy={mid.y} rx={tumor.a + 1} ry={tumor.r + 2} fill={`url(#${u}-tumor)`} fillOpacity={0.9} />
+        <ellipse cx={tumor.cx + mid.x - 62} cy={mid.y - 15} rx={52} ry={6} fill="#ffffff" fillOpacity={0.28} />
+        <T x={132} y={mid.y + 2} size={14} weight={700} fill="#ffffff">
+          tumor
+        </T>
+      </g>
+
+      {/* the cutting planes, each with the tumor's cross-section on it */}
+      {cuts.map((x, i) => {
+        const r = radiusAt(x);
+        const slideCx = slotX(i) + sw / 2;
+        return (
+          <g key={x}>
+            <g className="sm-in" style={delay(cutAt(i))}>
+              <polygon
+                points={pts([x, yt - 8], [x + DX, yt + DY - 8], [x + DX, yb + DY + 8], [x, yb + 8])}
+                fill={SURFACE}
+                fillOpacity={0.55}
+                stroke={FG}
+                strokeWidth={1.6}
+                strokeLinejoin="round"
+              />
+              {r > 0 ? (
+                <polygon points={inPlane(x, r)} fill={HEMATOXYLIN} fillOpacity={0.85} stroke="#ffffff" strokeWidth={1.4} />
+              ) : (
+                <polygon points={inPlane(x, 13)} fill="none" stroke={MUTED} strokeWidth={1.4} strokeDasharray="3 3" />
+              )}
+              <T x={x - 10} y={yb + 14} size={13} mono weight={700}>
+                {i + 1}
+              </T>
+            </g>
+            {/* from the cut to its section */}
+            <Path className="sm-fade" style={delay(slideAt(i))} d={`M${x},${yb + 12} C${x},${yb + 38} ${slideCx},${sy - 30} ${slideCx},${sy - 4}`} stroke={MUTED} width={1.4} dash="4 4" />
+          </g>
+        );
+      })}
+      {/* the fourth cut misses */}
+      <polygon className="sm-fade" style={delay(gone)} points={inPlane(cuts[3], 13)} fill="none" stroke={WARN} strokeWidth={2.2} strokeDasharray="3 3" />
+
+      {/* one section per glass slide, one antibody per section */}
+      {order.map((k, i) => {
+        const x = slotX(i);
+        const scx = x + sw / 2;
+        const scy = sy + 34 + (sh - 34) / 2;
+        const r = r1(radiusAt(cuts[i]) * 0.95);
+        const [dx, dy] = shift[i];
+        const lost = r === 0;
+        return (
+          <g key={k}>
+            <g className="sm-in" style={delay(slideAt(i))}>
+              <rect x={x} y={sy} width={sw} height={sh} rx={6} fill={SURFACE} fillOpacity={0.6} stroke={BORDER} strokeWidth={1.6} />
+              <rect x={x} y={sy} width={sw} height={34} rx={6} fill={BORDER} fillOpacity={0.55} />
+              <T x={x + 24} y={sy + 18} size={12} mono fill={MUTED}>
+                §{i + 1}
+              </T>
+              <TissueGlyph cx={scx} cy={scy} s={0.75} palette="he" shape="disc" half={64} ox={i * 9} oy={i * 5} />
+            </g>
+            <g className="sm-fade" style={delay(stainAt(i))}>
+              <TissueGlyph cx={scx} cy={scy} s={0.75} palette="stained" stains={[k]} patchy={false} shape="disc" half={64} ox={i * 9} oy={i * 5} background={false} />
+            </g>
+            {!lost ? (
+              <polygon
+                className="sm-fade"
+                style={delay(slideAt(i) + 0.3)}
+                points={starPoly(scx + dx, scy + dy, r, i + 3)}
+                fill={HEMATOXYLIN}
+                fillOpacity={0.5}
+                stroke={HEMATOXYLIN}
+                strokeWidth={1.5}
+              />
+            ) : (
+              <g className="sm-fade" style={delay(gone)}>
+                <circle cx={scx + dx} cy={scy + dy} r={18} fill={SURFACE} fillOpacity={0.85} stroke={WARN} strokeWidth={2.4} strokeDasharray="4 4" />
+                <T className={`${u}-blink`} x={scx + dx} y={scy + dy + 1} size={20} weight={800} fill={WARN}>
+                  ?
+                </T>
+              </g>
+            )}
+            <g className="sm-pop" style={delay(stainAt(i) - 0.2)}>
+              <rect x={x + sw - 66} y={sy + 6} width={60} height={22} rx={6} fill={STAIN[k].color} fillOpacity={0.16} stroke={STAIN[k].color} strokeWidth={1.5} />
+              <T x={x + sw - 36} y={sy + 17} size={12} mono weight={700}>
+                {STAIN[k].name}
+              </T>
+            </g>
+            {lost ? (
+              <rect className="sm-draw" style={delay(gone)} pathLength={1} x={x - 3} y={sy - 3} width={sw + 6} height={sh + 6} rx={8} fill="none" stroke={WARN} strokeWidth={2.4} />
+            ) : null}
+          </g>
+        );
+      })}
+
+    </svg>
+  );
+}
+
+/** Kim tries chromogenic cycling, by hand, on a loop: four trips from the
+    staining and washing station to the microscope to the computer.
+    1. Stain 1 goes on; she takes image 1.
+    2. Wash 1: under the microscope the stain is not completely gone.
+    3. Wash 2: now it is completely gone.
+    4. Stain 2, a different antibody, goes on the same cells' neighbours; she
+       takes image 2, and on the computer the two images are overlaid:
+       multi-staining. */
+export function ChromogenicRoundFigure() {
+  const u = useUid();
+  const W = 600;
+  const P = 26;
+  const ink = '#1f2937';
+  const WASH = '#7dd3fc';
+  /* two antibodies: each has its own bottle, its own colour, its own cells */
+  const stains = [
+    { name: 'stain 1', color: STAIN.cd3.color, marks: (c: Cell) => c.kind === 'cd3' || c.kind === 'cd20' },
+    { name: 'stain 2', color: STAIN.ki67.color, marks: (c: Cell) => c.kind === 'panck' },
+  ];
+  /* the three stations, and Kim's stops under them */
+  const cardW = 180;
+  const cardX = [12, 210, 408];
+  const mid = (i: number) => cardX[i] + cardW / 2;
+  const step = cardX[1] - cardX[0];
+  const bottleX = [mid(0) - 57, mid(0), mid(0) + 57];
+  /* the cells under the microscope; some of stain 1's keep it through wash 1 */
+  const lens = { cx: mid(1), cy: 128, s: 0.9, half: 64 };
+  const cells = tissueCells(-lens.half, -lens.half, lens.half, lens.half).filter((c) => c.x * c.x + c.y * c.y < (lens.half - 8) ** 2);
+  const first = cells.filter(stains[0].marks);
+  const second = cells.filter(stains[1].marks);
+  const sticky = (c: Cell) => c.took;
+  const clean = Math.round((first.filter((c) => !sticky(c)).length / first.length) * 100);
+
+  /* the clock, in seconds: four trips, the last one ending on the overlay */
+  const T0 = [0, 6, 12, 18];
+  const bench = T0.map((t) => [t, t + 1] as [number, number]);
+  const scope = T0.map((t) => [t + 1.7, t + 3.2] as [number, number]);
+  const pc = T0.map((t, r) => [t + 3.8, r === 3 ? t + 6.8 : t + 5.1] as [number, number]);
+  const home = 25.7;
+  const off = 25.3;
+  const overlayAt = pc[3][0] + 1.5;
+  const pctOf = (t: number) => Math.round((t / P) * 10000) / 100;
+  const loop = (name: string, timing = 'linear') => `section.present .${u}-${name} { animation: ${u}-${name} ${P}s ${timing} 0.8s infinite both; }`;
+  /** Visible during the given stretches of the loop, in seconds. */
+  const shown = (name: string, ...ranges: [number, number][]) => {
+    const stops = ranges.flatMap(([a, b]) => {
+      const from = pctOf(a);
+      const to = pctOf(b);
+      return [from > 0 ? `${from - 0.75}% { opacity: 0; }` : '', `${from}%, ${to}% { opacity: 1; }`, to < 100 ? `${to + 0.75}% { opacity: 0; }` : ''];
+    });
+    return `
+    .${u}-${name} { opacity: 0; }
+    ${loop(name)}
+    @keyframes ${u}-${name} { ${ranges[0][0] > 0 ? '0% { opacity: 0; }' : ''} ${stops.join(' ')} ${ranges[ranges.length - 1][1] < P ? '100% { opacity: 0; }' : ''} }`;
+  };
+  /** A drop falling from its bottle onto the slide, at each given second. */
+  const falls = (name: string, ...at: number[]) => `
+    .${u}-${name} { opacity: 0; }
+    ${loop(name, 'ease-in')}
+    @keyframes ${u}-${name} { 0% { opacity: 0; transform: translateY(0); } ${at
+      .map((t) => `${pctOf(t)}% { opacity: 0; transform: translateY(0); } ${pctOf(t + 0.1)}% { opacity: 1; transform: translateY(0); } ${pctOf(t + 0.6)}% { opacity: 1; transform: translateY(38px); } ${pctOf(t + 0.7)}% { opacity: 0; transform: translateY(38px); }`)
+      .join(' ')} 100% { opacity: 0; transform: translateY(38px); } }`;
+  const at = (x: number, [a, b]: [number, number]) => `${pctOf(a)}%, ${pctOf(b)}% { transform: translateX(${x}px); }`;
+  const entries = [
+    { head: 'stain 1', swatch: stains[0].color, text: 'image 1 saved', fill: '#f9fafb' },
+    { head: 'wash 1', swatch: WASH, text: `${clean} % clean ✗`, fill: '#fbbf24' },
+    { head: 'wash 2', swatch: WASH, text: '100 % clean ✓', fill: '#34d399' },
+    { head: 'stain 2', swatch: stains[1].color, text: 'image 2 saved', fill: '#f9fafb' },
+  ];
+  const entryOn = (r: number): [number, number] => [pc[r][0], r < 3 ? pc[r + 1][0] - 0.5 : off];
+  const says: [string, string, number, string, [number, number]][] = [
+    ['say-b0', 'stain 1', 0, stains[0].color, [0.1, 0.95]],
+    ['say-b1', 'wash 1', 0, PRIMARY, [6.1, 6.95]],
+    ['say-b2', 'wash 2', 0, PRIMARY, [12.1, 12.95]],
+    ['say-b3', 'stain 2', 0, stains[1].color, [18.1, 18.95]],
+    ['say-s0', 'take image 1', 1, PRIMARY, [scope[0][0] + 0.1, scope[0][1] - 0.1]],
+    ['say-s1', 'not completely gone', 1, WARN, [scope[1][0] + 0.1, scope[1][1] - 0.1]],
+    ['say-s2', 'completely gone', 1, PRIMARY, [scope[2][0] + 0.1, scope[2][1] - 0.1]],
+    ['say-s3', 'take image 2', 1, PRIMARY, [scope[3][0] + 0.1, scope[3][1] - 0.1]],
+    ['say-p0', 'write it down', 2, PRIMARY, [pc[0][0] + 0.1, pc[0][1] - 0.1]],
+    ['say-p1', 'write it down', 2, PRIMARY, [pc[1][0] + 0.1, pc[1][1] - 0.1]],
+    ['say-p2', 'write it down', 2, PRIMARY, [pc[2][0] + 0.1, pc[2][1] - 0.1]],
+    ['say-p3', 'overlay the images', 2, PRIMARY, [pc[3][0] + 0.1, overlayAt - 0.1]],
+    ['say-multi', 'multi-staining', 2, PRIMARY, [overlayAt + 0.3, pc[3][1] - 0.1]],
+  ];
+  const css = `
+    ${loop('walk', 'ease-in-out')}
+    @keyframes ${u}-walk { ${T0.map((_, r) => `${at(0, bench[r])} ${at(step, scope[r])} ${at(2 * step, pc[r])}`).join(' ')} ${pctOf(home)}%, 100% { transform: translateX(0); } }
+    ${shown('bench', ...bench, [home, P])}
+    ${shown('scope', ...scope)}
+    ${shown('pc', ...pc)}
+    ${shown('carried', ...T0.map((t, r) => [t + 1.05, (r < 3 ? t + 6 : home) - 0.05] as [number, number]))}
+    ${says.map(([name, , , , range]) => shown(name, range)).join('')}
+    ${entries.map((_, r) => shown(`entry${r}`, entryOn(r))).join('')}
+    ${shown('img1', [pc[0][0] + 0.7, off])}
+    ${shown('img2', [pc[3][0] + 0.7, off])}
+    ${shown('both', [overlayAt, off])}
+    ${shown('full', [0.6, 6.5])}
+    ${shown('left', [6.5, 12.5])}
+    ${shown('next', [18.6, home + 0.2])}
+    ${shown('ring1', [scope[1][0] + 0.2, scope[1][1] - 0.3])}
+    ${shown('ring2', [scope[2][0] + 0.2, scope[2][1] - 0.3])}
+    .${u}-view { opacity: 0.22; }
+    ${loop('view')}
+    @keyframes ${u}-view { 0% { opacity: 0.22; } ${scope.map(([a, b]) => `${pctOf(a) - 0.75}% { opacity: 0.22; } ${pctOf(a)}%, ${pctOf(b)}% { opacity: 1; } ${pctOf(b) + 0.75}% { opacity: 0.22; }`).join(' ')} 100% { opacity: 0.22; } }
+    ${falls('drop0', 0.15)}
+    ${falls('drop1', 18.15)}
+    ${falls('drop2', 6.15, 12.15)}
+    section.present .${u}-type { transform-box: fill-box; transform-origin: right center; animation: ${u}-type ${P}s steps(14, end) 0.8s infinite both; }
+    @keyframes ${u}-type { 0% { transform: scaleX(1); } ${entries
+      .map((_, r) => `${pctOf(pc[r][0])}% { transform: scaleX(1); } ${pctOf(pc[r][0] + 0.6)}%, ${pctOf(entryOn(r)[1] + 0.3)}% { transform: scaleX(0); } ${pctOf(entryOn(r)[1] + 0.35)}% { transform: scaleX(1); }`)
+      .join(' ')} 100% { transform: scaleX(1); } }
+    @media (prefers-reduced-motion: reduce) {
+      section.present [class*="${u}-"] { animation: none; }
+      section.present :is(.${u}-bench, .${u}-next, .${u}-entry3, .${u}-img1, .${u}-img2, .${u}-both, .${u}-say-multi) { opacity: 1; }
+      section.present .${u}-type { opacity: 0; }
+    }
+  `;
+  const drop = (x: number, y: number) => `M${x} ${y} C ${x + 3} ${y + 6}, ${x + 6} ${y + 9}, ${x + 6} ${y + 13} A 6 6 0 1 1 ${x - 6} ${y + 13} C ${x - 6} ${y + 9}, ${x - 3} ${y + 6}, ${x} ${y} Z`;
+  const bottle = (x: number, color: string, label: string) => (
+    <g key={label}>
+      <T x={x} y={56} size={11} mono weight={700} fill={MUTED}>
+        {label}
+      </T>
+      <rect x={x - 8} y={66} width={16} height={10} rx={2} fill={FG} fillOpacity={0.8} />
+      <rect x={x - 17} y={76} width={34} height={52} rx={5} fill={SURFACE} stroke={FG} strokeWidth={2} />
+      <rect x={x - 14} y={92} width={28} height={33} rx={3} fill={color} fillOpacity={0.8} />
+      <path d={`M${x - 4} 128 h8 l-2 10 h-4 Z`} fill={FG} fillOpacity={0.8} />
+    </g>
+  );
+  /** A glass slide with its section on it: stain 1, what wash 1 leaves of
+      it, then stain 2. */
+  const glass = (x: number, y: number, w: number) => (
+    <g>
+      <rect x={x} y={y} width={w} height={14} rx={2} fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.4} />
+      <ellipse cx={x + w / 2} cy={y + 7} rx={w * 0.3} ry={4.5} fill={EOSIN} />
+      <ellipse className={`${u}-full`} cx={x + w / 2} cy={y + 7} rx={w * 0.3} ry={4.5} fill={stains[0].color} />
+      <ellipse className={`${u}-left`} cx={x + w / 2} cy={y + 7} rx={w * 0.3} ry={4.5} fill={stains[0].color} fillOpacity={0.4} />
+      <ellipse className={`${u}-next`} cx={x + w / 2} cy={y + 7} rx={w * 0.3} ry={4.5} fill={stains[1].color} />
+    </g>
+  );
+  /** Cells in the lens carrying a stain. */
+  const stainedCells = (which: Cell[], color: string, opacity = 0.85) =>
+    which.map((c, i) => {
+      const x = lens.cx + c.x * lens.s;
+      const y = lens.cy + c.y * lens.s;
+      return (
+        <g key={i} transform={`rotate(${c.rot} ${x} ${y})`}>
+          <ellipse cx={x} cy={y} rx={c.rx * lens.s} ry={c.ry * lens.s} fill={color} fillOpacity={opacity} />
+          <ellipse cx={x + c.nx * lens.s} cy={y + c.ny * lens.s} rx={4.8 * lens.s} ry={3.9 * lens.s} fill={HEMATOXYLIN} fillOpacity={0.85} />
+        </g>
+      );
+    });
+  /** A saved image on the screen: the lens, small, with the given stains. */
+  const thumb = (x: number, which: number[]) => {
+    const k = 15 / (lens.half * lens.s);
+    return (
+      <g>
+        <circle cx={x} cy={133} r={15} fill={TISSUE_BG} />
+        {which.flatMap((r) =>
+          (r === 0 ? first : second).map((c, i) => <circle key={`${r}-${i}`} cx={Math.round((x + c.x * lens.s * k) * 10) / 10} cy={Math.round((133 + c.y * lens.s * k) * 10) / 10} r={2.6} fill={stains[r].color} />),
+        )}
+        <circle cx={x} cy={133} r={15} fill="none" stroke="#9ca3af" strokeWidth={1.2} />
+      </g>
+    );
+  };
+  const rings = (name: string, color: (c: Cell) => string) =>
+    first.map((c, i) => (
+      <circle
+        key={i}
+        className={`${u}-${name}`}
+        style={{ animationDelay: `${(0.8 + i * 0.04).toFixed(2)}s` }}
+        cx={lens.cx + c.x * lens.s}
+        cy={lens.cy + c.y * lens.s}
+        r={c.rx * lens.s + 1}
+        fill="none"
+        stroke={color(c)}
+        strokeWidth={2.2}
+      />
+    ));
+
+  return (
+    <svg
+      width={W}
+      height={470}
+      viewBox={`0 0 ${W} 470`}
+      role="img"
+      aria-label={`Kim does chromogenic cycling by hand, on a loop, walking between the staining and washing station, the microscope and the computer. Stain 1 goes on and she takes image 1. After wash 1 the stain is not completely gone: ${clean} percent of the cells are clean. After wash 2 it is completely gone. Then stain 2 goes on, she takes image 2, and the two images are overlaid on the computer: multi-staining`}
+      className="shrink-0"
+    >
+      <LoopStyles css={css} />
+      <defs>
+        <clipPath id={`${u}-lens`}>
+          <circle cx={lens.cx} cy={lens.cy} r={lens.half * lens.s} />
+        </clipPath>
+      </defs>
+
+      {/* the three stations */}
+      {['stain · wash', 'microscope', 'computer'].map((name, i) => (
+        <g key={name} className="sm-in" style={delay(0.2 + i * 0.15)}>
+          <rect x={cardX[i]} y={34} width={cardW} height={216} rx={14} fill={SURFACE} stroke={BORDER} strokeWidth={1.6} />
+          <rect className={`${u}-${['bench', 'scope', 'pc'][i]}`} x={cardX[i]} y={34} width={cardW} height={216} rx={14} fill="none" stroke={PRIMARY} strokeWidth={3} />
+          <T x={mid(i)} y={230} size={14} weight={600} fill={MUTED}>
+            {name}
+          </T>
+        </g>
+      ))}
+
+      {/* staining and washing: a bottle per antibody, and the wash */}
+      <g className="sm-in" style={delay(0.2)}>
+        {[...stains.map((st) => [st.color, st.name]), [WASH, 'wash']].map(([color, label], i) => bottle(bottleX[i], color, label))}
+        {[stains[0].color, stains[1].color, WASH].map((color, i) => (
+          <path key={i} className={`${u}-drop${i}`} d={drop(bottleX[i], 142)} fill={color} />
+        ))}
+        <rect x={mid(0) - 70} y={204} width={140} height={6} rx={3} fill={FG} fillOpacity={0.25} />
+        <g className={`${u}-bench`}>{glass(mid(0) - 62, 190, 124)}</g>
+      </g>
+
+      {/* the microscope: what is on the slide right now */}
+      <g className="sm-in" style={delay(0.35)}>
+        <g className={`${u}-view`}>
+          <g clipPath={`url(#${u}-lens)`}>
+            <TissueGlyph cx={lens.cx} cy={lens.cy} s={lens.s} palette="he" shape="disc" half={lens.half} />
+            <g className={`${u}-full`}>{stainedCells(first, stains[0].color)}</g>
+            <g className={`${u}-left`}>{stainedCells(first.filter(sticky), stains[0].color, 0.6)}</g>
+            <g className={`${u}-next`}>{stainedCells(second, stains[1].color)}</g>
+          </g>
+        </g>
+        <circle cx={lens.cx} cy={lens.cy} r={lens.half * lens.s + 3} fill="none" stroke={FG} strokeWidth={6} />
+        {/* after each wash she checks stain 1's cells: is it gone? */}
+        {rings('ring1', (c) => (sticky(c) ? WARN : PRIMARY))}
+        {rings('ring2', () => PRIMARY)}
+      </g>
+
+      {/* the computer: her notes, the saved images, and their overlay */}
+      <g className="sm-in" style={delay(0.5)}>
+        <rect x={mid(2) - 76} y={58} width={152} height={104} rx={8} fill={ink} stroke={FG} strokeWidth={2} />
+        <rect x={mid(2) - 8} y={162} width={16} height={18} fill={FG} fillOpacity={0.8} />
+        <rect x={mid(2) - 44} y={180} width={88} height={8} rx={3} fill={FG} fillOpacity={0.8} />
+        <rect x={mid(2) - 58} y={196} width={116} height={10} rx={3} fill={SURFACE} stroke={FG} strokeWidth={1.6} />
+        {/* ImageJ, open on it: its microscope, top right */}
+        <g transform={`translate(${mid(2) + 40} 63)`}>
+          <title>ImageJ</title>
+          <rect width={28} height={28} rx={6} fill="#f8fafc" />
+          <g transform="scale(0.933)">
+            <g fill="#1d4f91">
+              <rect x={6} y={23.5} width={18} height={3} rx={1.5} />
+              <rect x={8} y={18.5} width={11} height={2} rx={1} />
+              <rect x={10} y={4} width={6.5} height={10} rx={1.5} />
+              <rect x={11.7} y={14} width={3} height={3.2} />
+            </g>
+            <path d="M20.5 24 V11.5 Q20.5 8 17 8 H16" fill="none" stroke="#1d4f91" strokeWidth={3} strokeLinecap="round" />
+          </g>
+        </g>
+        {entries.map((e, r) => (
+          <g key={r} className={`${u}-entry${r}`}>
+            <rect x={mid(2) - 66} y={71} width={10} height={10} rx={2} fill={e.swatch} />
+            <T x={mid(2) - 50} y={77} size={12} mono weight={700} anchor="start" fill="#e5e7eb">
+              {e.head}
+            </T>
+            <T x={mid(2) - 66} y={103} size={13} mono weight={700} anchor="start" fill={e.fill}>
+              {e.text}
+            </T>
+          </g>
+        ))}
+        <rect className={`${u}-type`} x={mid(2) - 68} y={93} width={140} height={20} fill={ink} />
+        <g className={`${u}-img1`}>{thumb(mid(2) - 52, [0])}</g>
+        <g className={`${u}-img2`}>
+          <T x={mid(2) - 29} y={133} size={14} mono weight={700} fill="#e5e7eb">
+            +
+          </T>
+          {thumb(mid(2) - 6, [1])}
+        </g>
+        <g className={`${u}-both`}>
+          <T x={mid(2) + 19} y={133} size={14} mono weight={700} fill="#e5e7eb">
+            =
+          </T>
+          {thumb(mid(2) + 44, [0, 1])}
+          <circle cx={mid(2) + 44} cy={133} r={17.5} fill="none" stroke="#34d399" strokeWidth={2} />
+        </g>
+      </g>
+
+      {/* the floor, and Kim with her slide */}
+      <path className="sm-fade" d={`M8 404 H${W - 8}`} stroke={BORDER} strokeWidth={4} strokeLinecap="round" />
+      <g transform={`translate(${mid(0) - 60} 254)`}>
+        <g className={`${u}-walk`}>
+          <KimFigure size={120} />
+          <g className={`${u}-carried`}>
+            <circle cx={36} cy={113} r={6} fill="#c68863" />
+            <circle cx={84} cy={113} r={6} fill="#c68863" />
+            {glass(37, 106, 46)}
+          </g>
+        </g>
+      </g>
+
+      {/* what is happening */}
+      {says.map(([name, text, where, fill]) => (
+        <T key={name} className={`${u}-${name}`} x={mid(where)} y={436} size={16} weight={700} fill={fill}>
+          {text}
+        </T>
+      ))}
+    </svg>
+  );
+}
+
+/* --- her macro -------------------------------------------------------------- */
+
+/** Kim's Fiji macro, step by step: tiles, stitch, segment the cells,
+    measure the stain in every cell, verdict.
+
+    It opens zoomed in on the tissue from the slide before, at the size it
+    had there, patchy CD20 and all. The view pulls back until that patch is
+    one tile of a tiled slide, and the macro runs on it from there. */
 export function MacroChainFigure() {
   const u = useUid();
   const tile = 140;
   const xs = [10, 210, 410, 610];
   const y = 50;
-  const labels = ['Z stack', 'Max projection', 'Otsu threshold', 'Analyse particles'];
-  const dark = '#2b1b4d';
+  const labels = ['Tiles', 'Stitch', 'Segment cells', 'Per-cell uptake'];
   const cxs = (i: number) => xs[i] + tile / 2;
-  // where the organoid ends up (centre of the front stack image), and where
-  // it starts: the middle of the figure, at slide 2's size
-  const land = { x: xs[0] + 60, y: y + 60, s: 0.29 };
-  const start = { x: 510, y: 130, scale: 0.6 / 0.29 };
+  // the slide is 3 × 3 tiles of 200 field units each
+  const tw = 44;
+  const gap = (tile - 3 * tw) / 2;
+  const ts = tw / 200;
+  const tiles = Array.from({ length: 9 }, (_, k) => ({ r: Math.floor(k / 3), c: k % 3 }));
+  const tileX = (c: number) => xs[0] + c * (tw + gap) + tw / 2;
+  const tileY = (r: number) => y + r * (tw + gap) + tw / 2;
+  // where the patch ends up (the middle tile), and where it starts: the
+  // middle of the figure, at the previous slide's size
+  const land = { x: tileX(1), y: tileY(1) };
+  const start = { x: 510, y: 130, scale: 1 / ts };
   const zoom = { from: 0.4, dur: 1.5 };
   const Z = zoom.from + zoom.dur; // everything after the landing is shifted by this
+  // the crop that segmentation and measurement show, in field units
+  const crop = 110;
+  const cs = tile / (2 * crop);
+  /** The whole slide is drawn once and shown through windows: each tile,
+      the mosaic, and the crop are the same cells. */
+  const mosaic = (cx: number, cy: number, scale: number, ox = 0, oy = 0) => (
+    <use href={`#${u}-mosaic`} transform={`translate(${(cx - ox * scale).toFixed(2)} ${(cy - oy * scale).toFixed(2)}) scale(${scale.toFixed(4)})`} />
+  );
+  const tileClip = (k: number) => `url(#${u}-t${k})`;
   return (
-    <svg width={1020} height={260} viewBox="0 0 1020 260" role="img" aria-label="Zooming out from Kim's organoid until it is one image in a z stack; then her ImageJ macro: max projection, Otsu threshold, analysed particles, then a verdict" className="mx-auto block" overflow="visible">
+    <svg width={1020} height={260} viewBox="0 0 1020 260" role="img" aria-label="Zooming out from Kim's tissue until it is one tile of a tiled slide; then her Fiji macro: stitch the tiles, segment the cells, measure the stain in every cell, then a verdict: CD20 at 41 percent uptake, stain again" className="mx-auto block" overflow="visible">
       <defs>
-        <filter id={`${u}-blur`}>
-          <feGaussianBlur stdDeviation={3.5} />
-        </filter>
-        <clipPath id={`${u}-otsu`}>
+        <g id={`${u}-mosaic`}>
+          <TissueGlyph cx={0} cy={0} s={1} half={300} palette="stained" stains={['cd3', 'cd20']} patchy />
+        </g>
+        {tiles.map(({ r, c }, k) => (
+          <clipPath key={k} id={`${u}-t${k}`}>
+            <rect x={tileX(c) - tw / 2} y={tileY(r) - tw / 2} width={tw} height={tw} />
+          </clipPath>
+        ))}
+        <clipPath id={`${u}-seg`}>
           <rect x={xs[2]} y={y} width={tile} height={tile} rx={10} />
         </clipPath>
+        {[0, 1, 2, 3].map((i) => (
+          <clipPath key={i} id={`${u}-p${i}`}>
+            <rect x={xs[i]} y={y} width={tile} height={tile} rx={10} />
+          </clipPath>
+        ))}
       </defs>
       <Arrowheads id={u} />
       <LoopStyles
@@ -1311,77 +1752,68 @@ export function MacroChainFigure() {
           .${u}-zoom { transform-box: view-box; transform-origin: ${land.x}px ${land.y}px; }
           section.present .${u}-zoom { animation: ${u}-zoom ${zoom.dur}s cubic-bezier(.65,0,.25,1) ${zoom.from}s both; }
           @keyframes ${u}-zoom { from { transform: translate(${start.x - land.x}px, ${start.y - land.y}px) scale(${start.scale.toFixed(3)}); } to { transform: none; } }
-          .${u}-slidepal { opacity: 0; }
-          section.present .${u}-slidepal { animation: ${u}-out 0.5s ease ${Z - 0.35}s both; }
-          section.present .${u}-fluor { animation: sm-fade 0.5s ease ${Z - 0.35}s both; }
-          @keyframes ${u}-out { from { opacity: 1; } to { opacity: 0; } }
           section.present .${u}-scan { animation: ${u}-scan 1.4s linear ${Z + 1.5}s 1 both; }
           section.present .${u}-wipe { animation: ${u}-wipe 1.4s linear ${Z + 1.5}s both; }
           @keyframes ${u}-wipe { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
           @keyframes ${u}-scan { 0% { transform: translateY(0); opacity: 0; } 10%, 90% { opacity: 1; } 100% { transform: translateY(${tile}px); opacity: 0; } }
           .${u}-scan { opacity: 0; }
           @media (prefers-reduced-motion: reduce) {
-            section.present :is(.${u}-zoom, .${u}-slidepal, .${u}-fluor) { animation: none; }
+            section.present :is(.${u}-zoom, .${u}-scan, .${u}-wipe) { animation: none; }
           }
         `}
       />
 
-      {/* z stack: the images appear behind the organoid as it lands */}
+      {/* the tiled slide: the other eight tiles appear round the patch as it lands */}
       <g className="sm-fade" style={delay(Z - 0.4)}>
-        {[2, 1, 0].map((k) => (
-          <rect key={k} x={xs[0] + k * 10} y={y - k * 10} width={tile - 20} height={tile - 20} rx={10} fill={dark} stroke={BORDER} strokeWidth={1} opacity={1 - k * 0.25} />
-        ))}
+        {tiles.map(({ r, c }, k) =>
+          k === 4 ? null : (
+            <g key={k}>
+              <g clipPath={tileClip(k)}>{mosaic(tileX(c), tileY(r), ts, (c - 1) * 200, (r - 1) * 200)}</g>
+              <rect x={tileX(c) - tw / 2} y={tileY(r) - tw / 2} width={tw} height={tw} fill="none" stroke={BORDER} strokeWidth={1} />
+            </g>
+          ),
+        )}
       </g>
       <g className={`${u}-zoom`}>
-        <g className={`${u}-slidepal`}>
-          <OrganoidGlyph cx={land.x} cy={land.y} s={land.s} palette="slide" />
-        </g>
-        <g className={`${u}-fluor`}>
-          <OrganoidGlyph cx={land.x} cy={land.y} s={land.s} palette="fluor" />
-        </g>
+        <g clipPath={tileClip(4)}>{mosaic(land.x, land.y, ts)}</g>
+        <rect x={land.x - tw / 2} y={land.y - tw / 2} width={tw} height={tw} fill="none" stroke={PRIMARY} strokeWidth={0.8} />
       </g>
 
-      {/* max projection: the same organoid, blurred */}
+      {/* stitched: one mosaic, and the crop the next two steps show */}
       <g className="sm-pop" style={delay(Z + 0.5)}>
-        <rect x={xs[1]} y={y} width={tile} height={tile} rx={10} fill={dark} />
-        <g filter={`url(#${u}-blur)`}>
-          <OrganoidGlyph cx={cxs(1)} cy={y + 70} s={0.33} palette="fluor" />
+        <g clipPath={`url(#${u}-p1)`}>
+          {mosaic(cxs(1), y + 70, tile / 600)}
         </g>
+        <rect x={xs[1]} y={y} width={tile} height={tile} rx={10} fill="none" stroke={BORDER} strokeWidth={1.2} />
+        <rect x={cxs(1) - crop * (tile / 600)} y={y + 70 - crop * (tile / 600)} width={2 * crop * (tile / 600)} height={2 * crop * (tile / 600)} fill="none" stroke={FG} strokeWidth={1.4} strokeDasharray="4 3" />
       </g>
 
-      {/* otsu: the whole organoid, thresholded; the mask follows the scan */}
+      {/* segment: StarDist outlines, following the scan */}
       <g className="sm-pop" style={delay(Z + 1.2)}>
-        <rect x={xs[2]} y={y} width={tile} height={tile} rx={10} fill={dark} />
-        <g filter={`url(#${u}-blur)`} opacity={0.5}>
-          <OrganoidGlyph cx={cxs(2)} cy={y + 70} s={0.33} palette="fluor" />
+        <g clipPath={`url(#${u}-p2)`}>
+          <g opacity={0.55}>{mosaic(cxs(2), y + 70, cs)}</g>
+          <g className={`${u}-wipe`}>
+            <TissueGlyph cx={cxs(2)} cy={y + 70} s={cs} half={crop} palette="labels" />
+          </g>
         </g>
-        <g className={`${u}-wipe`}>
-          <OrganoidGlyph cx={cxs(2)} cy={y + 70} s={0.33} palette="mask" />
-        </g>
-        <g clipPath={`url(#${u}-otsu)`}>
+        <rect x={xs[2]} y={y} width={tile} height={tile} rx={10} fill="none" stroke={BORDER} strokeWidth={1.2} />
+        <g clipPath={`url(#${u}-seg)`}>
           <rect className={`${u}-scan`} x={xs[2]} y={y} width={tile} height={3} fill={WARN} />
         </g>
       </g>
 
-      {/* particles: the whole organoid again, one label per cell */}
+      {/* per-cell uptake: every CD20 cell gets a verdict, one by one */}
       <g className="sm-pop" style={delay(Z + 2.4)}>
-        <rect x={xs[3]} y={y} width={tile} height={tile} rx={10} fill={dark} />
-        <g opacity={0.35}>
-          <OrganoidGlyph cx={cxs(3)} cy={y + 70} s={0.33} palette="mask" />
+        <g clipPath={`url(#${u}-p3)`}>
+          <g opacity={0.4}>{mosaic(cxs(3), y + 70, cs)}</g>
+          <TissueGlyph cx={cxs(3)} cy={y + 70} s={cs} half={crop} palette="uptake" background={false} cellClass="sm-pop" cellDelay={(i) => Z + 2.7 + i * 0.06} />
         </g>
-        <OrganoidGlyph
-          cx={cxs(3)}
-          cy={y + 70}
-          s={0.33}
-          palette="labels"
-          cellClass="sm-pop"
-          cellDelay={(i) => Z + 2.7 + i * 0.025}
-        />
+        <rect x={xs[3]} y={y} width={tile} height={tile} rx={10} fill="none" stroke={BORDER} strokeWidth={1.2} />
       </g>
       <g className="sm-in" style={delay(Z + 4.3)}>
-        <rect x={xs[3] + tile - 74} y={y + tile - 26} width={68} height={20} rx={5} fill={dark} fillOpacity={0.85} />
+        <rect x={xs[3] + tile - 74} y={y + tile - 26} width={68} height={20} rx={5} fill="#1f2937" fillOpacity={0.85} />
         <T x={xs[3] + tile - 40} y={y + tile - 15} size={13} mono weight={700} fill="#ffffff">
-          n = 61
+          41 %
         </T>
       </g>
 
@@ -1409,13 +1841,13 @@ export function MacroChainFigure() {
         </T>
       </g>
       <T className="sm-in" style={delay(Z + 4.9)} x={832} y={y + 58} anchor="start" size={18}>
-        Density index 45
+        CD20: 41 % uptake
       </T>
       <T className="sm-in" style={delay(Z + 5.2)} x={832} y={y + 90} anchor="start" size={18}>
         Verdict:
       </T>
       <T className="sm-in" style={delay(Z + 5.5)} x={832} y={y + 114} anchor="start" size={18} weight={700} fill={PRIMARY}>
-        needs growth factor
+        stain again
       </T>
     </svg>
   );
@@ -1423,47 +1855,169 @@ export function MacroChainFigure() {
 
 /* --- and yet ---------------------------------------------------------------- */
 
-/** The organoid, sad: its misshapen core in the middle like a stomach ache,
-    big eyes above, a frown below, a tear that keeps running, and a slow sigh. */
-export function SadOrganoidFigure() {
+/** Kim, overworked: a small Kim with a box of slides runs back and forth
+    between the staining bench and the microscope, hopping as she goes. The
+    timer on the wall won't stop ringing, and the sticky note says how far
+    along she is. */
+export function OverworkedKimFigure() {
   const u = useUid();
-  const cx = 220;
-  const cy = 222;
-  const eye = (x: number) => (
-    <g key={x}>
-      <ellipse cx={x} cy={cy - 104} rx={24} ry={26} fill="#ffffff" stroke={FG} strokeWidth={3} />
-      <circle cx={x + (x < cx ? 4 : -4)} cy={cy - 94} r={10} fill={FG} />
-      <circle cx={x + (x < cx ? 7 : -1)} cy={cy - 98} r={3} fill="#ffffff" />
+  const ink = '#1f2937';
+  const run = 4.4;
+  const travel = 176;
+  const css = `
+    .${u}-run { animation: ${u}-run ${run}s ease-in-out 0.8s infinite; }
+    @keyframes ${u}-run { 0%, 4% { transform: translateX(0); } 46%, 54% { transform: translateX(${travel}px); } 96%, 100% { transform: translateX(0); } }
+    .${u}-hop { animation: ${u}-hop 0.36s ease-in-out infinite alternate; }
+    @keyframes ${u}-hop { from { transform: translateY(0); } to { transform: translateY(-9px); } }
+    .${u}-right, .${u}-left { opacity: 0; }
+    .${u}-right { animation: ${u}-right ${run}s linear 0.8s infinite; }
+    .${u}-left { animation: ${u}-left ${run}s linear 0.8s infinite; }
+    @keyframes ${u}-right { 0%, 4% { opacity: 0; } 8%, 42% { opacity: 1; } 46%, 100% { opacity: 0; } }
+    @keyframes ${u}-left { 0%, 54% { opacity: 0; } 58%, 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+    .${u}-ring { transform-box: fill-box; transform-origin: center; animation: ${u}-ring 1.2s linear infinite; }
+    @keyframes ${u}-ring { 0%, 50%, 100% { transform: rotate(0); } 5%, 15%, 25%, 35% { transform: rotate(-7deg); } 10%, 20%, 30%, 40% { transform: rotate(7deg); } 45% { transform: rotate(0); } }
+    .${u}-waves { animation: ${u}-waves 1.2s ease-out infinite; }
+    @keyframes ${u}-waves { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+    .${u}-sweat { animation: ${u}-sweat 1.1s ease-in infinite; }
+    @keyframes ${u}-sweat { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(14px); } }
+    @media (prefers-reduced-motion: reduce) {
+      .${u}-run, .${u}-hop, .${u}-ring, .${u}-waves, .${u}-sweat { animation: none; }
+      .${u}-right { animation: none; opacity: 1; }
+    }
+  `;
+  const jars: [number, string][] = [
+    [24, STAIN.cd3.color],
+    [62, STAIN.cd20.color],
+    [100, STAIN.ki67.color],
+  ];
+  const table = (x: number) => (
+    <g>
+      <rect x={x} y={292} width={136} height={10} rx={3} fill="#a16207" fillOpacity={0.85} />
+      <rect x={x + 8} y={302} width={8} height={102} fill="#8b5e3c" />
+      <rect x={x + 120} y={302} width={8} height={102} fill="#8b5e3c" />
     </g>
   );
+  const speed = (side: 'left' | 'right') => {
+    const x0 = side === 'right' ? -4 : 134;
+    const dir = side === 'right' ? -1 : 1;
+    return (
+      <g className={`${u}-${side}`} stroke={MUTED} strokeWidth={3} strokeLinecap="round">
+        {[
+          [58, 22],
+          [76, 30],
+          [94, 18],
+        ].map(([y, len]) => (
+          <path key={y} d={`M${x0} ${y} H${x0 + dir * len}`} />
+        ))}
+      </g>
+    );
+  };
   return (
-    <svg width={440} height={450} viewBox="0 0 440 450" role="img" aria-label="A sad organoid: misshapen core, big eyes, a frown and a tear" className="shrink-0">
-      <LoopStyles
-        css={`
-          .${u}-sigh { transform-box: view-box; transform-origin: ${cx}px ${cy + 190}px; }
-          section.present .${u}-sigh { animation: ${u}-sigh 4.2s ease-in-out 1.4s infinite; }
-          @keyframes ${u}-sigh { 0%, 100% { transform: none; } 45% { transform: scale(1.02, 0.95); } }
-          .${u}-tear { opacity: 0; }
-          section.present .${u}-tear { animation: ${u}-tear 2.6s ease-in 1.6s infinite; }
-          @keyframes ${u}-tear { 0% { opacity: 0; transform: translateY(0); } 15% { opacity: 1; } 80% { opacity: 1; transform: translateY(70px); } 100% { opacity: 0; transform: translateY(84px); } }
-          @media (prefers-reduced-motion: reduce) { section.present :is(.${u}-sigh, .${u}-tear) { animation: none; } }
-        `}
-      />
-      <ellipse className="sm-fade" style={delay(0.3)} cx={cx} cy={cy + 196} rx={150} ry={12} fill={MUTED} fillOpacity={0.15} />
+    <svg width={440} height={450} viewBox="0 0 440 450" role="img" aria-label="Kim, overworked, runs back and forth between the staining bench and the microscope with a box of slides. A timer rings, and a sticky note says round 3 of 5" className="shrink-0">
+      <LoopStyles css={css} />
+      <Arrowheads id={u} />
+
+      {/* the ringing timer */}
       <g className="sm-pop" style={delay(0.3)}>
-        <g className={`${u}-sigh`}>
-          <OrganoidGlyph cx={cx} cy={cy} s={0.95} palette="slide" />
-          <g className="sm-in" style={delay(0.9)}>
-            {/* brows: inner ends up */}
-            <path d={`M${cx - 92} ${cy - 140} L${cx - 42} ${cy - 156} M${cx + 92} ${cy - 140} L${cx + 42} ${cy - 156}`} stroke={FG} strokeWidth={5} strokeLinecap="round" />
-            {[cx - 62, cx + 62].map(eye)}
-            <path d={`M${cx - 52} ${cy + 118} Q${cx} ${cy + 82} ${cx + 52} ${cy + 118}`} stroke={FG} strokeWidth={6} fill="none" strokeLinecap="round" />
+        <g className={`${u}-ring`}>
+          <rect x={28} y={42} width={104} height={62} rx={12} fill={SURFACE} stroke={FG} strokeWidth={3} />
+          <rect x={40} y={54} width={80} height={38} rx={6} fill={ink} />
+          <T x={80} y={74} size={24} mono weight={700} fill="#ef4444">
+            00:00
+          </T>
+        </g>
+        <g className={`${u}-waves`} stroke={WARN} strokeWidth={3} fill="none" strokeLinecap="round">
+          <path d="M18 56 Q10 73 18 90 M8 50 Q-2 73 8 96" />
+          <path d="M142 56 Q150 73 142 90 M152 50 Q162 73 152 96" />
+        </g>
+        <T x={80} y={24} size={15} mono weight={800} fill={WARN} className={`${u}-waves`}>
+          BEEP BEEP
+        </T>
+      </g>
+
+      {/* the sticky note */}
+      <g transform="rotate(5 362 86)">
+        <g className="sm-pop" style={delay(0.6)}>
+          <path d="M304 34 H420 V118 L402 136 H304 Z" fill="#fef08a" stroke="#ca8a04" strokeOpacity={0.5} strokeWidth={1.5} />
+          <path d="M420 118 L402 118 L402 136 Z" fill="#facc15" />
+          <T x={362} y={64} size={18} weight={800} fill="#422006">
+            round 3 of 5
+          </T>
+          <T x={362} y={92} size={15} weight={600} fill="#422006">
+            slide 9 of 20
+          </T>
+          <path d="M322 108 H396" stroke="#422006" strokeOpacity={0.4} strokeWidth={2} strokeLinecap="round" />
+        </g>
+      </g>
+
+      {/* back and forth, all day */}
+      <path
+        className="sm-fade"
+        style={delay(0.9)}
+        d="M96 232 C 150 148, 290 128, 338 170"
+        fill="none"
+        stroke={WARN}
+        strokeWidth={2.4}
+        strokeDasharray="8 7"
+        strokeLinecap="round"
+        markerStart={`url(#${u}-warn)`}
+        markerEnd={`url(#${u}-warn)`}
+      />
+
+      {/* the floor, the bench and the microscope */}
+      <path className="sm-fade" d="M8 404 H432" stroke={BORDER} strokeWidth={4} strokeLinecap="round" />
+      <g className="sm-in" style={delay(0.2)}>
+        {table(14)}
+        {jars.map(([x, color]) => (
+          <g key={x}>
+            <rect x={x} y={250} width={28} height={42} rx={4} fill={SURFACE} stroke={FG} strokeWidth={2} />
+            <rect x={x + 3} y={266} width={22} height={23} rx={2} fill={color} fillOpacity={0.75} />
+            <rect x={x - 2} y={244} width={32} height={8} rx={2} fill={FG} fillOpacity={0.8} />
           </g>
-          <path
-            className={`${u}-tear`}
-            d={`M${cx + 80} ${cy - 84} C ${cx + 84} ${cy - 76}, ${cx + 88} ${cy - 72}, ${cx + 88} ${cy - 66} A 8 8 0 1 1 ${cx + 72} ${cy - 66} C ${cx + 72} ${cy - 72}, ${cx + 76} ${cy - 76}, ${cx + 80} ${cy - 84} Z`}
-            fill="#60a5fa"
-          />
+        ))}
+      </g>
+      <g className="sm-in" style={delay(0.35)}>
+        {table(290)}
+        <g transform="translate(190 140)" fill={SURFACE} stroke={FG} strokeWidth={2.5} strokeLinejoin="round">
+          <rect x={122} y={140} width={96} height={12} rx={4} />
+          <path d="M204 140 V70 Q204 50 184 50 H170" fill="none" strokeWidth={10} strokeLinecap="round" />
+          <rect x={142} y={36} width={36} height={22} rx={6} />
+          <rect x={153} y={58} width={16} height={26} rx={3} />
+          <polygon points="155,86 167,86 176,108 146,108" fill={PRIMARY} fillOpacity={0.35} stroke="none" />
+          <rect x={132} y={108} width={68} height={8} rx={3} />
+        </g>
+      </g>
+      <T className="sm-fade" style={delay(0.5)} x={82} y={428} size={15} fill={MUTED}>
+        staining bench
+      </T>
+      <T className="sm-fade" style={delay(0.5)} x={360} y={428} size={15} fill={MUTED}>
+        microscope
+      </T>
+
+      {/* Kim, in transit */}
+      <g transform="translate(60 242)">
+        <g className={`${u}-run`}>
+          {speed('right')}
+          {speed('left')}
+          <g className={`${u}-hop`}>
+            <g transform="scale(1.18)">
+              <KimFigure size={110} mood="worried" />
+              {/* the box of slides, held in front of her */}
+              <g className="sm-pop" style={delay(0.5)}>
+                <circle cx={32} cy={104} r={6} fill="#c68863" />
+                <circle cx={78} cy={104} r={6} fill="#c68863" />
+                <rect x={34} y={94} width={42} height={24} rx={3} fill="#e5e7eb" stroke={ink} strokeWidth={1.8} />
+                {[0, 1, 2, 3, 4].map((k) => (
+                  <rect key={k} x={39 + k * 7} y={90} width={4} height={14} rx={1} fill="#f8fafc" stroke="#94a3b8" strokeWidth={0.8} />
+                ))}
+                {[0, 1, 2, 3, 4].map((k) => (
+                  <rect key={k} x={39.6 + k * 7} y={91} width={2.8} height={4} fill={EOSIN} />
+                ))}
+              </g>
+              <path className={`${u}-sweat`} d="M88 22 C 85 28, 85 31, 88 32 C 91 31, 91 28, 88 22 Z" fill="#60a5fa" />
+              <path className={`${u}-sweat`} style={{ animationDelay: '0.5s' }} d="M22 30 C 19 36, 19 39, 22 40 C 25 39, 25 36, 22 30 Z" fill="#60a5fa" />
+            </g>
+          </g>
         </g>
       </g>
     </svg>
@@ -1473,14 +2027,14 @@ export function SadOrganoidFigure() {
 /* --- she publishes --------------------------------------------------------- */
 
 const MACRO_LINES: [string, string][] = [
-  ['// kim_organoid.ijm', 'comment'],
-  ['run("Z Project...", "projection=[Max Intensity]");', 'code'],
-  ['setAutoThreshold("Otsu dark");', 'code'],
-  ['run("Convert to Mask");', 'code'],
-  ['run("Set Measurements...", "area shape");', 'code'],
-  ['run("Analyze Particles...", "size=20-Infinity display");', 'code'],
-  ['round = getResult("Round", 0);  // the core', 'code'],
-  ['if (round < 0.5) print("needs growth factor");', 'code'],
+  ['// kim_sequential.ijm', 'comment'],
+  ['run("Grid/Collection stitching", "type=[Grid]");', 'code'],
+  ['run("Colour Deconvolution", "vectors=[H AEC]");', 'code'],
+  ['run("StarDist 2D", "model=[Versatile (H&E nuclei)]");', 'code'],
+  ['run("Set Measurements...", "mean area");', 'code'],
+  ['roiManager("Measure");', 'code'],
+  ['uptake = getResult("Positive", 0);  // per cell', 'code'],
+  ['if (uptake < 0.8) print("stain again");', 'code'],
 ];
 
 /** Kim's preprint: title, byline, DOI, and the macro itself in the methods,
@@ -1497,7 +2051,7 @@ export function PaperCard() {
         </span>
       </div>
       <span className="text-[21px] font-bold leading-snug">
-        Core sphericity predicts organoid rescue by growth factor A
+        Per-cell QC makes five-plex sequential staining on one H&amp;E slide reliable
       </span>
       <span className="text-[15px] text-fd-muted-foreground">Kim et al. · macro and data on a DOI</span>
       <pre className="mt-1 overflow-hidden rounded-xl border border-fd-border bg-fd-muted/60 px-4 py-3 font-mono text-[13px] leading-[1.65]">
@@ -1511,19 +2065,20 @@ export function PaperCard() {
   );
 }
 
-/** Figure 2 of Kim's preprint: organoids surviving with and without growth
-    factor at the macro's signal. Persona numbers, illustrative. */
+/** Figure 2 of Kim's preprint: five-stain panels completed on one slide,
+    without and with the per-cell check after every round. Persona numbers,
+    illustrative. */
 export function ResultsChart() {
   const base = 290;
   const h = 200;
   const bars = [
-    { label: 'untreated', value: 0.18, x: 70, tone: MUTED },
-    { label: 'growth factor', sub: 'when core < 0.5', value: 0.83, x: 210, tone: PRIMARY },
+    { label: 'no check', value: 0.31, x: 70, tone: MUTED },
+    { label: 'per-cell QC', sub: 'after every round', value: 0.88, x: 210, tone: PRIMARY },
   ];
   return (
-    <svg width={360} height={370} viewBox="0 0 360 370" role="img" aria-label="Bar chart: 18 percent of untreated organoids survive to day 7, against 83 percent when growth factor is given at the macro's signal" className="shrink-0">
+    <svg width={360} height={370} viewBox="0 0 360 370" role="img" aria-label="Bar chart: 31 percent of five-stain panels completed without a per-cell check, against 88 percent with the per-cell check after every round" className="shrink-0">
       <T className="sm-fade" style={delay(2.6)} x={20} y={22} anchor="start" size={13} mono weight={700} fill={MUTED}>
-        FIG. 2 · SURVIVAL TO DAY 7
+        FIG. 2 · PANELS COMPLETED
       </T>
       <Path className="sm-draw" style={delay(2.7)} d={`M40 ${base} L340 ${base}`} stroke={BORDER} width={2} />
       {bars.map((b, i) => {
@@ -1546,13 +2101,13 @@ export function ResultsChart() {
         );
       })}
       <g className="sm-in" style={delay(4.4)}>
-        <path d={`M110 ${base - 0.18 * h - 40} V64 H250 V${base - 0.83 * h - 40}`} fill="none" stroke={FG} strokeWidth={1.5} />
+        <path d={`M110 ${base - 0.31 * h - 40} V64 H250 V${base - 0.88 * h - 40}`} fill="none" stroke={FG} strokeWidth={1.5} />
         <T x={180} y={52} size={14} mono weight={700}>
           p &lt; 0.01
         </T>
       </g>
       <T className="sm-fade" style={delay(4.6)} x={340} y={358} anchor="end" size={13} mono fill={MUTED}>
-        n = 48 organoids
+        n = 48 slides
       </T>
     </svg>
   );
@@ -1570,129 +2125,83 @@ function starPoly(cx: number, cy: number, r: number, seed: number) {
   }).join(' ');
 }
 
-/** The organoid under the lens on the dream-workflow slide, on the same
-    ten-second clock as its arrows. While the run keeps answering "no", it
-    dies from the core outwards: cells grey and shrink. When the pump's
-    growth factor arrives down the tube, it recovers and its core rounds up.
-    SMIL throughout, so it stays in step with the arrows. */
-function LensOrganoid({
-  cx,
-  cy,
-  r: lensR,
-  cycle,
-  rescue = [0.8, 0.92],
-  die = [0.12, 0.1],
-  still = false,
-}: {
-  cx: number;
-  cy: number;
-  r: number;
-  cycle: string;
-  /** When growth factor arrives (shares of the cycle), or null: it never
-      does, and the organoid stays dead until the cycle fades it back in. */
-  rescue?: [number, number] | null;
-  /** When the core starts dying, and how much later each ring follows. */
-  die?: [number, number];
-  /** No motion: a healthy organoid. */
-  still?: boolean;
-}) {
-  const s = 0.29;
-  const grey = '#9ca3af';
-  const anim = (attr: string, values: (string | number)[], keyTimes: number[]) =>
-    still ? null : (
-      <animate attributeName={attr} values={values.join(';')} keyTimes={keyTimes.map((t) => t.toFixed(3)).join(';')} dur={cycle} repeatCount="indefinite" />
-    );
-  /** Keyframes for a cell, with or without the rescue at the end. */
-  const fate = (alive: (string | number)[], dying: (string | number)[], kt: number[], rk: number) =>
-    rescue
-      ? { values: [...alive, ...dying, ...dying.slice(-1), ...alive.slice(-1), ...alive.slice(-1)], kt: [...kt, rescue[0] + rk, rescue[1] - 0.04 + rk, 1] }
-      : { values: [...alive, ...dying, ...dying.slice(-1)], kt: [...kt, 1] };
+/** The slide under the lens on the dream-workflow slide, on the same
+    ten-second clock as its arrows. CD3 is already on. CD20 goes on patchy,
+    then the rest of it after "stain again"; then Ki-67 lands in the nuclei;
+    then the panel is done and the next slide starts clean. The ring turns
+    amber while the uptake is below target. SMIL throughout, so it stays in
+    step with the arrows. */
+function LensSlide({ cx, cy, r: lensR, cycle }: { cx: number; cy: number; r: number; cycle: string }) {
+  const s = 0.75;
+  const half = lensR / s;
+  const cells = tissueCells(-half, -half, half, half).filter((c) => c.x * c.x + c.y * c.y < (half - 6) ** 2);
+  /** Opacity keyframes: off, then on from `t0` until the cycle resets. */
+  const appear = (t0: number) => ({
+    values: '0;0;1;1;0;0',
+    keyTimes: [0, t0, t0 + 0.03, 0.95, 0.99, 1].map((t) => t.toFixed(3)).join(';'),
+  });
+  const fade = (t0: number) => {
+    const a = appear(t0);
+    return <animate attributeName="opacity" values={a.values} keyTimes={a.keyTimes} dur={cycle} repeatCount="indefinite" />;
+  };
+  const ring = (values: string) => (
+    <animate attributeName="stroke-opacity" values={values} keyTimes="0;0.29;0.31;0.39;0.41;1" dur={cycle} repeatCount="indefinite" />
+  );
   return (
     <g>
-      {rescue || still ? null : <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.03;0.95;1" dur={cycle} repeatCount="indefinite" />}
-      {/* the lens ring: amber while dying, primary once rescued */}
+      <circle cx={cx} cy={cy} r={lensR} fill={TISSUE_BG} />
+      {cells.map((c, i) => {
+        const x = cx + c.x * s;
+        const y = cy + c.y * s;
+        const jitter = (i % 7) * 0.004;
+        return (
+          <g key={i} transform={`rotate(${c.rot} ${x} ${y})`}>
+            <ellipse cx={x} cy={y} rx={c.rx * s} ry={c.ry * s} fill={c.kind === 'cd3' ? STAIN.cd3.color : EOSIN} fillOpacity={0.8} stroke={EOSIN_EDGE} strokeOpacity={0.35} strokeWidth={1} />
+            {c.kind === 'cd20' ? (
+              <ellipse cx={x} cy={y} rx={c.rx * s} ry={c.ry * s} fill={STAIN.cd20.color} fillOpacity={0.8} opacity={0}>
+                {fade((c.took ? 0.1 : 0.38) + jitter)}
+              </ellipse>
+            ) : null}
+            <ellipse cx={x + c.nx * s} cy={y + c.ny * s} rx={4.8 * s} ry={3.9 * s} fill={HEMATOXYLIN} fillOpacity={0.85} />
+            {c.ki67 ? (
+              <ellipse cx={x + c.nx * s} cy={y + c.ny * s} rx={4.8 * s} ry={3.9 * s} fill={STAIN.ki67.color} opacity={0}>
+                {fade(0.68 + jitter)}
+              </ellipse>
+            ) : null}
+          </g>
+        );
+      })}
+      {/* the lens ring: amber while the uptake is below target */}
       <circle cx={cx} cy={cy} r={lensR} fill="none" stroke={PRIMARY} strokeWidth={4}>
-        {rescue ? anim('stroke-opacity', [1, 0, 0, 1, 1], [0, 0.2, rescue[0], rescue[1], 1]) : anim('stroke-opacity', [1, 0, 0], [0, 0.2, 1])}
+        {ring('1;1;0;0;1;1')}
       </circle>
       <circle cx={cx} cy={cy} r={lensR} fill="none" stroke={WARN} strokeWidth={4} strokeOpacity={0}>
-        {rescue ? anim('stroke-opacity', [0, 1, 1, 0, 0], [0, 0.2, rescue[0], rescue[1], 1]) : anim('stroke-opacity', [0, 1, 1], [0, 0.2, 1])}
+        {ring('0;0;1;1;0;0')}
       </circle>
-      {ORGANOID_RINGS.flatMap(([ringR, n], k) =>
-        Array.from({ length: n }, (_, i) => {
-          const a = (i / n) * Math.PI * 2 + k * 0.3;
-          const x = cx + ringR * s * cos(a);
-          const y = cy + ringR * s * sin(a);
-          const R = 15 * s;
-          const d0 = die[0] + k * die[1] + (i % 4) * 0.012;
-          const d1 = d0 + 0.14;
-          const rk = k * 0.01;
-          // outer cells: alive, then grey and shrunken (then, maybe, alive again)
-          const size = fate([R, R], [R * 0.6], [0, d0, d1], rk);
-          const alive = fate([1, 1], [0.1], [0, d0, d1], rk);
-          const dead = fate([0, 0], [1], [0, d0, d1], rk);
-          if (k < 2) {
-            // the core: round, then misshapen (the signal), dying, maybe rescued
-            const core = (v: (string | number)[]) =>
-              rescue
-                ? { values: [...v, v[0], v[0]], kt: [0, Math.min(0.08, d0 - 0.02), d0, d1, rescue[0], rescue[1], 1] }
-                : { values: [...v.slice(0, 4), v[3]], kt: [0, Math.min(0.08, d0 - 0.02), d0, d1, 1] };
-            const rot = `rotate(${(i * 47 + k * 20) % 180} ${x} ${y})`;
-            const rx = core([R, R * 1.4, R * 1.4, R * 0.9, R * 0.9]);
-            const ry = core([R, R * 0.6, R * 0.6, R * 0.45, R * 0.45]);
-            const layers: [string, number[]][] = [
-              [WARN, [0, 1, 1, 0.1, 0.1]],
-              [grey, [0, 0, 0, 1, 1]],
-              [PRIMARY, [1, 0, 0, 0, 0]],
-            ];
-            return (
-              <g key={`${k}-${i}`} transform={rot}>
-                {layers.map(([color, v]) => {
-                  const o = rescue ? { values: [...v, color === PRIMARY ? 1 : 0, color === PRIMARY ? 1 : 0], kt: rx.kt } : core(v);
-                  return (
-                    <ellipse key={color} cx={x} cy={y} rx={R} ry={R} fill={color} fillOpacity={0.3} stroke={color} strokeWidth={1.2} opacity={v[0]}>
-                      {anim('rx', rx.values, rx.kt)}
-                      {anim('ry', ry.values, ry.kt)}
-                      {anim('opacity', o.values, o.kt)}
-                    </ellipse>
-                  );
-                })}
-              </g>
-            );
-          }
-          return (
-            <g key={`${k}-${i}`}>
-              <circle cx={x} cy={y} r={R} fill={PRIMARY} fillOpacity={0.18} stroke={PRIMARY} strokeWidth={1.2}>
-                {anim('r', size.values, size.kt)}
-                {anim('opacity', alive.values, alive.kt)}
-              </circle>
-              <circle cx={x} cy={y} r={R} fill={grey} fillOpacity={0.25} stroke={grey} strokeWidth={1.2} opacity={0}>
-                {anim('r', size.values, size.kt)}
-                {anim('opacity', dead.values, dead.kt)}
-              </circle>
-            </g>
-          );
-        }),
-      )}
     </g>
   );
 }
 
-/** Kim's dream, read left to right: the organoid plate (with a lens on her
-    organoid), the microscope imaging it, StarDist segmenting, and a decision.
-    "No" loops back to keep watching; "yes" goes down to an ESP32-driven
-    peristaltic pump, which sends growth factor back along a tube into the
-    well.
+/** Kim's dream, as a loop. Top row, left to right, the bench and the scope:
+    the slide rack (with a lens on her slide), the robot arm, the OT-2 that
+    stains it, the openUC2 that images it in tiles. Bottom row, right to
+    left, the analysis: StarDist segments the cells, the uptake is measured
+    per cell, and a decision: below target goes back to the OT-2 with the
+    same stain, reached goes back with the next one, and a finished panel
+    goes back to the rack.
 
     Only the arrows move. Over one ten-second cycle they light up in the
-    order a run takes them: the main row and the "no" loop, then the main
-    row again, "yes", and the tube. All SMIL, so they stay in step.
+    order a run takes them: CD20, patchy, stain again; CD20 again, reached,
+    next stain; Ki-67, done. All SMIL, so they stay in step with the lens.
 
     `lab` is the same figure, already there and still running. On one
     keypress (a reveal.js fragment) it rearranges into the building Kim
-    actually works in: the pump moves next to the plate in the imaging room,
-    segmentation and the decision move down the hall, and each step shows
-    the computer it runs on. The fragment is an empty marker; everything
-    that moves is a later sibling and reacts to `.visible` with `~`. */
+    actually works in: the openUC2 moves down next to its acquisition PC in
+    the imaging room, beside the bench with the arm and the OT-2;
+    segmentation, measurement and the decision move to the office down the
+    hall, and each step shows the machine it runs on. The fragment is an
+    empty marker; everything that moves is a later sibling and reacts to
+    `.visible` with `~`. */
 export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' | 'lab' }) {
   const u = useUid();
   const lab = variant === 'lab';
@@ -1700,16 +2209,16 @@ export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' |
   const icon = { fill: SURFACE, stroke, strokeWidth: 2.5, strokeLinejoin: 'round' as const };
   const cycle = '10s';
   const nuclei: [number, number, number][] = [
-    [496, 160, 13],
-    [528, 154, 11],
-    [562, 166, 12],
-    [490, 196, 12],
-    [526, 190, 14],
-    [562, 202, 11],
-    [508, 226, 12],
-    [546, 226, 13],
+    [876, 310, 13],
+    [908, 304, 11],
+    [942, 316, 12],
+    [870, 346, 12],
+    [906, 340, 14],
+    [942, 352, 11],
+    [888, 376, 12],
+    [926, 376, 13],
   ];
-  const lens = { x: 120, y: 190, r: 62 };
+  const lens = { x: 96, y: 150, r: 56 };
 
   /** Opacity keyframes that are 1 inside the given windows (shares of the
       cycle) and 0 elsewhere. */
@@ -1724,25 +2233,27 @@ export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' |
     v.push(0);
     return { keyTimes: kt.map((t) => t.toFixed(3)).join(';'), values: v.join(';') };
   };
-  // the same six connections, as drawn in the dream and in the building
+  /** Text that shows only inside the given windows. */
+  const flash = (spans: [number, number][]) => {
+    const w = windows(spans);
+    return <animate attributeName="opacity" values={w.values} keyTimes={w.keyTimes} dur={cycle} repeatCount="indefinite" />;
+  };
+  // the same nine connections, as drawn in the dream and in the building
   const arrows: { dream: string; lab: string; spans: [number, number][]; head: 'fg' | 'primary' }[] = [
-    { dream: 'M196 190 L274 190', lab: 'M196 190 L274 190', spans: [[0.02, 0.12], [0.5, 0.58]], head: 'fg' },
-    { dream: 'M388 190 L462 190', lab: 'M388 190 L542 190', spans: [[0.1, 0.2], [0.56, 0.64]], head: 'fg' },
-    { dream: 'M596 190 L690 190', lab: 'M676 190 L800 190', spans: [[0.18, 0.28], [0.62, 0.7]], head: 'fg' },
-    { dream: 'M760 126 C 760 30, 330 30, 330 124', lab: 'M870 126 C 870 30, 330 30, 330 124', spans: [[0.26, 0.44]], head: 'fg' },
-    { dream: 'M760 254 L760 294', lab: 'M870 254 L870 412 L336 412', spans: [[0.68, 0.76]], head: 'primary' },
-    { dream: 'M700 380 L120 380 L120 256', lab: 'M120 292 L120 256', spans: [[0.74, 0.96]], head: 'primary' },
+    { dream: 'M182 150 L230 150', lab: 'M182 150 L230 150', spans: [[0.01, 0.06]], head: 'fg' },
+    { dream: 'M350 150 L430 150', lab: 'M350 150 L430 150', spans: [[0.05, 0.1]], head: 'fg' },
+    { dream: 'M550 150 L644 150', lab: 'M452 220 C 440 262, 300 240, 293 272', spans: [[0.1, 0.16], [0.41, 0.47], [0.68, 0.74]], head: 'fg' },
+    { dream: 'M756 150 C 900 150, 900 200, 900 272', lab: 'M348 320 L682 320', spans: [[0.15, 0.21], [0.46, 0.52], [0.73, 0.79]], head: 'fg' },
+    { dream: 'M844 330 L756 330', lab: 'M798 320 L844 320', spans: [[0.2, 0.26], [0.51, 0.57], [0.78, 0.83]], head: 'fg' },
+    { dream: 'M644 330 L548 330', lab: 'M890 266 C 880 214, 820 192, 802 180', spans: [[0.25, 0.31], [0.56, 0.62], [0.82, 0.87]], head: 'fg' },
+    { dream: 'M468 280 L468 212', lab: 'M706 134 L552 134', spans: [[0.3, 0.38]], head: 'fg' },
+    { dream: 'M512 280 L512 212', lab: 'M706 166 L552 166', spans: [[0.61, 0.68]], head: 'primary' },
+    { dream: 'M436 330 L96 330 L96 212', lab: 'M760 84 C 760 6, 160 6, 150 90', spans: [[0.86, 0.96]], head: 'primary' },
   ];
   const drawn = (which: 'dream' | 'lab', build: boolean) =>
-    arrows.map((a, i) =>
-      i === 5 ? (
-        <path key={i} className={build ? 'sm-fade' : undefined} style={build ? delay(1.4) : undefined} d={a[which]} fill="none" stroke={BORDER} strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />
-      ) : (
-        <Path key={i} className={build ? 'sm-draw' : undefined} style={build ? delay(0.5 + i * 0.3) : undefined} d={a[which]} head={`${u}-${a.head}`} stroke={a.head === 'primary' ? PRIMARY : MUTED} width={a.head === 'primary' ? 3 : 2.5} />
-      ),
-    );
-  /** The radio hop, router to ESP32 (lab only). */
-  const wifi = 'M288 398 Q 230 404 172 372';
+    arrows.map((a, i) => (
+      <Path key={i} className={build ? 'sm-draw' : undefined} style={build ? delay(0.5 + i * 0.2) : undefined} d={a[which]} head={`${u}-${a.head}`} stroke={a.head === 'primary' ? PRIMARY : MUTED} width={a.head === 'primary' ? 3 : 2.5} />
+    ));
   const flows = (which: 'dream' | 'lab') =>
     arrows.map((a, i) => {
       const w = windows(a.spans);
@@ -1755,9 +2266,10 @@ export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' |
     });
 
   /* In the lab variant, every top-level group is a sibling of the marker
-     fragment: `still` skips its build, `mv` moves it, `dream` and `labOnly`
-     cross-fade. */
+     fragment: `still` skips its build, `mv` moves it, `dreamOnly` and
+     `labOnly` cross-fade. */
   const still = lab ? 'sm-still' : '';
+  const dreamOnly = lab ? `sm-still ${u}-dream` : undefined;
   const mv = (dx: number, dy = 0) => ({
     className: `${still} ${u}-mv`,
     style: { ['--dx' as string]: dx, ['--dy' as string]: dy } as CSSProperties,
@@ -1815,6 +2327,32 @@ export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' |
       </T>
     </g>
   );
+  /** A label sitting on an arrow, on a patch of background. */
+  const pill = (x: number, y: number, text: string, fill: string) => (
+    <g>
+      <rect x={x - (text.length * 7.8 + 14) / 2} y={y - 10} width={text.length * 7.8 + 14} height={20} rx={10} fill="var(--color-fd-background)" />
+      <T x={x} y={y} size={13} mono weight={700} fill={fill}>
+        {text}
+      </T>
+    </g>
+  );
+  const title = (x: number, y: number, text: string, sub: string, at: number, anchor: 'middle' | 'end' = 'middle') => (
+    <>
+      <T className="sm-in" style={delay(at)} x={x} y={y} anchor={anchor} size={19} weight={600}>
+        {text}
+      </T>
+      <T className="sm-in" style={delay(at + 0.05)} x={x} y={y + 20} anchor={anchor} size={14} fill={MUTED}>
+        {sub}
+      </T>
+    </>
+  );
+  /** A thick, outlined arm segment. */
+  const link = (d: string) => (
+    <>
+      <path d={d} stroke={stroke} strokeWidth={15} strokeLinecap="round" fill="none" />
+      <path d={d} stroke={SURFACE} strokeWidth={9} strokeLinecap="round" fill="none" />
+    </>
+  );
 
   return (
     <svg
@@ -1824,8 +2362,8 @@ export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' |
       role="img"
       aria-label={
         lab
-          ? "The same workflow in Kim's building: the plate, the microscope PC and the ESP32-driven pump in the imaging room; segmentation on a GPU server and the decision on her laptop, in an office down the hall. Every connection crosses between rooms."
-          : "Kim's dream workflow, left to right: the organoid plate is imaged, segmented with StarDist, and a decision checks the core. No: keep watching. Yes: an ESP32-driven pump sends growth factor back into the organoid's well."
+          ? "The same workflow in Kim's building: the robot arm and the OT-2 on the bench and the openUC2 with its acquisition PC, all in the imaging room; StarDist and the per-cell measurement on a GPU server and the decision on her laptop, in an office down the hall. Every step shows the machine it runs on, and connections cross between rooms."
+          : "Kim's dream workflow: a robot arm takes the slide from the rack to the OT-2, which stains it; the openUC2 images it in tiles, StarDist segments the cells, and the stain uptake is measured per cell. Below target: back to the OT-2, same stain. Reached: the next stain. Panel done: back to the rack."
       }
       className="mx-auto block"
     >
@@ -1836,16 +2374,16 @@ export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' |
           <Fragment as="g" index={1} className={`${u}-on`} />
           {/* the building, under everything else */}
           <g {...labOnly(0)}>
-            {room(0, 448, 'IMAGING ROOM', 'start')}
-            {room(500, 536, 'OFFICE · DOWN THE HALL', 'end')}
+            {room(0, 600, 'IMAGING ROOM', 'start')}
+            {room(640, 396, 'OFFICE · DOWN THE HALL', 'end')}
           </g>
         </>
       ) : null}
 
       {/* the arrows, drawn in, then lighting up in the order a run takes them */}
-      <g className={lab ? `sm-still ${u}-dream` : undefined}>
+      <g className={dreamOnly}>
         {drawn('dream', true)}
-        <g className={lab ? undefined : 'sm-fade'} style={lab ? undefined : delay(2.2)}>
+        <g className={lab ? undefined : 'sm-fade'} style={lab ? undefined : delay(2.4)}>
           {flows('dream')}
         </g>
       </g>
@@ -1853,160 +2391,188 @@ export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' |
         <g {...labOnly(1.2)}>
           {drawn('lab', false)}
           {flows('lab')}
-          {/* the pump is not on the wire: the cable ends at a router, and the
-              last hop to the ESP32 is radio, on a network of its own */}
-          <path d={wifi} fill="none" stroke={WARN} strokeWidth={2.5} strokeDasharray="1 7" strokeLinecap="round" />
-          <path d={wifi} fill="none" stroke={PRIMARY} strokeWidth={4} strokeDasharray="1 9" strokeLinecap="round" opacity={0}>
-            <animate attributeName="stroke-dashoffset" values="20;0" dur="0.5s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values={windows([[0.73, 0.8]]).values} keyTimes={windows([[0.73, 0.8]]).keyTimes} dur={cycle} repeatCount="indefinite" />
-          </path>
-          <g transform="translate(232 394)">
-            <circle r={13} fill="var(--color-fd-background)" stroke={WARN} strokeWidth={1.5} />
-            <path d="M-8 -2 Q0 -9 8 -2 M-5 1.5 Q0 -2.5 5 1.5" fill="none" stroke={WARN} strokeWidth={2} strokeLinecap="round" />
-            <circle cy={5} r={1.8} fill={WARN} />
-          </g>
-          {/* the router the cable ends at */}
-          <g fill="none" stroke={WARN} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <rect x={292} y={404} width={40} height={16} rx={3} fill={SURFACE} />
-            <path d="M298 404 L294 392 M326 404 L330 392" />
-            <circle cx={302} cy={412} r={1.6} fill={WARN} stroke="none" />
-            <circle cx={309} cy={412} r={1.6} fill={WARN} stroke="none" />
-          </g>
-          <T x={312} y={380} size={12} mono weight={700} fill={WARN}>
-            Wi-Fi router
-          </T>
         </g>
       ) : null}
 
-      <g {...mv(55)}>
-        <T className="sm-in" style={delay(1.8)} x={545} y={44} size={14} mono weight={700} fill={MUTED}>
-          no · keep watching
+      {/* what the decision says, on its arrows */}
+      <g className={dreamOnly}>
+        <T className="sm-in" style={delay(1.9)} x={597} y={136} size={12} mono weight={700} fill={MUTED}>
+          by arm
+        </T>
+        <T className="sm-in" style={delay(2)} x={456} y={246} anchor="end" size={14} mono weight={700} fill={MUTED}>
+          again · same stain
+        </T>
+        <T className="sm-in" style={delay(2.1)} x={524} y={246} anchor="start" size={14} mono weight={700} fill={PRIMARY}>
+          next stain
+        </T>
+        <T className="sm-in" style={delay(2.2)} x={266} y={316} size={14} mono weight={700} fill={PRIMARY}>
+          panel done
         </T>
       </g>
-      <g {...mv(110, 26)}>
-        <T className="sm-in" style={delay(2)} x={774} y={274} anchor="start" size={14} mono weight={700} fill={PRIMARY}>
-          yes
-        </T>
-      </g>
-      <g className={lab ? `sm-still ${u}-dream` : undefined}>
-        <T className="sm-in" style={delay(1.6)} x={420} y={366} size={14} weight={600} fill={PRIMARY}>
-          growth factor A
-        </T>
-      </g>
+      {lab ? (
+        <g {...labOnly(1.3)}>
+          {pill(620, 134, 'again', MUTED)}
+          {pill(620, 166, 'next stain', PRIMARY)}
+          {pill(455, 30, 'panel done', PRIMARY)}
+        </g>
+      ) : null}
 
-      {/* the plate, with a lens on Kim's organoid */}
+      {/* the bench and the rack: they stay where they are */}
       <g className={still}>
+        {/* the rack, with a lens on Kim's slide */}
         <g className="sm-pop" style={delay(0.2)}>
-          <rect x={20} y={110} width={200} height={160} rx={14} {...icon} strokeWidth={2} />
-          {Array.from({ length: 12 }, (_, i) => (
-            <circle key={i} cx={50 + (i % 4) * 46} cy={145 + Math.floor(i / 4) * 45} r={16} fill={SURFACE} stroke={BORDER} strokeWidth={1.5} />
+          <rect x={16} y={100} width={160} height={100} rx={12} {...icon} strokeWidth={2} />
+          {Array.from({ length: 6 }, (_, i) => (
+            <g key={i}>
+              <rect x={30 + i * 24} y={114} width={13} height={72} rx={2} fill={SURFACE} stroke={BORDER} strokeWidth={1.5} />
+              <rect x={31 + i * 24} y={115} width={11} height={14} fill={MUTED} fillOpacity={0.25} />
+              <circle cx={36.5 + i * 24} cy={160} r={4.5} fill={EOSIN} />
+            </g>
           ))}
         </g>
         <g className="sm-pop" style={delay(0.5)}>
           <circle cx={lens.x + 3} cy={lens.y + 5} r={lens.r} fill={FG} fillOpacity={0.12} />
-          <circle cx={lens.x} cy={lens.y} r={lens.r} fill={SURFACE} />
-          <LensOrganoid cx={lens.x} cy={lens.y} r={lens.r} cycle={cycle} />
+          <LensSlide cx={lens.x} cy={lens.y} r={lens.r} cycle={cycle} />
         </g>
-        <T className="sm-in" style={delay(0.3)} x={120} y={92} size={19} weight={600}>
-          Organoid plate
-        </T>
+        {title(96, 62, 'Slide rack', 'HE-07', 0.3)}
 
-        {/* acquire: a microscope */}
-        <g className="sm-pop" style={delay(0.4)}>
-          <g transform="translate(160 95)">
-            <rect x={122} y={140} width={96} height={12} rx={4} {...icon} />
-            <path d="M204 140 V70 Q204 50 184 50 H170" fill="none" stroke={stroke} strokeWidth={10} strokeLinecap="round" />
-            <rect x={142} y={36} width={36} height={22} rx={6} {...icon} />
-            <rect x={153} y={58} width={16} height={26} rx={3} {...icon} />
-            <polygon points="155,86 167,86 176,108 146,108" fill={PRIMARY} fillOpacity={0.35} />
-            <rect x={132} y={108} width={68} height={8} rx={3} {...icon} />
-          </g>
+        {/* the robot arm, holding a slide */}
+        <g className="sm-pop" style={delay(0.35)}>
+          <rect x={252} y={190} width={52} height={14} rx={4} {...icon} />
+          {link('M278 182 L298 120')}
+          {link('M298 120 L334 140')}
+          <circle cx={278} cy={182} r={8} {...icon} />
+          <circle cx={298} cy={120} r={7} {...icon} />
+          <circle cx={334} cy={140} r={6} {...icon} />
+          <path d="M328 146 V160 M340 146 V160" stroke={stroke} strokeWidth={3} strokeLinecap="round" />
+          <rect x={322} y={160} width={24} height={6} rx={1.5} fill={SURFACE} stroke={stroke} strokeWidth={1.5} />
+          <circle cx={334} cy={163} r={2.2} fill={EOSIN} />
         </g>
-        <T className="sm-in" style={delay(0.5)} x={330} y={272} size={19} weight={600}>
-          Acquire
-        </T>
-        <T className="sm-in" style={delay(0.55)} x={330} y={292} size={14} fill={MUTED}>
-          lightsheet
-        </T>
+        {title(290, 62, 'Robot arm', 'carries the slide', 0.4)}
+
+        {/* the OT-2, with the protocol it is running */}
+        <g className="sm-pop" style={delay(0.5)}>
+          <rect x={440} y={96} width={100} height={108} rx={8} {...icon} />
+          <rect x={446} y={102} width={88} height={18} rx={4} fill="#1f2937" />
+          <g>
+            <T x={490} y={111.5} size={11} mono weight={700} fill="#ffffff">
+              stain_cd20
+            </T>
+            {flash([[0.001, 0.62]])}
+          </g>
+          <g opacity={0}>
+            <T x={490} y={111.5} size={11} mono weight={700} fill="#ffffff">
+              stain_ki67
+            </T>
+            {flash([[0.625, 0.97]])}
+          </g>
+          <path d="M448 128 H532" stroke={stroke} strokeWidth={4} strokeLinecap="round" />
+          <rect x={482} y={128} width={14} height={26} rx={3} {...icon} strokeWidth={2} />
+          <path d="M486 154 L489 164 L492 164 L492 154" fill={stroke} />
+          {[0, 1, 2].map((c) =>
+            [0, 1].map((r) => (
+              <rect key={`${c}-${r}`} x={450 + c * 28} y={168 + r * 17} width={24} height={13} rx={2} fill={c === 1 && r === 0 ? EOSIN : MUTED} fillOpacity={c === 1 && r === 0 ? 0.7 : 0.15} stroke={BORDER} strokeWidth={1} />
+            )),
+          )}
+        </g>
+        {title(490, 62, 'OT-2', 'stain k', 0.55)}
       </g>
 
+      {/* the openUC2: cubes, an objective, a camera */}
+      <g {...mv(-410, 180)}>
+        <g className="sm-pop" style={delay(0.65)}>
+          <rect x={678} y={100} width={44} height={44} rx={6} {...icon} />
+          <circle cx={700} cy={122} r={11} fill="none" stroke={stroke} strokeWidth={2} />
+          <path d="M700 113 V131 M691 122 H709" stroke={stroke} strokeWidth={1.5} />
+          <polygon points="692,144 708,144 704,154 696,154" fill={PRIMARY} fillOpacity={0.4} />
+          <rect x={668} y={154} width={64} height={5} rx={1.5} fill={SURFACE} stroke={stroke} strokeWidth={1.5} />
+          <circle cx={700} cy={156.5} r={2.2} fill={EOSIN} />
+          <rect x={654} y={160} width={44} height={44} rx={6} {...icon} />
+          <rect x={702} y={160} width={44} height={44} rx={6} {...icon} />
+          <circle cx={676} cy={182} r={7} fill={PRIMARY} fillOpacity={0.5} />
+          <rect x={714} y={174} width={20} height={16} rx={3} fill="none" stroke={stroke} strokeWidth={2} />
+        </g>
+      </g>
+      <g className={dreamOnly}>{title(700, 62, 'openUC2', 'tiles', 0.7)}</g>
+      {lab ? (
+        <g {...labOnly(1.4)}>
+          <T x={226} y={318} anchor="end" size={19} weight={600}>
+            openUC2
+          </T>
+          <T x={226} y={338} anchor="end" size={14} fill={MUTED}>
+            tiles
+          </T>
+        </g>
+      ) : null}
+
       {/* segment: StarDist outlines */}
-      <g {...mv(80)}>
-        <g className="sm-pop" style={delay(0.7)}>
-          <rect x={470} y={130} width={120} height={120} rx={12} fill="#2b1b4d" stroke={stroke} strokeWidth={2.5} />
+      <g {...mv(-160, -10)}>
+        <g className="sm-pop" style={delay(0.8)}>
+          <rect x={850} y={280} width={100} height={100} rx={12} fill="#2b1b4d" stroke={stroke} strokeWidth={2.5} />
           {nuclei.map(([x, y, r], i) => (
-            <polygon key={i} className="sm-pop" style={delay(1 + i * 0.1)} points={starPoly(x, y, r, i)} fill={LABELS[i % LABELS.length]} fillOpacity={0.35} stroke={LABELS[i % LABELS.length]} strokeWidth={2} />
+            <polygon key={i} className="sm-pop" style={delay(1 + i * 0.1)} points={starPoly(x - 6, y - 6, r * 0.85, i)} fill={LABELS[i % LABELS.length]} fillOpacity={0.35} stroke={LABELS[i % LABELS.length]} strokeWidth={2} />
           ))}
         </g>
-        <T className="sm-in" style={delay(0.8)} x={530} y={272} size={19} weight={600}>
-          Segment
-        </T>
-        <T className="sm-in" style={delay(0.85)} x={530} y={292} size={14} fill={MUTED}>
-          StarDist
-        </T>
+        {title(900, 402, 'StarDist', 'segment cells', 0.85)}
+      </g>
+
+      {/* measure: the stain in every cell, against the target */}
+      <g {...mv(200, -10)}>
+        <g className="sm-pop" style={delay(0.95)}>
+          <rect x={650} y={282} width={100} height={96} rx={12} {...icon} />
+          {[30, 12, 38, 22, 44, 8, 34].map((h, i) => (
+            <rect key={i} x={661 + i * 12} y={368 - h} width={8} height={h} rx={1.5} fill={STAIN.cd20.color} fillOpacity={0.6} />
+          ))}
+          <path d="M656 334 H744" stroke={WARN} strokeWidth={1.8} strokeDasharray="4 3" />
+          <g opacity={0}>
+            <T x={700} y={302} size={15} mono weight={700} fill={WARN}>
+              41 %
+            </T>
+            {flash([[0.27, 0.4]])}
+          </g>
+          <g opacity={0}>
+            <T x={700} y={302} size={15} mono weight={700} fill={PRIMARY}>
+              93 %
+            </T>
+            {flash([[0.58, 0.68]])}
+          </g>
+          <g opacity={0}>
+            <T x={700} y={302} size={15} mono weight={700} fill={PRIMARY}>
+              88 %
+            </T>
+            {flash([[0.84, 0.95]])}
+          </g>
+        </g>
+        {title(700, 402, 'Measure', 'per-cell uptake', 1)}
       </g>
 
       {/* decide */}
-      <g {...mv(110)}>
-        <g className="sm-pop" style={delay(1)}>
-          <circle cx={760} cy={190} r={62} {...icon} />
-          <T x={760} y={180} size={15} weight={700}>
-            core
+      <g {...mv(270, -190)}>
+        <g className="sm-pop" style={delay(1.1)}>
+          <circle cx={490} cy={330} r={52} {...icon} />
+          <T x={490} y={320} size={15} weight={700}>
+            uptake
           </T>
-          <T x={760} y={200} size={15} mono weight={700} fill={WARN}>
-            &lt; 0.5?
+          <T x={490} y={340} size={15} mono weight={700} fill={WARN}>
+            ≥ 0.8?
           </T>
         </g>
-        <T className="sm-in" style={delay(1.1)} x={836} y={180} anchor="start" size={19} weight={600}>
-          Decide
-        </T>
-        <T className="sm-in" style={delay(1.15)} x={836} y={200} anchor="start" size={14} fill={MUTED}>
-          sphericity
-        </T>
+        {title(490, 402, 'Decide', 'again · next · done', 1.15)}
       </g>
 
-      {/* pump: peristaltic, driven by an ESP32 */}
-      <g {...mv(-660, -8)}>
-        <g className="sm-pop" style={delay(1.3)}>
-          <g transform="translate(596 26)">
-            <rect x={104} y={274} width={128} height={98} rx={16} {...icon} />
-            <circle cx={152} cy={320} r={33} fill="none" stroke={MUTED} strokeWidth={2} />
-            {[0, 120, 240].map((a) => {
-              const r = (a * Math.PI) / 180;
-              return (
-                <g key={a}>
-                  <line x1={152} y1={320} x2={152 + 20 * cos(r)} y2={320 + 20 * sin(r)} stroke={stroke} strokeWidth={3} />
-                  <circle cx={152 + 20 * cos(r)} cy={320 + 20 * sin(r)} r={7} fill={PRIMARY} stroke={stroke} strokeWidth={1.5} />
-                </g>
-              );
-            })}
-            <circle cx={152} cy={320} r={5} fill={stroke} />
-            <rect x={198} y={336} width={26} height={22} rx={3} fill="#1f2937" />
-            {[0, 1, 2, 3].map((k) => (
-              <line key={k} x1={202 + k * 6} y1={336} x2={202 + k * 6} y2={331} stroke="#1f2937" strokeWidth={1.5} />
-            ))}
-          </g>
-        </g>
-        <T className="sm-in" style={delay(1.4)} x={840} y={340} anchor="start" size={19} weight={600}>
-          Pump
-        </T>
-        <T className="sm-in" style={delay(1.45)} x={840} y={360} anchor="start" size={14} fill={MUTED}>
-          ESP32
-        </T>
-      </g>
-
-      {/* which computer each step runs on */}
+      {/* which machine each step runs on */}
       {lab ? (
-        <g {...labOnly(1.4)}>
-          {computer(330, 318, 'desktop', 'microscope PC')}
-          {computer(610, 318, 'server', 'GPU server')}
-          {computer(946, 228, 'laptop', 'laptop', 'start')}
-          {/* the ESP32's own network */}
-          <rect x={26} y={282} width={226} height={118} rx={14} fill={WARN} fillOpacity={0.05} stroke={WARN} strokeWidth={1.8} strokeDasharray="7 6" />
-          <rect x={52} y={392} width={150} height={16} rx={4} fill="var(--color-fd-background)" />
-          <T x={127} y={400} size={12} mono weight={700} fill={WARN}>
-            own Wi-Fi network
+        <g {...labOnly(1.5)}>
+          <rect x={200} y={206} width={360} height={8} rx={3} fill="#a16207" fillOpacity={0.7} />
+          <T x={204} y={196} anchor="start" size={12} mono weight={700} fill={MUTED}>
+            bench
           </T>
+          {computer(290, 236, 'desktop', 'arm controller')}
+          {computer(290, 408, 'desktop', 'acquisition PC')}
+          <rect x={670} y={256} width={300} height={170} rx={14} fill={WARN} fillOpacity={0.05} stroke={WARN} strokeWidth={1.8} strokeDasharray="7 6" />
+          <rect x={754} y={246} width={132} height={20} rx={4} fill="var(--color-fd-background)" />
+          {computer(820, 256, 'server', 'GPU server')}
+          {computer(822, 140, 'laptop', 'laptop', 'start')}
         </g>
       ) : null}
     </svg>
@@ -2020,46 +2586,50 @@ type LoopVariant = 'dream' | 'lab' | 'arkitekt';
 const NW = 220;
 const NH = 96;
 const LOOP_NODES = [
-  { name: 'Acquire', what: 'lightsheet', machine: 'microscope PC · 20 s', action: 'action · microscope PC', x: 60, y: 24 },
-  { name: 'Segment', what: 'StarDist', machine: 'GPU server · 1–2 min', action: 'action · GPU server', x: 720, y: 24 },
-  { name: 'Decide', what: 'sphericity < 0.5?', machine: 'laptop · 0.3 s', action: 'workflow step', x: 720, y: 288 },
-  { name: 'Pump', what: 'growth factor A', machine: 'ESP32 · instant', action: 'action · ESP32', x: 60, y: 288 },
+  { name: 'Stain', what: 'OT-2 · stain k', machine: 'OT-2 · 20 min', action: 'action · ot2', x: 40, y: 24 },
+  { name: 'Image', what: 'tiles + stitch', machine: 'acquisition PC · 20 s', action: 'openuc2 + stitcher', x: 740, y: 24 },
+  { name: 'Segment', what: 'StarDist', machine: 'GPU server · 1–2 min', action: 'action · stardist', x: 740, y: 300 },
+  { name: 'Measure', what: 'per-cell uptake', machine: 'GPU server · 5 s', action: 'action · analyzer', x: 390, y: 300 },
+  { name: 'Decide', what: 'again · next · done', machine: 'laptop · 0.3 s', action: 'workflow step', x: 40, y: 300 },
 ];
 
-/** Kim's closed loop: acquire, segment, decide, pump, and round again.
-    `dream` is the plan, with a sample going round. `lab` is what four
-    computers make of it: the analysis can't keep up, so stacks pile up in
+/** Kim's closed loop: stain, image, segment, measure, decide, and round
+    again; the arm carries the slide from the bench to the scope.
+    `dream` is the plan, with a slide going round. `lab` is what five
+    machines make of it: the analysis can't keep up, so tiles pile up in
     front of segmentation. `arkitekt` is the same loop with every call going
     through the hub. */
 export function KimLoopFigure({ variant }: { variant: LoopVariant }) {
   const u = useUid();
-  const [acq, seg, dec, pump] = LOOP_NODES;
+  const [stain, image, seg, measure, decide] = LOOP_NODES;
   const mid = (n: (typeof LOOP_NODES)[number]) => [n.x + NW / 2, n.y + NH / 2];
   const edges = [
-    `M${acq.x + NW + 8} ${mid(acq)[1]} L${seg.x - 10} ${mid(seg)[1]}`,
-    `M${mid(seg)[0]} ${seg.y + NH + 8} L${mid(dec)[0]} ${dec.y - 10}`,
-    `M${dec.x - 8} ${mid(dec)[1]} L${pump.x + NW + 10} ${mid(pump)[1]}`,
-    `M${mid(pump)[0]} ${pump.y - 8} L${mid(acq)[0]} ${acq.y + NH + 10}`,
+    `M${stain.x + NW + 8} ${mid(stain)[1]} L${image.x - 10} ${mid(image)[1]}`,
+    `M${mid(image)[0]} ${image.y + NH + 8} L${mid(seg)[0]} ${seg.y - 10}`,
+    `M${seg.x - 8} ${mid(seg)[1]} L${measure.x + NW + 10} ${mid(measure)[1]}`,
+    `M${measure.x - 8} ${mid(measure)[1]} L${decide.x + NW + 10} ${mid(decide)[1]}`,
+    `M${mid(decide)[0]} ${decide.y - 8} L${mid(stain)[0]} ${stain.y + NH + 10}`,
   ];
-  const ring = `M${mid(acq)[0]} ${mid(acq)[1]} L${mid(seg)[0]} ${mid(seg)[1]} L${mid(dec)[0]} ${mid(dec)[1]} L${mid(pump)[0]} ${mid(pump)[1]} Z`;
+  const ring = `M${LOOP_NODES.map((n) => mid(n).join(' ')).join(' L')} Z`;
   const hub = { x: 390, y: 140, w: 220, h: 136 };
   const hc = [hub.x + hub.w / 2, hub.y + hub.h / 2];
-  const spokes = LOOP_NODES.map((n) => {
-    const [nx, ny] = mid(n);
-    const sx = nx < hc[0] ? n.x + NW : n.x;
-    const sy = ny;
-    const ex = nx < hc[0] ? hub.x : hub.x + hub.w;
-    const ey = ny < hc[1] ? hub.y + 30 : hub.y + hub.h - 30;
-    return `M${sx} ${sy} L${ex} ${ey}`;
-  });
-  const viaHub = `M${mid(acq)[0]} ${mid(acq)[1]} L${hc[0]} ${hc[1]} L${mid(seg)[0]} ${mid(seg)[1]} L${hc[0]} ${hc[1]} L${mid(dec)[0]} ${mid(dec)[1]} L${hc[0]} ${hc[1]} L${mid(pump)[0]} ${mid(pump)[1]} L${hc[0]} ${hc[1]} Z`;
+  const spokes = [
+    `M${stain.x + NW - 40} ${stain.y + NH} L${hub.x} ${hub.y + 30}`,
+    `M${image.x + 40} ${image.y + NH} L${hub.x + hub.w} ${hub.y + 30}`,
+    `M${seg.x + 40} ${seg.y} L${hub.x + hub.w} ${hub.y + hub.h - 30}`,
+    `M${mid(measure)[0]} ${measure.y} L${hc[0]} ${hub.y + hub.h}`,
+    `M${decide.x + NW - 40} ${decide.y} L${hub.x} ${hub.y + hub.h - 30}`,
+  ];
+  const viaHub = `M${LOOP_NODES.map((n) => `${mid(n).join(' ')} L${hc[0]} ${hc[1]}`).join(' L')} Z`;
   const backlog = 6;
+  const queueX = mid(seg)[0] + 12;
+  const queueY = (i: number) => seg.y - 36 - i * 23;
   const loopCss =
     variant === 'lab'
       ? `${Array.from({ length: backlog }, (_, i) => {
           const at = 8 + i * 13;
           return `section.present .${u}-q${i} { animation: ${u}-q${i} 9s linear 1.6s infinite both; }
-          @keyframes ${u}-q${i} { 0%, ${at}% { opacity: 0; transform: translateX(-40px); } ${at + 4}%, 94% { opacity: 1; transform: none; } 100% { opacity: 0; } }`;
+          @keyframes ${u}-q${i} { 0%, ${at}% { opacity: 0; transform: translateY(-30px); } ${at + 4}%, 94% { opacity: 1; transform: none; } 100% { opacity: 0; } }`;
         }).join('\n')}`
       : '';
   return (
@@ -2070,10 +2640,10 @@ export function KimLoopFigure({ variant }: { variant: LoopVariant }) {
       role="img"
       aria-label={
         variant === 'lab'
-          ? 'Kim’s loop spread over four computers: a new stack every 20 seconds, segmentation taking 1 to 2 minutes, so stacks pile up'
+          ? 'Kim’s loop spread over five machines: a new tile every 20 seconds, segmentation taking 1 to 2 minutes, so tiles pile up'
           : variant === 'arkitekt'
             ? 'Kim’s loop on Arkitekt: every step an action on its device, every call going through the hub'
-            : 'Kim’s loop: acquire, segment, decide on sphericity, pump growth factor, repeat'
+            : 'Kim’s loop: the OT-2 stains, the arm carries the slide to the openUC2, StarDist segments, the uptake is measured per cell, and a decision sends it round again, on to the next stain, or back to the rack'
       }
       className="mx-auto block"
     >
@@ -2107,12 +2677,22 @@ export function KimLoopFigure({ variant }: { variant: LoopVariant }) {
           ))
         : null}
 
+      {/* what the edges carry */}
+      <T className="sm-in" style={delay(1.6)} x={(stain.x + NW + image.x) / 2} y={mid(stain)[1] - 18} size={14} mono weight={700} fill={variant === 'arkitekt' ? PRIMARY : MUTED}>
+        {variant === 'arkitekt' ? 'action · arkirino' : variant === 'lab' ? 'arm controller · 1 min' : 'the arm carries the slide'}
+      </T>
+      {variant === 'arkitekt' ? null : (
+        <T className="sm-in" style={delay(1.7)} x={mid(decide)[0] + 12} y={(stain.y + NH + decide.y) / 2} anchor="start" size={14} mono weight={700} fill={MUTED}>
+          again · next stain
+        </T>
+      )}
+
       {/* nodes */}
       {LOOP_NODES.map((n, i) => (
         <Box
           key={n.name}
           className="sm-pop"
-          style={delay(0.2 + i * 0.3)}
+          style={delay(0.2 + i * 0.25)}
           x={n.x}
           y={n.y}
           w={NW}
@@ -2128,25 +2708,29 @@ export function KimLoopFigure({ variant }: { variant: LoopVariant }) {
 
       {/* the middle */}
       {variant === 'arkitekt' ? (
-        <Box className="sm-pop" style={delay(0.9)} x={hub.x} y={hub.y} w={hub.w} h={hub.h} title="Arkitekt" sub="one workflow, four devices" tone="solid" titleSize={28} rx={18} />
+        <Box className="sm-pop" style={delay(0.9)} x={hub.x} y={hub.y} w={hub.w} h={hub.h} title="Arkitekt" sub="one workflow, six apps" tone="solid" titleSize={28} rx={18} />
       ) : variant === 'lab' ? (
         <g className="sm-pop" style={delay(1.8)}>
           <rect x={hub.x} y={hub.y} width={hub.w} height={hub.h} rx={18} fill={WARN} fillOpacity={0.08} stroke={WARN} strokeWidth={1.6} />
           <T x={hc[0]} y={hc[1] - 16} size={26} weight={700} fill={WARN}>
-            4 computers
+            5 machines
           </T>
           <T x={hc[0]} y={hc[1] + 16} size={14} fill={MUTED}>
-            stacks pile up at segmentation
+            tiles pile up at segmentation
           </T>
         </g>
       ) : (
         <g className="sm-fade" style={delay(1.4)}>
           <rect x={hub.x} y={hub.y} width={hub.w} height={hub.h} rx={18} fill={SURFACE} stroke={BORDER} strokeDasharray="6 5" strokeWidth={1.6} />
-          {Array.from({ length: 9 }, (_, i) => (
-            <circle key={i} className="sm-pulse" style={delay(i * 0.2)} cx={hc[0] - 24 + (i % 3) * 24} cy={hc[1] - 34 + Math.floor(i / 3) * 18} r={8} fill={PRIMARY} fillOpacity={0.25} stroke={PRIMARY} strokeWidth={1.2} />
+          {Array.from({ length: 6 }, (_, i) => (
+            <g key={i}>
+              <rect x={hc[0] - 74 + i * 26} y={hc[1] - 46} width={18} height={56} rx={2.5} fill={SURFACE} stroke={MUTED} strokeWidth={1.4} />
+              <rect x={hc[0] - 73 + i * 26} y={hc[1] - 45} width={16} height={11} fill={MUTED} fillOpacity={0.25} />
+              <circle className="sm-pulse" style={delay(i * 0.3)} cx={hc[0] - 65 + i * 26} cy={hc[1] - 12} r={6} fill={EOSIN} />
+            </g>
           ))}
           <T x={hc[0]} y={hc[1] + 36} size={15} fill={MUTED}>
-            organoid plate
+            slide rack
           </T>
         </g>
       )}
@@ -2154,15 +2738,18 @@ export function KimLoopFigure({ variant }: { variant: LoopVariant }) {
       {/* what moves */}
       {variant === 'dream' ? (
         <g className="sm-fade" style={delay(1.8)}>
-          <Token path={ring} dur={7}>
-            <rect x={-13} y={-13} width={26} height={26} rx={6} fill={PRIMARY} stroke="var(--color-fd-background)" strokeWidth={2} />
+          <Token path={ring} dur={9}>
+            <g>
+              <rect x={-17} y={-8} width={34} height={16} rx={2.5} fill={SURFACE} stroke={PRIMARY} strokeWidth={2.2} />
+              <circle cx={3} r={4.5} fill={EOSIN} />
+            </g>
           </Token>
         </g>
       ) : null}
       {variant === 'arkitekt' ? (
         <g className="sm-fade" style={delay(2)}>
           {[0, 0.5].map((phase) => (
-            <Token key={phase} path={viaHub} dur={10} phase={phase}>
+            <Token key={phase} path={viaHub} dur={12} phase={phase}>
               <circle r={9} fill={PRIMARY} stroke="var(--color-fd-background)" strokeWidth={2} />
             </Token>
           ))}
@@ -2171,9 +2758,9 @@ export function KimLoopFigure({ variant }: { variant: LoopVariant }) {
       {variant === 'lab' ? (
         <>
           {Array.from({ length: backlog }, (_, i) => (
-            <rect key={i} className={`${u}-q${i}`} x={seg.x - 44 - i * 30} y={mid(seg)[1] - 34} width={22} height={22} rx={5} fill={WARN} fillOpacity={0.8} />
+            <rect key={i} className={`${u}-q${i}`} x={queueX} y={queueY(i)} width={22} height={22} rx={5} fill={WARN} fillOpacity={0.8} />
           ))}
-          <T className="sm-in" style={delay(2.4)} x={seg.x - 44 - 2.5 * 30 + 11} y={mid(seg)[1] + 24} size={14} mono weight={700} fill={WARN}>
+          <T className="sm-in" style={delay(2.4)} x={queueX - 32} y={queueY(2.5) + 11} anchor="end" size={14} mono weight={700} fill={WARN}>
             backlog
           </T>
         </>
@@ -2269,48 +2856,147 @@ export function MultiplyFigure() {
   );
 }
 
-/** Scattered pieces settling around one hub. */
+/** What Kim asks for: one script, ImageJ-style, that runs on the machines,
+    and an answer that comes back as her data. */
 export function BetterFigure() {
-  const n = 16;
-  const cx = 260;
-  const cy = 210;
-  const r = 160;
+  const u = useUid();
+  const ink = '#1f2937';
+  const OK = '#16a34a';
+  /* the script, as she would write it for one machine */
+  const lines: [string, string][] = [
+    ['slide', ' = pickUp("rack A");'],
+    ['stain', '(slide, "antibody 1");'],
+    ['image1', ' = acquire(slide);'],
+    ['washUntilGone', '(slide);'],
+    ['stain', '(slide, "antibody 2");'],
+    ['image2', ' = acquire(slide);'],
+    ['overlay', '(image1, image2);'],
+  ];
+  const win = { x: 14, y: 8, w: 344, h: 236 };
+  const machines = ['robot arm', 'OT-2', 'microscope'];
+  const chip = { x: 420, w: 166, h: 54 };
+  const chipY = (i: number) => 22 + i * 76;
+  const run = { x: win.x + win.w - 92, y: win.y + win.h - 40, w: 80, h: 28 };
+  const T_RUN = 2.3;
+  const T_DATA = T_RUN + 2.6;
+  /* the data: the overlay, both stains on one tissue */
+  const thumb = { x: 404, y: 300, s: 112 };
+  const cells = tissueCells(0, 0, thumb.s, thumb.s).filter((c) => c.x > 10 && c.x < thumb.s - 10 && c.y > 10 && c.y < thumb.s - 10);
   return (
-    <svg width={520} height={420} viewBox="0 0 520 420" role="img" aria-label="Scattered pieces settling into a ring around one hub" className="shrink-0">
-      {Array.from({ length: n }, (_, i) => {
-        const a = (i / n) * Math.PI * 2;
-        const x = cx + r * cos(a);
-        const y = cy + r * sin(a);
+    <svg
+      width={600}
+      height={470}
+      viewBox="0 0 600 470"
+      role="img"
+      aria-label="A script in an ImageJ-style editor: pick up the slide, stain with antibody 1, acquire, wash until gone, stain with antibody 2, acquire, overlay. Run is pressed, the robot arm, the OT-2 and the microscope each do their part, and the answer comes back: yes, here is your data, the overlay of both stains"
+      className="shrink-0"
+    >
+      <Arrowheads id={u} />
+      {/* the editor */}
+      <g className="sm-in" style={delay(0.5)}>
+        <rect x={win.x} y={win.y} width={win.w} height={win.h} rx={8} fill="#ffffff" stroke={ink} strokeWidth={2} />
+        <path d={`M${win.x} ${win.y + 26} H${win.x + win.w}`} stroke={ink} strokeWidth={2} />
+        <path d={`M${win.x + 1} ${win.y + 26} V${win.y + 9} a8 8 0 0 1 8 -8 H${win.x + win.w - 9} a8 8 0 0 1 8 8 V${win.y + 26} Z`} fill="#e5e7eb" />
+        {[0, 1, 2].map((i) => (
+          <circle key={i} cx={win.x + 16 + i * 14} cy={win.y + 13} r={4} fill={['#f87171', '#fbbf24', '#4ade80'][i]} />
+        ))}
+        <T x={win.x + win.w / 2} y={win.y + 18} size={13} weight={600} fill={ink} mono>
+          multi_staining.ijm
+        </T>
+        <T x={win.x + 12} y={win.y + 43} size={11.5} fill="#6b7280" anchor="start">
+          File · Edit · Language · Run · Help
+        </T>
+        <path d={`M${win.x} ${win.y + 50} H${win.x + win.w}`} stroke="#d1d5db" strokeWidth={1} />
+      </g>
+      {lines.map(([name, rest], i) => (
+        <text key={i} className="sm-in" style={delay(0.8 + i * 0.16)} x={win.x + 40} y={win.y + 72 + i * 20} fontSize={13.5} fontFamily="var(--font-mono, ui-monospace, monospace)" fill={ink}>
+          <tspan x={win.x + 24} textAnchor="end" fill="#9ca3af">
+            {i + 1}
+          </tspan>
+          <tspan x={win.x + 36} fill="#1d4ed8" fontWeight={600}>
+            {name}
+          </tspan>
+          {rest}
+        </text>
+      ))}
+      <g className="sm-pop" style={delay(T_RUN - 0.4)}>
+        <rect x={run.x} y={run.y} width={run.w} height={run.h} rx={6} fill={OK} />
+        <T x={run.x + run.w / 2} y={run.y + 19} size={14} weight={700} fill="#ffffff">
+          ▶ Run
+        </T>
+      </g>
+      <circle className="sm-ping" style={delay(T_RUN)} cx={run.x + run.w / 2} cy={run.y + run.h / 2} r={22} fill="none" stroke={OK} strokeWidth={3} />
+
+      {/* the machines it runs on */}
+      <T x={chip.x + chip.w / 2} y={12} size={13} fill={MUTED} className="sm-fade" style={delay(T_RUN + 0.2)}>
+        runs on the machines
+      </T>
+      {machines.map((name, i) => {
+        const y = chipY(i);
+        const at = T_RUN + 0.3 + i * 0.6;
         return (
-          <Path key={`s${i}`} className="sm-draw" style={delay(1.9 + i * 0.04)} d={`M${x} ${y} L${cx + 48 * cos(a)} ${cy + 48 * sin(a)}`} stroke={PRIMARY} width={1.6} opacity={0.5} />
+          <g key={name}>
+            <Path className="sm-draw" style={delay(at - 0.15)} d={`M${win.x + win.w + 4} ${win.y + 70 + i * 50} C${win.x + win.w + 36} ${win.y + 70 + i * 50}, ${chip.x - 34} ${y + chip.h / 2}, ${chip.x - 8} ${y + chip.h / 2}`} stroke={PRIMARY} width={2} head={`${u}-primary`} />
+            <g className="sm-pop" style={delay(at)}>
+              <rect x={chip.x} y={y} width={chip.w} height={chip.h} rx={12} fill={SURFACE} stroke={BORDER} strokeWidth={2} />
+              <T x={chip.x + 16} y={y + chip.h / 2 + 6} size={17} weight={600} anchor="start">
+                {name}
+              </T>
+            </g>
+            <g className="sm-pop" style={delay(at + 0.55)}>
+              <circle cx={chip.x + chip.w - 24} cy={y + chip.h / 2} r={12} fill={OK} />
+              <path d={`M${chip.x + chip.w - 30} ${y + chip.h / 2} l4.5 4.5 l8 -9`} fill="none" stroke="#ffffff" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
+            </g>
+          </g>
         );
       })}
-      {Array.from({ length: n }, (_, i) => {
-        const a = (i / n) * Math.PI * 2;
-        const x = cx + r * cos(a);
-        const y = cy + r * sin(a);
-        const dx = (((i * 97) % 200) - 100) * 1.6;
-        const dy = (((i * 53 + 31) % 200) - 100) * 1.3;
-        return (
-          <rect
-            key={i}
-            className="sm-converge"
-            style={{ ['--x' as string]: `${dx}px`, ['--y' as string]: `${dy}px`, ['--d' as string]: `${0.2 + i * 0.05}s` } as CSSProperties}
-            x={x - 16}
-            y={y - 16}
-            width={32}
-            height={32}
-            rx={7}
-            fill={SURFACE}
-            stroke={i % 3 === 0 ? WARN : MUTED}
-            strokeWidth={1.6}
-          />
-        );
-      })}
-      <g className="sm-pop" style={delay(1.7)}>
-        <circle cx={cx} cy={cy} r={46} fill={PRIMARY} />
-        <T x={cx} y={cy + 2} size={40} weight={700} fill="var(--color-fd-primary-foreground)">
+
+      {/* the answer */}
+      <g className="sm-pop" style={delay(T_DATA)}>
+        <circle cx={46} cy={356} r={30} fill={PRIMARY} />
+        <T x={46} y={367} size={32} weight={700} fill="var(--color-fd-primary-foreground)">
           ?
+        </T>
+      </g>
+      <g className="sm-in" style={delay(T_DATA + 0.25)}>
+        <path d="M92 356 l14 -10 v20 Z" fill={SURFACE} stroke={BORDER} strokeWidth={2} strokeLinejoin="round" />
+        <rect x={104} y={318} width={262} height={76} rx={16} fill={SURFACE} stroke={BORDER} strokeWidth={2} />
+        <path d="M105 348 v16" stroke={SURFACE} strokeWidth={3} />
+        <T x={124} y={352} size={25} weight={700} anchor="start">
+          Yes.
+        </T>
+        <T x={124} y={380} size={21} weight={600} anchor="start" fill={PRIMARY}>
+          Here’s your data.
+        </T>
+      </g>
+      <Path className="sm-draw" style={delay(T_DATA + 0.5)} d={`M368 356 H${thumb.x - 10}`} stroke={PRIMARY} width={2} head={`${u}-primary`} />
+      <g className="sm-pop" style={delay(T_DATA + 0.7)}>
+        <rect x={thumb.x - 8} y={thumb.y - 8} width={thumb.s + 76} height={thumb.s + 40} rx={12} fill={SURFACE} stroke={OK} strokeWidth={2.5} />
+        <rect x={thumb.x} y={thumb.y} width={thumb.s} height={thumb.s} rx={6} fill={TISSUE_BG} />
+        {cells.map((c) => {
+          const one = c.kind === 'cd3' || c.kind === 'cd20';
+          const two = c.kind === 'panck';
+          return (
+            <ellipse
+              key={c.n}
+              cx={thumb.x + c.x}
+              cy={thumb.y + c.y}
+              rx={Math.min(c.rx, 9) * 0.8}
+              ry={Math.min(c.ry, 9) * 0.8}
+              fill={EOSIN}
+              fillOpacity={0.55}
+              stroke={one ? STAIN.cd3.color : two ? STAIN.ki67.color : EOSIN_EDGE}
+              strokeWidth={one || two ? 2.6 : 0.8}
+            />
+          );
+        })}
+        {['image 1', 'image 2', 'overlay'].map((name, i) => (
+          <T key={name} x={thumb.x + thumb.s + 10} y={thumb.y + 20 + i * 24} size={12.5} anchor="start" mono weight={i === 2 ? 700 : 400}>
+            {name}
+          </T>
+        ))}
+        <T x={thumb.x + (thumb.s + 60) / 2} y={thumb.y + thumb.s + 22} size={14} weight={700} fill={OK}>
+          multi-staining ✓
         </T>
       </g>
     </svg>
