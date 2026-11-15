@@ -23,19 +23,26 @@ Because the plugin lives inside Fiji, it works wherever Fiji works: Windows, Lin
 You need a working Fiji installation. You can download Fiji from [here](https://imagej.net/software/fiji/downloads).
 The plugin is tested against the JRE that ships with Fiji, so no separate Java installation is needed.
 
-Each release of the plugin ships in two forms:
-
 <FijiGrid/>
 
-- **Jar (simplest)**: download `arkitekt-plugin-<version>.jar` and drop it into the `plugins/` folder of your Fiji installation (`Fiji.app/plugins/`).
-  Delete any older `arkitekt-plugin-*.jar` first. With two versions on the classpath Fiji picks one at random.
+Download [`arkitekt-plugin.jar`](https://github.com/arkitektio/imagej-arkitekt-plugin/releases/latest/download/arkitekt-plugin.jar)
+and drop it into the `plugins/` folder of your Fiji installation (`Fiji.app/plugins/`). The link always gives the latest release.
+The jar has no version in its name, so updating is the same step: the new jar replaces the old one.
 
-- **Zip**: the archive unpacks to a single `arkitekt/` folder inside `plugins/`. Remove a previous install before unpacking:
+<Callout type="warn" title="Updating from a version before 3.2?">
 
-  ```bash
-  rm -rf /path/to/Fiji.app/plugins/arkitekt
-  unzip arkitekt-plugin-*.zip -d /path/to/Fiji.app/plugins/
-  ```
+Older releases were named `arkitekt-plugin-<version>.jar`. Delete that file when you install the new jar:
+with two versions in `plugins/`, Fiji picks one at random.
+
+</Callout>
+
+Every [release](https://github.com/arkitektio/imagej-arkitekt-plugin/releases/latest) also carries checksums and the same plugin
+as a zip, which unpacks to a single `arkitekt/` folder inside `plugins/`. Remove a previous install before unpacking:
+
+```bash
+rm -rf /path/to/Fiji.app/plugins/arkitekt
+unzip arkitekt-plugin-*.zip -d /path/to/Fiji.app/plugins/
+```
 
 Restart Fiji afterwards. The plugin shows up in the menu under **Plugins › Arkitekt**.
 
