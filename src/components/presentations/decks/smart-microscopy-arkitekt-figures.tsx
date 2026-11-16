@@ -9,9 +9,10 @@
    running on the current slide. Example values (timestamps, coordinates,
    thresholds) are illustrative, not from a real run. */
 
+import { Fragment as ReactFragment } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Fragment } from '@revealjs/react';
-import { Bot, Building2, Check, Cpu, Laptop, Layers, Lock, Microchip, Microscope, Network, NotebookPen, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
+import { Bot, Building2, Check, Cpu, LayoutDashboard, Laptop, Layers, Lock, Microchip, Microscope, Network, NotebookPen, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
 import { cn } from '@/lib/cn';
@@ -2530,6 +2531,109 @@ export function DataKindsFigure() {
           </span>
         </div>
       ))}
+    </div>
+  );
+}
+
+/* --- reproducibility is remixing --------------------------------------------------- */
+
+type RemixPart = { app: string; name: string; kind: 'action' | 'blok' | 'workflow'; icon: LucideIcon };
+const REMIX_ROWS: { kim: RemixPart; theirs: RemixPart & { from: 'kim' | 'own' }; how: 'swap' | 'install' | 'remix' | 'build' }[] = [
+  { kim: { app: 'openuc2', name: 'acquire_image', kind: 'action', icon: Microscope }, theirs: { app: 'nikon', name: 'acquire_image', kind: 'action', icon: Microscope, from: 'own' }, how: 'swap' },
+  { kim: { app: 'stardist', name: 'segment_image', kind: 'action', icon: Cpu }, theirs: { app: 'stardist', name: 'segment_image', kind: 'action', icon: Cpu, from: 'kim' }, how: 'install' },
+  { kim: { app: 'analyzer', name: 'calculate_stain_percentage', kind: 'action', icon: ScanSearch }, theirs: { app: 'analyzer', name: 'calculate_stain_percentage', kind: 'action', icon: ScanSearch, from: 'kim' }, how: 'install' },
+  { kim: { app: 'stainstorm', name: 'run_progress', kind: 'blok', icon: LayoutDashboard }, theirs: { app: 'stainstorm', name: 'run_progress', kind: 'blok', icon: LayoutDashboard, from: 'kim' }, how: 'install' },
+  { kim: { app: 'stainstorm', name: 'process_slides', kind: 'workflow', icon: Workflow }, theirs: { app: 'spheroids', name: 'screen_spheroids', kind: 'workflow', icon: Workflow, from: 'own' }, how: 'remix' },
+  { kim: { app: 'openuc2', name: 'capture_panel', kind: 'blok', icon: LayoutDashboard }, theirs: { app: 'spheroids', name: 'review_panel', kind: 'blok', icon: LayoutDashboard, from: 'own' }, how: 'build' },
+];
+const REMIX_HOW = {
+  swap: 'swap in their scope · same ScopeLike protocol',
+  install: 'install',
+  remix: 'remix · her steps, their scope, one new step',
+  build: 'build their own · a few lines, made for their AI',
+} as const;
+
+function RemixChip({ part, tag, tone, at }: { part: RemixPart; tag?: string; tone: 'kim' | 'own'; at: number }) {
+  const Icon = part.icon;
+  return (
+    <div
+      className={cn('sm-pop flex h-[52px] items-center gap-3 rounded-xl border-2 bg-fd-card px-3 shadow-sm', tone === 'kim' ? 'border-fd-primary/50' : 'border-fd-border')}
+      style={delay(at)}
+    >
+      <span className={cn('flex size-[34px] shrink-0 items-center justify-center rounded-lg', tone === 'kim' ? 'bg-fd-primary/12 text-fd-primary' : 'bg-fd-muted text-fd-muted-foreground')}>
+        <Icon className="size-[20px]" strokeWidth={1.9} />
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="truncate font-mono text-[14.5px] font-semibold">{part.name}</span>
+        <span className="font-mono text-[11.5px] text-fd-muted-foreground">
+          {part.app} · {part.kind}
+        </span>
+      </span>
+      {tag ? (
+        <span className={cn('ml-auto shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-semibold', tone === 'kim' ? 'bg-fd-primary/12 text-fd-primary' : 'bg-fd-muted text-fd-muted-foreground')}>{tag}</span>
+      ) : null}
+    </div>
+  );
+}
+
+/** Reproducing as rebuilding: a partner lab doesn't rerun Kim's frozen
+    script, it builds its own experiment from the parts she published. It
+    swaps in its own microscope where the protocol fits, installs her
+    segmentation, analysis and progress blok, and remixes her workflow. */
+export function RemixReproFigure() {
+  const colW = 380;
+  const rightX = 1180 - colW;
+  const rowY = (i: number) => 32 + i * 61;
+  const midY = (i: number) => rowY(i) + 26;
+  const at = (i: number) => 0.9 + i * 0.3;
+  return (
+    <div
+      className="relative mx-auto h-[440px] w-[1180px]"
+      role="img"
+      aria-label="Kim's lab published its parts: openuc2 acquire_image, stardist segment_image, the analyzer's calculate_stain_percentage, the stainstorm run_progress blok and the process_slides workflow. A partner lab builds its own experiment from them: it swaps in its own Nikon acquire_image, which fits the same ScopeLike protocol, installs Kim's segmentation, analysis and blok, and remixes her workflow into its own screen_spheroids workflow. Next to Kim's capture_panel blok, it builds its own review_panel blok in a few lines, made for its own AI to hand out."
+    >
+      <svg width={1180} height={440} viewBox="0 0 1180 440" className="absolute inset-0" aria-hidden>
+        {REMIX_ROWS.map((r, i) => (
+          <Path
+            key={i}
+            className="sm-draw"
+            style={delay(at(i))}
+            d={`M${colW + 8} ${midY(i)} L${rightX - 8} ${midY(i)}`}
+            stroke={r.how === 'install' ? PRIMARY : MUTED}
+            width={2.4}
+            dash={r.how === 'install' ? undefined : '7 6'}
+            opacity={r.how === 'install' ? 0.7 : 0.9}
+          />
+        ))}
+      </svg>
+
+      <span className="sm-fade absolute left-0 top-0 text-[16px] font-semibold" style={delay(0.1)}>
+        Kim’s lab <span className="font-normal text-fd-muted-foreground">· what she published</span>
+      </span>
+      <span className="sm-fade absolute top-0 text-[16px] font-semibold" style={{ left: rightX, ...delay(0.6) }}>
+        A partner lab <span className="font-normal text-fd-muted-foreground">· their own experiment</span>
+      </span>
+
+      {REMIX_ROWS.map((r, i) => (
+        <ReactFragment key={i}>
+          <div className="absolute" style={{ left: 0, top: rowY(i), width: colW }}>
+            <RemixChip part={r.kim} tone="kim" at={0.2 + i * 0.08} />
+          </div>
+          <span
+            className={cn('sm-in absolute -translate-x-1/2 whitespace-nowrap rounded-full border bg-fd-card px-2.5 py-0.5 text-[12.5px] font-semibold', r.how === 'install' ? 'border-fd-primary/50 text-fd-primary' : 'border-fd-border text-fd-muted-foreground')}
+            style={{ left: 590, top: midY(i) - 13, ...delay(at(i) + 0.3) }}
+          >
+            {REMIX_HOW[r.how]} →
+          </span>
+          <div className="absolute" style={{ left: rightX, top: rowY(i), width: colW }}>
+            <RemixChip part={r.theirs} tone={r.theirs.from} tag={r.theirs.from === 'kim' ? 'from Kim' : 'their own'} at={at(i) + 0.45} />
+          </div>
+        </ReactFragment>
+      ))}
+
+      <p className="sm-in absolute inset-x-0 top-[408px] text-center text-[18px] text-fd-muted-foreground" style={delay(at(REMIX_ROWS.length) + 0.4)}>
+        Not one frozen script to rerun, but <span className="font-semibold text-fd-foreground">typed parts to build on</span>, each with its version.
+      </p>
     </div>
   );
 }

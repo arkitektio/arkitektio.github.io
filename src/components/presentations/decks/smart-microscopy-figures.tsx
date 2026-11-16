@@ -176,6 +176,8 @@ type Night = {
   lines: [string, string][];
   /** Claude's helpful suggestion, which sets it all off. */
   tip: string;
+  /** What Claude says as it rewrites each line, getting ever more pleased with itself. */
+  steps: string[];
   /** Errors that pop up round the cloud. */
   errors: string[];
   /** Kim's thoughts, in the small hours. */
@@ -203,6 +205,14 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
       ['if (uptake < 0.8) print("stain again");', '# TODO: what if the IPs change??'],
     ],
     tip: 'Give every device an HTTP API and send JSON. Easy!',
+    steps: [
+      "I just found the IPs and stuff.",
+      "Oh, here we use the HTTP API. JSON is fine.",
+      "And then StarDist gets its own little server.",
+      "And then the measuring too, why not.",
+      "And then the OT-2. Same trick!",
+      "Done! Hardcoded IPs never change. ✨",
+    ],
     errors: [
       'ConnectionRefusedError: 10.0.0.12:8000',
       'MemoryError in json.dumps',
@@ -225,6 +235,14 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
       ['', 'results.append(uptake)  # race condition?'],
     ],
     tip: 'Use threads, and a join at the end. It’s easy!',
+    steps: [
+      "Let’s speed this up with a thread.",
+      "Oh, and a second one for the other GPU.",
+      "And then we start them both.",
+      "And then a join. Joins always come back.",
+      "Hmm, a sleep(1), just in case.",
+      "Done! Lists are thread-safe, mostly. ✨",
+    ],
     errors: [
       'Exception in thread Thread-2',
       'Thread-1 still alive after 120 s',
@@ -247,6 +265,14 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
       ['', '# where is experiment_one???'],
     ],
     tip: 'Don’t worry, here’s another script that collects the data.',
+    steps: [
+      "Let’s keep the labels on the GPU server.",
+      "Oh, and copy them back with scp.",
+      "And then the metadata goes in the filename.",
+      "And then a plain TIFF. Much smaller!",
+      "And then a log, with timestamps.",
+      "Done! Everything is somewhere. ✨",
+    ],
     errors: [
       'OSError: No space left on device',
       'FileNotFoundError: experiment_one/',
@@ -269,6 +295,14 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
       ['if (uptake < 0.8) print("stain again");', '# pip freeze > requirements.txt  (too late)'],
     ],
     tip: 'Just pin everything in a requirements.txt. Easy!',
+    steps: [
+      "Let’s just track the versions in git.",
+      "Oh, and load the newest model.",
+      "And then a slider, so you can tune it.",
+      "And then a fresh seed. Randomness is good.",
+      "And then the config from your desktop.",
+      "Done! Just pip freeze it later. ✨",
+    ],
     errors: [
       'AttributeError: st.experimental_rerun',
       'CUDA 11.2 ≠ CUDA 12.1',
@@ -280,6 +314,27 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
     night: 'NIGHT 4',
     ending: 'It worked once. That counts, right?',
   },
+};
+
+/** Claude's mark, small: the badge that sweeps over each line it rewrites. */
+function ClaudeMark() {
+  return (
+    <span className="flex size-[24px] shrink-0 items-center justify-center rounded-md bg-[#d97757] text-white shadow-md">
+      <svg viewBox="-12 -12 24 24" width={15} height={15}>
+        {Array.from({ length: 8 }, (_, i) => (
+          <rect key={i} x={-1.6} y={-10} width={3.2} height={9} rx={1.6} fill="currentColor" transform={`rotate(${i * 45})`} />
+        ))}
+      </svg>
+    </span>
+  );
+}
+
+/** The device each night is about, and what it says when it goes wrong. */
+const NIGHT_DEVICE: Record<keyof typeof NIGHTS, { kind: 'ot2' | 'server' | 'microscope'; name: string; error: string }> = {
+  communication: { kind: 'ot2', name: 'the OT-2', error: 'offline' },
+  threads: { kind: 'server', name: 'the GPU server', error: 'hung' },
+  data: { kind: 'microscope', name: 'the microscope', error: 'PC disk full' },
+  repro: { kind: 'server', name: 'the GPU server', error: 'CUDA 11.2 ≠ 12.1' },
 };
 
 /** Where the errors hang off the cloud, and how they tilt. */
@@ -308,25 +363,34 @@ function cloudPath(w: number, h: number, m = 28, r = 34) {
     .join(' ')} Z`;
 }
 
-/** Kim asleep, dreaming of her pipeline, and one night of turning it into
-    a distributed one. Told once per visit, about 12 s:
-    - the dream: the code as it was, in a thought cloud; Kim smiles, z z z;
-    - Claude's helpful tip arrives, and line by line the code is rewritten,
+/** Kim at the bench, late, and one night of turning her pipeline into a
+    distributed one. Told once per visit, about 12 s:
+    - the plan: the code as it was, in a thought cloud; Kim types on her
+      laptop, the night's device (the OT-2, the GPU server, the microscope)
+      sits on the other bench with a green light;
+    - Claude's helpful tip arrives, and line by line Claude sweeps over the
+      code and rewrites it, narrating each change ("I just found the IPs",
+      "and then…"), ever more pleased with itself while it gets worse;
       errors pile up round the cloud, her worries surface, the cloud turns
-      amber, Kim tosses and sweats, the clock runs on;
-    - the morning: Kim wide awake, her line for the night, and on the last
-      night the stamp: IT WORKED. (once) */
+      amber; the device's light goes red, and Kim hops back and forth
+      between the laptop and the device, sweating, while the clock runs on;
+    - the morning: Kim back at the laptop, her line for the night, and on
+      the last night the stamp: IT WORKED. (once) */
 export function NightmareFigure({ night: which }: { night: keyof typeof NIGHTS }) {
   const u = useUid();
   const night = NIGHTS[which];
-  const at = { cloud: 1, tip: 2.6, swap: 3.6, step: 0.8, trouble: 4.6, awake: 9.8, ending: 10.3, stamp: 11 };
+  const at = { cloud: 1, tip: 2.4, swap: 3.4, step: 1.4, trouble: 5.5, awake: 11.6, ending: 12.1, stamp: 12.8 };
   const mutate = (i: number) => at.swap + i * at.step;
-  const errorAt = (i: number) => 4.4 + i * 0.95;
-  const worryAt = (i: number) => 5.2 + i * 1.4;
+  const errorAt = (i: number) => 5.8 + i * 1.6;
+  const worryAt = (i: number) => 6.6 + i * 1.9;
   const v = (o: Record<string, number | string>) =>
     Object.fromEntries(Object.entries(o).map(([k, x]) => [`--${k}`, typeof x === 'number' ? `${x.toFixed(2)}s` : x])) as CSSProperties;
   const W = 800;
   const H = 440;
+  const device = NIGHT_DEVICE[which];
+  const dashX = 72; // from beside the laptop to the device
+  const dashLen = 1.7;
+  const dashes = Math.floor((at.awake - at.trouble) / dashLen);
   const css = `
 .${u}-until, .${u}-span { opacity: 0; }
 section.present .${u}-until { animation: ${u}-until var(--len) linear both; }
@@ -339,15 +403,28 @@ section.present .${u}-old { animation: ${u}-old 0.5s ease-in var(--d) both; }
 .${u}-type { display: inline-block; overflow: hidden; vertical-align: top; white-space: pre; width: calc((var(--n) + 1) * 1ch); }
 section.present .${u}-type { animation: ${u}-type var(--t) steps(var(--n)) var(--d) both; }
 @keyframes ${u}-type { from { width: 0; } }
-.${u}-z { animation: ${u}-z 2.4s ease-out infinite; }
-@keyframes ${u}-z { 0% { opacity: 0; transform: translate(0, 0) scale(0.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(26px, -46px) scale(1.2); } }
-section.present .${u}-shake { animation: ${u}-shake 0.3s linear var(--d) var(--n); }
-@keyframes ${u}-shake { 0%, 100% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-2px, 1px) rotate(-0.8deg); } 75% { transform: translate(2px, -1px) rotate(0.8deg); } }
+.${u}-swoosh { opacity: 0; }
+section.present .${u}-swoosh { animation: ${u}-swoosh 0.75s cubic-bezier(.5,0,.3,1) var(--d) both; }
+@keyframes ${u}-swoosh { 0% { opacity: 0; transform: translateX(-30px); } 15% { opacity: 1; } 85% { opacity: 1; transform: translateX(var(--w)); } 100% { opacity: 0; transform: translateX(var(--w)); } }
+.${u}-red, .${u}-err, .${u}-sweat { opacity: 0; }
+section.present .${u}-dash { animation: ${u}-dash ${dashLen}s ease-in-out ${at.trouble}s ${dashes} both; }
+@keyframes ${u}-dash { 0% { transform: translateX(0); } 45%, 55% { transform: translateX(${-dashX}px); } 100% { transform: translateX(0); } }
+section.present .${u}-hop { animation: ${u}-hop 0.3s ease-in-out ${at.trouble}s ${Math.round((dashLen * dashes) / 0.3)} alternate; }
+@keyframes ${u}-hop { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+section.present .${u}-typing { animation: ${u}-typing 0.25s ease-in-out 0.4s ${Math.round((at.trouble - 0.4) / 0.25)} alternate; }
+@keyframes ${u}-typing { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+section.present .${u}-red { animation: ${u}-blink 0.7s steps(1) ${at.trouble + 0.2}s 8, ${u}-on 0.2s linear ${at.trouble + 0.2 + 5.6}s forwards; }
+@keyframes ${u}-blink { 0% { opacity: 1; } 50% { opacity: 0.15; } }
+section.present .${u}-err { animation: ${u}-pop 0.4s cubic-bezier(.3,1.5,.5,1) ${at.trouble + 0.4}s both; }
+@keyframes ${u}-pop { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: none; } }
+section.present .${u}-sweat { animation: ${u}-sweat 1s ease-in ${at.trouble}s 5; }
+@keyframes ${u}-sweat { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(12px); } }
+@keyframes ${u}-on { from { opacity: 0; } to { opacity: 1; } }
 section.present .${u}-wobble { animation: ${u}-wobble 0.6s ease-in-out var(--d) var(--n); }
 @keyframes ${u}-wobble { 0%, 100% { transform: rotate(0); } 33% { transform: rotate(-0.6deg); } 66% { transform: rotate(0.6deg); } }
 @media (prefers-reduced-motion: reduce) {
-  section.present :is(.${u}-until, .${u}-span, .${u}-old, .${u}-type, .${u}-shake, .${u}-wobble) { animation: none; }
-  .${u}-z { animation: none; }
+  section.present :is(.${u}-until, .${u}-span, .${u}-old, .${u}-type, .${u}-wobble, .${u}-dash, .${u}-hop, .${u}-typing, .${u}-sweat, .${u}-swoosh) { animation: none; }
+  section.present :is(.${u}-red, .${u}-err) { animation: none; opacity: 1; }
 }
 `;
   const skin = '#c68863';
@@ -364,18 +441,25 @@ section.present .${u}-wobble { animation: ${u}-wobble 0.6s ease-in-out var(--d) 
     <div className="relative flex w-full items-center gap-2">
       <LoopStyles css={css} />
 
-      {/* Kim, in bed */}
-      <svg width={330} height={440} viewBox="0 0 330 440" role="img" aria-label={`Kim asleep, ${night.night.toLowerCase()}. She smiles at first, then tosses and sweats, and by ${night.clock[2]} she is wide awake.`} className="shrink-0">
+      {/* Kim at the bench: her laptop, and the night's device */}
+      <svg
+        width={330}
+        height={440}
+        viewBox="0 0 330 440"
+        role="img"
+        aria-label={`Kim at the bench, ${night.night.toLowerCase()}, from ${night.clock[0]} to ${night.clock[2]}. She types on her laptop, then ${device.name} goes red (${device.error}) and she runs back and forth between the laptop and ${device.name}.`}
+        className="shrink-0"
+      >
         {/* the clock on the wall */}
         <g className="sm-pop" style={delay(0.2)}>
           <rect x={30} y={40} width={124} height={52} rx={10} fill="#111827" stroke={BORDER} strokeWidth={2} />
-          <g className={`${u}-until`} style={v({ len: 4.5 })}>
+          <g className={`${u}-until`} style={v({ len: 5.5 })}>
             {clock(night.clock[0])}
           </g>
-          <g className={`${u}-span`} style={v({ d: 4.5, len: 4.3 })}>
+          <g className={`${u}-span`} style={v({ d: 5.5, len: 5.6 })}>
             {clock(night.clock[1])}
           </g>
-          <g className="sm-fade" style={delay(8.8)}>
+          <g className="sm-fade" style={delay(11.1)}>
             {clock(night.clock[2])}
           </g>
           <T x={92} y={108} size={13} mono weight={700} fill={WARN}>
@@ -383,63 +467,95 @@ section.present .${u}-wobble { animation: ${u}-wobble 0.6s ease-in-out var(--d) 
           </T>
         </g>
 
+        {/* the floor and two benches */}
+        <path className="sm-fade" d="M4 404 H326" stroke={BORDER} strokeWidth={4} strokeLinecap="round" />
+        {[8, 212].map((x) => (
+          <g key={x} className="sm-in" style={delay(0.15)}>
+            <rect x={x} y={330} width={112} height={10} rx={3} fill="#a16207" fillOpacity={0.85} />
+            <rect x={x + 8} y={340} width={8} height={64} fill="#8b5e3c" />
+            <rect x={x + 96} y={340} width={8} height={64} fill="#8b5e3c" />
+          </g>
+        ))}
+
+        {/* the night's device, on the left bench */}
+        <g className="sm-in" style={delay(0.3)}>
+          {device.kind === 'ot2' ? (
+            <g stroke={FG} strokeWidth={2.2} strokeLinejoin="round">
+              <rect x={16} y={242} width={96} height={88} rx={8} fill={SURFACE} />
+              <rect x={24} y={254} width={80} height={62} rx={4} fill={PRIMARY} fillOpacity={0.08} />
+              <path d="M24 268 H104" strokeWidth={3} />
+              <rect x={56} y={268} width={14} height={20} rx={3} fill={SURFACE} />
+              <path d="M63 288 V296" strokeWidth={2} />
+              {[36, 54, 72, 90].map((x) => (
+                <rect key={x} x={x - 6} y={300} width={12} height={10} rx={2} fill={MUTED} fillOpacity={0.25} strokeWidth={1.4} />
+              ))}
+            </g>
+          ) : device.kind === 'server' ? (
+            <g stroke={FG} strokeWidth={2.2} strokeLinejoin="round">
+              <rect x={30} y={212} width={68} height={118} rx={6} fill="#1f2937" />
+              {[228, 248, 268, 288].map((y) => (
+                <path key={y} d={`M40 ${y} H88`} stroke="#4b5563" strokeWidth={6} strokeLinecap="round" />
+              ))}
+              <T x={64} y={314} size={12} mono weight={700} fill="#9ca3af">
+                GPU
+              </T>
+            </g>
+          ) : (
+            <g transform="translate(-106 178)" fill={SURFACE} stroke={FG} strokeWidth={2.5} strokeLinejoin="round">
+              <rect x={122} y={140} width={96} height={12} rx={4} />
+              <path d="M204 140 V70 Q204 50 184 50 H170" fill="none" strokeWidth={10} strokeLinecap="round" />
+              <rect x={142} y={36} width={36} height={22} rx={6} />
+              <rect x={153} y={58} width={16} height={26} rx={3} />
+              <polygon points="155,86 167,86 176,108 146,108" fill={PRIMARY} fillOpacity={0.35} stroke="none" />
+              <rect x={132} y={108} width={68} height={8} rx={3} />
+            </g>
+          )}
+          {/* its status light: green, then blinking red */}
+          <circle cx={device.kind === 'server' ? 88 : 104} cy={device.kind === 'server' ? 222 : 250} r={5} fill="#22c55e" />
+          <circle className={`${u}-red`} cx={device.kind === 'server' ? 88 : 104} cy={device.kind === 'server' ? 222 : 250} r={5.5} fill="#ef4444" />
+        </g>
+        {/* what it says */}
+        <g className={`${u}-err`} style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+          <rect x={8} y={168} width={Math.max(84, device.error.length * 8.6 + 24)} height={26} rx={6} fill="#fef2f2" stroke="#ef4444" strokeWidth={1.6} />
+          <T x={8 + Math.max(84, device.error.length * 8.6 + 24) / 2} y={181} size={13} mono weight={700} fill="#b91c1c">
+            ✕ {device.error}
+          </T>
+        </g>
+
+        {/* her laptop, on the right bench */}
+        <g className="sm-in" style={delay(0.25)}>
+          <rect x={236} y={276} width={78} height={50} rx={4} fill="#0f172a" stroke={FG} strokeWidth={2} />
+          {[0, 1, 2, 3].map((i) => (
+            <rect key={i} className="sm-fade" style={delay(0.6 + i * 0.25)} x={243} y={284 + i * 9} width={[44, 58, 36, 50][i]} height={4} rx={2} fill={i === 3 ? WARN : '#94a3b8'} />
+          ))}
+          <path d="M228 326 H322 L316 332 H234 Z" fill={SURFACE} stroke={FG} strokeWidth={2} strokeLinejoin="round" />
+        </g>
+
+        <T className="sm-fade" style={delay(0.5)} x={64} y={428} size={14} fill={MUTED}>
+          {device.name}
+        </T>
+        <T className="sm-fade" style={delay(0.5)} x={268} y={428} size={14} fill={MUTED}>
+          her laptop
+        </T>
+
         {/* thought bubbles up to the cloud */}
         {[
-          [170, 236, 7, 0.5],
-          [204, 204, 11, 0.65],
-          [248, 168, 16, 0.8],
+          [204, 250, 6, 0.5],
+          [238, 220, 9, 0.65],
+          [282, 186, 13, 0.8],
         ].map(([x, y, r, d]) => (
           <circle key={x} className="sm-pop" style={delay(d)} cx={x} cy={y} r={r} fill={SURFACE} stroke={BORDER} strokeWidth={2} />
         ))}
 
-        <g className="sm-pop" style={delay(0.1)}>
-          <g className={`${u}-shake`} style={v({ d: at.trouble, n: String(Math.round((at.awake - at.trouble) / 0.3)) })}>
-            {/* bed */}
-            <rect x={14} y={256} width={22} height={150} rx={6} fill="#8b5e3c" />
-            <rect x={24} y={330} width={292} height={40} rx={8} fill="#a16207" fillOpacity={0.85} />
-            <rect x={36} y={370} width={14} height={36} rx={3} fill="#8b5e3c" />
-            <rect x={292} y={370} width={14} height={36} rx={3} fill="#8b5e3c" />
-            <rect x={32} y={318} width={282} height={20} rx={8} fill={SURFACE} stroke={BORDER} strokeWidth={2} />
-            <ellipse cx={92} cy={308} rx={58} ry={20} fill={SURFACE} stroke={BORDER} strokeWidth={2} />
-            {/* Kim's head on the pillow */}
-            <circle cx={96} cy={268} r={44} fill={hair} />
-            <circle cx={100} cy={272} r={36} fill={skin} />
-            <path d="M66 262 C 70 236, 116 226, 134 252 C 116 246, 92 246, 66 262 Z" fill={hair} />
-            {/* blanket */}
-            <path d="M128 330 C 132 286, 170 262, 214 270 C 256 276, 300 292, 314 330 Z" fill={PRIMARY} fillOpacity={0.55} stroke={PRIMARY} strokeWidth={2} />
-            <path d="M118 318 L132 330 L314 330" fill="none" stroke={PRIMARY} strokeWidth={2} />
-
-            {/* asleep, smiling */}
-            <g className={`${u}-until`} style={v({ len: at.trouble })}>
-              <path d="M82 272 Q88 278 94 272 M106 272 Q112 278 118 272" stroke={ink} strokeWidth={2.5} fill="none" strokeLinecap="round" />
-              <path d="M92 290 Q100 296 108 290" stroke="#7c2d12" strokeWidth={2.5} fill="none" strokeLinecap="round" />
-              <circle cx={78} cy={284} r={5} fill="#f87171" fillOpacity={0.4} />
-              <circle cx={122} cy={284} r={5} fill="#f87171" fillOpacity={0.4} />
-              {[0, 0.8, 1.6].map((d, i) => (
-                <text key={i} className={`${u}-z`} style={{ animationDelay: `${d}s`, transformBox: 'fill-box' }} x={140 + i * 4} y={236 - i * 6} fontSize={18 + i * 4} fontWeight={700} fill={MUTED}>
-                  z
-                </text>
-              ))}
-            </g>
-            {/* tossing, sweating */}
-            <g className={`${u}-span`} style={v({ d: at.trouble, len: at.awake - at.trouble })}>
-              <path d="M82 268 L92 273 L82 278 M118 268 L108 273 L118 278" stroke={ink} strokeWidth={2.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M88 294 Q92 288 96 294 Q100 300 104 294 Q108 288 112 294" stroke="#7c2d12" strokeWidth={2.5} fill="none" strokeLinecap="round" />
-              <path d="M136 246 C 132 254, 132 260, 137 262 C 142 260, 142 254, 136 246 Z" fill="#60a5fa" />
-              <path d="M62 256 C 59 262, 59 267, 63 268 C 67 267, 67 262, 62 256 Z" fill="#60a5fa" />
-              <T x={150} y={226} size={26} weight={800} fill={WARN}>
-                !?
-              </T>
-            </g>
-            {/* awake */}
-            <g className="sm-fade" style={delay(at.awake)}>
-              <circle cx={88} cy={270} r={8} fill="#ffffff" stroke={ink} strokeWidth={1.5} />
-              <circle cx={112} cy={270} r={8} fill="#ffffff" stroke={ink} strokeWidth={1.5} />
-              <circle cx={88} cy={271} r={2.6} fill={ink} />
-              <circle cx={112} cy={271} r={2.6} fill={ink} />
-              <path d="M80 282 Q88 286 96 282 M104 282 Q112 286 120 282" stroke="#7c3aed" strokeOpacity={0.6} strokeWidth={2.5} fill="none" strokeLinecap="round" />
-              <path d="M92 296 H108" stroke="#7c2d12" strokeWidth={2.5} strokeLinecap="round" />
-              <path d="M84 236 L80 222 M100 232 L101 216 M116 236 L122 223" stroke={hair} strokeWidth={3} strokeLinecap="round" />
+        {/* Kim: types, then runs between the laptop and the device */}
+        <g transform="translate(112 266)">
+          <g className={`${u}-dash`}>
+            <g className={`${u}-hop`}>
+              <g className={`${u}-typing`}>
+                <KimFigure size={110} mood="worried" />
+              </g>
+              <path className={`${u}-sweat`} d="M92 20 C 89 26, 89 29, 92 30 C 95 29, 95 26, 92 20 Z" fill="#60a5fa" />
+              <path className={`${u}-sweat`} style={{ animationDelay: `${at.trouble + 0.5}s` }} d="M18 30 C 15 36, 15 39, 18 40 C 21 39, 21 36, 18 30 Z" fill="#60a5fa" />
             </g>
           </g>
         </g>
@@ -470,6 +586,15 @@ section.present .${u}-wobble { animation: ${u}-wobble 0.6s ease-in-out var(--d) 
                     </span>
                   </span>
                 ) : null}
+                {/* Claude, sweeping over the line it is about to rewrite */}
+                <span
+                  aria-hidden
+                  className={`${u}-swoosh pointer-events-none absolute left-0 top-[-2px] z-10 flex h-[30px] items-center`}
+                  style={{ ...v({ d: mutate(i) - 0.2 }), ['--w' as string]: `${Math.max(dream.length, nightmare.length) * 9}px` } as CSSProperties}
+                >
+                  <span className="h-[22px] w-[70px] rounded-l-full bg-gradient-to-r from-transparent to-[#d97757]/35" />
+                  <ClaudeMark />
+                </span>
                 <span className={cn('absolute inset-0', nightmare.startsWith('#') && 'text-[#d97706]')}>
                   <span className={`${u}-type`} style={{ ...v({ d: mutate(i) + 0.3, t: nightmare.length * 0.012 }), ['--n' as string]: nightmare.length } as CSSProperties}>
                     {nightmare}
@@ -500,7 +625,22 @@ section.present .${u}-wobble { animation: ${u}-wobble 0.6s ease-in-out var(--d) 
               </svg>
             </span>
             <span className="sr-only">Claude: </span>
-            {night.tip}
+            <span className="grid">
+              <span className={`${u}-until [grid-area:1/1]`} style={v({ len: at.swap })}>
+                {night.tip}
+              </span>
+              {night.steps.map((say, i) =>
+                i < night.steps.length - 1 ? (
+                  <span key={say} className={`${u}-span [grid-area:1/1]`} style={v({ d: mutate(i), len: at.step })}>
+                    {say}
+                  </span>
+                ) : (
+                  <span key={say} className="sm-fade [grid-area:1/1] font-semibold" style={delay(mutate(i))}>
+                    {say}
+                  </span>
+                ),
+              )}
+            </span>
           </span>
         </div>
 

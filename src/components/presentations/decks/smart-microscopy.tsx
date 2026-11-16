@@ -13,6 +13,7 @@
 
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { Brain, Microscope, Users } from 'lucide-react';
 import { Fragment, Slide } from '@revealjs/react';
 import { cn } from '@/lib/cn';
 import { DeckFrame } from '../deck-frame';
@@ -64,6 +65,7 @@ import {
   AiWorkflowFigure,
   AnywhereFigure,
   BlokOfferFigure,
+  RemixReproFigure,
   DataKindsFigure,
   BlokRemixFigure,
 } from './smart-microscopy-arkitekt-figures';
@@ -149,6 +151,29 @@ function Shot({ src, alt, label = 'Screenshot', height = 440 }: { src: string; a
         }}
         onLoad={() => setReady(true)}
         className={cn('absolute inset-0 size-full bg-black object-contain', !ready && 'invisible')}
+      />
+    </div>
+  );
+}
+
+/** A photo. Until the file exists, a quiet placeholder names the file. */
+function Photo({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  const [ready, setReady] = useState(false);
+  return (
+    <div className={cn('relative overflow-hidden rounded-2xl border border-dashed border-fd-border bg-fd-card/40', className)}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 px-6 text-center">
+        <span className="text-[15px] font-semibold">{alt}</span>
+        <span className="font-mono text-[12px] text-fd-muted-foreground">{src}</span>
+      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        ref={(el) => {
+          if (el?.complete && el.naturalWidth > 0) setReady(true);
+        }}
+        onLoad={() => setReady(true)}
+        className={cn('absolute inset-0 size-full object-cover', !ready && 'invisible')}
       />
     </div>
   );
@@ -255,6 +280,55 @@ export function SmartMicroscopyDeck() {
           <CoverFigure />
         </div>
       </Slide>
+
+      <DeckSlide
+        title="Hi, I’m Johannes"
+        lead="Group leader at the Clinical Institute of Neuroscience."
+        notes="Thirty seconds, no more. I lead a small but growing team at the Clinical Institute of Neuroscience. What we try to do is bring smart microscopy into the clinic, in pathology first, which is where Kim comes from. And, more recently, we have started on smart MRI paradigms: the same idea of an acquisition that adapts to what it sees, on a scanner instead of a microscope. Everything in this talk comes from building that infrastructure."
+      >
+        <div className="grid flex-1 grid-cols-[minmax(0,1fr)_420px] items-center gap-10">
+          <div className="flex flex-col gap-5">
+            {(
+              [
+                { icon: Microscope, title: 'Smart microscopy, in the clinic', text: 'In pathology: acquisition that adapts to the tissue, on the instruments the clinic already runs.', at: 0.3, tag: undefined },
+                { icon: Brain, title: 'Smart MRI paradigms', text: 'The same idea on a scanner: acquisition that reacts to what it sees.', at: 0.55, tag: 'recent' },
+              ] as const
+            ).map(({ icon: Icon, title, text, at, tag }) => (
+              <div key={title} className="sm-in flex gap-4 rounded-2xl border-2 border-fd-border bg-fd-card p-5 shadow-sm" style={delay(at)}>
+                <span className="flex size-[52px] shrink-0 items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
+                  <Icon className="size-[28px]" strokeWidth={1.8} />
+                </span>
+                <span className="flex flex-col gap-1.5">
+                  <span className="flex items-center gap-2 text-[24px] font-semibold leading-tight">
+                    {title}
+                    {tag ? <span className="rounded-full bg-fd-muted px-2.5 py-0.5 text-[14px] font-medium text-fd-muted-foreground">{tag}</span> : null}
+                  </span>
+                  <span className="text-[18px] leading-snug text-fd-muted-foreground">{text}</span>
+                </span>
+              </div>
+            ))}
+            <p className="sm-in flex items-center gap-3 text-[20px] text-fd-muted-foreground" style={delay(0.8)}>
+              <Users className="size-[24px] shrink-0 text-fd-primary" strokeWidth={2} />A small but growing team.
+            </p>
+          </div>
+
+          {/* me, and the group */}
+          <div className="flex flex-col gap-4">
+            <div className="sm-pop flex items-end gap-4" style={delay(0.15)}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`${MEDIA}/johannes.jpg`} alt="Johannes Roos" className="h-[180px] w-[146px] rounded-2xl object-cover shadow-md" />
+              <span className="mb-1 flex flex-col">
+                <span className="text-[22px] font-semibold leading-tight">Johannes Roos</span>
+                <span className="text-[15px] text-fd-muted-foreground">group leader</span>
+              </span>
+            </div>
+            <div className="sm-in flex flex-col gap-1.5" style={delay(0.45)}>
+              <Photo src={`${MEDIA}/group.jpg`} alt="The group at the Institute of Anatomy and Cell Biology" className="h-[236px] w-[420px]" />
+              <span className="text-[14px] text-fd-muted-foreground">The group · Institute of Anatomy and Cell Biology</span>
+            </div>
+          </div>
+        </div>
+      </DeckSlide>
 
       <Slide notes="Kim is a persona, not a real person: say so. She is a pathologist, and she wants several antibodies on the same tumor: CD3, CD20, Ki-67, PanCK. The classic way is one antibody per section: cut the block into serial sections and stain each one with its own antibody. Let it play: the cuts go through the block, each section gets its antibody, and the tumor shrinks from section to section. The fourth cut falls outside the tumor, and that is the PanCK section, the one that was meant to find it. Even where the tumor is there, every section has different cells, so you can never ask what one cell carries. Next slide is her way out.">
         <div className="flex h-[600px] w-full items-center gap-8">
@@ -864,16 +938,12 @@ export function SmartMicroscopyDeck() {
       </DeckSlide>
 
       <DeckSlide
-        title="The workflow running in the lab"
-        notes="Record this one first; videos 3 to 7 reuse the same run. Narrate the steps as they happen: the arm picks up the slide, the OT-2 stains, the arm carries it to the openUC2, tiles, stitch, segment, measure; one round comes out below target and goes back for another."
+        title="Reproducibility is remixing"
+        lead="Reproducing isn’t rerunning one frozen script. Other labs install the parts, swap in their own instruments, and write their own bloks in a few lines, tailored to their own AI."
+        notes="The point of sharing code and data, said plainly: reproducibility in smart microscopy is not one more lab running Kim’s exact script on Kim’s exact microscope. Nobody has her microscope. Go row by row. Their scope is a Nikon, not an openUC2, but it offers acquire_image on the same ScopeLike protocol, so it slots in. Segmentation, the analysis and the progress blok they install as they are, with the versions Kim ran. And her workflow they remix: her steps, their scope, one new step of their own, spheroid classification. Last row, the interface: they don’t have to live with Kim’s UI either. Writing their own blok is a few lines of BSX, here a review panel for their spheroids, and because it is declared and typed like any blok, their own AI can hand it out in the chat, exactly like the capture blok earlier. What gets reproduced is the parts, typed and versioned, and they compose into new experiments; that is how the method spreads."
       >
-        <div className="flex flex-1 items-center justify-center">
-          <Clip
-            n={2}
-            file="02-workflow-run.mp4"
-            length="60 s"
-            shows="process_slides in the lab: Orkestrator next to a camera on the arm, the OT-2 and the openUC2."
-          />
+        <div className="flex flex-1 items-center">
+          <RemixReproFigure />
         </div>
       </DeckSlide>
 
@@ -996,6 +1066,10 @@ export function SmartMicroscopyDeck() {
           <QuirksFigure />
         </div>
       </Slide>
+
+      <StatementSlide notes="A beat between the problem and the answer. We have the cubes, and every cube is a known piece of optics: a lens with a focal length, an LED with a spectrum, a camera with a pixel size. So instead of guessing, why not compute it: simulate what the image is supposed to look like, before anything is built, and compare it to what the camera actually sees. The next two slides are how: Optikit describes the microscope, newswitch simulates it.">
+        So we have cubes, and we know their optics. <Hl>What if we just simulate what the image is supposed to look like?</Hl>
+      </StatementSlide>
 
       <DeckSlide
         title="Design the microscope like a circuit board"

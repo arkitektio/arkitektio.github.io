@@ -27,7 +27,7 @@ export const presentations: Presentation[] = [
       'From workflows to optics: Kim’s AI-built sequential-staining loop works, and still leaves the same debt behind. Arkitekt pays it down line by line, with openUC2 and Optikit as the outlook.',
     topic: 'Arkitekt',
     tags: ['Smart microscopy', 'Workflows', 'openUC2'],
-    slides: 66,
+    slides: 68,
     minutes: 45,
   },
   {
