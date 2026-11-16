@@ -71,6 +71,12 @@ section.present .sm-glow { animation: sm-glow 2.2s ease-in-out var(--d, 0s) infi
 
 .sm-ping { opacity: 0; }
 
+/* Only the slide on screen moves. Every slide stays mounted, so without this
+   the loops on the neighbouring slides keep running too: pause every CSS
+   animation off the current slide, and drop the SMIL tokens there. */
+.reveal .slides section:not(.present) :is(*, *::before, *::after) { animation-play-state: paused !important; }
+.reveal .slides section:not(.present) .sm-token { display: none; }
+
 /* A figure shown again as the ground for an overlay: no build, just there. */
 section.present .sm-still :is(.sm-in, .sm-pop, .sm-fade, .sm-draw, .sm-grow, .sm-grow-y, .sm-converge) { animation: none; }
 

@@ -318,7 +318,7 @@ section.present .${u}-reply { animation: ${u}-reply 0.8s ease-in-out ${at.reply}
   );
 }
 
-/* --- 2a · errors: a record of everything, and workflows that resume ------------------ */
+/* --- 2a · errors: one log of everything, and workflows that recover from it --------- */
 
 type RecordRow = { t: string; kind: 'call' | 'log'; text: string; on?: string; out?: string; replay?: boolean };
 /* Run 41 of process_slides on HE-07: CD20, round 1 comes back at 0.41, so
@@ -367,38 +367,66 @@ function RecordLine({ r, at, replayAt }: { r: RecordRow; at: number; replayAt?: 
   );
 }
 
-export function RecordWinFigure() {
-  const at = (i: number) => 0.5 + i * 0.32;
-  const crashAt = at(RECORD_BEFORE.length) + 0.2;
+/** The hub's log of run 41, in two acts. `observe`: the log fills in, call by
+    call and line by line, from every machine: the measurement you watch a run
+    with. `recover`: the same log is already there when the workflow's process
+    dies; it resumes, the finished calls come back from the log, and the run
+    carries on without staining the slide twice. */
+export function RecordWinFigure({ mode }: { mode: 'observe' | 'recover' }) {
+  const observe = mode === 'observe';
+  const at = (i: number) => (observe ? 0.6 + i * 0.32 : 0.3 + i * 0.06);
+  const crashAt = observe ? 0 : at(RECORD_BEFORE.length) + 0.6;
   const resumeAt = crashAt + 1.5;
+  const doneAt = observe ? at(RECORD_BEFORE.length) + 0.3 : resumeAt + 2.6;
+  const head = 'grid grid-cols-[76px_1fr_80px_150px] items-center gap-x-3 px-4';
   return (
-    <div className="flex size-full flex-col gap-2 pt-1" role="img" aria-label="The hub's record of run 41 of process_slides on slide HE-07: every call on the OT-2, the microscope, the stitcher, StarDist, the analyzer and the robot arm, with its inputs and outputs, and every log line and progress update. CD20 comes back at 0.41, so the slide is stained again. Then the workflow's process dies when Kim closes her laptop. It is resumed in a new process, the finished calls come back from the record without running again, so the slide is not stained twice, and the run carries on: CD20 reaches 0.86 and the next stain is Ki-67.">
+    <div
+      className="flex size-full flex-col gap-2 pt-1"
+      role="img"
+      aria-label={
+        observe
+          ? "The hub's log of run 41 of process_slides on slide HE-07 fills in: every call on the OT-2, the microscope, the stitcher, StarDist, the analyzer and the robot arm, with when it ran, where, and what it returned, and every log line. CD20 comes back at 0.41, so the slide is stained again. One log, for every machine, in one place."
+          : "The same log of run 41. The workflow's process dies when Kim closes her laptop. It is resumed in a new process, the finished calls come back from the log without running again, so the slide is not stained twice, and the run carries on: CD20 reaches 0.86 and the next stain is Ki-67."
+      }
+    >
       <div className="sm-in flex items-center gap-3" style={delay(0.2)}>
         <span className="flex size-[32px] items-center justify-center rounded-lg bg-fd-primary">
           <span className="flex size-[26px] items-center justify-center rounded-md bg-white/95">
             <Logo className="size-[22px]" />
           </span>
         </span>
-        <span className="text-[18px] font-semibold">The record · process_slides · run 41</span>
+        <span className="text-[18px] font-semibold">The log · process_slides · run 41</span>
         <ScrollText className="ml-auto size-[18px] text-fd-muted-foreground" strokeWidth={2} />
         <span className="font-mono text-[12px] text-fd-muted-foreground">every call, input, output, log line</span>
       </div>
       <div className="flex flex-col overflow-hidden rounded-xl border-2 border-fd-border bg-fd-card">
+        {observe ? (
+          <div className={cn(head, 'sm-fade h-[24px] border-b border-fd-border bg-fd-muted/60 text-[12px] font-semibold text-fd-muted-foreground')} style={delay(0.4)}>
+            <span>when</span>
+            <span>what was called</span>
+            <span>on which app</span>
+            <span className="text-right">what came back</span>
+          </div>
+        ) : null}
         {RECORD_BEFORE.map((r, i) => (
-          <RecordLine key={r.t} r={r} at={at(i)} replayAt={resumeAt + 0.5 + i * 0.1} />
+          <RecordLine key={r.t} r={r} at={at(i)} replayAt={observe ? undefined : resumeAt + 0.5 + i * 0.1} />
         ))}
-        <div className="sm-in flex h-[30px] items-center gap-2 border-b border-fd-border bg-red-500/8 px-4 font-mono text-[13px] font-semibold text-red-700" style={delay(crashAt)}>
-          ✕ 14:15:02 · the workflow’s process died: Kim closed her laptop
-        </div>
-        <div className="sm-in flex h-[30px] items-center gap-2 border-b border-fd-border bg-fd-primary/8 px-4 text-[14px] font-semibold text-fd-primary" style={delay(resumeAt)}>
-          <RotateCcw className="size-[16px]" strokeWidth={2.4} /> 14:17:40 · resumed in a new process · finished calls come back from the record
-        </div>
-        {RECORD_AFTER.map((r, i) => (
-          <RecordLine key={r.t} r={r} at={resumeAt + 1.2 + i * 0.45} />
-        ))}
+        {observe ? null : (
+          <>
+            <div className="sm-in flex h-[30px] items-center gap-2 border-b border-fd-border bg-red-500/8 px-4 font-mono text-[13px] font-semibold text-red-700" style={delay(crashAt)}>
+              ✕ 14:15:02 · the workflow’s process died: Kim closed her laptop
+            </div>
+            <div className="sm-in flex h-[30px] items-center gap-2 border-b border-fd-border bg-fd-primary/8 px-4 text-[14px] font-semibold text-fd-primary" style={delay(resumeAt)}>
+              <RotateCcw className="size-[16px]" strokeWidth={2.4} /> 14:17:40 · resumed in a new process · finished calls come back from the log
+            </div>
+            {RECORD_AFTER.map((r, i) => (
+              <RecordLine key={r.t} r={r} at={resumeAt + 1.2 + i * 0.45} />
+            ))}
+          </>
+        )}
       </div>
-      <div className="sm-pop self-start rounded-full bg-emerald-500 px-4 py-1.5 text-[15px] font-semibold text-white shadow-md" style={delay(resumeAt + 2.6)}>
-        Same run, same answers. The slide is not stained twice.
+      <div className="sm-pop self-start rounded-full bg-emerald-500 px-4 py-1.5 text-[15px] font-semibold text-white shadow-md" style={delay(doneAt)}>
+        {observe ? 'One log, for every machine, in one place.' : 'Same run, same answers. The slide is not stained twice.'}
       </div>
     </div>
   );

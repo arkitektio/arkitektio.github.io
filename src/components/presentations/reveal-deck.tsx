@@ -36,6 +36,10 @@ const config: RevealConfig = {
   slideNumber: 'c/t',
   transition: 'slide',
   transitionSpeed: 'fast',
+  // Render fewer slides around the current one (the default is 3 each way):
+  // the decks are heavy with figures, and only the slide on screen animates.
+  viewDistance: 2,
+  mobileViewDistance: 1,
   backgroundTransition: 'fade',
 };
 

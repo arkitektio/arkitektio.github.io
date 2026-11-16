@@ -11,7 +11,7 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 import { Fragment } from '@revealjs/react';
-import { Bot, Check, Cpu, Layers, MessagesSquare, Microscope, Network, NotebookPen, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
+import { Bot, Building2, Check, Cpu, Laptop, Layers, Lock, Microchip, Microscope, Network, NotebookPen, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
 import { cn } from '@/lib/cn';
@@ -220,10 +220,75 @@ const MIDDLE_APPS: HubNode[] = [
   { name: 'Analysis', what: 'StarDist · GPU', icon: Cpu },
   { name: 'Fiji · napari', what: 'macros · viewers', icon: ScanSearch },
 ];
-const MIDDLE_FRONTS: (HubNode & { tag?: string })[] = [
-  { name: 'Orkestrator', what: 'forms · workflows', icon: Workflow },
-  { name: 'Chat', what: 'just ask', icon: MessagesSquare, tag: 'or' },
+
+/** The actions Orkestrator lists, by the app that offers them. */
+const MIDDLE_ACTIONS: [string, string][] = [
+  ['acquire_image', 'openuc2'],
+  ['run_protocol', 'ot2'],
+  ['run_trajectory', 'arm'],
+  ['segment_image', 'stardist'],
 ];
+
+/** Orkestrator in the browser: the hub's actions, and the last result. */
+function OrkestratorScreen({ at }: { at: number }) {
+  return (
+    <div className="sm-pop flex size-full flex-col overflow-hidden rounded-2xl border-2 border-fd-primary/60 bg-fd-card shadow-md" style={delay(at)}>
+      <div className="flex h-[28px] shrink-0 items-center gap-1.5 border-b border-fd-border bg-fd-muted px-3">
+        {['#f87171', '#fbbf24', '#34d399'].map((c) => (
+          <span key={c} className="size-[9px] rounded-full" style={{ background: c }} />
+        ))}
+        <span className="ml-2 flex items-center gap-1.5 text-[12px] font-semibold">
+          <Logo className="size-[14px]" /> Orkestrator
+        </span>
+        <span className="ml-auto font-mono text-[11px] text-fd-muted-foreground">lab › actions</span>
+      </div>
+      <div className="flex flex-1 gap-3 p-3">
+        <div className="flex flex-1 flex-col gap-1.5">
+          {MIDDLE_ACTIONS.map(([name, app], i) => (
+            <span
+              key={name}
+              className={cn('flex items-center gap-2 rounded-lg border px-2 py-1', i === 0 ? 'border-fd-primary/60 bg-fd-primary/10' : 'border-fd-border')}
+            >
+              <span className="font-mono text-[12px] font-semibold">{name}</span>
+              <span className="ml-auto font-mono text-[10.5px] text-fd-muted-foreground">{app}</span>
+            </span>
+          ))}
+        </div>
+        <div className="flex w-[96px] shrink-0 flex-col items-center gap-1">
+          <ImageTile size={92} />
+          <span className="font-mono text-[10.5px] text-fd-muted-foreground">image · stored</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** The Arkitekt app on Kim's phone: the same actions, and the same result. */
+function PhoneScreen({ at }: { at: number }) {
+  return (
+    <div className="sm-pop relative size-full overflow-hidden rounded-[24px] border-[5px] border-zinc-800 bg-gradient-to-b from-slate-700 to-slate-900 shadow-xl dark:border-zinc-600" style={delay(at)}>
+      <span className="absolute left-1/2 top-[5px] h-[11px] w-[40px] -translate-x-1/2 rounded-full bg-zinc-900" />
+      <div className="absolute inset-x-1.5 top-[22px] flex flex-col gap-1.5 rounded-2xl bg-white/95 p-2 text-zinc-900 shadow-lg">
+        <span className="flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-zinc-500">
+          <Logo className="size-[11px]" /> Arkitekt
+        </span>
+        <span className="font-mono text-[9.5px] font-semibold tracking-tight">acquire_image</span>
+        <span className="flex items-center gap-1">
+          <span className="rounded border border-zinc-300 px-1 font-mono text-[9.5px]">10x</span>
+          <span className="ml-auto flex h-[20px] items-center rounded-md bg-fd-primary px-2 text-[10px] font-semibold text-fd-primary-foreground">Run</span>
+        </span>
+      </div>
+      <div className="absolute inset-x-1.5 top-[104px] flex items-center gap-1.5 rounded-2xl bg-white/95 p-1.5 text-zinc-900 shadow-lg">
+        <ImageTile size={40} />
+        <span className="flex flex-col leading-tight">
+          <span className="text-[10px] font-semibold">image</span>
+          <span className="text-[9px] text-zinc-500">just now</span>
+        </span>
+      </div>
+      <span className="absolute bottom-[6px] left-1/2 h-[4px] w-[44px] -translate-x-1/2 rounded-full bg-white/60" />
+    </div>
+  );
+}
 
 /** A horizontal S-curve from one point to another. */
 function sCurve(x1: number, y1: number, x2: number, y2: number) {
@@ -232,39 +297,43 @@ function sCurve(x1: number, y1: number, x2: number, y2: number) {
 }
 
 /** Arkitekt as the middleman: the apps on the left offer their actions, Kim
-    on the right uses them through Orkestrator or a chat. Calls flow left,
-    results flow right; neither side talks to the other directly. */
+    on the right uses them from Orkestrator in the browser or the Arkitekt app
+    on her phone. Calls flow left, results flow right, to both screens;
+    neither side talks to the other directly. */
 export function MiddlemanFigure() {
   const u = useUid();
   const W = 1000;
   const left = { w: 236, ys: [0, 104, 208, 312] };
   const hub = { x: 330, y: 100, w: 230, h: 220 };
-  const front = { x: 622, w: 222, ys: [112, 232] };
-  const kim = { x: 868, y: 128, size: 120, port: [878, 222] as const };
+  // the two interfaces: Orkestrator in the browser, the app on her phone
+  const screen = { x: 612, y: 18, w: 340, h: 196 };
+  const phone = { x: 640, y: 236, w: 112, h: 184 };
+  const kim = { x: 800, y: 270, size: 130 };
 
   const appRows = left.ys.map((y) => y + 38);
   const inPorts = [0, 1, 2, 3].map((i) => hub.y + 50 + i * 40);
-  const frontRows = front.ys.map((y) => y + 38);
+  const fronts = [
+    [screen.x, screen.y + screen.h / 2],
+    [phone.x, phone.y + phone.h / 2],
+  ] as const;
   const outPorts = [hub.y + 50, hub.y + 170];
 
   // Each link once per direction: calls travel towards the apps, results back.
   const appLinks = appRows.map((cy, i) => ({ toHub: sCurve(left.w, cy, hub.x, inPorts[i]), toApp: sCurve(hub.x, inPorts[i], left.w, cy) }));
-  const frontLinks = frontRows.map((cy, i) => ({ toHub: sCurve(front.x, cy, hub.x + hub.w, outPorts[i]), toFront: sCurve(hub.x + hub.w, outPorts[i], front.x, cy) }));
-  const kimLinks = frontRows.map((cy) => sCurve(front.x + front.w, cy, kim.port[0], kim.port[1]));
+  const frontLinks = fronts.map(([fx, fy], i) => ({ toHub: sCurve(fx, fy, hub.x + hub.w, outPorts[i]), toFront: sCurve(hub.x + hub.w, outPorts[i], fx, fy) }));
 
   const dots: [number, number][] = [
     ...appRows.map((cy) => [left.w, cy] as [number, number]),
     ...inPorts.map((py) => [hub.x, py] as [number, number]),
     ...outPorts.map((py) => [hub.x + hub.w, py] as [number, number]),
-    ...frontRows.map((cy) => [front.x, cy] as [number, number]),
-    ...frontRows.map((cy) => [front.x + front.w, cy] as [number, number]),
+    ...fronts.map(([fx, fy]) => [fx, fy] as [number, number]),
   ];
 
   return (
     <div
       className="relative mx-auto h-[420px] w-[1000px]"
       role="img"
-      aria-label="Arkitekt as the middleman: microscopes, robots, analysis and Fiji or napari offer their actions on the left; Kim uses them on the right through Orkestrator or a chat"
+      aria-label="Arkitekt as the middleman: microscopes, robots, analysis and Fiji or napari offer their actions on the left; on the right Kim uses them from Orkestrator in her browser or from the Arkitekt app on her phone, and results come back to both"
     >
       <LoopStyles
         css={`
@@ -281,9 +350,6 @@ export function MiddlemanFigure() {
         ))}
         {frontLinks.map((l, i) => (
           <Path key={`f${i}`} className="sm-draw" style={delay(1.2 + i * 0.12)} d={l.toHub} stroke={BORDER} width={2.2} />
-        ))}
-        {kimLinks.map((d, i) => (
-          <Path key={`k${i}`} className="sm-draw" style={delay(1.45 + i * 0.12)} d={d} stroke={BORDER} width={2.2} dash={i === 1 ? '6 7' : undefined} />
         ))}
         <g className="sm-fade" style={delay(1.5)}>
           {dots.map(([x, y], i) => (
@@ -326,12 +392,16 @@ export function MiddlemanFigure() {
       {MIDDLE_APPS.map((n, i) => (
         <HubCard key={n.name} node={n} x={0} y={left.ys[i]} w={left.w} at={0.3 + i * 0.1} />
       ))}
-      {MIDDLE_FRONTS.map((n, i) => (
-        <HubCard key={n.name} node={n} x={front.x} y={front.ys[i]} w={front.w} at={0.7 + i * 0.12} tone={i === 0 ? 'primary' : 'default'} tag={n.tag} />
-      ))}
+      {/* her two interfaces: the browser and the phone */}
+      <div className="absolute" style={{ left: screen.x, top: screen.y, width: screen.w, height: screen.h }}>
+        <OrkestratorScreen at={0.7} />
+      </div>
+      <div className="absolute" style={{ left: phone.x, top: phone.y, width: phone.w, height: phone.h }}>
+        <PhoneScreen at={0.85} />
+      </div>
 
       {/* the user */}
-      <div className="absolute flex flex-col items-center" style={{ left: kim.x, top: kim.y }}>
+      <div className="sm-in absolute flex flex-col items-center" style={{ left: kim.x, top: kim.y, ...delay(1.0) }}>
         <KimFigure size={kim.size} mood="happy" />
       </div>
 
@@ -843,6 +913,207 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
       {caption(1, '③ pick', 'Orkestrator builds the form from the types: the objectives come from the microscope’s state')}
       {caption(2, '④ assign', 'through the hub, down the openuc2 app’s socket: no open port, no IP')}
       {caption(3, '⑤ result', 'the image goes to the hub first, stored, then on to Kim')}
+    </div>
+  );
+}
+
+/* --- the microscope brings its own UI ------------------------------------------ */
+
+const BLOK_TREE: Tok[][] = [
+  [['app.blok(', ''], ['"capture_panel"', 's'], [', ', ''], ['"""', 's']],
+  [['<Page>', 'f']],
+  [['  <Image ', 'f'], ['value=', ''], ['"$state.camera.frame"', 's'], [' />', 'f']],
+  [['  <Text ', 'f'], ['value=', ''], ['"$state.stage.position"', 's'], [' />', 'f']],
+  [['  <Text ', 'f'], ['value=', ''], ['"$state.optics.objective"', 's'], [' />', 'f']],
+  [['  <Button ', 'f'], ['title=', ''], ['"Capture"', 's']],
+  [['    onClick=', ''], ['"@openuc2.acquire_image()"', 's'], [' />', 'f']],
+  [['</Page>', 'f']],
+  [['"""', 's'], [')', '']],
+];
+
+/** The same three columns as the offer slide, for a blok: the openUC2 app
+    offers its capture panel (a component tree, not code that runs), the hub
+    keeps it next to the actions, and Orkestrator renders it. Then Kim presses
+    Capture, and the press goes back through the hub as a typed call. */
+export function BlokOfferFigure() {
+  const u = useUid();
+  const pw = 300;
+  const hubX = 440;
+  const fx = 880;
+  const gapA = [pw, hubX] as const;
+  const gapB = [hubX + pw, fx] as const;
+  const yLane = 150;
+  const t = { offer: 1.4, kept: 2.3, send: 2.7, render: 3.6, press: 5.4 };
+  const css = `
+:is(.${u}-goA, .${u}-goB, .${u}-call) { opacity: 0; }
+section.present .${u}-goA { animation: ${u}-travel 0.9s ease-in-out ${t.offer}s both; --dx: ${gapA[1] - gapA[0]}; }
+section.present .${u}-goB { animation: ${u}-travel 0.9s ease-in-out ${t.send}s both; --dx: ${gapB[1] - gapB[0]}; }
+section.present .${u}-call { animation: ${u}-back 1.6s ease-in-out ${t.press + 0.3}s both; }
+section.present .${u}-press { animation: ${u}-press 0.4s ease-out ${t.press}s both; }
+section.present .${u}-shot { animation: ${u}-fadein 0.4s ease-out ${t.press + 2}s both; }
+.${u}-shot { opacity: 0; }
+@keyframes ${u}-travel {
+  0% { opacity: 0; transform: translateX(0); }
+  15% { opacity: 1; }
+  85% { opacity: 1; transform: translateX(calc(var(--dx) * 1px)); }
+  100% { opacity: 0; transform: translateX(calc(var(--dx) * 1px)); }
+}
+@keyframes ${u}-back {
+  0% { opacity: 0; transform: translateX(0); }
+  8% { opacity: 1; }
+  92% { opacity: 1; transform: translateX(${gapA[0] - gapB[1]}px); }
+  100% { opacity: 0; transform: translateX(${gapA[0] - gapB[1]}px); }
+}
+@keyframes ${u}-press { 0%, 100% { transform: scale(1); } 45% { transform: scale(0.92); } }
+@keyframes ${u}-fadein { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { section.present :is(.${u}-goA, .${u}-goB, .${u}-call) { animation: none; } }
+`;
+  const card = 'rounded-2xl border-2 border-fd-border bg-fd-card shadow-sm';
+  const head = (icon: ReactNode, title: string, sub: string) => (
+    <div className="flex items-center gap-3">
+      {icon}
+      <span className="flex flex-col">
+        <span className="text-[19px] font-semibold leading-tight">{title}</span>
+        <span className="text-[13px] text-fd-muted-foreground">{sub}</span>
+      </span>
+    </div>
+  );
+  const label = (x: number, at: number, step: string, text: string) => (
+    <span className="sm-in absolute top-[404px] text-center text-[15px]" style={{ left: x, width: pw, ...delay(at) }}>
+      <span className="font-semibold text-fd-primary">{step}</span> <span className="text-fd-muted-foreground">{text}</span>
+    </span>
+  );
+  const pill = (
+    <span className="flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-fd-primary/60 bg-fd-card px-3 py-1 font-mono text-[13px] font-semibold shadow-md">
+      <span className="rounded-full bg-fd-primary px-1.5 py-px text-[9.5px] font-bold uppercase tracking-wide text-fd-primary-foreground">blok</span>
+      capture_panel
+    </span>
+  );
+  return (
+    <div
+      className="relative mx-auto h-[440px] w-[1180px]"
+      role="img"
+      aria-label="The openUC2 microscope app offers a blok, capture_panel: a component tree with its live image, its stage position, its objective and a Capture button that calls acquire_image. The hub keeps the blok next to the microscope's actions. Orkestrator renders it. Kim presses Capture, and the press goes through the hub to the microscope as a typed acquire_image call."
+    >
+      <LoopStyles css={css} />
+      <svg width={1180} height={440} viewBox="0 0 1180 440" className="absolute inset-0" aria-hidden>
+        <line className="sm-fade" style={delay(0.9)} x1={gapA[0]} y1={yLane} x2={gapA[1]} y2={yLane} stroke={PRIMARY} strokeOpacity={0.7} strokeWidth={2.4} strokeDasharray="8 6" />
+        <line className="sm-fade" style={delay(0.9)} x1={gapB[0]} y1={yLane} x2={gapB[1]} y2={yLane} stroke={BORDER} strokeWidth={2.4} />
+        {[gapA[0], gapA[1], gapB[0], gapB[1]].map((x) => (
+          <circle key={x} className="sm-fade" style={delay(0.9)} cx={x} cy={yLane} r={5} fill={SURFACE} stroke={PRIMARY} strokeWidth={2} />
+        ))}
+      </svg>
+
+      {/* the microscope app, and the blok it ships */}
+      <div className="absolute left-0 top-[6px]" style={{ width: pw }}>
+        <div className={cn('sm-pop flex h-[388px] flex-col gap-2.5 p-3.5', card)} style={delay(0.15)}>
+          {head(
+            <span className="flex size-[44px] items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
+              <Microscope className="size-[25px]" strokeWidth={1.8} />
+            </span>,
+            'openUC2 FRAME',
+            'the microscope, as an app',
+          )}
+          <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-fd-border bg-fd-background/60">
+            <span className="border-b border-fd-border px-3 py-1.5 font-mono text-[12px] font-semibold">openuc2 · app.py</span>
+            <pre className="px-2 py-2 font-mono text-[10px] leading-[1.6] tracking-[-0.02em]">
+              {BLOK_TREE.map((line, i) => (
+                <span key={i} className="sm-fade block whitespace-pre" style={delay(0.4 + i * 0.07)}>
+                  {line.map(([text, kind], j) => (
+                    <span key={j} className={TOK_CLASS[kind]}>
+                      {text}
+                    </span>
+                  ))}
+                </span>
+              ))}
+            </pre>
+          </div>
+          <span className="text-[13px] leading-snug text-fd-muted-foreground">A tree of fixed components, bound to its state and its actions. Nothing in it runs code.</span>
+        </div>
+      </div>
+
+      {/* the hub keeps it next to the actions */}
+      <div className="absolute top-[6px]" style={{ left: hubX, width: pw }}>
+        <div className={cn('sm-pop flex h-[388px] flex-col gap-2.5 p-3.5', card)} style={delay(0.3)}>
+          {head(
+            <span className="flex size-[44px] items-center justify-center rounded-xl bg-fd-primary">
+              <span className="flex size-[36px] items-center justify-center rounded-lg bg-white/95">
+                <Logo className="size-[32px]" />
+              </span>
+            </span>,
+            'Arkitekt hub',
+            'what the microscope provides',
+          )}
+          {OFFERS.map((o) => (
+            <div key={o.name} className="flex items-center justify-between rounded-xl border border-l-4 border-fd-border border-l-fd-primary/40 bg-fd-background/60 px-3 py-1.5 opacity-60">
+              <span className="font-mono text-[14px] font-semibold">{o.name}</span>
+              <span className="font-mono text-[11px] text-fd-muted-foreground">action</span>
+            </div>
+          ))}
+          <div className="sm-pop flex flex-col gap-1 rounded-xl border-2 border-fd-primary/70 bg-fd-primary/8 px-3 py-2" style={delay(t.kept)}>
+            <span className="flex items-center gap-2">
+              <span className="font-mono text-[15px] font-semibold">capture_panel</span>
+              <span className="ml-auto rounded-full bg-fd-primary px-2 py-px font-mono text-[10px] font-bold uppercase tracking-wide text-fd-primary-foreground">blok</span>
+            </span>
+            <span className="font-mono text-[11.5px] text-fd-muted-foreground">calls acquire_image</span>
+            <span className="font-mono text-[11.5px] text-fd-muted-foreground">reads camera · stage · optics</span>
+          </div>
+          <span className="sm-in mt-auto text-[13px] leading-snug text-fd-muted-foreground" style={delay(t.kept + 0.4)}>
+            The hub knows exactly which actions and state the blok needs, so it can check them.
+          </span>
+        </div>
+      </div>
+
+      {/* Orkestrator renders it */}
+      <div className="absolute top-[6px]" style={{ left: fx, width: pw }}>
+        <div className={cn('sm-pop flex h-[388px] flex-col gap-2.5 p-3.5', card)} style={delay(0.45)}>
+          {head(
+            <span className="flex size-[44px] items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
+              <Workflow className="size-[25px]" strokeWidth={1.8} />
+            </span>,
+            'Orkestrator',
+            'in Kim’s browser',
+          )}
+          <div className="sm-pop flex flex-1 flex-col gap-2 rounded-xl border-2 border-fd-primary/60 bg-fd-primary/5 p-2.5" style={delay(t.render)}>
+            <span className="flex items-center gap-2">
+              <span className="text-[14px] font-semibold">Capture</span>
+              <span className="font-mono text-[11px] text-fd-muted-foreground">openuc2</span>
+              <span className="ml-auto rounded-full bg-fd-primary px-2 py-px font-mono text-[10px] font-bold uppercase tracking-wide text-fd-primary-foreground">blok</span>
+            </span>
+            <div className="sm-in relative mx-auto overflow-hidden rounded-lg border border-fd-border" style={delay(t.render + 0.3)}>
+              <ImageTile size={140} />
+              <span className={`${u}-shot absolute inset-0 flex items-end justify-end p-1`}>
+                <span className="rounded bg-emerald-500 px-1.5 py-px font-mono text-[10px] font-bold text-white">new image</span>
+              </span>
+            </div>
+            <span className="sm-in font-mono text-[12px]" style={delay(t.render + 0.5)}>
+              stage x 12.4 · y 8.1 mm
+            </span>
+            <span className="sm-in font-mono text-[12px]" style={delay(t.render + 0.6)}>
+              objective 10x
+            </span>
+            <span className={`${u}-press sm-in mt-auto flex h-[34px] items-center justify-center rounded-lg bg-fd-primary text-[14px] font-semibold text-fd-primary-foreground`} style={delay(t.render + 0.7)}>
+              Capture
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* the blok travelling: app → hub → Orkestrator */}
+      <div className={`${u}-goA absolute`} style={{ left: gapA[0] - 70, top: yLane - 16 }}>
+        {pill}
+      </div>
+      <div className={`${u}-goB absolute`} style={{ left: gapB[0] - 70, top: yLane - 16 }}>
+        {pill}
+      </div>
+      {/* the press, back to the microscope as a typed call */}
+      <div className={`${u}-call absolute`} style={{ left: gapB[1] - 80, top: yLane + 26 }}>
+        <span className="flex h-[30px] items-center whitespace-nowrap rounded-full bg-fd-primary px-3 font-mono text-[12.5px] font-bold text-fd-primary-foreground shadow-md">← acquire_image()</span>
+      </div>
+
+      {label(0, t.offer - 0.3, '① offer', 'the blok, with the app')}
+      {label(hubX, t.kept + 0.2, '② keep', 'next to its actions')}
+      {label(fx, t.render + 0.3, '③ render', 'every press is a call')}
     </div>
   );
 }
@@ -1867,6 +2138,398 @@ export function AiWorkflowFigure() {
           ))}
         </pre>
       </div>
+    </div>
+  );
+}
+
+/* --- and the UI: remix the bloks ------------------------------------------------- */
+
+/** One `<Blok use=…>` per tile; `tone` ties the code line to its tile. */
+type RemixTone = 'sky' | 'primary' | 'emerald' | 'amber';
+const REMIX_TONE: Record<RemixTone, { bar: string; dot: string; text: string }> = {
+  sky: { bar: 'border-t-sky-500', dot: 'bg-sky-500', text: 'text-sky-600' },
+  primary: { bar: 'border-t-fd-primary', dot: 'bg-fd-primary', text: 'text-fd-primary' },
+  emerald: { bar: 'border-t-emerald-500', dot: 'bg-emerald-500', text: 'text-emerald-600' },
+  amber: { bar: 'border-t-amber-500', dot: 'bg-amber-500', text: 'text-amber-600' },
+};
+
+/** The page Claude writes: nothing but layout, and the bloks the apps already ship. */
+const REMIX_CODE: { line: Tok[]; tone?: RemixTone }[] = [
+  { line: [['app.blok(', ''], ['"run_dashboard"', 's'], [', ', ''], ['"""', 's']] },
+  { line: [['<Page>', 'f']] },
+  { line: [['  <Stack ', 'f'], ['direction=', ''], ['"row"', 's'], ['>', 'f']] },
+  { line: [['    <Blok ', 'f'], ['use=', ''], ['"scope.live_view"', 's'], [' />', 'f']], tone: 'sky' },
+  { line: [['    <Stack>', 'f']] },
+  { line: [['      <Blok ', 'f'], ['use=', ''], ['"stainstorm.progress"', 's'], [' />', 'f']], tone: 'primary' },
+  { line: [['      <Blok ', 'f'], ['use=', ''], ['"ot2.deck_status"', 's'], [' />', 'f']], tone: 'emerald' },
+  { line: [['      <Blok ', 'f'], ['use=', ''], ['"robot.pose"', 's'], [' />', 'f']], tone: 'amber' },
+  { line: [['    </Stack>', 'f']] },
+  { line: [['  </Stack>', 'f']] },
+  { line: [['</Page>', 'f']] },
+  { line: [['"""', 's'], [', dependencies={', ''], ['"scope"', 's'], [': ScopeLike,', '']] },
+  { line: [['    ', ''], ['"ot2"', 's'], [': OT2Like, ', ''], ['"robot"', 's'], [': ArmLike})', '']] },
+];
+
+/** One tile of the remixed page: the app's own blok, under its name. */
+function RemixTile({ name, app, tone, at, className, children }: { name: string; app: string; tone: RemixTone; at: number; className?: string; children: ReactNode }) {
+  return (
+    <div className={cn('sm-pop flex flex-col gap-2 rounded-xl border border-t-4 border-fd-border bg-fd-card p-3 shadow-sm', REMIX_TONE[tone].bar, className)} style={delay(at)}>
+      <div className="flex items-center gap-2">
+        <span className="text-[14.5px] font-semibold">{name}</span>
+        <span className={cn('font-mono text-[11.5px]', REMIX_TONE[tone].text)}>{app}</span>
+        <span className="ml-auto rounded-full bg-fd-muted px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-fd-muted-foreground">blok</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/** Kim wants one screen to watch the run. Claude doesn't generate a UI: it
+    writes a blok that only lays out the bloks her apps already ship (the
+    openUC2's live view, the run's progress, the OT-2's deck, the arm's pose),
+    and the page fills in tile by tile as each `<Blok use=…>` line appears. */
+export function BlokRemixFigure() {
+  const lineAt = (i: number) => 2.0 + i * 0.16;
+  const tileAt = (tone: RemixTone) => lineAt(REMIX_CODE.findIndex((l) => l.tone === tone)) + 0.15;
+  const done = lineAt(REMIX_CODE.length) + 0.3;
+  const code = 'font-mono text-[13.5px] text-fd-primary';
+  const progress: [string, string, 'done' | 'now' | 'todo'][] = [
+    ['CD3', '84 % ✓', 'done'],
+    ['CD20', 'round 2 …', 'now'],
+    ['Ki-67', '', 'todo'],
+    ['PanCK', '', 'todo'],
+  ];
+  return (
+    <div
+      className="relative mx-auto grid h-[440px] w-[1180px] grid-cols-[400px_1fr] gap-5"
+      role="img"
+      aria-label="Kim asks for one screen to watch her run. Claude writes a blok called run_dashboard that contains no new components, only the bloks her apps already ship: the openUC2 live view, the stainstorm run progress, the OT-2 deck status and the robot arm's pose. The dashboard fills in tile by tile as each line appears."
+    >
+      {/* the ask, and the page Claude writes */}
+      <div className="flex flex-col gap-2.5">
+        <div className="sm-in self-end rounded-2xl rounded-br-md bg-fd-primary px-4 py-2.5 text-[16px] leading-snug text-fd-primary-foreground shadow-sm" style={delay(0.3)}>
+          And give me one screen to watch the run.
+        </div>
+        <div className="sm-in flex items-start gap-2.5" style={delay(1.0)}>
+          <span className="flex size-[30px] shrink-0 items-center justify-center rounded-lg bg-[#d97757] text-[18px] font-bold text-white">✻</span>
+          <span className="rounded-2xl rounded-tl-md border border-fd-border bg-fd-card px-4 py-2.5 text-[15.5px] leading-snug shadow-sm">
+            Your apps already ship bloks for that. Here’s a page made of <code className={code}>four</code> of them:
+          </span>
+        </div>
+        <div className="sm-pop mt-auto flex flex-col overflow-hidden rounded-2xl border-2 border-fd-border bg-fd-card shadow-sm" style={delay(1.7)}>
+          <div className="flex h-[32px] shrink-0 items-center gap-2 border-b border-fd-border px-4">
+            <span className="font-mono text-[13px] font-semibold">stainstorm.py</span>
+            <span className="ml-auto font-mono text-[11.5px] text-fd-muted-foreground">no new components</span>
+          </div>
+          <pre className="px-4 py-2 font-mono text-[12.5px] leading-[1.42]">
+            {REMIX_CODE.map(({ line, tone }, i) => (
+              <span key={i} className={cn('sm-fade relative block min-h-[1.42em] whitespace-pre', tone && 'rounded bg-fd-muted/60')} style={delay(lineAt(i))}>
+                {tone ? <span className={cn('absolute -left-2.5 top-[5px] size-[7px] rounded-full', REMIX_TONE[tone].dot)} /> : null}
+                {line.map(([text, kind], j) => (
+                  <span key={j} className={TOK_CLASS[kind]}>
+                    {text}
+                  </span>
+                ))}
+              </span>
+            ))}
+          </pre>
+        </div>
+      </div>
+
+      {/* the page it becomes, in Orkestrator */}
+      <div className="flex flex-col gap-3">
+        <div className="sm-pop flex flex-1 flex-col overflow-hidden rounded-2xl border-2 border-fd-border bg-fd-muted/40 shadow-sm" style={delay(1.9)}>
+          <div className="flex h-[36px] shrink-0 items-center gap-2 border-b border-fd-border bg-fd-card px-4">
+            <span className="size-[10px] rounded-full bg-fd-border" />
+            <span className="size-[10px] rounded-full bg-fd-border" />
+            <span className="ml-2 font-mono text-[13px] font-semibold">Orkestrator · run_dashboard</span>
+            <span className="ml-auto font-mono text-[12px] text-fd-muted-foreground">HE-07 · process_slides</span>
+          </div>
+          <div className="grid flex-1 grid-cols-[300px_1fr] gap-3 p-3">
+            <RemixTile name="Live view" app="openuc2" tone="sky" at={tileAt('sky')}>
+              <div className="relative h-[232px] overflow-hidden rounded-lg border border-fd-border">
+                <ImageTile size={276} />
+                <span className="absolute left-2 top-2 flex items-center gap-1.5 rounded bg-black/60 px-1.5 py-0.5 font-mono text-[11px] text-white">
+                  <span className="size-[7px] animate-pulse rounded-full bg-red-500" /> live · 10x
+                </span>
+                <span className="absolute bottom-2 right-2 rounded bg-black/60 px-1.5 py-0.5 font-mono text-[11px] text-white">tile 14 / 40</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="rounded-md border border-fd-border px-2 py-1 font-mono text-[12px]">20 ms</span>
+                <span className="ml-auto rounded-md bg-fd-primary px-3 py-1 text-[12.5px] font-semibold text-fd-primary-foreground">Capture</span>
+              </div>
+            </RemixTile>
+            <div className="flex flex-col gap-3">
+              <RemixTile name="Run progress" app="stainstorm" tone="primary" at={tileAt('primary')}>
+                <div className="grid grid-cols-4 gap-2">
+                  {progress.map(([stain, note, state]) => (
+                    <div
+                      key={stain}
+                      className={cn(
+                        'flex flex-col rounded-md border px-2 py-1',
+                        state === 'done' && 'border-emerald-500/50 bg-emerald-500/10',
+                        state === 'now' && 'border-amber-500/60 bg-amber-500/10',
+                        state === 'todo' && 'border-fd-border text-fd-muted-foreground',
+                      )}
+                    >
+                      <span className="text-[13px] font-semibold">{stain}</span>
+                      <span className="min-h-[1.2em] font-mono text-[11px]">{note}</span>
+                    </div>
+                  ))}
+                </div>
+              </RemixTile>
+              <RemixTile name="Deck" app="ot2" tone="emerald" at={tileAt('emerald')}>
+                <div className="flex items-center gap-3">
+                  <div className="grid grid-cols-3 gap-1">
+                    {Array.from({ length: 6 }, (_, i) => (
+                      <span key={i} className={cn('h-[16px] w-[24px] rounded-sm border', i === 1 ? 'border-emerald-500 bg-emerald-500/40' : 'border-fd-border bg-fd-muted/60')} />
+                    ))}
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1">
+                    <span className="font-mono text-[12.5px]">stain_CD20 · step 4 / 9</span>
+                    <span className="h-[6px] w-full overflow-hidden rounded-full bg-fd-border">
+                      <span className="block h-full w-[44%] rounded-full bg-emerald-500" />
+                    </span>
+                  </div>
+                </div>
+              </RemixTile>
+              <RemixTile name="Arm" app="robot" tone="amber" at={tileAt('amber')}>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[12.5px]">at scope · holding HE-07</span>
+                  <span className="ml-auto rounded-md border border-fd-border px-3 py-1 text-[12.5px] font-semibold">Home</span>
+                </div>
+              </RemixTile>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-6">
+          {['Each tile is its app’s own blok', 'Buttons stay typed calls', 'Nothing generated'].map((p, i) => (
+            <span key={p} className="sm-in flex items-center gap-1.5 text-[15px] text-fd-muted-foreground" style={delay(done + i * 0.25)}>
+              <Check className="size-[16px] shrink-0 text-emerald-600" strokeWidth={3} /> {p}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* --- connect from anywhere, encrypted --------------------------------------------- */
+
+type Place = { place: string; name: string; sub: string; icon: LucideIcon; x: number; y: number; port: [number, number]; hubPort: [number, number]; tunnel: string };
+
+/** Where Kim's apps actually run: none of them reachable from outside, all of
+    them dialling out to the hub. The ESP32 speaks TLS, not WireGuard. */
+const PLACES: Place[] = [
+  { place: 'Lab network · behind NAT', name: 'openUC2 PC', sub: 'acquire · stage', icon: Microscope, x: 0, y: 0, port: [300, 62], hubPort: [480, 120], tunnel: 'WireGuard' },
+  { place: 'University HPC · firewalled', name: 'GPU node', sub: 'SLURM job · StarDist', icon: Server, x: 0, y: 232, port: [300, 294], hubPort: [480, 190], tunnel: 'WireGuard' },
+  { place: 'On the train', name: 'Kim’s laptop', sub: 'phone hotspot', icon: Laptop, x: 880, y: 0, port: [880, 62], hubPort: [700, 120], tunnel: 'WireGuard' },
+  { place: 'Partner institute', name: 'napari', sub: 'a collaborator’s PC', icon: Building2, x: 880, y: 232, port: [880, 294], hubPort: [700, 190], tunnel: 'WireGuard' },
+];
+const ESP = { x: 440, y: 316, w: 300, port: [590, 316] as [number, number], hubPort: [590, 236] as [number, number] };
+
+function PlaceCard({ place, name, sub, icon: Icon, at, w = 300 }: { place: string; name: string; sub: string; icon: LucideIcon; at: number; w?: number }) {
+  return (
+    <div className="sm-pop flex flex-col gap-2 rounded-2xl border-2 border-dashed border-fd-border bg-fd-card/40 p-3" style={{ width: w, ...delay(at) }}>
+      <span className="text-[13px] text-fd-muted-foreground">{place}</span>
+      <div className="flex items-center gap-3 rounded-xl border-2 border-fd-border bg-fd-card px-3 py-2 shadow-sm">
+        <span className="flex size-[40px] shrink-0 items-center justify-center rounded-lg bg-fd-primary/12 text-fd-primary">
+          <Icon className="size-[22px]" strokeWidth={1.8} />
+        </span>
+        <span className="flex min-w-0 flex-col">
+          <span className="text-[18px] font-semibold leading-tight">{name}</span>
+          <span className="truncate font-mono text-[12px] text-fd-muted-foreground">{sub}</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function TunnelBadge({ x, y, label, at }: { x: number; y: number; label: string; at: number }) {
+  return (
+    <span
+      className="sm-pop absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 whitespace-nowrap rounded-full border border-fd-primary/50 bg-fd-card px-2 py-0.5 font-mono text-[11.5px] font-semibold text-fd-primary shadow-sm"
+      style={{ left: x, top: y, ...delay(at) }}
+    >
+      <Lock className="size-[12px]" strokeWidth={2.6} /> {label}
+    </span>
+  );
+}
+
+/** Connection, the second blow: the same handshake works from anywhere. A
+    microscope PC behind the lab's NAT, a GPU node inside the HPC firewall, a
+    laptop on a hotspot, a collaborator's institute, and an ESP32 on the bench
+    all dial out to the hub through an encrypted tunnel. Nothing opens a port. */
+export function AnywhereFigure() {
+  const hub = { x: 480, y: 84, w: 220, h: 152 };
+  const links = [
+    ...PLACES.map((p) => ({ d: sCurve(p.port[0], p.port[1], p.hubPort[0], p.hubPort[1]), back: sCurve(p.hubPort[0], p.hubPort[1], p.port[0], p.port[1]), mid: [(p.port[0] + p.hubPort[0]) / 2, (p.port[1] + p.hubPort[1]) / 2], label: p.tunnel })),
+    { d: `M${ESP.port[0]} ${ESP.port[1]} L${ESP.hubPort[0]} ${ESP.hubPort[1]}`, back: `M${ESP.hubPort[0]} ${ESP.hubPort[1]} L${ESP.port[0]} ${ESP.port[1]}`, mid: [ESP.port[0], (ESP.port[1] + ESP.hubPort[1]) / 2], label: 'TLS' },
+  ];
+  return (
+    <div
+      className="relative mx-auto h-[430px] w-[1180px]"
+      role="img"
+      aria-label="Five apps in five places dial out to the Arkitekt hub: the openUC2 PC behind the lab's NAT, a GPU node running a SLURM job inside the university HPC firewall, Kim's laptop on a phone hotspot on the train, napari at a partner institute, all over WireGuard, and an ESP32 on the bench over TLS. No open ports, no public IP."
+    >
+      <svg width={1180} height={430} viewBox="0 0 1180 430" className="absolute inset-0" aria-hidden>
+        {links.map((l, i) => (
+          <Path key={i} className="sm-draw" style={delay(1.1 + i * 0.12)} d={l.d} stroke={PRIMARY} width={3} opacity={0.45} />
+        ))}
+        <g className="sm-fade" style={delay(1.9)}>
+          {links.map((l, i) => (
+            <g key={i}>
+              <Token path={l.d} dur={2.4} phase={i * 0.19}>
+                <circle r={5.5} fill={PRIMARY} />
+              </Token>
+              <Token path={l.back} dur={2.4} phase={0.5 + i * 0.19}>
+                <rect x={-5} y={-5} width={10} height={10} rx={2.5} fill={SURFACE} stroke={PRIMARY} strokeWidth={2} />
+              </Token>
+            </g>
+          ))}
+        </g>
+      </svg>
+
+      <p className="sm-in absolute left-[310px] top-0 w-[560px] text-center text-[17px] leading-snug text-fd-muted-foreground" style={delay(2.3)}>
+        Every connection dials out. <span className="font-semibold text-fd-foreground">No open ports, no public IP.</span>
+      </p>
+
+      {PLACES.map((p, i) => (
+        <div key={p.name} className="absolute" style={{ left: p.x, top: p.y }}>
+          <PlaceCard {...p} at={0.3 + i * 0.12} />
+        </div>
+      ))}
+
+      {/* the ESP32 on the bench */}
+      <div className="absolute" style={{ left: ESP.x, top: ESP.y }}>
+        <PlaceCard place="On the bench · the lab Wi-Fi" name="ESP32" sub="LED controller · 520 kB" icon={Microchip} at={0.8} w={ESP.w} />
+      </div>
+
+      {/* the hub */}
+      <div className="absolute" style={{ left: hub.x, top: hub.y, width: hub.w, height: hub.h }}>
+        <div className="sm-pop flex size-full flex-col items-center justify-center gap-2 rounded-[26px] bg-fd-primary text-fd-primary-foreground shadow-xl" style={delay(0.15)}>
+          <span className="flex size-[54px] items-center justify-center rounded-2xl bg-white/95 shadow-sm">
+            <Logo className="size-[44px]" />
+          </span>
+          <span className="text-[26px] font-bold leading-none tracking-[-0.02em]">Arkitekt</span>
+          <span className="font-mono text-[12px] opacity-85">your hub, wherever it runs</span>
+        </div>
+      </div>
+
+      {links.map((l, i) => (
+        <TunnelBadge key={i} x={l.mid[0]} y={l.mid[1]} label={l.label} at={1.5 + i * 0.12} />
+      ))}
+    </div>
+  );
+}
+
+/* --- not only image data ---------------------------------------------------------- */
+
+/** A tiny sketch of what each kind of data looks like. */
+function KindSketch({ kind }: { kind: 'image' | 'timeseries' | 'flim' | 'spectral' | 'multichannel' | 'volume' | 'table' | 'mesh' }) {
+  const s = { width: 96, height: 60, viewBox: '0 0 96 60', className: 'block shrink-0', 'aria-hidden': true } as const;
+  switch (kind) {
+    case 'image':
+      return (
+        <svg {...s}>
+          <rect x={18} y={0} width={60} height={60} rx={6} fill="#f6eef3" stroke={BORDER} />
+          {[[30, 14, 5, 0], [50, 10, 4, 1], [64, 24, 5, 0], [36, 36, 5, 1], [56, 44, 4, 0], [28, 50, 3, 1]].map(([cx, cy, r, t], i) => (
+            <circle key={i} cx={cx} cy={cy} r={r} fill={t ? '#8a5a2b' : '#6b5aa6'} fillOpacity={0.85} />
+          ))}
+        </svg>
+      );
+    case 'timeseries':
+      return (
+        <svg {...s}>
+          {[12, 30, 48].map((y, k) => (
+            <path key={y} d={`M2 ${y} ${Array.from({ length: 23 }, (_, i) => `L${6 + i * 4} ${y - ([5, 13, 19][k] === i || [6, 14, 20][k] === i ? 10 : [7, 15, 21][k] === i ? 5 : Math.sin(i + k) * 1.2)}`).join(' ')}`} fill="none" stroke={PRIMARY} strokeWidth={1.6} strokeLinejoin="round" />
+          ))}
+        </svg>
+      );
+    case 'flim':
+      return (
+        <svg {...s}>
+          <path d="M8 56 A40 40 0 0 1 88 56" fill="none" stroke={MUTED} strokeWidth={1.4} />
+          <line x1={4} y1={56} x2={92} y2={56} stroke={BORDER} strokeWidth={1.4} />
+          <ellipse cx={58} cy={32} rx={13} ry={9} fill="#38bdf8" fillOpacity={0.55} />
+          <ellipse cx={58} cy={32} rx={6} ry={4} fill="#0ea5e9" />
+        </svg>
+      );
+    case 'spectral':
+      return (
+        <svg {...s}>
+          <defs>
+            <linearGradient id="kind-rainbow" x1="0" x2="1">
+              {['#7c3aed', '#2563eb', '#10b981', '#eab308', '#f97316', '#dc2626'].map((c, i) => (
+                <stop key={c} offset={i / 5} stopColor={c} />
+              ))}
+            </linearGradient>
+          </defs>
+          <path d="M4 54 C 22 54, 28 12, 42 12 C 54 12, 58 40, 68 40 C 76 40, 80 28, 92 54 Z" fill="url(#kind-rainbow)" fillOpacity={0.75} />
+        </svg>
+      );
+    case 'multichannel':
+      return (
+        <svg {...s}>
+          {['#2563eb', '#10b981', '#dc2626'].map((c, i) => (
+            <rect key={c} x={18 + i * 10} y={4 + i * 6} width={44} height={44} rx={6} fill={c} fillOpacity={0.25} stroke={c} strokeWidth={1.4} />
+          ))}
+        </svg>
+      );
+    case 'volume':
+      return (
+        <svg {...s}>
+          <path d="M30 18 L54 6 L78 18 L78 46 L54 58 L30 46 Z" fill={PRIMARY} fillOpacity={0.12} stroke={PRIMARY} strokeWidth={1.4} />
+          <path d="M30 18 L54 30 L78 18 M54 30 L54 58" fill="none" stroke={PRIMARY} strokeWidth={1.4} />
+        </svg>
+      );
+    case 'table':
+      return (
+        <svg {...s}>
+          <rect x={10} y={4} width={76} height={52} rx={5} fill={SURFACE} stroke={BORDER} />
+          <rect x={10} y={4} width={76} height={11} rx={5} fill={MUTED} fillOpacity={0.2} />
+          {[15, 25, 35, 45].map((y) => (
+            <line key={y} x1={10} y1={y} x2={86} y2={y} stroke={BORDER} />
+          ))}
+          {[35, 60].map((x) => (
+            <line key={x} x1={x} y1={4} x2={x} y2={56} stroke={BORDER} />
+          ))}
+        </svg>
+      );
+    case 'mesh':
+      return (
+        <svg {...s}>
+          <ellipse cx={48} cy={30} rx={30} ry={24} fill={PRIMARY} fillOpacity={0.1} stroke={PRIMARY} strokeWidth={1.4} />
+          <path d="M18 30 Q48 44 78 30 M18 30 Q48 16 78 30 M48 6 Q34 30 48 54 M48 6 Q62 30 48 54" fill="none" stroke={PRIMARY} strokeWidth={1} strokeOpacity={0.7} />
+        </svg>
+      );
+  }
+}
+
+const DATA_KINDS: { kind: Parameters<typeof KindSketch>[0]['kind']; name: string; what: string }[] = [
+  { kind: 'image', name: 'Images', what: 'tiles, mosaics, slides' },
+  { kind: 'multichannel', name: 'Multichannel', what: 'one channel per stain' },
+  { kind: 'volume', name: 'Volumes', what: 'z-stacks, light sheet' },
+  { kind: 'timeseries', name: 'Time series', what: 'calcium imaging · ΔF/F' },
+  { kind: 'flim', name: 'FLIM', what: 'lifetimes · phasor' },
+  { kind: 'spectral', name: 'Spectral', what: 'a spectrum per pixel' },
+  { kind: 'table', name: 'Tables', what: 'measurements per cell' },
+  { kind: 'mesh', name: 'Meshes', what: 'segmented 3D surfaces' },
+];
+
+/** The kinds of data mikro keeps, each as its own typed dataset. */
+export function DataKindsFigure() {
+  return (
+    <div className="mx-auto grid w-[1180px] grid-cols-4 gap-4" role="img" aria-label="Mikro keeps more than images: multichannel images, volumes, time series such as calcium imaging, FLIM lifetimes with their phasor, spectral data, tables of measurements per cell, and meshes.">
+      {DATA_KINDS.map((k, i) => (
+        <div key={k.name} className="sm-pop flex flex-col items-center gap-3 rounded-2xl border-2 border-fd-border bg-fd-card px-4 py-5 shadow-sm" style={delay(0.2 + i * 0.1)}>
+          <KindSketch kind={k.kind} />
+          <span className="flex flex-col items-center gap-0.5">
+            <span className="text-[21px] font-semibold leading-tight">{k.name}</span>
+            <span className="font-mono text-[13px] text-fd-muted-foreground">{k.what}</span>
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
