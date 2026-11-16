@@ -35,6 +35,9 @@ import {
   BetterFigure,
   ClaudeChatFigure,
   ChromogenicRoundFigure,
+  CyclingIdeaFigure,
+  AllBrownFigure,
+  KimAtWork,
   CollapseFigure,
   DistributedMemeFigure,
   CoverFigure,
@@ -52,10 +55,15 @@ import {
   YearsFigure,
 } from './smart-microscopy-figures';
 import { DreamLab3D } from './smart-microscopy-dream-3d';
+import { OptikitCubes3D, landsAt } from './smart-microscopy-cubes-3d';
+
+/** The parts of the 3D build, in the order they snap in (`CUBE_ORDER`). */
+const CUBE_PARTS = ['fiber holder', 'blue laser', 'mirror', 'dichroic', 'objective', 'mirror', 'sample stage', 'camera', 'controller'];
 import {
   BloksFigure,
   CoordsFigure,
   HubFigure,
+  MiddlemanFigure,
   OfferFigure,
   WorkflowFigure,
   AiWorkflowFigure,
@@ -67,6 +75,7 @@ import {
   ShareFigure,
 } from './smart-microscopy-arkitekt-figures';
 import { AgentRightsFigure, BlokChatFigure, PitchFigure } from './smart-microscopy-llm-figures';
+import { OptikitBenchFigure, QuestionScopesFigure, QuirksFigure, SensorSpacesFigure, SimulateFigure } from './smart-microscopy-optics-figures';
 
 const MEDIA = '/presentations/smart-microscopy';
 
@@ -375,25 +384,49 @@ export function SmartMicroscopyDeck() {
         </div>
       </Slide>
 
-      <Slide notes="Her way out: Kim reads about chromogenic cycling and tries it out, by hand. Keep every antibody on the same slide: stain, look, wash the chromogen off, stain the next one. The tumor can’t wander off, and every cell carries the whole panel. Let the loop play once and narrate the four trips. One: stain 1 goes on, she carries the slide to the microscope and takes image 1. Two: wash 1, back to the microscope, and the stain is not completely gone; she writes that down. Three: wash 2, and now it is completely gone. Four: stain 2, a different antibody from its own bottle, in its own colour, on other cells of the same tissue; she takes image 2, and on the computer the two images are overlaid. That overlay is the multi-staining: two antibodies, one slide, the same cells. What she discovers: if she does it exactly right, and the cells come out of the wash unstained (the cells, not the artifacts: a fold or a speck of debris keeps the chromogen forever and means nothing), she can reliably stain again. Opening total is about 9 minutes; if short on time, drop “The lab’s reality” first.">
+      <Slide notes="Then Kim hears about chromogenic cycling, at a talk. The idea fits on one slide: keep the tissue on one slide and cycle. Stain with an antibody and its chromogen, image the slide, wash until the colour is completely gone, then the next antibody. Let the dot go round once per antibody: CD3, CD20, Ki-67, PanCK, each marking its own cells, one image per round. At the end the four images overlay, and every marker sits on the same cells. That is exactly what the four serial sections on the last slide could not give her. Next slide: she tries it, by hand.">
         <div className="flex h-[600px] w-full items-center gap-8">
           <div className="flex flex-1 flex-col gap-7">
             <div className="sm-in flex flex-col gap-2" style={delay(0.2)}>
               <Eyebrow>Meet Kim</Eyebrow>
-              <h2 className="text-[52px] font-bold leading-[1.05] tracking-[-0.025em]">Chromogenic cycling</h2>
+              <h2 className="text-[48px] font-bold leading-[1.05] tracking-[-0.025em]">Then she hears about chromogenic cycling</h2>
+            </div>
+            <div className="flex items-end gap-3">
+              <div className="shrink-0">
+                <KimFigure size={130} />
+              </div>
+              <div className="sm-pop relative mb-14 flex-1 rounded-3xl rounded-bl-sm border-2 border-fd-border bg-fd-card px-6 py-4 shadow-sm" style={delay(0.9)}>
+                <span className="font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-fd-muted-foreground">at a talk</span>
+                <p className="mt-1 text-[24px] font-semibold leading-snug">
+                  “Stain, image, wash the colour off, stain the next one. <Hl>All on the same slide.</Hl>”
+                </p>
+              </div>
+            </div>
+          </div>
+          <CyclingIdeaFigure />
+        </div>
+      </Slide>
+
+      <StatementSlide
+        eyebrow="Meet Kim"
+        notes="The only problem. On the last slide every antibody had its own colour; in practice nearly every chromogen is brown, DAB. So after round 2, a brown cell is either the new antibody, or the old one that never washed off. Round 1 marks the CD3 cells, the wash leaves a few of them faintly brown, and in round 2 those leftovers look exactly like CD20. The only way to know is to look after every wash, and wash again until it is really gone. That is what she does on the next slide, by hand."
+        sub="Everything is brown. How do I know the stain from the last round is gone?"
+        figure={<AllBrownFigure />}
+      >
+        The only problem?
+      </StatementSlide>
+
+      <Slide notes="Her way out: Kim tries chromogenic cycling out, by hand. Keep every antibody on the same slide: stain, look, wash the chromogen off, stain the next one. The tumor can’t wander off, and every cell carries the whole panel. Let the loop play once and narrate the four trips. One: stain 1 goes on, she carries the slide to the microscope and takes image 1. Two: wash 1, back to the microscope, and the stain is not completely gone; she writes that down: “Still too much. Let’s wash again.” Three: wash 2, and now it is completely gone: “It’s done, let’s go!” Four: stain 2, a different antibody from its own bottle, in its own colour, on other cells of the same tissue; she takes image 2, and on the computer the two images are overlaid. That overlay is the multi-staining: two antibodies, one slide, the same cells. What she discovers: if she does it exactly right, and the cells come out of the wash unstained (the cells, not the artifacts: a fold or a speck of debris keeps the chromogen forever and means nothing), she can reliably stain again. Opening total is about 9 minutes; if short on time, drop “The lab’s reality” first.">
+        <div className="flex h-[600px] w-full items-center gap-8">
+          <div className="flex flex-1 flex-col gap-7">
+            <div className="sm-in flex flex-col gap-2" style={delay(0.2)}>
+              <Eyebrow>Meet Kim</Eyebrow>
+              <h2 className="text-[52px] font-bold leading-[1.05] tracking-[-0.025em]">Kim, to work</h2>
               <span className="text-[22px] leading-snug text-fd-muted-foreground">
                 stain 1 · wash until it is gone · stain 2, on one slide
               </span>
             </div>
-            <div
-              className="sm-pop rounded-[40px] border-2 border-fd-border bg-fd-card px-8 py-6 text-[28px] font-bold leading-[1.22] tracking-[-0.015em] shadow-sm"
-              style={delay(1.1)}
-            >
-              Stain 1, wash until it is completely gone, stain 2…{' '}
-              <span className="sm-in inline" style={delay(2)}>
-                <Hl>overlay the two images: multi-staining.</Hl>
-              </span>
-            </div>
+            <KimAtWork />
           </div>
           <ChromogenicRoundFigure />
         </div>
@@ -570,7 +603,7 @@ export function SmartMicroscopyDeck() {
       <DeckSlide
         eyebrow="Night 4 · Reproducibility"
         title="Can you run that again?"
-        notes="The fourth night. Her macro had a version and a DOI; anyone could rerun it. The pipeline has neither: which commit made run 41, which StarDist model, a threshold tuned by eye at 3 am, an unseeded random number, a config file on her desktop. Claude’s tip: just pin everything in a requirements.txt. Then the errors: a missing module, a CUDA mismatch, the config is gone, and two runs on the same data disagree. Docker, Conda, Nix, Pixi? Did my PI’s rerun use the old model? Her line: it worked once, that counts, right? Click: the fourth horseman, Reproducibility. Then the next slide is that one run."
+        notes="The fourth night. Her macro had a version and a DOI; anyone could rerun it. The pipeline has neither: which commit made run 41, which StarDist model, a threshold tuned by eye at 3 am on a slider in the Streamlit GUI she vibe-coded, an unseeded random number, a config file on her desktop. Claude’s tip: just pin everything in a requirements.txt. Then the errors: the GUI already breaks on a newer Streamlit, a CUDA mismatch, the config is gone, and two runs on the same data disagree. Docker, Conda, Nix, Pixi? Did my PI’s rerun use the old model? And the GUI: there is no way to publish or package it, and it most likely won’t run next year. Her line: it worked once, that counts, right? Click: the fourth horseman, Reproducibility. Then the next slide is that one run."
       >
         <div className="flex flex-1 items-center">
           <NightmareFigure night="repro" />
@@ -643,19 +676,20 @@ export function SmartMicroscopyDeck() {
 
       <DeckSlide
         eyebrow="What is Arkitekt"
-        title="Every step is a typed action on a shared lab hub"
-        notes="One mental model is enough to start. Lab infrastructure for microscopy workflows that span more than one device: in Kim’s case a robot arm, a liquid handler, a microscope and a GPU server. Section total: about 6 minutes."
+        title="Arkitekt is the middleman"
+        lead="The apps offer their steps as typed actions; Kim uses them from Orkestrator, or just asks a chat. Every call and every result goes through the hub."
+        notes="One mental model is enough to start: Arkitekt sits in the middle. On the left, the apps in Kim’s lab: the openUC2 microscope, the robot arm and the OT-2, the analysis on the GPU server, Fiji and napari. Each one offers its steps to the hub as typed actions. On the right, Kim. She never talks to a machine directly: she uses those actions from Orkestrator, or she just asks a chat. Point at the dots: calls go left, from Kim through the hub to whichever app offers the action; results come back right, through the hub, where they are stored with their provenance. Neither side needs to know where the other one runs. The next three slides zoom in: one action through Orkestrator, a whole workflow, then the chat. Section total: about 6 minutes."
       >
         <div className="flex flex-1 items-center">
-          <HubFigure />
+          <MiddlemanFigure />
         </div>
       </DeckSlide>
 
       <DeckSlide
         eyebrow="Microscope as an app"
-        title="Stain, image, measure: every device is an app"
-        lead="The arm, the OT-2, the openUC2 and the analysis each offer their steps as actions the hub knows by their types."
-        notes="No code yet, just the contract. On arrival: each app in Kim’s lab offers its actions, with names, inputs and outputs, and the hub registers them: the OT-2 run_protocol, the arm run_trajectory, the openUC2 acquire_image, each on its own machine (StarDist and the analyzer on the GPU server work the same way). Then each opens one websocket to the hub and listens. None of them needs an open port or a known IP. Click: the hub moves aside and Orkestrator appears; the form for run_protocol is built from its types, and the protocol list comes straight from the OT-2’s own state; Kim picks stain_cd20. Click: assign. The task goes to the hub, and the hub sends it down the OT-2’s socket. Click: the result goes to the hub first (stored, with provenance), and only then on to Kim’s browser. Those types are what Orkestrator shows and what can be wired together."
+        title="The microscope offers what it can do"
+        lead="The openUC2 tells the hub which functions it provides, with their types. Orkestrator turns them into something Kim can click."
+        notes="No code yet, just the contract, and just one device: the microscope. On arrival: the openUC2 app offers the functions it provides, with names, inputs and outputs (acquire_image, move_stage, autofocus), and the hub registers them. Then it opens one websocket to the hub and listens. It needs no open port and no known IP. The arm, the OT-2 and the GPU server do exactly the same. Click: the hub moves aside and Orkestrator appears; the form for acquire_image is built from its types, and the objective list comes straight from the microscope’s own state; Kim picks 10x. Click: assign. The task goes to the hub, and the hub sends it down the microscope’s socket. Click: the image goes to the hub first (stored, with provenance), and only then on to Kim’s browser. Those types are what Orkestrator shows and what can be wired together."
       >
         <div className="flex flex-1 items-center">
           <OfferFigure />
@@ -664,9 +698,34 @@ export function SmartMicroscopyDeck() {
 
       <DeckSlide
         eyebrow="Microscope as an app"
+        title="It can bring its own UI, too"
+        lead="Next to its functions, the microscope offers a blok to the hub: its own little UI. Orkestrator shows it, right next to the forms."
+        notes="Video slot: drop the recording in as public/presentations/smart-microscopy/microscope-blok.mp4 and it plays here. Narrate it as the second half of the last slide: functions are not everything a device wants to say. The openUC2 app registers a blok with the hub, a small UI it ships itself (live view, stage position, objective, the light), and Orkestrator renders it like any other page. Kim did not build it and the hub does not know what is in it; the app brought it. Keep it short: bloks come back in full when we pay down “its own UI”."
+      >
+        <div className="flex flex-1 items-center justify-center">
+          <Clip
+            label="Video · the microscope’s blok"
+            file="microscope-blok.mp4"
+            length="30 s"
+            shows="The openUC2 app offers its blok to the hub; Orkestrator shows it: live view, stage, objective, light."
+          />
+        </div>
+      </DeckSlide>
+
+      <StatementSlide
+        eyebrow="Fair point"
+        notes="Say it in Kim’s voice, a bit deflated. Everything so far is real, but it is remote control: Kim is still the one clicking every step, just from a browser instead of three PCs. Automation means the steps run without her. That is the next slide: wire the actions together."
+        figure={<KimFigure size={200} mood="worried" />}
+        sub="Kim, unimpressed"
+      >
+        “Okay, so now I control everything with clicks in a UI. <Hl>That’s not automation.</Hl>”
+      </StatementSlide>
+
+      <DeckSlide
+        eyebrow="Microscope as an app"
         title="And now: a workflow"
         lead="The actions of six apps, wired by their types in Orkestrator. Press Run, and the hub does the rest."
-        notes="On arrival: the actions on the hub sit in the palette; the arm’s move, the OT-2’s run_protocol, the openUC2’s acquire, stitch, segment and measure are dragged out and wired, with one edge looping back: below target, stain again. Point at the edge chips: an edge only connects if the output type fits the input (image into image, labels into labels). This is Kim’s loop, for real: six apps on five machines in two rooms. Click: Run. The hub assigns each node to the app that offers it (the same assign/done from the last slide, once per step) and every image lands on the hub. Click: the big red X. “That is so 2023.” Nobody wants to drag boxes any more; next slide."
+        notes="On arrival: the actions on the hub sit in the palette; the arm’s move, the OT-2’s run_protocol, the openUC2’s acquire, stitch, segment and measure are dragged out and wired, with one edge looping back: below target, stain again. Point at the edge chips: an edge only connects if the output type fits the input (image into image, labels into labels). This is Kim’s loop, for real: six apps on five machines in two rooms. Click: Run. The hub assigns each node to the app that offers it (the same assign and result as the microscope slide, once per step) and every image lands on the hub. Click: the big red X. “That is so 2023.” Nobody wants to drag boxes any more; next slide."
       >
         <div className="flex flex-1 items-center">
           <WorkflowFigure />
@@ -748,6 +807,10 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
+      <Slide notes="The third horseman: Data Management, Reviewer 2 once more: “lol, on your server you still just have folders. You don’t solve that.” One blow this time.">
+        <HorsemanDuelFigure night="data" />
+      </Slide>
+
       <DeckSlide
         eyebrow="mikro coordinate systems"
         title="Smart microscopy isn’t an MDA"
@@ -757,10 +820,6 @@ export function SmartMicroscopyDeck() {
           <CoordsFigure />
         </div>
       </DeckSlide>
-
-      <Slide notes="The third horseman: Data Management, Reviewer 2 once more: “lol, on your server you still just have folders. You don’t solve that.” One blow this time.">
-        <HorsemanDuelFigure night="data" />
-      </Slide>
 
       <DeckSlide
         eyebrow="Defeating the third horseman"
@@ -911,6 +970,117 @@ export function SmartMicroscopyDeck() {
       >
         <div className="flex flex-1 items-center">
           <BlokChatFigure />
+        </div>
+      </DeckSlide>
+
+      {/* something completely different: the instrument itself (about 4 min) */}
+
+      <Slide notes="A deliberate gear change, Monty Python timing. Then the disclaimer, said plainly and with a smile: this part is an industry collaboration with openUC2, so take everything in it with a grain of salt. I have no financial interest in openUC2. And Bene had no say in these slides. So far the instrument was a given: Arkitekt adapted where and how to image, and what ran next. The next slides are about the instrument itself: openUC2’s idea, the problem it makes for software, then Optikit, newswitch, microscopes built for one question, and coordinate systems one more time. About 5 minutes.">
+        <div className="flex h-[600px] w-full flex-col justify-center gap-10">
+          <div className="flex flex-col gap-5">
+            <p className="sm-in max-w-[1000px] text-[52px] font-bold leading-[1.1] tracking-[-0.025em]" style={delay(0.1)}>
+              And now for something <Hl>completely different.</Hl>
+            </p>
+            <p className="sm-in text-[28px] italic leading-snug text-fd-muted-foreground" style={delay(0.5)}>
+              The microscope itself.
+            </p>
+          </div>
+          <div className="sm-in flex max-w-[860px] flex-col gap-2 rounded-2xl border-2 border-dashed border-[#d97706]/60 bg-[#d97706]/5 px-6 py-4" style={delay(1.1)}>
+            <span className="font-mono text-[13px] font-bold uppercase tracking-[0.18em] text-[#d97706]">Disclaimer</span>
+            <ul className="flex flex-col gap-1 text-[21px] leading-snug">
+              <li>This part is an <b>industry collaboration</b> with openUC2: take it with a grain of salt.</li>
+              <li>I have <b>no financial interest</b> in openUC2.</li>
+              <li className="text-fd-muted-foreground">Bene had no say in these slides. :D</li>
+            </ul>
+          </div>
+        </div>
+      </Slide>
+
+      <DeckSlide
+        eyebrow="openUC2"
+        title="Modularity is king"
+        lead="A handful of cube kinds, snapped onto a baseplate and wired together: a different microscope every time."
+        notes="openUC2’s main idea in one line: modularity is king. Instead of buying one closed microscope, you get cubes, each holding one thing (an LED, a sample holder, an objective, a lens, a mirror, a camera), and you snap them onto a baseplate in whatever order the experiment needs. Let the build snap together: this is a real fluorescence microscope as Optikit exports it, cube by cube, in the order the light goes through it: the fiber holder and the blue laser, a mirror, the dichroic, the objective, a mirror up to the sample stage, the camera, and the controller. They come in black, as they look on the bench; then the housings fade away and the optics inside show: the mirrors, the amber dichroic, the green emission filter, the lenses. Then it turns slowly: swap any cube and it is a different microscope. Cheap, open, and rebuilt over lunch."
+      >
+        <div className="flex flex-1 items-stretch gap-8">
+          <div className="relative min-h-[400px] flex-[1.5] overflow-hidden rounded-2xl border border-fd-border bg-fd-card/40">
+            <OptikitCubes3D className="absolute inset-0" />
+            <span className="absolute left-4 top-3 font-mono text-[12px] text-fd-muted-foreground">a fluorescence microscope, from cubes · exported by Optikit</span>
+          </div>
+          <div className="flex flex-1 flex-col justify-center gap-5">
+            <p className="sm-in text-[30px] font-bold leading-tight tracking-[-0.02em]" style={delay(0.2)}>
+              Snap cubes onto a plate, <Hl>get a microscope.</Hl>
+            </p>
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+              {CUBE_PARTS.map((name, i) => (
+                <li key={`${name}-${i}`} className="sm-in flex items-center gap-2 text-[17px]" style={delay(landsAt(i) + 0.35)}>
+                  <span className="size-[10px] shrink-0 rounded-[3px] border-2 border-fd-primary" />
+                  {name}
+                </li>
+              ))}
+            </ul>
+            <p className="sm-in text-[18px] leading-snug text-fd-muted-foreground" style={delay(3.8)}>
+              Swap a cube, and it’s a different microscope: transmission, two cameras, a light-sheet.
+            </p>
+          </div>
+        </div>
+      </DeckSlide>
+
+      <Slide notes="And here is the catch, from the software side: modularity is the worst thing that can happen to microscope software. Every program quietly assumes a microscope: one camera the right way up, focus on the stage, an LED you switch on, and the same build tomorrow. With cubes, no two microscopes behave alike, and the next build breaks whatever you hard-coded. So the software can’t assume the microscope; it has to be told what it is. That is where Optikit and newswitch come in.">
+        <div className="flex h-[600px] w-full flex-col justify-center gap-8">
+          <div className="flex flex-col gap-4">
+            <p className="sm-in max-w-[1080px] text-[46px] font-bold leading-[1.1] tracking-[-0.025em]" style={delay(0.1)}>
+              Modularity is <Hl>the worst thing</Hl> for microscope software.
+            </p>
+            <p className="sm-in text-[26px] italic leading-snug text-fd-muted-foreground" style={delay(0.5)}>
+              No two microscopes behave alike.
+            </p>
+          </div>
+          <QuirksFigure />
+        </div>
+      </Slide>
+
+      <DeckSlide
+        eyebrow="Optikit"
+        title="Design the microscope like a circuit board"
+        lead="Parts from a library go onto a bench, the light is traced through them, and out come the numbers the instrument needs."
+        notes="The answer to the last slide: describe the microscope instead of assuming it. Optikit is the openUC2 platform for designing an instrument, think KiCad for optics. Every part, an LED, an objective, a tube lens, a splitter, a camera, is authored once in a library with its real geometry, and reused in every design. Place them on the bench and Optikit traces the light: one path per camera, here A straight through and B folded by the splitter. Out of the trace come the facts nobody should type by hand: µm per pixel (the 3.45 µm pitch over 10×, 0.345), the light path per detector, and a priced parts list to order from. Credit the Optikit team by name here."
+      >
+        <div className="flex flex-1 items-center">
+          <OptikitBenchFigure />
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="newswitch"
+        title="The design runs before the hardware does"
+        lead="newswitch, the next ImSwitch, builds the instrument from the Optikit design, and can simulate any part of it."
+        notes="My side of it. newswitch is a rewrite of ImSwitch, the openUC2 microscope software, and it reads the Optikit design instead of a hand-written config. Because it knows the optics, it can simulate them: with simulate set to everything, every part is simulated and the camera draws a simulated sample, here beads, through the traced optics. Set it to unwired, and whatever is plugged in is real, the stage and camera A here, while the rest stays simulated. Set it to nothing, and it is the real instrument. The actions, states and bloks are the same in every mode, so Arkitekt and Orkestrator can’t tell the difference: routines and workflows run before the hardware is built, and a simulated bench even carries hidden errors for calibration to find."
+      >
+        <div className="flex flex-1 items-center">
+          <SimulateFigure />
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="newswitch · bloks"
+        title="A microscope for one question"
+        lead="Built from modules, an instrument can be assembled for one question, and it ships the bloks for that question with it."
+        notes="The payoff of the last two slides plus bloks. If you can design, simulate and build an instrument cheaply, you can build it for one question instead of buying one for every question. The instrument’s description carries its bloks, its own little UIs, so the UI comes with the question: Kim’s brightfield scope asks “did the stain take?” and ships a stain check; a FLIM scope ships a lifetime fit; a light-sheet ships a sheet alignment. Orkestrator renders whichever bloks the instrument brings, on the same hub, with the same actions underneath. The three instruments are configurations in newswitch; the numbers in the bloks are illustrative."
+      >
+        <div className="flex flex-1 items-center">
+          <QuestionScopesFigure />
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        eyebrow="Coordinate systems, again"
+        title="Every detector is a sensor in a coordinate system"
+        lead="The trace says how each sensor reaches the sample, so every image lands where it was taken, from every camera."
+        notes="Back to coordinate systems, one level down. Each detector is a coordinate system of its own: its sensor, in pixels. Camera B sits behind the splitter, so it sees the sample mirrored. Because newswitch knows the optics from the trace, it knows how each sensor maps onto the stage (0.345 µm per pixel, and a mirror for B), and the stage onto the sample. So both images land on the same cells without anyone registering them by hand. It is the same coordinate graph the hub stores the data in, which is why the images from Kim’s run were already placed."
+      >
+        <div className="flex flex-1 items-center">
+          <SensorSpacesFigure />
         </div>
       </DeckSlide>
 

@@ -263,19 +263,19 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
     lines: [
       ['// kim_sequential.ijm v1.2, doi:10.5281/zenodo.42', '# which version made run 41?  git log: "fix"'],
       ['run("Grid/Collection stitching", "type=[Grid]");', 'model = StarDist2D.from_pretrained("2D_versatile_he")'],
-      ['run("Colour Deconvolution", "vectors=[H AEC]");', 'thresh = 0.47  # tuned at 3 am, by eye'],
+      ['run("Colour Deconvolution", "vectors=[H AEC]");', 'thresh = st.slider("thresh")  # vibe-coded GUI, 3 am'],
       ['run("StarDist 2D", "model=[Versatile (H&E nuclei)]");', 'np.random.seed()  # different every run'],
       ['uptake = getResult("Positive", 0);  // per cell', 'cfg = load("C:/Users/kim/Desktop/cfg_old.json")'],
       ['if (uptake < 0.8) print("stain again");', '# pip freeze > requirements.txt  (too late)'],
     ],
     tip: 'Just pin everything in a requirements.txt. Easy!',
     errors: [
-      'ModuleNotFoundError: csbdeep',
+      'AttributeError: st.experimental_rerun',
       'CUDA 11.2 ≠ CUDA 12.1',
       'FileNotFoundError: cfg_old.json',
       'run 41: 0.78 · run 42: 0.83',
     ],
-    worries: ['Docker? Conda? Nix? Pixi?', 'Did my PI’s rerun use the old model?', 'Which settings made run 41?'],
+    worries: ['Docker? Conda? Nix? Pixi?', 'Did my PI’s rerun use the old model?', 'My vibe-coded GUI: publish it how? Will it even run next year?'],
     clock: ['23:05', '02:22', '05:41'],
     night: 'NIGHT 4',
     ending: 'It worked once. That counts, right?',
@@ -1381,6 +1381,314 @@ export function SerialSectionsFigure() {
       })}
 
     </svg>
+  );
+}
+
+/** What Kim hears about: chromogenic cycling as an idea. One section in the
+    middle, the cycle round it (stain, image, wash until it is gone, next
+    antibody), four rounds: CD3, CD20, Ki-67, PanCK, each on its own cells,
+    an image collected each time. Then all four show together, on the same
+    cells: the answer to the serial sections. Outside the current slide (and
+    with reduced motion) it shows that end state. */
+export function CyclingIdeaFigure() {
+  const u = useUid();
+  const W = 600;
+  const H = 560;
+  const C = { x: 300, y: 235 };
+  const R = 170;
+  const ROUND = 4;
+  const ROUNDS: StainKey[] = ['cd3', 'cd20', 'ki67', 'panck'];
+  const P = ROUNDS.length * ROUND + 4; // four rounds, then the overlay holds
+  const ALL: [number, number] = [ROUNDS.length * ROUND + 0.2, P - 0.2];
+  const disc = { s: 1.2, half: 72 };
+  const cells = tissueCells(-disc.half, -disc.half, disc.half, disc.half).filter((c) => c.x * c.x + c.y * c.y < (disc.half - 8) ** 2);
+  const X = (x: number) => Math.round((C.x + x * disc.s) * 10) / 10;
+  const Y = (y: number) => Math.round((C.y + y * disc.s) * 10) / 10;
+  const marks = (key: StainKey, c: Cell) => (key === 'ki67' ? c.ki67 : c.kind === key);
+
+  const pct = (t: number) => ((t / P) * 100).toFixed(2);
+  /** Opacity over the loop: on during `ranges` (seconds); `still` is what
+      thumbnails, print and reduced motion show. */
+  const vis = (name: string, ranges: [number, number][], still: 0 | 1) => `
+    .${u}-${name} { opacity: ${still}; }
+    section.present .${u}-${name} { animation: ${u}-${name} ${P}s linear 0.8s infinite both; }
+    @keyframes ${u}-${name} { 0% { opacity: 0; } ${ranges
+      .map(([a, b]) => `${pct(a)}% { opacity: 0; } ${pct(a + 0.3)}% { opacity: 1; } ${pct(b - 0.3)}% { opacity: 1; } ${pct(b)}% { opacity: 0; }`)
+      .join(' ')} 100% { opacity: 0; } }`;
+  const css = [
+    ...ROUNDS.map((_, r) => vis(`layer${r}`, [[r * ROUND + 0.3, r * ROUND + 2.6], ALL], 1)),
+    ...ROUNDS.map((_, r) => vis(`tile${r}`, [[r * ROUND + 1.3, P - 0.2]], 1)),
+    ...ROUNDS.map((_, r) => vis(`name${r}`, [[r * ROUND, (r + 1) * ROUND]], 0)),
+    ...[0, 1, 2, 3].map((k) => vis(`hl${k}`, ROUNDS.map((_, r) => [r * ROUND + k, r * ROUND + k + 1] as [number, number]), 0)),
+    vis('wash', ROUNDS.map((_, r) => [r * ROUND + 2, r * ROUND + 3] as [number, number]), 0),
+    vis('all', [ALL], 1),
+    `.${u}-dot { transform-box: view-box; transform-origin: ${C.x}px ${C.y}px; opacity: 0; }
+    section.present .${u}-dot { animation: ${u}-dot ${P}s linear 0.8s infinite both; }
+    @keyframes ${u}-dot { 0% { opacity: 1; transform: rotate(-45deg); } ${pct(ROUNDS.length * ROUND - 0.05)}% { opacity: 1; } ${pct(ROUNDS.length * ROUND)}% { opacity: 0; transform: rotate(${ROUNDS.length * 360 - 45}deg); } 100% { opacity: 0; transform: rotate(${ROUNDS.length * 360 - 45}deg); } }`,
+    `@media (prefers-reduced-motion: reduce) { section.present [class*="${u}-"] { animation: none !important; } }`,
+  ].join('\n');
+
+  const stations: { n: string; title: string; sub: string; x: number; y: number }[] = [
+    { n: '①', title: 'stain', sub: 'antibody + chromogen', x: C.x, y: C.y - R },
+    { n: '②', title: 'image', sub: 'the whole slide', x: C.x + R, y: C.y },
+    { n: '③', title: 'wash', sub: 'until the colour is gone', x: C.x, y: C.y + R },
+    { n: '④', title: 'next antibody', sub: 'same slide, same cells', x: C.x - R, y: C.y },
+  ];
+  const sw = 168;
+  const sh = 58;
+
+  return (
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Chromogenic cycling, as an idea: one tissue section in the middle and a cycle round it: stain with an antibody and its chromogen, image the slide, wash until the colour is gone, take the next antibody. Four rounds: CD3, CD20, Ki-67 and PanCK, each marking its own cells, one image per round. In the end all four markers show together on the same cells." className="shrink-0">
+      <LoopStyles css={css} />
+      {/* the cycle */}
+      <circle className="sm-fade" style={delay(0.2)} cx={C.x} cy={C.y} r={R} fill="none" stroke={BORDER} strokeWidth={2.5} strokeDasharray="2 9" strokeLinecap="round" />
+      {[45, 135, 225, 315].map((a) => {
+        const rad = ((a - 90) * Math.PI) / 180;
+        const x = C.x + R * Math.cos(rad);
+        const y = C.y + R * Math.sin(rad);
+        return <path key={a} className="sm-fade" style={delay(0.4)} d="M-6 -7 L4 0 L-6 7" fill="none" stroke={MUTED} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${a})`} />;
+      })}
+
+      {/* the section, one stain at a time, then all four */}
+      <g className="sm-pop" style={delay(0.3)}>
+        <circle cx={C.x} cy={C.y} r={disc.half * disc.s} fill={TISSUE_BG} stroke={EOSIN_EDGE} strokeOpacity={0.4} strokeWidth={1.5} />
+        {cells.map((c, i) => (
+          <g key={i} transform={`rotate(${c.rot} ${X(c.x)} ${Y(c.y)})`}>
+            <ellipse cx={X(c.x)} cy={Y(c.y)} rx={c.rx * disc.s} ry={c.ry * disc.s} fill={EOSIN} fillOpacity={0.35} stroke={EOSIN_EDGE} strokeOpacity={0.25} strokeWidth={1} />
+            <ellipse cx={X(c.x + c.nx)} cy={Y(c.y + c.ny)} rx={4.8 * disc.s} ry={3.9 * disc.s} fill={HEMATOXYLIN} fillOpacity={0.55} />
+          </g>
+        ))}
+        {ROUNDS.map((key, r) => (
+          <g key={key} className={`${u}-layer${r}`}>
+            {cells
+              .filter((c) => marks(key, c))
+              .map((c, i) =>
+                key === 'ki67' ? (
+                  <ellipse key={i} cx={X(c.x + c.nx)} cy={Y(c.y + c.ny)} rx={5.2 * disc.s} ry={4.3 * disc.s} fill={STAIN.ki67.color} fillOpacity={0.95} transform={`rotate(${c.rot} ${X(c.x)} ${Y(c.y)})`} />
+                ) : (
+                  <ellipse key={i} cx={X(c.x)} cy={Y(c.y)} rx={c.rx * disc.s} ry={c.ry * disc.s} fill="none" stroke={STAIN[key].color} strokeWidth={3.2} strokeOpacity={0.9} transform={`rotate(${c.rot} ${X(c.x)} ${Y(c.y)})`} />
+                ),
+              )}
+          </g>
+        ))}
+        <circle className={`${u}-wash`} cx={C.x} cy={C.y} r={disc.half * disc.s} fill="#7dd3fc" fillOpacity={0.35} />
+      </g>
+
+      {/* which antibody this round; then the overlay's caption */}
+      {ROUNDS.map((key, r) => (
+        <T key={key} className={`${u}-name${r}`} x={C.x} y={C.y - disc.half * disc.s - 16} size={15} mono weight={700} fill={STAIN[key].color}>
+          {`round ${r + 1} · ${STAIN[key].name}`}
+        </T>
+      ))}
+      <g className={`${u}-all`}>
+        <T x={C.x} y={C.y - disc.half * disc.s - 16} size={15} weight={700} fill={FG}>
+          every marker, on the same cells
+        </T>
+      </g>
+
+      {/* the stations */}
+      {stations.map((st, k) => (
+        <g key={st.title} className="sm-pop" style={delay(0.5 + k * 0.15)}>
+          <rect x={st.x - sw / 2} y={st.y - sh / 2} width={sw} height={sh} rx={14} fill={SURFACE} stroke={BORDER} strokeWidth={1.8} />
+          <rect className={`${u}-hl${k}`} x={st.x - sw / 2} y={st.y - sh / 2} width={sw} height={sh} rx={14} fill={PRIMARY} fillOpacity={0.1} stroke={PRIMARY} strokeWidth={2.5} />
+          <T x={st.x} y={st.y - 9} size={18} weight={700}>
+            {`${st.n} ${st.title}`}
+          </T>
+          <T x={st.x} y={st.y + 13} size={12.5} fill={MUTED}>
+            {st.sub}
+          </T>
+        </g>
+      ))}
+
+      {/* where we are in the cycle */}
+      <g className={`${u}-dot`}>
+        <circle cx={C.x} cy={C.y - R} r={9} fill={PRIMARY} stroke={SURFACE} strokeWidth={3} />
+      </g>
+
+      {/* the images, one per round */}
+      <T className="sm-fade" style={delay(0.6)} x={30} y={466} anchor="start" size={12} mono weight={700} fill={MUTED}>
+        ONE SLIDE · ONE IMAGE PER ROUND
+      </T>
+      {ROUNDS.map((key, r) => {
+        const x = 30 + r * 140;
+        return (
+          <g key={key} className={`${u}-tile${r}`}>
+            <rect x={x} y={482} width={128} height={48} rx={10} fill={SURFACE} stroke={STAIN[key].color} strokeWidth={2} />
+            <circle cx={x + 24} cy={506} r={12} fill={TISSUE_BG} stroke={STAIN[key].color} strokeWidth={3} />
+            <T x={x + 46} y={498} anchor="start" size={12} mono fill={MUTED}>{`image ${r + 1}`}</T>
+            <T x={x + 46} y={515} anchor="start" size={15} weight={700} fill={STAIN[key].color}>{STAIN[key].name}</T>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/** The catch in the cycle: in practice nearly every chromogen is brown
+    (DAB). Round 1 marks the CD3 cells; the wash leaves some of them faintly
+    brown; round 2 marks the CD20 cells, brown as well, and the leftovers
+    look just like them. */
+export function AllBrownFigure() {
+  const u = useUid();
+  const DAB = '#7c4a1e';
+  const disc = { half: 64, s: 1.2 };
+  const cells = tissueCells(-disc.half, -disc.half, disc.half, disc.half).filter((c) => c.x * c.x + c.y * c.y < (disc.half - 8) ** 2);
+  const leftover = (c: Cell) => c.kind === 'cd3' && c.took;
+  const xs = [95, 300, 505];
+  const cy = 190;
+  const r = disc.half * disc.s;
+  const css = `
+    .${u}-ring { transform-box: fill-box; transform-origin: center; }
+    section.present .${u}-ring { animation: ${u}-ring 1.6s ease-in-out 3s infinite; }
+    @keyframes ${u}-ring { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.25); opacity: 0.55; } }
+    @media (prefers-reduced-motion: reduce) { section.present .${u}-ring { animation: none; } }`;
+  /** One section: `brown` says how brown each cell is (0 to 1). */
+  const section = (x: number, brown: (c: Cell) => number, at: number, rings = false) => {
+    const X = (v: number) => Math.round((x + v * disc.s) * 10) / 10;
+    const Y = (v: number) => Math.round((cy + v * disc.s) * 10) / 10;
+    return (
+      <g className="sm-pop" style={delay(at)}>
+        <circle cx={x} cy={cy} r={r} fill={TISSUE_BG} stroke={EOSIN_EDGE} strokeOpacity={0.4} strokeWidth={1.5} />
+        {cells.map((c, i) => {
+          const b = brown(c);
+          return (
+            <g key={i} transform={`rotate(${c.rot} ${X(c.x)} ${Y(c.y)})`}>
+              <ellipse cx={X(c.x)} cy={Y(c.y)} rx={c.rx * disc.s} ry={c.ry * disc.s} fill={b > 0 ? DAB : EOSIN} fillOpacity={b > 0 ? 0.25 + 0.6 * b : 0.35} stroke={EOSIN_EDGE} strokeOpacity={0.25} strokeWidth={1} />
+              <ellipse cx={X(c.x + c.nx)} cy={Y(c.y + c.ny)} rx={4.8 * disc.s} ry={3.9 * disc.s} fill={HEMATOXYLIN} fillOpacity={0.6} />
+            </g>
+          );
+        })}
+        {rings
+          ? cells.filter(leftover).map((c, i) => (
+              <circle key={`q${i}`} className={`${u}-ring`} cx={X(c.x)} cy={Y(c.y)} r={c.rx * disc.s + 4} fill="none" stroke={WARN} strokeWidth={3} />
+            ))
+          : null}
+      </g>
+    );
+  };
+  const arrow = (x1: number, x2: number, label: string, at: number) => (
+    <g className="sm-in" style={delay(at)}>
+      <path d={`M${x1} ${cy} L${x2} ${cy}`} stroke={MUTED} strokeWidth={2.5} strokeLinecap="round" />
+      <path d={`M${x2 - 8} ${cy - 7} L${x2} ${cy} L${x2 - 8} ${cy + 7}`} fill="none" stroke={MUTED} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      <T x={(x1 + x2) / 2} y={cy - 16} size={14} mono weight={700} fill={MUTED}>
+        {label}
+      </T>
+    </g>
+  );
+  return (
+    <svg width={600} height={420} viewBox="0 0 600 420" role="img" aria-label="Three views of the same section, all in the same brown. Round 1, CD3: the CD3 cells are brown. After the wash: most are clean, a few are still faintly brown. Round 2, CD20: the CD20 cells are brown, and so are the leftovers from round 1; they are ringed with a question: CD20, or CD3 that never left?" className="shrink-0">
+      <LoopStyles css={css} />
+      {(
+        [
+          ['round 1 · CD3', 0.3],
+          ['after the wash', 1.1],
+          ['round 2 · CD20', 1.9],
+        ] as const
+      ).map(([label, at], i) => (
+        <T key={label} className="sm-in" style={delay(at)} x={xs[i]} y={cy - r - 20} size={16} weight={700} fill={i === 1 ? MUTED : DAB}>
+          {label}
+        </T>
+      ))}
+      {section(xs[0], (c) => (c.kind === 'cd3' ? 1 : 0), 0.3)}
+      {arrow(xs[0] + r + 8, xs[1] - r - 8, 'wash', 0.8)}
+      {section(xs[1], (c) => (leftover(c) ? 0.35 : 0), 1.1)}
+      {arrow(xs[1] + r + 8, xs[2] - r - 8, 'stain', 1.6)}
+      {section(xs[2], (c) => (c.kind === 'cd20' ? 1 : leftover(c) ? 0.85 : 0), 1.9, true)}
+
+      <g className="sm-in" style={delay(2.6)}>
+        <path d={`M${xs[2]} ${cy + r + 6} L${xs[2]} ${cy + r + 34}`} stroke={WARN} strokeWidth={2} strokeDasharray="4 4" />
+        <rect x={xs[2] - 150} y={cy + r + 34} width={240} height={62} rx={14} fill={SURFACE} stroke={WARN} strokeWidth={2} />
+        <T x={xs[2] - 30} y={cy + r + 56} size={17} weight={700}>
+          CD20?
+        </T>
+        <T x={xs[2] - 30} y={cy + r + 78} size={15} fill={MUTED}>
+          or CD3 that never left?
+        </T>
+      </g>
+      <g className="sm-in" style={delay(1.4)}>
+        <T x={xs[1]} y={cy + r + 26} size={14} fill={MUTED}>
+          gone? mostly.
+        </T>
+      </g>
+    </svg>
+  );
+}
+
+/** Kim, beside `ChromogenicRoundFigure`, on its clock (26 s, from 0.8 s):
+    she starts out, frowns at wash 1 (not gone: wash again), celebrates at
+    wash 2 (gone: on to stain 2), and ends on the overlay. Outside the
+    current slide it shows the last line. */
+export function KimAtWork() {
+  const u = useUid();
+  const P = 26;
+  const pct = (t: number) => ((t / P) * 100).toFixed(2);
+  const vis = (name: string, ranges: [number, number][], still: 0 | 1) => `
+    .${u}-${name} { opacity: ${still}; }
+    section.present .${u}-${name} { animation: ${u}-${name} ${P}s linear 0.8s infinite both; }
+    @keyframes ${u}-${name} { 0% { opacity: 0; } ${ranges
+      .map(([a, b]) => `${pct(a)}% { opacity: 0; } ${pct(a + 0.25)}% { opacity: 1; } ${pct(b - 0.25)}% { opacity: 1; } ${pct(b)}% { opacity: 0; }`)
+      .join(' ')} 100% { opacity: 0; } }`;
+  const START: [number, number] = [0.2, 8];
+  const AGAIN: [number, number] = [8, 13.9];
+  const DONE: [number, number] = [13.9, 19.7];
+  const END: [number, number] = [19.7, 25.8];
+  const css = [
+    vis('neutral', [START], 0),
+    vis('worried', [AGAIN], 0),
+    vis('happy', [DONE, END], 1),
+    vis('l0', [START], 0),
+    vis('l1', [AGAIN], 0),
+    vis('l2', [DONE], 0),
+    vis('l3', [END], 1),
+    vis('party', [DONE], 0),
+    `.${u}-bit { transform-box: fill-box; transform-origin: center; }
+    section.present .${u}-bit { animation: ${u}-bit ${P}s ease-out 0.8s infinite both; }
+    @keyframes ${u}-bit { 0%, ${pct(DONE[0])}% { transform: translate(0, 0) scale(0.2) rotate(0deg); } ${pct(DONE[0] + 1.2)}% { transform: translate(var(--x), var(--y)) scale(1) rotate(200deg); } ${pct(DONE[1])}%, 100% { transform: translate(var(--x), calc(var(--y) + 30px)) scale(1) rotate(320deg); } }`,
+    `@media (prefers-reduced-motion: reduce) { section.present [class*="${u}-"] { animation: none !important; } }`,
+  ].join('\n');
+  const lines: [string, ReactNode][] = [
+    ['l0', <>Stain 1, then wash it off…</>],
+    ['l1', <>Still too much. <span style={{ color: WARN }}>Let’s wash again.</span></>],
+    ['l2', <>🎉 It’s done, <span className="text-fd-primary">let’s go!</span></>],
+    ['l3', <>Overlay the two images: <span className="text-fd-primary">multi-staining.</span></>],
+  ];
+  const bits = [
+    [-70, -90, '#f87171'], [60, -110, '#fbbf24'], [110, -40, '#34d399'], [-110, -20, '#60a5fa'],
+    [20, -140, '#c084fc'], [-40, -130, '#f472b6'], [90, -100, '#2dd4bf'], [-90, -70, '#fb923c'],
+  ] as const;
+  return (
+    <div className="flex items-end gap-3">
+      <LoopStyles css={css} />
+      <div className="relative h-[162px] w-[130px] shrink-0">
+        <div className={`${u}-neutral absolute inset-0`}>
+          <KimFigure size={130} />
+        </div>
+        <div className={`${u}-worried absolute inset-0`}>
+          <KimFigure size={130} mood="worried" />
+        </div>
+        <div className={`${u}-happy absolute inset-0`}>
+          <KimFigure size={130} mood="happy" />
+        </div>
+        <div className={`${u}-party pointer-events-none absolute left-1/2 top-1/2`} aria-hidden>
+          {bits.map(([x, y, color], i) => (
+            <span
+              key={i}
+              className={`${u}-bit absolute block h-[8px] w-[14px] rounded-[2px]`}
+              style={{ background: color, ['--x' as string]: `${x}px`, ['--y' as string]: `${y}px` } as CSSProperties}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="relative mb-14 h-[120px] flex-1 rounded-3xl rounded-bl-sm border-2 border-fd-border bg-fd-card shadow-sm">
+        {lines.map(([key, text]) => (
+          <p key={key} className={`${u}-${key} absolute inset-0 flex items-center px-6 text-[26px] font-bold leading-[1.22] tracking-[-0.015em]`}>
+            <span>
+              <span className="sr-only">Kim: </span>“{text}”
+            </span>
+          </p>
+        ))}
+      </div>
+    </div>
   );
 }
 

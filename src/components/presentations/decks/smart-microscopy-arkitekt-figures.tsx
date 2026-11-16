@@ -11,7 +11,7 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 import { Fragment } from '@revealjs/react';
-import { Bot, Check, FlaskConical, Layers, Microscope, Network, NotebookPen, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
+import { Bot, Check, Cpu, Layers, MessagesSquare, Microscope, Network, NotebookPen, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
 import { cn } from '@/lib/cn';
@@ -31,6 +31,7 @@ import {
   delay,
   useUid,
 } from './smart-microscopy-anim';
+import { KimFigure } from './smart-microscopy-figures';
 
 /** `section.present`-scoped looping animation for one element class. */
 function loop(u: string, name: string, seconds: number, keyframes: string, start = 0.6) {
@@ -211,19 +212,165 @@ export function HubFigure({ beyond = false }: { beyond?: boolean }) {
   );
 }
 
-/* --- the app ---------------------------------------------------------------- */
+/* --- the middleman ---------------------------------------------------------- */
 
-/* The implicit contract, without code: each app in Kim's lab offers its
-   actions (name, inputs, outputs) to the hub, then opens one websocket and
-   listens. From then on the hub assigns and the app answers. */
-const OFFERS = [
-  { app: 'ot2', name: 'run_protocol', ins: 'protocol · choice', out: '–' },
-  { app: 'arkirino', name: 'run_trajectory', ins: 'name · choice', out: '–' },
-  { app: 'openuc2', name: 'acquire_image', ins: '–', out: 'image' },
+const MIDDLE_APPS: HubNode[] = [
+  { name: 'Microscopes', what: 'openUC2 · acquire', icon: Microscope },
+  { name: 'Robots', what: 'arm · OT-2 · stain', icon: Bot },
+  { name: 'Analysis', what: 'StarDist · GPU', icon: Cpu },
+  { name: 'Fiji · napari', what: 'macros · viewers', icon: ScanSearch },
+];
+const MIDDLE_FRONTS: (HubNode & { tag?: string })[] = [
+  { name: 'Orkestrator', what: 'forms · workflows', icon: Workflow },
+  { name: 'Chat', what: 'just ask', icon: MessagesSquare, tag: 'or' },
 ];
 
-/** The OT-2's `run.available_protocols` state: what the protocol dropdown offers. */
-const PROTOCOLS = ['stain_cd3', 'stain_cd20', 'stain_ki67', 'stain_panck'];
+/** A horizontal S-curve from one point to another. */
+function sCurve(x1: number, y1: number, x2: number, y2: number) {
+  const mx = (x1 + x2) / 2;
+  return `M${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+}
+
+/** Arkitekt as the middleman: the apps on the left offer their actions, Kim
+    on the right uses them through Orkestrator or a chat. Calls flow left,
+    results flow right; neither side talks to the other directly. */
+export function MiddlemanFigure() {
+  const u = useUid();
+  const W = 1000;
+  const left = { w: 236, ys: [0, 104, 208, 312] };
+  const hub = { x: 330, y: 100, w: 230, h: 220 };
+  const front = { x: 622, w: 222, ys: [112, 232] };
+  const kim = { x: 868, y: 128, size: 120, port: [878, 222] as const };
+
+  const appRows = left.ys.map((y) => y + 38);
+  const inPorts = [0, 1, 2, 3].map((i) => hub.y + 50 + i * 40);
+  const frontRows = front.ys.map((y) => y + 38);
+  const outPorts = [hub.y + 50, hub.y + 170];
+
+  // Each link once per direction: calls travel towards the apps, results back.
+  const appLinks = appRows.map((cy, i) => ({ toHub: sCurve(left.w, cy, hub.x, inPorts[i]), toApp: sCurve(hub.x, inPorts[i], left.w, cy) }));
+  const frontLinks = frontRows.map((cy, i) => ({ toHub: sCurve(front.x, cy, hub.x + hub.w, outPorts[i]), toFront: sCurve(hub.x + hub.w, outPorts[i], front.x, cy) }));
+  const kimLinks = frontRows.map((cy) => sCurve(front.x + front.w, cy, kim.port[0], kim.port[1]));
+
+  const dots: [number, number][] = [
+    ...appRows.map((cy) => [left.w, cy] as [number, number]),
+    ...inPorts.map((py) => [hub.x, py] as [number, number]),
+    ...outPorts.map((py) => [hub.x + hub.w, py] as [number, number]),
+    ...frontRows.map((cy) => [front.x, cy] as [number, number]),
+    ...frontRows.map((cy) => [front.x + front.w, cy] as [number, number]),
+  ];
+
+  return (
+    <div
+      className="relative mx-auto h-[420px] w-[1000px]"
+      role="img"
+      aria-label="Arkitekt as the middleman: microscopes, robots, analysis and Fiji or napari offer their actions on the left; Kim uses them on the right through Orkestrator or a chat"
+    >
+      <LoopStyles
+        css={`
+          .${u}-halo { transform-box: fill-box; transform-origin: center; opacity: 0; }
+          section.present .${u}-halo { animation: ${u}-halo 3s ease-out 1.6s infinite; }
+          @keyframes ${u}-halo { 0% { opacity: 0.45; transform: scale(1); } 100% { opacity: 0; transform: scale(1.22); } }
+          @media (prefers-reduced-motion: reduce) { section.present .${u}-halo { animation: none; } }
+        `}
+      />
+      <svg width={W} height={420} viewBox={`0 0 ${W} 420`} className="absolute inset-0" aria-hidden>
+        <rect className={`${u}-halo`} x={hub.x} y={hub.y} width={hub.w} height={hub.h} rx={26} fill="none" stroke={PRIMARY} strokeWidth={3} />
+        {appLinks.map((l, i) => (
+          <Path key={`a${i}`} className="sm-draw" style={delay(0.8 + i * 0.12)} d={l.toHub} stroke={BORDER} width={2.2} />
+        ))}
+        {frontLinks.map((l, i) => (
+          <Path key={`f${i}`} className="sm-draw" style={delay(1.2 + i * 0.12)} d={l.toHub} stroke={BORDER} width={2.2} />
+        ))}
+        {kimLinks.map((d, i) => (
+          <Path key={`k${i}`} className="sm-draw" style={delay(1.45 + i * 0.12)} d={d} stroke={BORDER} width={2.2} dash={i === 1 ? '6 7' : undefined} />
+        ))}
+        <g className="sm-fade" style={delay(1.5)}>
+          {dots.map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r={5} fill={SURFACE} stroke={PRIMARY} strokeWidth={2} />
+          ))}
+        </g>
+        <g className="sm-fade" style={delay(1.9)}>
+          {/* calls: from Kim's side, through the hub, out to the apps */}
+          {frontLinks.map((l, i) => (
+            <Token key={`fc${i}`} path={l.toHub} dur={2.2} phase={i * 0.5}>
+              <circle r={6} fill={PRIMARY} />
+            </Token>
+          ))}
+          {appLinks.map((l, i) => (
+            <Token key={`ac${i}`} path={l.toApp} dur={2.4} phase={0.15 + i * 0.27}>
+              <circle r={6} fill={PRIMARY} />
+            </Token>
+          ))}
+          {/* results: from the apps, through the hub, back to Kim */}
+          {appLinks.map((l, i) => (
+            <Token key={`ar${i}`} path={l.toHub} dur={2.6} phase={0.6 + i * 0.21}>
+              <rect x={-5} y={-5} width={10} height={10} rx={2.5} fill={SURFACE} stroke={PRIMARY} strokeWidth={2} />
+            </Token>
+          ))}
+          {frontLinks.map((l, i) => (
+            <Token key={`fr${i}`} path={l.toFront} dur={2.4} phase={0.35 + i * 0.5}>
+              <rect x={-5} y={-5} width={10} height={10} rx={2.5} fill={SURFACE} stroke={PRIMARY} strokeWidth={2} />
+            </Token>
+          ))}
+        </g>
+      </svg>
+
+      <span className="sm-fade absolute left-0 top-[-22px] font-mono text-[13px] font-bold tracking-[0.12em] text-fd-muted-foreground" style={delay(0.1)}>
+        APPS · OFFER ACTIONS
+      </span>
+      <span className="sm-fade absolute right-0 top-[-22px] font-mono text-[13px] font-bold tracking-[0.12em] text-fd-muted-foreground" style={delay(0.1)}>
+        KIM · USES THEM
+      </span>
+
+      {MIDDLE_APPS.map((n, i) => (
+        <HubCard key={n.name} node={n} x={0} y={left.ys[i]} w={left.w} at={0.3 + i * 0.1} />
+      ))}
+      {MIDDLE_FRONTS.map((n, i) => (
+        <HubCard key={n.name} node={n} x={front.x} y={front.ys[i]} w={front.w} at={0.7 + i * 0.12} tone={i === 0 ? 'primary' : 'default'} tag={n.tag} />
+      ))}
+
+      {/* the user */}
+      <div className="absolute flex flex-col items-center" style={{ left: kim.x, top: kim.y }}>
+        <KimFigure size={kim.size} mood="happy" />
+      </div>
+
+      {/* the hub */}
+      <div className="absolute" style={{ left: hub.x, top: hub.y, width: hub.w, height: hub.h }}>
+        <div className="sm-pop flex size-full flex-col items-center justify-center gap-2 rounded-[26px] bg-fd-primary text-fd-primary-foreground shadow-xl" style={delay(0.2)}>
+          <span className="flex size-[64px] items-center justify-center rounded-2xl bg-white/95 shadow-sm">
+            <Logo className="size-[54px]" />
+          </span>
+          <span className="text-[30px] font-bold leading-none tracking-[-0.02em]">Arkitekt</span>
+          <span className="text-center font-mono text-[12.5px] leading-snug opacity-85">
+            typed actions
+            <br />
+            data · provenance
+          </span>
+        </div>
+      </div>
+      <p className="sm-fade absolute text-center text-[15px] italic leading-snug text-fd-muted-foreground" style={{ left: hub.x - 30, top: hub.y + hub.h + 16, width: hub.w + 60, ...delay(2.2) }}>
+        neither side knows where
+        <br />
+        the other one runs
+      </p>
+    </div>
+  );
+}
+
+/* --- the app ---------------------------------------------------------------- */
+
+/* The implicit contract, without code: the microscope app offers the
+   functions it provides (name, inputs, outputs) to the hub, then opens one
+   websocket and listens. From then on the hub assigns and the app answers. */
+const OFFERS = [
+  { app: 'openuc2', name: 'acquire_image', ins: 'objective · choice', out: 'image' },
+  { app: 'openuc2', name: 'move_stage', ins: 'x, y · µm', out: '–' },
+  { app: 'openuc2', name: 'autofocus', ins: '–', out: 'z · µm' },
+];
+
+/** The openUC2's `optics.objectives` state: what the objective dropdown offers. */
+const OBJECTIVES = ['4x', '10x', '20x', '40x'];
 
 function TypeLine({ ins, out }: { ins: string; out: string }) {
   return (
@@ -258,6 +405,31 @@ function MiniSlide({ size = 44 }: { size?: number }) {
   );
 }
 
+/** A tiny brightfield tile, the kind `acquire_image` returns: hematoxylin
+    nuclei, a few of them brown where the stain took. */
+function ImageTile({ size = 44 }: { size?: number }) {
+  const cells: [number, number, number, boolean][] = [
+    [9, 10, 3, false],
+    [19, 7, 2.6, true],
+    [31, 11, 3.2, false],
+    [37, 24, 2.8, true],
+    [13, 22, 3, true],
+    [25, 20, 2.4, false],
+    [8, 34, 2.6, false],
+    [21, 33, 3.1, true],
+    [33, 36, 2.5, false],
+  ];
+  return (
+    <svg width={size} height={size} viewBox="0 0 44 44" className="block shrink-0" aria-hidden>
+      <rect x={0.5} y={0.5} width={43} height={43} rx={7} fill="#f6eef3" stroke={BORDER} />
+      <path d="M2 30 C 12 24, 22 34, 42 26 L42 42 L2 42 Z" fill="#e8c9da" fillOpacity={0.6} />
+      {cells.map(([cx, cy, r, took], i) => (
+        <circle key={i} cx={cx} cy={cy} r={r} fill={took ? '#8a5a2b' : '#6b5aa6'} fillOpacity={took ? 0.9 : 0.75} />
+      ))}
+    </svg>
+  );
+}
+
 /** The mouse pointer in Orkestrator. */
 function Pointer() {
   return (
@@ -267,11 +439,11 @@ function Pointer() {
   );
 }
 
-/** The apps of Kim's lab offer their actions to the hub; then, one click at a
-    time, the hub moves aside for Orkestrator, Kim picks `stain_cd20` for
-    `run_protocol` there (the dropdown is fed by the OT-2's state) and assigns
-    it, the task goes down the ot2 app's socket, and the OT-2's "done" flows
-    back to the hub and on to her. Steps are reveal fragments: empty markers
+/** The microscope app offers the functions it provides to the hub; then, one
+    click at a time, the hub moves aside for Orkestrator, Kim picks `10x` for
+    `acquire_image` there (the dropdown is fed by the microscope's state) and
+    assigns it, the task goes down the openuc2 app's socket, and the image
+    flows back to the hub and on to her. Steps are reveal fragments: empty markers
     whose `.visible` class drives the sibling selectors below. */
 export function OfferFigure() {
   const u = useUid();
@@ -286,7 +458,7 @@ export function OfferFigure() {
   const pill = 220;
   const laneX = pw + 18;
   const lane = hubFrom - 18 - pill - laneX;
-  // narrow layout: app | hub | Orkestrator, with 140 px gaps
+  // narrow layout: microscope | hub | Orkestrator, with 140 px gaps
   const gapA = [pw, hubTo] as const; // app ↔ hub, over the socket
   const gapB = [hubTo + pw, fx] as const; // hub ↔ Orkestrator
   const ySocket = 362;
@@ -417,7 +589,7 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
     </div>
   );
   return (
-    <div className="relative mx-auto h-[440px] w-[1180px]" role="img" aria-label="The apps of Kim’s lab, the OT-2, the robot arm and the openUC2 microscope, offer their actions with inputs and outputs to the Arkitekt hub and open a socket each. Then the hub moves aside for Orkestrator, where Kim opens run_protocol, picks stain_cd20 from a dropdown filled by the OT-2’s state and assigns it; the task goes through the hub and down the socket to the OT-2 app, and the OT-2’s done flows back to the hub and on to Orkestrator.">
+    <div className="relative mx-auto h-[440px] w-[1180px]" role="img" aria-label="The openUC2 microscope app offers the functions it provides, acquire_image, move_stage and autofocus, with their inputs and outputs to the Arkitekt hub and opens a socket. Then the hub moves aside for Orkestrator, where Kim opens acquire_image, picks the 10x objective from a dropdown filled by the microscope’s state and assigns it; the task goes through the hub and down the socket to the microscope app, and the image flows back to the hub and on to Orkestrator.">
       {marker(1)}
       {marker(2)}
       {marker(3)}
@@ -436,7 +608,7 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
         <g className={`${u}-narrow`}>
           <line x1={gapA[0]} y1={ySocket} x2={gapA[1]} y2={ySocket} stroke={PRIMARY} strokeOpacity={0.7} strokeWidth={2.4} strokeDasharray="8 6" />
           <text x={(gapA[0] + gapA[1]) / 2} y={ySocket + 22} textAnchor="middle" fontFamily="var(--font-mono, monospace)" fontSize={12} fill={MUTED}>
-            ot2’s socket
+            openuc2’s socket
           </text>
           <line x1={gapB[0]} y1={yFront} x2={gapB[1]} y2={yFront} stroke={BORDER} strokeWidth={2.4} />
           {[gapA[0], gapA[1]].map((x) => (
@@ -467,16 +639,16 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
         </span>
       </div>
 
-      {/* the apps of Kim's lab */}
+      {/* the microscope app */}
       <div className="absolute left-0 top-[6px]" style={{ width: pw }}>
         <div className={cn('sm-pop flex h-[388px] flex-col gap-2.5 p-3.5', card)} style={delay(0.15)}>
           <div className="flex items-center gap-3">
             <span className="flex size-[44px] items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
-              <FlaskConical className="size-[25px]" strokeWidth={1.8} />
+              <Microscope className="size-[25px]" strokeWidth={1.8} />
             </span>
             <span className="flex flex-col">
-              <span className="text-[19px] font-semibold leading-tight">Kim’s lab</span>
-              <span className="text-[13px] text-fd-muted-foreground">three apps, on three machines</span>
+              <span className="text-[19px] font-semibold leading-tight">openUC2 FRAME</span>
+              <span className="text-[13px] text-fd-muted-foreground">the microscope, as an app</span>
             </span>
           </div>
           {OFFERS.map((o, i) => (
@@ -486,7 +658,6 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
                 <TypeLine ins={o.ins} out={o.out} />
               </span>
               <span className="flex flex-col items-end gap-1">
-                <span className="font-mono text-[12px] text-fd-muted-foreground">{o.app}</span>
                 <Check className="sm-pop size-[18px] text-fd-primary" strokeWidth={2.6} style={delay(offerAt(i))} />
               </span>
               {i === 0 ? (
@@ -508,7 +679,7 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
               </svg>
               <span className="size-[10px] rounded-full bg-fd-primary" />
             </span>
-            <span className="font-mono text-[14px] font-semibold">3 apps · listening</span>
+            <span className="font-mono text-[14px] font-semibold">openuc2 · listening</span>
             <Radio className="ml-auto size-[18px]" strokeWidth={2} />
           </div>
         </div>
@@ -525,7 +696,7 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
             </span>
             <span className="flex flex-col">
               <span className="text-[19px] font-semibold leading-tight">Arkitekt hub</span>
-              <span className="text-[13px] text-fd-muted-foreground">registered from three apps</span>
+              <span className="text-[13px] text-fd-muted-foreground">what the microscope provides</span>
             </span>
           </div>
           {OFFERS.map((o, i) => (
@@ -534,7 +705,6 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
                 <span className="font-mono text-[16px] font-semibold">{o.name}</span>
                 <TypeLine ins={o.ins} out={o.out} />
               </span>
-              <span className="self-start font-mono text-[12px] text-fd-muted-foreground">{o.app}</span>
             </div>
           ))}
           <div className="relative mt-auto h-[64px]">
@@ -550,7 +720,7 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
             </div>
             <div className={`${u}-task absolute inset-0 flex items-center gap-3 rounded-xl border-2 border-fd-primary/40 bg-fd-primary/5 px-3`}>
               <span className="flex min-w-0 flex-1 flex-col gap-1.5">
-                <span className="font-mono text-[14px] font-semibold">task · run_protocol</span>
+                <span className="font-mono text-[14px] font-semibold">task · acquire_image</span>
                 <span className="relative h-[20px]">
                   <span className={`${u}-b-asg absolute left-0 top-0 rounded-full bg-fd-muted px-2 py-0.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-fd-muted-foreground`}>assigned</span>
                   <span className={`${u}-b-run absolute left-0 top-0 rounded-full bg-fd-primary px-2 py-0.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-fd-primary-foreground`}>running</span>
@@ -558,7 +728,7 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
                 </span>
               </span>
               <span className={`${u}-thumb`}>
-                <MiniSlide size={44} />
+                <ImageTile size={44} />
               </span>
             </div>
           </div>
@@ -591,12 +761,12 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
           ))}
           <div className={`${u}-form absolute inset-x-3.5 rounded-xl border border-fd-border bg-fd-background/60`} style={{ top: form, height: 140 }}>
             <span className="absolute left-3 top-2.5 whitespace-nowrap font-mono text-[12px] text-fd-muted-foreground">
-              protocol <span className="rounded bg-fd-muted px-1">choice</span> ← ot2 state
+              objective <span className="rounded bg-fd-muted px-1">choice</span> ← openuc2 state
             </span>
             <div className="absolute inset-x-3 top-[32px] flex h-[34px] items-center rounded-lg border-2 border-fd-border bg-fd-card px-2.5 font-mono text-[15px]">
               <span className="relative flex-1">
-                <span className={`${u}-ph text-[14px] text-fd-muted-foreground`}>pick a protocol</span>
-                <span className={`${u}-pick absolute inset-y-0 left-0`}>stain_cd20</span>
+                <span className={`${u}-ph text-[14px] text-fd-muted-foreground`}>pick an objective</span>
+                <span className={`${u}-pick absolute inset-y-0 left-0`}>10x</span>
               </span>
               <span className="text-[12px] text-fd-muted-foreground">▼</span>
             </div>
@@ -605,19 +775,19 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
               <span className={`${u}-btn2 absolute inset-0 flex items-center justify-center gap-2 rounded-lg border-2 border-fd-primary/50 bg-fd-primary/10 text-[15px] font-semibold text-fd-primary`}>assigned · waiting…</span>
             </div>
             <div className={`${u}-result absolute inset-x-3 top-[72px] flex items-center gap-3`}>
-              <MiniSlide size={56} />
+              <ImageTile size={56} />
               <span className="flex flex-col">
-                <span className="font-mono text-[14px] font-semibold">stain_cd20 · ran</span>
+                <span className="font-mono text-[14px] font-semibold">acquire_image · 10x</span>
                 <span className="flex items-center gap-1 text-[13px] font-semibold text-emerald-600">
-                  <Check className="size-[15px]" strokeWidth={2.8} /> done, from the hub
+                  <Check className="size-[15px]" strokeWidth={2.8} /> image, from the hub
                 </span>
               </span>
             </div>
-            {/* the dropdown, filled from the OT-2's state */}
+            {/* the dropdown, filled from the microscope's state */}
             <div className={`${u}-list absolute inset-x-3 top-[68px] z-10 rounded-lg border-2 border-fd-border bg-fd-card p-0.5 shadow-lg`}>
-              {PROTOCOLS.map((p) => (
+              {OBJECTIVES.map((p) => (
                 <div key={p} className="relative flex h-[19px] items-center rounded px-2 font-mono text-[13px]">
-                  {p === 'stain_cd20' ? <span className={`${u}-hl absolute inset-0 rounded bg-fd-primary/15`} /> : null}
+                  {p === '10x' ? <span className={`${u}-hl absolute inset-0 rounded bg-fd-primary/15`} /> : null}
                   <span className="relative">{p}</span>
                 </div>
               ))}
@@ -649,30 +819,30 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
       ))}
 
       {/* step 2: the assignment, Orkestrator → hub → app */}
-      <div className={`${u}-asgA absolute`} style={{ left: gapB[1] - 62, top: yFront - 17, ...travel(gapB[0] - gapB[1]) }}>
-        <span className="flex h-[34px] w-[124px] items-center justify-center whitespace-nowrap rounded-full bg-fd-primary font-mono text-[13px] font-bold text-fd-primary-foreground shadow-md">← run_protocol</span>
+      <div className={`${u}-asgA absolute`} style={{ left: gapB[1] - 72, top: yFront - 17, ...travel(gapB[0] - gapB[1]) }}>
+        <span className="flex h-[34px] w-[144px] items-center justify-center whitespace-nowrap rounded-full bg-fd-primary font-mono text-[13px] font-bold text-fd-primary-foreground shadow-md">← acquire_image</span>
       </div>
       <div className={`${u}-asgB absolute`} style={{ left: gapA[1] - 62, top: ySocket - 17, ...travel(gapA[0] - gapA[1]) }}>
-        <span className="flex h-[34px] w-[124px] items-center justify-center whitespace-nowrap rounded-full bg-fd-primary font-mono text-[13px] font-bold text-fd-primary-foreground shadow-md">← stain_cd20</span>
+        <span className="flex h-[34px] w-[124px] items-center justify-center whitespace-nowrap rounded-full bg-fd-primary font-mono text-[13px] font-bold text-fd-primary-foreground shadow-md">← 10x</span>
       </div>
 
-      {/* step 3: the OT-2's done, app → hub → Orkestrator */}
+      {/* step 3: the image, app → hub → Orkestrator */}
       <div className={`${u}-imgA absolute`} style={{ left: gapA[0] - 30, top: ySocket - 58, ...travel(gapA[1] - gapA[0]) }}>
         <span className="flex flex-col items-center gap-0.5 rounded-lg border-2 border-emerald-500/70 bg-fd-card p-1 shadow-md">
-          <MiniSlide size={48} />
-          <span className="font-mono text-[10px] font-bold text-emerald-600">done →</span>
+          <ImageTile size={48} />
+          <span className="font-mono text-[10px] font-bold text-emerald-600">image →</span>
         </span>
       </div>
       <div className={`${u}-imgB absolute`} style={{ left: gapB[0] - 30, top: yFront - 40, ...travel(gapB[1] - gapB[0]) }}>
         <span className="flex flex-col items-center gap-0.5 rounded-lg border-2 border-emerald-500/70 bg-fd-card p-1 shadow-md">
-          <MiniSlide size={48} />
-          <span className="font-mono text-[10px] font-bold text-emerald-600">done →</span>
+          <ImageTile size={48} />
+          <span className="font-mono text-[10px] font-bold text-emerald-600">image →</span>
         </span>
       </div>
 
-      {caption(1, '③ pick', 'Orkestrator builds the form from the types: the protocols come from the OT-2’s state')}
-      {caption(2, '④ assign', 'through the hub, down the ot2 app’s socket: no open port, no IP')}
-      {caption(3, '⑤ result', 'the OT-2 reports done: to the hub first, then on to Kim')}
+      {caption(1, '③ pick', 'Orkestrator builds the form from the types: the objectives come from the microscope’s state')}
+      {caption(2, '④ assign', 'through the hub, down the openuc2 app’s socket: no open port, no IP')}
+      {caption(3, '⑤ result', 'the image goes to the hub first, stored, then on to Kim')}
     </div>
   );
 }
