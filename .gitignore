@@ -3,7 +3,7 @@
 
 # generated content
 .source
-
+/drop
 # test & build
 /coverage
 /.next/

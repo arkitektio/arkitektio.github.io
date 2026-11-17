@@ -11,10 +11,10 @@
    what it shows until the file is dropped into
    `public/presentations/smart-microscopy/`. */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Brain, Microscope, Users } from 'lucide-react';
-import { Fragment, Slide } from '@revealjs/react';
+import { Brain, Dna, Microscope, TriangleAlert, Users } from 'lucide-react';
+import { Fragment, Slide, useReveal } from '@revealjs/react';
 import { cn } from '@/lib/cn';
 import { Logo } from '@/components/site/logo';
 import { DeckFrame } from '../deck-frame';
@@ -49,6 +49,7 @@ import {
   ItWorkedFigure,
   KimFigure,
   HORSEMEN,
+  PandoraBoxFigure,
   HorsemanArt,
   MacroChainFigure,
   NightmareFigure,
@@ -59,6 +60,7 @@ import {
   YearsFigure,
 } from './smart-microscopy-figures';
 import { DreamLab3D } from './smart-microscopy-dream-3d';
+import { ThanksFigure } from './smart-microscopy-thanks-figures';
 import { OptikitCubes3D } from './smart-microscopy-cubes-3d';
 
 /** The parts of the 3D build, in the order they snap in (`CUBE_ORDER`). */
@@ -96,6 +98,7 @@ function Clip({
   shows,
   length,
   height = 440,
+  aspect = 16 / 9,
 }: {
   /** The clip's number in the running order, or a `label` instead. */
   n?: number;
@@ -105,32 +108,74 @@ function Clip({
   length?: string;
   /** Height in slide pixels. */
   height?: number;
+  /** The recording's own shape, width over height: the player takes exactly
+      that shape, so nothing is letterboxed, and its rounded corners clip the
+      recorded window's. */
+  aspect?: number;
 }) {
   const src = `${MEDIA}/${file}`;
   // A missing file still paints a black player over the placeholder, so the
   // player only shows once it has a frame to show.
   const [ready, setReady] = useState(false);
+  // The clip waits on its first frame, and plays from the start on the first
+  // press of "next" on its slide: the press shows an empty reveal.js fragment,
+  // and the video follows it. Stepping back, or leaving the slide, rewinds it.
+  // Every clip on a slide shares the fragment index, so one press starts all.
+  const deck = useReveal();
+  const video = useRef<HTMLVideoElement | null>(null);
+  const mark = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (!deck || !ready) return;
+    let playing = false;
+    const sync = () => {
+      const v = video.current;
+      const m = mark.current;
+      if (!v || !m) return;
+      const on = Boolean(m.closest('section')?.classList.contains('present')) && m.classList.contains('visible');
+      if (on === playing) return;
+      playing = on;
+      v.currentTime = 0;
+      if (on) void v.play().catch(() => {});
+      else v.pause();
+    };
+    const events = ['ready', 'slidechanged', 'fragmentshown', 'fragmenthidden'] as const;
+    for (const e of events) deck.on(e, sync);
+    sync();
+    return () => {
+      for (const e of events) deck.off(e, sync);
+    };
+  }, [deck, ready]);
   return (
     <div
-      className="relative mx-auto aspect-video overflow-hidden rounded-2xl border border-dashed border-fd-border bg-fd-card/40"
-      style={{ height }}
+      className={cn(
+        'relative mx-auto shrink-0 overflow-hidden rounded-2xl',
+        ready ? 'shadow-xl ring-1 ring-fd-border' : 'border border-dashed border-fd-border bg-fd-card/40',
+      )}
+      style={{ height, aspectRatio: aspect }}
     >
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-16 text-center">
+      <div className={cn('absolute inset-0 flex flex-col items-center justify-center gap-2 px-16 text-center', ready && 'invisible')}>
         <span className="font-mono text-[13px] font-bold uppercase tracking-[0.18em] text-fd-primary">
           {[label ?? `Video ${n}`, length].filter(Boolean).join(' · ')}
         </span>
         <span className="text-[24px] font-semibold leading-snug">{shows}</span>
         <span className="font-mono text-[13px] text-fd-muted-foreground">{src}</span>
       </div>
+      {/* nothing to start while the file is missing, so no press to spend on it */}
+      {ready ? <span ref={mark} className="fragment" data-fragment-index={0} aria-hidden /> : null}
       <video
-        autoPlay
         muted
         loop
         controls
         playsInline
+        preload="auto"
+        // a video in the server's HTML can have its first frame before React attaches onLoadedData
+        ref={(el) => {
+          video.current = el;
+          if (el && el.readyState >= 2) setReady(true);
+        }}
         onLoadedData={() => setReady(true)}
         className={cn(
-          'absolute inset-0 size-full bg-black object-contain',
+          'absolute inset-0 size-full object-cover',
           !ready && 'invisible',
         )}
       >
@@ -256,6 +301,22 @@ function StatementSlide({
     </Slide>
   );
 }
+
+/** A recording, almost full screen: a small title, then the player as big as
+    the slide allows. */
+function ClipSlide({ title, notes, children }: { title: ReactNode; notes?: string; children: ReactNode }) {
+  return (
+    <Slide notes={notes}>
+      <div className="flex h-[680px] w-full flex-col items-center justify-center gap-2.5">
+        <h2 className="text-[22px] font-bold leading-none tracking-[-0.02em]">{title}</h2>
+        {children}
+      </div>
+    </Slide>
+  );
+}
+
+/** The shape of the Orkestrator window recordings, cropped to the window. */
+const WINDOW = 1722 / 1080;
 
 /** Accent for the half of a statement that carries the punch. */
 function Hl({ children }: { children: ReactNode }) {
@@ -569,7 +630,9 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
-      <StatementSlide notes="A beat between Claude’s cheerful answer and the four nights. Say it like a narrator, slowly: she has no idea what she just opened. Then the nights, one horseman each: The Network (connection), The Silent Crash (error handling and observability), The Folder (data management), Works On My Machine (reproducibility).">
+      <StatementSlide
+        figure={<PandoraBoxFigure />}
+        notes="A beat between Claude’s cheerful answer and the four nights. The box stands shut, a glow throbbing under its lid. Say it like a narrator, slowly: she has no idea what she just opened. One press of next, on “Pandora’s box”: it rattles, the lid flies open, and four spirits wind out, white, red, black and pale. Then the nights, one horseman each: The Network (connection), The Silent Crash (error handling and observability), The Folder (data management), Works On My Machine (reproducibility).">
         Little does she know that she has opened Pandora’s box, and will soon be visited by <Hl>the four horsemen of smart microscopy and lab automation.</Hl>
       </StatementSlide>
 
@@ -686,7 +749,7 @@ export function SmartMicroscopyDeck() {
 
       <DeckSlide
         title="Arkitekt is the middleman"
-        notes="One mental model is enough to start: Arkitekt sits in the middle. On the left, the apps in Kim’s lab: the openUC2 microscope, the robot arm and the OT-2, the analysis on the GPU server, Fiji and napari. Each one offers its steps to the hub as typed actions. On the right, Kim, with her two interfaces: Orkestrator in the browser, and the Arkitekt app on her phone. Same actions on both, and the image she just took shows up on both. She never talks to a machine directly. Nothing moves here; trace it with your words: calls go left, from Kim’s interfaces over their one connection through the hub to whichever app offers the action; results come back right, through the hub, where they are stored with their provenance. Neither side needs to know where the other one runs. The next three slides zoom in: one action through Orkestrator, a whole workflow, then the chat. Section total: about 6 minutes."
+        notes="One mental model is enough to start: Arkitekt sits in the middle. On the left, the apps in Kim’s lab: the openUC2 microscope, the robot arm and the OT-2, the analysis on the GPU server, Fiji and napari. Each one offers its steps to the hub as typed actions. On the right, Kim, with her two interfaces: Orkestrator in the browser, and the Arkitekt app on her phone. Same actions on both, and the image she just took shows up on both. She never talks to a machine directly. Trace it with your words: calls go left, from Kim’s interfaces over their one connection through the hub to whichever app offers the action; results come back right, through the hub. Neither side needs to know where the other one runs. One press of next: and it is the data hub, too. A drawer slides out from under the hub, and data moves over the same connections: the microscope stores an image, the analysis retrieves it and stores its labels back, then Kim’s screen and Fiji retrieve what they need. Every app stores its data in the hub and retrieves it from there, with its provenance; no app ever sends a file to another app. The next three slides zoom in: one action through Orkestrator, a whole workflow, then the chat. Section total: about 6 minutes."
       >
         <div className="flex flex-1 items-center">
           <MiddlemanFigure />
@@ -711,19 +774,33 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
-      <DeckSlide
+      <ClipSlide
         title="Here is how that works"
-        notes="Video slot: drop the recording in as public/presentations/smart-microscopy/microscope-actions.mp4 and it plays here. It is the last slide for real: the openUC2 app starts and its actions show up on the hub; in Orkestrator Kim opens acquire_image, picks the 10x objective from the dropdown, assigns it, and the image comes back. Next: the app can bring its own UI, too."
+        notes="Recorded clip, 20 seconds, starts on the first press of next and loops (public/presentations/smart-microscopy/microscope-actions.mp4). It is the last two slides for real. It starts on the hub’s list of apps; Kim opens the openUC2 app, and there is the microscope in 3D, placed where it stands, next to the actions it offers: acquire_image, focus, jog, move_to_position, snap, autofocus. She presses play on acquire_image, the task shows up bottom left, and the image comes back and opens in mikro: an H&E section. Next: the image is a typed dataset now, so the next app can pick it up."
       >
-        <div className="flex flex-1 items-center justify-center">
-          <Clip
-            label="Video · the microscope’s actions"
-            file="microscope-actions.mp4"
-            length="30 s"
-            shows="The openUC2 app offers its actions to the hub; in Orkestrator Kim picks 10x, assigns acquire_image, and the image comes back."
-          />
-        </div>
-      </DeckSlide>
+        <Clip
+          label="Video · the microscope’s actions"
+          file="microscope-actions.mp4"
+          length="20 s"
+          shows="The openUC2 app offers its actions to the hub; in Orkestrator Kim assigns acquire_image, and the image comes back."
+          aspect={WINDOW}
+          height={646}
+        />
+      </ClipSlide>
+
+      <ClipSlide
+        title="And the next app picks it up"
+        notes="Recorded clip, 30 seconds, starts on the first press of next and loops (public/presentations/smart-microscopy/segment-image.mp4). Same image as the last clip, a different app on a different machine. Kim opens the image’s menu: Orkestrator lists every action that takes an image, whoever offers it. She picks Segment Cells in RGB Image, the form is built from its types (diameter, flow threshold, cell probability), and she assigns it. It runs on the GPU server; the labels come back as a new layer on the same coordinates as the image, and she zooms in on the cells. Nobody told the segmenter where the microscope is or where the file went. Next: the app can bring its own UI, too."
+      >
+        <Clip
+          label="Video · segmenting the image"
+          file="segment-image.mp4"
+          length="30 s"
+          shows="From the image’s menu Kim assigns Segment Cells; the labels come back as a layer on the same image."
+          aspect={WINDOW}
+          height={646}
+        />
+      </ClipSlide>
 
       <DeckSlide
         title="It can bring its own UI, too"
@@ -734,19 +811,19 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
-      <DeckSlide
+      <ClipSlide
         title="And it can get quite complex itself"
-        notes="Video slot: drop the recording in as public/presentations/smart-microscopy/microscope-blok.mp4 and it plays here. Narrate it as the second half of the last slide, and the point of the title: a blok can get quite complex itself, this one is a whole microscope panel. Functions are not everything a device wants to say. The openUC2 app registers a blok with the hub, a small UI it ships itself (live view, stage position, objective, the light), and Orkestrator renders it like any other page. Kim did not build it and the hub does not know what is in it; the app brought it. Keep it short: it comes back as a building block in a moment."
+        notes="Recorded clip, 25 seconds, starts on the first press of next and loops (public/presentations/smart-microscopy/microscope-blok.mp4). Narrate it as the second half of the last slide, and the point of the title: a blok can get quite complex itself, this one is a whole microscope panel. It is the openUC2 app’s own page, openuc-panel, opened in Orkestrator: the live view comes up, with the stage position and a scale bar on it, and next to it the controls the app brought (live and exposure, the stage arrows with their step sizes, focus, autofocus). Kim steps the focus and the image sharpens, nudges the stage and the tissue moves, presses Snap, and the snapped frame opens as a scene in mikro. Kim did not build this UI and the hub does not know what is in it; the app brought it. Keep it short: it comes back as a building block in a moment."
       >
-        <div className="flex flex-1 items-center justify-center">
-          <Clip
-            label="Video · the microscope’s blok"
-            file="microscope-blok.mp4"
-            length="30 s"
-            shows="The openUC2 app offers its blok to the hub; Orkestrator shows it: live view, stage, objective, light."
-          />
-        </div>
-      </DeckSlide>
+        <Clip
+          label="Video · the microscope’s blok"
+          file="microscope-blok.mp4"
+          length="25 s"
+          shows="The openUC2 app’s own panel in Orkestrator: live view, stage, focus, and a snap that opens in mikro."
+          aspect={1696 / 1080}
+          height={646}
+        />
+      </ClipSlide>
 
       <StatementSlide
         notes="Say it in Kim’s voice, a bit deflated. Everything so far is real, but it is remote control: Kim is still the one clicking every step, just from a browser instead of three PCs. Automation means the steps run without her. That is the next slide: wire the actions together."
@@ -781,6 +858,19 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
+      <ClipSlide
+        title="And then it runs, in the lab"
+        notes="Recorded clip, 15 seconds, starts on the first press of next and loops (public/presentations/smart-microscopy/real-world-workflow.mp4). No screen this time: the real bench. The arm picks the slide up, carries it into the OT-2, the pipette stains it, the arm takes it up to the openUC2 microscope on the shelf and brings it back. This is the workflow from the last slide, the same twenty lines, with nobody in the room. Kim’s dream from earlier, without the sparkles."
+      >
+        <Clip
+          label="Video · the real workflow"
+          file="real-world-workflow.mp4"
+          length="15 s"
+          shows="The arm carries the slide between the OT-2 and the openUC2 microscope: process_slides, running in the lab."
+          height={646}
+        />
+      </ClipSlide>
+
       <DeckSlide
         title="And the UI? Remix the bloks"
         notes="Same move as the workflow, for the interface. Everything is on the slide on arrival, no steps: the ask, the answer, the code and the tiles. Kim wants one screen to watch the run. Claude doesn’t generate a UI from scratch: it writes a blok that only nests other bloks, the ones the apps brought with them, like the microscope’s blok two slides ago. Point at the colours: each Blok line becomes one tile. The openUC2’s live view with its capture button, the run’s progress from stainstorm, the OT-2’s deck, the arm’s pose. Every button on that page is still the app’s own typed action, with its own ranges, so nothing new has to be trusted. The syntax is illustrative."
@@ -790,18 +880,17 @@ export function SmartMicroscopyDeck() {
         </div>
       </DeckSlide>
 
-      <DeckSlide
+      <ClipSlide
         title="Live: the remixed page, running"
         notes="Video slot: drop the recording in as public/presentations/smart-microscopy/blok-remix-live.mp4 and it plays here; until then the slot says what goes in it. Show the real thing from the last slide: ask the chat for one screen to watch the run, the blok appears, Orkestrator renders it, and the tiles are live while process_slides runs (the openUC2 view updating, the stain progress ticking, the OT-2 and the arm changing state). Press one button on the page, so they see it is still the app’s own typed action."
       >
-        <div className="flex flex-1 items-center justify-center">
-          <Clip
-            label="Live demo"
-            file="blok-remix-live.mp4"
-            shows="The remixed run_dashboard in Orkestrator, live during a run: the openUC2 view, stain progress, the OT-2 deck and the arm, all updating."
-          />
-        </div>
-      </DeckSlide>
+        <Clip
+          label="Live demo"
+          file="blok-remix-live.mp4"
+          shows="The remixed run_dashboard in Orkestrator, live during a run: the openUC2 view, stain progress, the OT-2 deck and the arm, all updating."
+          height={646}
+        />
+      </ClipSlide>
 
       <Slide notes="Meme beat, right after the demos: just the sceptical Reviewer 2, peering over his glasses. Cool little UI plays, but how does this solve Kim’s problem? Nothing to step through. It is the right question, and the rest of the talk answers it, one horseman at a time, starting on the next slide.">
         <div className="flex h-[640px] w-full items-center justify-center">
@@ -844,19 +933,19 @@ export function SmartMicroscopyDeck() {
         Arkitekt puts everything that happens on a log, <Hl>so we know exactly what happened, when.</Hl>
       </StatementSlide>
 
-      <DeckSlide
+      <ClipSlide
         title="Observe: replay the run"
-        notes="First of the three: observe. Video slot: drop the recording in as public/presentations/smart-microscopy/replay-demo.mp4 and it plays here; until then the slot says what goes in it. Show a replay of our workflow in Orkestrator: scrub back through run 41 after the fact and watch every step again as it happened, the calls lighting up in order, the states and the images arriving. Nobody had to be there, and nobody had to add logging: it is the same log as on the last slide, played back."
+        notes="First of the three: observe. Recorded clip, 20 seconds, starts on the first press of next and loops (public/presentations/smart-microscopy/replay-demo.mp4). A finished run of process_slides in Orkestrator, replayed after the fact. Kim drags the timeline at the bottom back and forth, and everything follows: the arm, the OT-2 and the microscope move in the 3D scene to where they were at that moment, the steps on the right tick off (pick up, stain, image, stitch, segment, measure, put back), the device states change, and the mosaic and the labels show up when they were made. Nobody had to be there, and nobody had to add logging: it is the same log as on the last slide, played back."
       >
-        <div className="flex flex-1 items-center justify-center">
-          <Clip
-            label="Video · replay of the workflow"
-            file="replay-demo.mp4"
-            length="30 s"
-            shows="Run 41 of process_slides, replayed in Orkestrator after the fact: every call, state update and image, in the order it happened."
-          />
-        </div>
-      </DeckSlide>
+        <Clip
+          label="Video · replay of the workflow"
+          file="replay-demo.mp4"
+          length="20 s"
+          shows="A run of process_slides, replayed in Orkestrator after the fact: every call, state update and image, in the order it happened."
+          aspect={WINDOW}
+          height={646}
+        />
+      </ClipSlide>
 
       <DeckSlide
         title="Inform: when code can’t fix it, ask a person"
@@ -936,22 +1025,23 @@ export function SmartMicroscopyDeck() {
       </DeckSlide>
       ) : null}
 
-      <DeckSlide
+      <ClipSlide
         title="What that looks like"
-        notes="Live demo slot: drop the recording in as public/presentations/smart-microscopy/live-arkitekt.mp4 and it plays here; until then the slot says what goes in it. Straight after the coordinate system slide, so show the real thing: a run of the workflow, then its lineage graph and the images on the stage in Orkestrator."
+        notes="Recorded clip, about a minute, starts on the first press of next and loops (public/presentations/smart-microscopy/live-arkitekt.mp4). Straight after the coordinate system slide, so this is the real thing: the mosaic the workflow stitched from three tiles, opened in mikro. Kim switches the Cellpose labels on, and they sit exactly on the cells, because they share the mosaic’s coordinates. She zooms out to the whole section, then colours the cells by a measurement from the table, and filters on it: drag the range, and only the cells in it are left. Image, labels and table are three datasets, related in the database; nobody exported a CSV."
       >
-        <div className="flex flex-1 items-center justify-center">
-          <Clip
-            label="Live demo"
-            file="live-arkitekt.mp4"
-            shows="Arkitekt live: the workflow runs, then its lineage graph and the images on the stage in Orkestrator."
-          />
-        </div>
-      </DeckSlide>
+        <Clip
+          label="Video · exploring the mosaic"
+          file="live-arkitekt.mp4"
+          length="1 min"
+          shows="The stitched mosaic in mikro: the labels on the same coordinates, coloured and filtered by what was measured in each cell."
+          aspect={WINDOW}
+          height={646}
+        />
+      </ClipSlide>
 
       <DeckSlide
         title="There is more"
-        notes="After the demo, widen it in one slide. Everything so far was brightfield tiles, but it does not only work with images. On the right, two recordings (drop them in as public/presentations/smart-microscopy/flim-data.mp4 and calcium-traces.mp4; until then the slots say what goes in them). Top: a FLIM dataset in mikro with its phasor plot; select a cloud in the phasor and the image is coloured by lifetime. Bottom: calcium imaging as a time series, the ΔF/F traces of a few cells next to the movie. On the left, the rest of the list: tables of per-cell measurements, volumes, spectral stacks, the meshes that come out of segmentation. Each is a typed dataset, not a folder of files, and each sits in the same coordinate systems, with the same lineage, as Kim’s tiles."
+        notes="After the demo, widen it in one slide. Everything so far was brightfield tiles, but it does not only work with images. On the right, two recordings (calcium-traces.mp4 is in; flim-data.mp4 still has to be dropped into public/presentations/smart-microscopy, until then its slot says what goes in it). Top: a FLIM dataset in mikro with its phasor plot; select a cloud in the phasor and the image is coloured by lifetime. Bottom: calcium imaging as a time series, the ΔF/F traces of a few cells next to the movie. On the left, the rest of the list: tables of per-cell measurements, volumes, spectral stacks, the meshes that come out of segmentation. Each is a typed dataset, not a folder of files, and each sits in the same coordinate systems, with the same lineage, as Kim’s tiles."
       >
         <div className="flex flex-1 items-center gap-10">
           <div className="flex flex-1 flex-col gap-5">
@@ -978,7 +1068,7 @@ export function SmartMicroscopyDeck() {
           </div>
           <div className="flex shrink-0 flex-col gap-4">
             <Clip label="Video · FLIM" file="flim-data.mp4" shows="FLIM, with its phasor" height={214} />
-            <Clip label="Video · calcium" file="calcium-traces.mp4" shows="Calcium traces, cell by cell" height={214} />
+            <Clip label="Video · calcium" file="calcium-traces.mp4" shows="Calcium traces, cell by cell" height={214} aspect={WINDOW} />
           </div>
         </div>
       </DeckSlide>
@@ -1057,34 +1147,57 @@ export function SmartMicroscopyDeck() {
 
       <DeckSlide
         title="The problem with using LLMs in science"
-        notes="Take the hype seriously for one slide, and say where it actually hurts in a lab. It is not only the two things we have already seen: reproducibility (the run nobody can repeat) and dead UIs (the vibe-coded GUI that ran once, the graveyard from the interlude). Those are real, but every field has them. What is special about science is on the right, twice. We deal with sensitive hardware: a robot arm, a laser, a microscope that costs more than a house; one wrong call moves an arm into an objective or burns a sample. And we deal with sensitive data: patient tissue, clinical records, results nobody has published yet. Then the line, said plainly and without drama: this is something we should not give Anthropic access to. Not them, and not anyone else’s cloud either; it is not about one company. Next slide: what we do instead."
+        notes="Three presses of next: hardware, data, the line. Take the hype seriously for one slide, and say where it actually hurts in a lab. It is not only the two things we have already seen: reproducibility (the run nobody can repeat) and dead UIs (the vibe-coded GUI that ran once, the graveyard from the interlude). Those are real, but every field has them. What is special about science is on the right, twice. We deal with sensitive hardware: a robot arm, a laser, a microscope that costs more than a house; one wrong call moves an arm into an objective or burns a sample. And we deal with sensitive data: patient tissue, clinical records, results nobody has published yet. Then the line, said plainly and without drama: this is something we should not give Anthropic access to. Not them, and not anyone else’s cloud either; it is not about one company. Next slide: what we do instead."
       >
-        <div className="flex flex-1 flex-col justify-center gap-7">
-          <p className="flex flex-wrap items-baseline gap-x-3 text-[26px] leading-snug text-fd-muted-foreground">
-            It is not only
-            <span className="font-semibold text-fd-foreground">reproducibility</span>
-            and
-            <span className="font-semibold text-fd-foreground">dead UIs</span>.
+        <div className="flex flex-1 flex-col justify-center gap-6">
+          {/* what every field has, set aside */}
+          <p className="flex flex-wrap items-center gap-x-3 text-[24px] leading-snug text-fd-muted-foreground">
+            Not only
+            {['reproducibility', 'dead UIs'].map((t) => (
+              <span key={t} className="rounded-full border border-fd-border bg-fd-card/60 px-4 py-1 text-[20px] font-semibold text-fd-foreground">
+                {t}
+              </span>
+            ))}
+            <span>: every field has those. In a lab, an agent also touches two things.</span>
           </p>
-          <div className="grid grid-cols-2 gap-10">
+
+          {/* the two things, one press each */}
+          <div className="grid grid-cols-2 gap-6">
             {(
               [
-                [Microscope, 'Sensitive hardware', 'A robot arm, a laser, an instrument that took a year to get. One wrong call moves, burns or breaks something.'],
-                [Brain, 'Sensitive data', 'Patient tissue, clinical records, results nobody has published yet.'],
+                [Microscope, 'Sensitive hardware', ['a robot arm', 'a laser', 'the scope that took a year to get'], 'One wrong call moves, burns or breaks something.'],
+                [Dna, 'Sensitive data', ['patient tissue', 'clinical records', 'unpublished results'], 'One prompt, and it has left the building.'],
               ] as const
-            ).map(([Icon, what, why], i) => (
-              <div key={what} className={cn('flex gap-5', i > 0 && 'border-l-2 border-fd-border pl-10')}>
-                <Icon className="mt-1 size-[54px] shrink-0 text-fd-primary" strokeWidth={1.6} />
-                <div className="flex flex-col gap-2">
-                  <span className="text-[38px] font-bold leading-[1.05] tracking-[-0.025em]">{what}</span>
-                  <span className="text-[20px] leading-snug text-fd-muted-foreground">{why}</span>
+            ).map(([Icon, what, examples, risk], i) => (
+              <Fragment key={what} as="div" index={i} animation="fade-up" className="flex flex-col gap-4 rounded-3xl border border-fd-border bg-fd-card/70 p-7 shadow-sm">
+                <div className="flex items-center gap-4">
+                  <span className="flex size-[60px] shrink-0 items-center justify-center rounded-2xl bg-fd-primary/15">
+                    <Icon className="size-[34px] text-fd-primary" strokeWidth={1.8} />
+                  </span>
+                  <span className="text-[36px] font-bold leading-[1.05] tracking-[-0.025em]">{what}</span>
                 </div>
-              </div>
+                <div className="flex flex-wrap gap-2">
+                  {examples.map((e) => (
+                    <span key={e} className="rounded-lg bg-fd-muted px-3 py-1 text-[18px] leading-snug">
+                      {e}
+                    </span>
+                  ))}
+                </div>
+                <p className="flex items-center gap-2.5 border-t border-fd-border pt-4 text-[20px] font-semibold leading-snug text-[#d97706]">
+                  <TriangleAlert className="size-[22px] shrink-0" strokeWidth={2.2} />
+                  {risk}
+                </p>
+              </Fragment>
             ))}
           </div>
-          <p className="text-[34px] font-bold leading-tight tracking-[-0.02em]">
-            That is something we <span className="text-[#d97706]">should not</span> give Anthropic access to.
-          </p>
+
+          {/* and the line */}
+          <Fragment as="div" index={2} animation="fade-up" className="flex items-baseline justify-between gap-6 rounded-2xl border-2 border-[#d97706]/50 bg-[#d97706]/10 px-7 py-4">
+            <span className="text-[30px] font-bold leading-tight tracking-[-0.02em]">
+              That is something we <span className="text-[#d97706]">should not</span> give Anthropic access to.
+            </span>
+            <span className="shrink-0 text-[18px] text-fd-muted-foreground">Or anyone else’s cloud.</span>
+          </Fragment>
         </div>
       </DeckSlide>
 
@@ -1119,13 +1232,6 @@ export function SmartMicroscopyDeck() {
           <AgentRightsFigure />
         </div>
       </DeckSlide>
-
-      <StatementSlide
-        sub="So let the chat answer with something better than text."
-        notes="Problem two: what does the user chat with? People would like to chat with that, and that’s fine. But typing “a bit more exposure… no, less” to a microscope forty times a day is not an interface."
-      >
-        People would like to chat with that.
-      </StatementSlide>
 
       <DeckSlide
         title="The chat answers with a blok"
@@ -1264,6 +1370,15 @@ export function SmartMicroscopyDeck() {
               <span className="text-[24px] font-semibold leading-snug text-fd-primary">{answer}</span>
             </div>
           ))}
+        </div>
+      </DeckSlide>
+
+      <DeckSlide
+        title="Acknowledgements"
+        notes="Thank people by name, and by place: one map, and everyone on it, tied to the city they work in. Three teams, each with its picture: the IINS in Bordeaux, openUC2 in Jena (Benedict, Ethan and Stefan), and our own group at the Institute of Anatomy and Cell Biology in Linz. And the Arkitekt team: Alex in Frankfurt, Deborah in Berlin, Franzi in Helsinki, and Artemiy at the University of Marburg. Twenty seconds; then the last slide."
+      >
+        <div className="flex flex-1 items-center">
+          <ThanksFigure />
         </div>
       </DeckSlide>
 

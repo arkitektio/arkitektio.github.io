@@ -455,7 +455,6 @@ export function Steps({
   period,
   children,
   className = 'relative shrink-0',
-  pips = true,
   live = false,
   speed = 1,
   onStep,
@@ -473,8 +472,6 @@ export function Steps({
   period?: number;
   children: ReactNode;
   className?: string;
-  /** The row of dots that says how many presses are left. */
-  pips?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const stepped = live && cues.length > 1;
@@ -593,17 +590,6 @@ export function Steps({
     >
       {children}
       {marks}
-      {pips && stepped ? (
-        <div aria-hidden className="pointer-events-none absolute right-0 top-0 flex -translate-y-[14px] gap-[5px]">
-          {cues.map((_, i) => (
-            <span
-              key={i}
-              className="block size-[6px] rounded-full"
-              style={{ background: i <= step ? PRIMARY : BORDER }}
-            />
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 }

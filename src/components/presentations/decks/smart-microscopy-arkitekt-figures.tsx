@@ -12,7 +12,7 @@
 import { Fragment as ReactFragment } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Fragment } from '@revealjs/react';
-import { Bot, BrickWall, Building2, Check, Cpu, LayoutDashboard, Laptop, Layers, Lock, Microchip, Microscope, Network, NotebookPen, Pipette, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
+import { Bot, BrickWall, Building2, Check, Cpu, Database, LayoutDashboard, Laptop, Layers, Lock, Microchip, Microscope, Network, NotebookPen, Pipette, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
 import { ArmModel3D, FrameModel3D } from './smart-microscopy-frame-3d';
@@ -400,13 +400,56 @@ export function BetterMiddleFigure() {
   );
 }
 
+/** A tiny label image, the kind segmentation returns: one colour per cell. */
+function LabelTile({ size = 44 }: { size?: number }) {
+  const cells: [number, number, number, string][] = [
+    [10, 11, 5, '#f472b6'],
+    [24, 9, 4.4, '#60a5fa'],
+    [35, 16, 5, '#facc15'],
+    [14, 25, 5.4, '#34d399'],
+    [28, 24, 4.6, '#fb923c'],
+    [10, 37, 4, '#a78bfa'],
+    [23, 36, 5, '#22d3ee'],
+    [36, 33, 4.6, '#f87171'],
+  ];
+  return (
+    <svg width={size} height={size} viewBox="0 0 44 44" className="block shrink-0" aria-hidden>
+      <rect x={0.5} y={0.5} width={43} height={43} rx={7} fill="#0b0f19" stroke={BORDER} />
+      {cells.map(([cx, cy, r, fill], i) => (
+        <circle key={i} cx={cx} cy={cy} r={r} fill={fill} />
+      ))}
+    </svg>
+  );
+}
+
 /** Arkitekt as the middleman: the apps on the left offer their actions, Kim
     on the right uses them from Arkitekt's interfaces: Orkestrator in the
     browser, with the phone app overlapping its bottom right corner, on one
-    connection to the hub. Nothing moves; neither side talks to the other
-    directly. */
+    connection to the hub. Neither side talks to the other directly.
+
+    One press of "next": it is the data hub, too. A drawer slides out from
+    under the hub, and data starts to move over the same connections: the
+    microscope stores an image, the analysis retrieves it and stores its
+    labels, and Kim's screen and Fiji retrieve what they need. */
 export function MiddlemanFigure() {
   const u = useUid();
+  const t0 = 3;
+  const hop = 0.75;
+  const at = { drawer: t0 + 0.1, image: t0 + 0.7, toAnalysis: t0 + 1.7, labels: t0 + 2.6, out: t0 + 3.5 };
+  const end = at.out + hop + 0.3;
+  const css = `
+.${u}-tok { position: absolute; left: 0; top: 0; opacity: 0; offset-rotate: 0deg; }
+section.present .${u}-tok { animation: ${u}-go ${hop}s cubic-bezier(.45,0,.3,1) var(--d) both; }
+section.present .${u}-tok.${u}-rev { animation-name: ${u}-back; }
+@keyframes ${u}-go { 0% { offset-distance: 0%; opacity: 0; } 12%, 85% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+@keyframes ${u}-back { 0% { offset-distance: 100%; opacity: 0; } 12%, 85% { opacity: 1; } 100% { offset-distance: 0%; opacity: 0; } }
+section.present .${u}-drawer { animation: ${u}-drawer 0.5s cubic-bezier(.2,.8,.2,1) ${at.drawer}s both; }
+@keyframes ${u}-drawer { from { opacity: 0; transform: translateY(-70px); } to { opacity: 1; transform: none; } }
+.${u}-cap { opacity: 0; }
+section.present .${u}-cap { animation: ${u}-cap 0.3s ease-out ${t0}s both; }
+@keyframes ${u}-cap { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { section.present :is(.${u}-tok, .${u}-drawer, .${u}-cap) { animation: none; } }
+`;
   const W = 1000;
   const left = { w: 236, ys: [0, 104, 208, 312] };
   const hub = { x: 330, y: 100, w: 230, h: 220 };
@@ -431,12 +474,21 @@ export function MiddlemanFigure() {
     ...fronts.map(([fx, fy]) => [fx, fy] as [number, number]),
   ];
 
+  /* data on the move: along a connection, towards the hub or (`rev`) away from it */
+  const token = (d: string, when: number, kind: 'image' | 'labels', rev = false) => (
+    <div className={cn(`${u}-tok z-20 drop-shadow-md`, rev && `${u}-rev`)} style={{ offsetPath: `path('${d}')`, ...delay(when) }}>
+      {kind === 'image' ? <ImageTile size={30} /> : <LabelTile size={30} />}
+    </div>
+  );
+
   return (
+    <Steps live cues={[t0, end]} className="relative mx-auto w-fit">
     <div
-      className="relative mx-auto h-[420px] w-[1000px]"
+      className="relative h-[420px] w-[1000px]"
       role="img"
-      aria-label="Arkitekt as the middleman: microscopes, robots, analysis and Fiji or napari offer their actions on the left; on the right Kim uses them from Orkestrator in her browser with the Arkitekt app on her phone overlapping it, on one connection to the hub"
+      aria-label="Arkitekt as the middleman: microscopes, robots, analysis and Fiji or napari offer their actions on the left; on the right Kim uses them from Orkestrator in her browser with the Arkitekt app on her phone overlapping it, on one connection to the hub. It is the data hub too: the apps store their images and labels in it and retrieve them from it, over the same connections"
     >
+      <LoopStyles css={css} />
       <svg width={W} height={420} viewBox={`0 0 ${W} 420`} className="absolute inset-0" aria-hidden>
         {appLinks.map((l, i) => (
           <Path key={`a${i}`} className="sm-draw" style={delay(0.8 + i * 0.12)} d={l.toHub} stroke={BORDER} width={2.2} />
@@ -467,6 +519,42 @@ export function MiddlemanFigure() {
         <KimFigure size={kim.size} mood="happy" />
       </div>
 
+      {/* and the data hub: a drawer from under the hub */}
+      <div
+        className={`${u}-drawer absolute rounded-b-[22px] border-2 border-fd-primary/60 bg-fd-card shadow-md`}
+        style={{ left: hub.x + 14, top: hub.y + hub.h - 26, width: hub.w - 28, height: 112 }}
+      >
+        <div className="flex h-full items-end justify-between px-3.5 pb-3">
+          <div className="flex flex-col gap-1">
+            <span className="flex items-center gap-1.5 text-[17px] font-bold leading-none">
+              <Database className="size-[16px] text-fd-primary" aria-hidden />
+              Datahub
+            </span>
+            <span className="font-mono text-[11px] leading-tight text-fd-muted-foreground">
+              apps store
+              <br />
+              and retrieve
+            </span>
+          </div>
+          <div className="flex gap-1.5">
+            <span className="sm-pop" style={delay(at.image + hop - 0.1)}>
+              <ImageTile size={30} />
+            </span>
+            <span className="sm-pop" style={delay(at.labels + hop - 0.1)}>
+              <LabelTile size={30} />
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* the microscope stores an image; the analysis retrieves it and stores
+          its labels; Kim's screen and Fiji retrieve what they need */}
+      {token(appLinks[0].toHub, at.image, 'image')}
+      {token(appLinks[2].toHub, at.toAnalysis, 'image', true)}
+      {token(appLinks[2].toHub, at.labels, 'labels')}
+      {token(frontLinks[0].toHub, at.out, 'image', true)}
+      {token(appLinks[3].toHub, at.out + 0.15, 'labels', true)}
+
       {/* the hub */}
       <div className="absolute" style={{ left: hub.x, top: hub.y, width: hub.w, height: hub.h }}>
         <div className="sm-pop flex size-full flex-col items-center justify-center gap-2 rounded-[26px] bg-fd-primary text-fd-primary-foreground shadow-xl" style={delay(0.2)}>
@@ -481,12 +569,15 @@ export function MiddlemanFigure() {
           </span>
         </div>
       </div>
-      <p className="sm-fade absolute text-center text-[15px] italic leading-snug text-fd-muted-foreground" style={{ left: hub.x - 30, top: hub.y + hub.h + 16, width: hub.w + 60, ...delay(2.2) }}>
-        neither side knows where
-        <br />
-        the other one runs
-      </p>
+      <div className={`${u}-cap absolute`} style={{ left: hub.x - 30, top: hub.y + hub.h + 16, width: hub.w + 60 }}>
+        <p className="sm-fade text-center text-[15px] italic leading-snug text-fd-muted-foreground" style={delay(2.2)}>
+          neither side knows where
+          <br />
+          the other one runs
+        </p>
+      </div>
     </div>
+    </Steps>
   );
 }
 
@@ -1020,7 +1111,7 @@ section.present .${u}-hands { animation: ${u}-juggle 0.35s ease-in-out ${from}s 
 `;
   const hand = (x: number, y: number) => <circle cx={x} cy={y} r={14} fill="#fff" stroke="#111" strokeWidth={3} />;
   return (
-    <Steps live cues={[0.5, from + dur + 0.6]} className="relative shrink-0" pips={false}>
+    <Steps live cues={[0.5, from + dur + 0.6]} className="relative shrink-0">
       <div className="relative" style={{ width: W, height: H }} role="img" aria-label="The Arkitekt logo, with big proud eyes, holds a stack of its actions, shuffles them in its hands and lays them out in a circle around itself">
         <LoopStyles css={css} />
         <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 size-full overflow-visible" aria-hidden>
@@ -2729,7 +2820,7 @@ export function AiWorkflowFigure() {
   const cues = [runAt + 2.2];
   const code = 'font-mono text-[13.5px] text-fd-primary';
   return (
-    <Steps cues={cues} pips={false} className="relative mx-auto grid h-[440px] w-[1180px] grid-cols-[380px_1fr] gap-5">
+    <Steps cues={cues} className="relative mx-auto grid h-[440px] w-[1180px] grid-cols-[380px_1fr] gap-5">
     <div className="contents" role="img" aria-label="Kim asks an AI for a workflow that stains her slide on the OT-2 for each stain in her panel, images it on the openUC2, segments and measures it per cell, and stains again until it takes. It writes a short Python workflow, process_slides, against the actions of her six apps on the hub; she runs it, and the run reports CD3 at 84 percent, CD20 at 41 percent so stain again, then CD20 at 86 percent.">
       {/* the conversation, and the run */}
       <div className="flex flex-col gap-3">
@@ -2845,7 +2936,7 @@ export function BlokRemixFigure() {
     ['PanCK', '', 'todo'],
   ];
   return (
-    <Steps cues={cues} pips={false} className="relative mx-auto grid h-[440px] w-[1180px] grid-cols-[400px_1fr] gap-5">
+    <Steps cues={cues} className="relative mx-auto grid h-[440px] w-[1180px] grid-cols-[400px_1fr] gap-5">
     <div
       className="contents"
       role="img"

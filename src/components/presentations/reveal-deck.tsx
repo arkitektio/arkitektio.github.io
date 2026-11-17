@@ -14,11 +14,14 @@ import './reveal-theme.css';
    so a `text-[20px]` in a slide always keeps the same relative size. */
 export const DECK_WIDTH = 1280;
 export const DECK_HEIGHT = 720;
+/* The breathing room around the canvas while the deck is embedded in a page.
+   Fullscreen drops it (see `deck-frame.tsx`). */
+export const DECK_MARGIN = 0.03;
 
 const config: RevealConfig = {
   width: DECK_WIDTH,
   height: DECK_HEIGHT,
-  margin: 0.03,
+  margin: DECK_MARGIN,
   // Embedded decks share the page with the site nav, so reveal must not grab
   // the arrow keys until the deck is actually focused.
   embedded: true,

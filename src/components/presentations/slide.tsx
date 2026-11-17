@@ -127,7 +127,10 @@ export function DeckSlide({
 }) {
   return (
     <Slide notes={notes}>
-      <div className="flex h-[600px] w-full flex-col gap-4 pt-2">
+      {/* The whole canvas, less reveal's 20px above and below. The top inset
+          keeps the title where a centred 600px block would put it; the rest
+          of the height goes to the content. */}
+      <div className="flex h-[680px] w-full flex-col gap-4 pt-12">
         <header className="flex flex-col gap-2">
           {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
           

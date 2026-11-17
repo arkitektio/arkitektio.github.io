@@ -122,7 +122,7 @@ section.present .${u}-w { animation: sm-fade 0.25s ease-out var(--d) both; }
   const badge =
     'sm-pop inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3.5 py-1 text-[16px] font-semibold text-emerald-700 dark:text-emerald-300';
   return (
-    <Steps cues={[1, done + 1.2, done + 2.2]} className="relative mx-auto w-fit">
+    <Steps live cues={[1, done + 1.2, done + 2.2]} className="relative mx-auto w-fit">
     <div className="sm-fade flex w-[1000px] flex-col gap-5 px-7 py-6" style={delay(0.1)}>
       <LoopStyles css={css} />
 
@@ -3875,5 +3875,158 @@ ${horsemanAmbientCss(u)}`;
         <HorsemanBanner night={night} className={`${u}-banner`} intro={`Kim has just met ${h.ordinal.replace(/^The/, 'the')}`} />
       </div>
     </div>
+  );
+}
+
+/* --- Pandora's box ---------------------------------------------------------- */
+
+/** Where each of the four spirits goes once it is out of the box: a path from
+    the opening to where its head ends up. */
+const PANDORA_PLUMES: { night: HorsemanKey; d: string; head: [number, number]; tilt: number }[] = [
+  { night: 'communication', d: 'M214 404 C 190 330, 84 346, 78 256 C 74 204, 112 178, 92 128', head: [92, 128], tilt: -14 },
+  { night: 'threads', d: 'M224 404 C 214 326, 150 300, 172 226 C 190 168, 146 130, 180 66', head: [180, 66], tilt: -6 },
+  { night: 'data', d: 'M236 404 C 250 326, 312 304, 290 228 C 272 166, 322 134, 288 72', head: [288, 72], tilt: 6 },
+  { night: 'repro', d: 'M246 404 C 276 334, 380 350, 384 262 C 386 208, 346 184, 372 134', head: [372, 134], tilt: 14 },
+];
+
+/** Pandora's box, for the beat after Claude's cheerful answer. On arrival it
+    is shut, with a glow throbbing in the seam under the lid. One press of
+    "next": it rattles, the lid flies open in a burst of light, and four
+    spirits wind out of it one after the other, in the colours of the four
+    horses (white, red, black, pale), each with a pair of red eyes. They are
+    not the horsemen yet, just a promise of them; the nights introduce each. */
+export function PandoraBoxFigure() {
+  const u = useUid();
+  const W = 460;
+  const H = 540;
+  const shake = 0.5;
+  const open = 1.1;
+  const first = 1.4;
+  const gap = 0.3;
+  const draw = 0.9;
+  const end = first + (PANDORA_PLUMES.length - 1) * gap + draw + 0.6;
+  const css = `
+.${u}-box, .${u}-shut, .${u}-lid { transform-box: view-box; }
+.${u}-box { transform-origin: 230px 500px; }
+.${u}-shut, .${u}-lid { transform-origin: 230px 400px; }
+.${u}-shut { transform: scaleY(0); }
+.${u}-seam { opacity: 0; }
+.${u}-throb { animation: ${u}-throb 1.6s ease-in-out infinite; }
+section.present .${u}-box { animation: ${u}-shake 0.6s ease-in-out ${shake}s both; }
+section.present .${u}-shut { animation: ${u}-shut 0.16s ease-in ${open}s both; }
+section.present .${u}-lid { animation: ${u}-lift 0.34s cubic-bezier(.3,1.7,.5,1) ${open + 0.16}s both; }
+section.present .${u}-seam { animation: ${u}-seam 0.16s linear ${open}s both; }
+section.present .${u}-plume { animation: ${u}-rise ${draw}s cubic-bezier(.4,0,.2,1) var(--d) both; }
+@keyframes ${u}-shake {
+  0%, 100% { transform: none; }
+  14% { transform: rotate(-3deg); }
+  30% { transform: translateY(-4px) rotate(3deg); }
+  46% { transform: rotate(-4deg); }
+  62% { transform: translateY(-6px) rotate(4deg); }
+  80% { transform: rotate(-2deg); }
+}
+@keyframes ${u}-shut { from { transform: scaleY(1); } to { transform: scaleY(0); } }
+@keyframes ${u}-lift { from { transform: scaleY(0); } to { transform: none; } }
+@keyframes ${u}-seam { from { opacity: 1; } to { opacity: 0; } }
+@keyframes ${u}-throb { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+@keyframes ${u}-rise { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .${u}-throb, section.present :is(.${u}-box, .${u}-shut, .${u}-lid, .${u}-seam, .${u}-plume) { animation: none; }
+}
+`;
+  const OUT = '#111';
+  const WOOD = '#8b5a2b';
+  const GOLD = '#e0a526';
+  return (
+    <Steps live cues={[0.3, end]} className="relative shrink-0">
+      <svg
+        width={W}
+        height={H}
+        viewBox={`0 0 ${W} ${H}`}
+        className="overflow-visible"
+        role="img"
+        aria-label="Pandora’s box bursts open, and four spirits in the colours of the four horses wind out of it."
+      >
+        <LoopStyles css={css} />
+        <defs>
+          <filter id={`${u}-blur`} x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation={9} />
+          </filter>
+          <linearGradient id={`${u}-cone`} x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stopColor="#fde68a" stopOpacity={0.75} />
+            <stop offset="1" stopColor="#fde68a" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+
+        {/* the light that comes out with them */}
+        <polygon className="sm-fade" style={delay(open + 0.1)} points="146,404 314,404 430,120 30,120" fill={`url(#${u}-cone)`} />
+        {[0, 0.18].map((d) => (
+          <circle key={d} className="sm-ping" style={delay(open + 0.12 + d)} cx={230} cy={392} r={70} fill="none" stroke={GOLD} strokeWidth={5} />
+        ))}
+
+        {/* the lid, thrown back: its inside, seen from the front */}
+        <g className={`${u}-lid`}>
+          <path d="M132 402 L146 318 Q148 304 164 304 L296 304 Q312 304 314 318 L328 402 Z" fill="#3b230e" stroke={OUT} strokeWidth={3.5} strokeLinejoin="round" />
+          <path d="M152 396 L162 326 Q163 320 170 320 L290 320 Q297 320 298 326 L308 396 Z" fill="#24150a" />
+        </g>
+
+        {/* the four of them, one after the other */}
+        {PANDORA_PLUMES.map(({ night, d, head, tilt }, i) => {
+          const h = HORSEMEN[night];
+          const at = first + i * gap;
+          const line = { className: `${u}-plume`, d, pathLength: 1, fill: 'none', strokeLinecap: 'round' as const, strokeDasharray: 1, style: delay(at) };
+          return (
+            <g key={night}>
+              <g className="sm-fade" style={delay(at)}>
+                <path {...line} stroke={h.aura} strokeWidth={40} filter={`url(#${u}-blur)`} />
+                <path {...line} stroke={OUT} strokeWidth={23} />
+                <path {...line} stroke={h.horse} strokeWidth={17} />
+              </g>
+              <g transform={`translate(${head[0]} ${head[1]}) rotate(${tilt})`}>
+                <g className="sm-pop" style={delay(at + draw - 0.2)}>
+                  <circle r={34} fill={h.aura} filter={`url(#${u}-blur)`} />
+                  <path d="M-17 -12 L-13 -34 L-3 -19 Z M17 -12 L13 -34 L3 -19 Z" fill={h.horse} stroke={OUT} strokeWidth={3} strokeLinejoin="round" />
+                  <ellipse rx={22} ry={21} fill={h.horse} stroke={OUT} strokeWidth={3.5} />
+                  <path d="M-9 -9 Q0 -15 9 -9" fill="none" stroke={h.mane} strokeWidth={4} strokeLinecap="round" />
+                  {[-8, 8].map((x) => (
+                    <circle key={x} className="sm-pulse" style={delay(i * 0.4)} cx={x} cy={1} r={4} fill="#ef4444" stroke="#fecaca" strokeWidth={1} />
+                  ))}
+                </g>
+              </g>
+            </g>
+          );
+        })}
+
+        {/* the box */}
+        <g className={`${u}-box`}>
+          <rect x={130} y={400} width={200} height={104} rx={9} fill={WOOD} stroke={OUT} strokeWidth={3.5} />
+          {[434, 468].map((y) => (
+            <path key={y} d={`M133 ${y} H327`} stroke="#5b3716" strokeWidth={2.5} />
+          ))}
+          {[152, 294].map((x) => (
+            <rect key={x} x={x} y={400} width={14} height={104} fill={GOLD} stroke={OUT} strokeWidth={2.5} />
+          ))}
+          <rect x={212} y={400} width={36} height={34} rx={5} fill={GOLD} stroke={OUT} strokeWidth={2.5} />
+          <circle cx={230} cy={413} r={4.5} fill={OUT} />
+          <path d="M230 414 L226 427 H234 Z" fill={OUT} />
+
+          {/* shut, on arrival */}
+          <g className={`${u}-shut`}>
+            <path d="M124 402 L124 376 Q124 348 152 348 L308 348 Q336 348 336 376 L336 402 Z" fill="#9c6a35" stroke={OUT} strokeWidth={3.5} strokeLinejoin="round" />
+            {[152, 294].map((x) => (
+              <rect key={x} x={x} y={350} width={14} height={52} fill={GOLD} stroke={OUT} strokeWidth={2.5} />
+            ))}
+            <path d="M128 374 H332" stroke="#5b3716" strokeWidth={2.5} />
+          </g>
+          {/* what is already leaking out under the lid */}
+          <g className={`${u}-seam`}>
+            <g className={`${u}-throb`}>
+              <path d="M128 401 H332" stroke="#fde68a" strokeWidth={12} strokeLinecap="round" filter={`url(#${u}-blur)`} />
+              <path d="M130 401 H330" stroke="#fef3c7" strokeWidth={3} strokeLinecap="round" />
+            </g>
+          </g>
+        </g>
+      </svg>
+    </Steps>
   );
 }
