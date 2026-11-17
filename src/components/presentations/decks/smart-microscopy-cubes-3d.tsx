@@ -6,9 +6,10 @@
    controller) on the 50 mm grid; inside each cube, a `skeleton` (the housing)
    and a `mounted_*` insert (mirror, dichroic, lens, fiber holder, camera).
 
-   On arrival the cubes snap in one after the other, black as they are on the
-   bench; then the housings fade to transparent and the optics inside show,
-   and the build turns slowly. */
+   On arrival the cubes drop in together (one quick ripple), black as they
+   are on the bench, and the build turns slowly. A click on the scene fades
+   the housings to transparent so the optics inside show; another click
+   brings them back. */
 
 import dynamic from 'next/dynamic';
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -34,9 +35,10 @@ export const CUBE_ORDER = [
   'electronics_controller',
 ] as const;
 
-/** When the cube at `i` in `CUBE_ORDER` lands, in seconds after arrival. */
-export const landsAt = (i: number) => 0.5 + i * 0.32;
-const DROP = 0.55;
+/** When the cube at `i` in `CUBE_ORDER` lands, in seconds after arrival: a
+    ripple of well under a second, not a build to wait for. */
+export const landsAt = (i: number) => 0.15 + i * 0.05;
+const DROP = 0.45;
 const SETTLED = landsAt(CUBE_ORDER.length - 1) + DROP;
 
 type Time = RefObject<number>;
@@ -49,7 +51,7 @@ function materials() {
   const glass = (color: string, opacity: number) =>
     new THREE.MeshPhysicalMaterial({ color, transparent: true, opacity, roughness: 0.1, metalness: 0, emissive: color, emissiveIntensity: 0.35, depthWrite: false });
   return {
-    /* faded by the frame loop: opaque black first, then see-through */
+    /* faded by the frame loop: opaque black, see-through after a click */
     housing: new THREE.MeshStandardMaterial({ color: '#0b0b0c', transparent: true, opacity: 1, roughness: 0.45, side: THREE.DoubleSide }),
     insert: new THREE.MeshStandardMaterial({ color: '#27272a', transparent: true, opacity: 1, roughness: 0.6 }),
     mirror: new THREE.MeshStandardMaterial({ color: '#f1f5f9', metalness: 0.9, roughness: 0.12, emissive: '#cbd5e1', emissiveIntensity: 0.3 }),
@@ -63,9 +65,6 @@ function materials() {
     board: new THREE.MeshStandardMaterial({ color: '#18181b', roughness: 0.7 }),
   };
 }
-
-/** When the housings start fading, and how long it takes. */
-const XRAY: [number, number] = [SETTLED + 0.6, 1.6];
 
 function pick(name: string, m: ReturnType<typeof materials>) {
   if (name.includes('skeleton')) return m.housing;
@@ -87,13 +86,15 @@ function backOut(u: number) {
   return 1 + 2.7 * v * v * v + 1.7 * v * v;
 }
 
-function Build({ timeRef }: { timeRef: Time }) {
+function Build({ timeRef, xrayRef }: { timeRef: Time; xrayRef: RefObject<boolean> }) {
   const { scene } = useGLTF(MODEL);
   const model = useMemo(() => scene.clone(true), [scene]);
   const turn = useRef<THREE.Group>(null);
   const offset = useRef<THREE.Group>(null);
   const parts = useRef<{ node: THREE.Object3D; home: THREE.Vector3; out: THREE.Vector3 }[]>([]);
   const mats = useRef<ReturnType<typeof materials> | null>(null);
+  /* how far the housings have faded, 0 to 1 */
+  const faded = useRef(0);
 
   useLayoutEffect(() => {
     const m = materials();
@@ -134,10 +135,11 @@ function Build({ timeRef }: { timeRef: Time }) {
       node.position.copy(home).addScaledVector(out, lift);
       node.scale.setScalar(scale);
     });
-    /* black cubes first; then the housings fade and the optics show */
+    /* black cubes; on a click the housings fade and the optics show */
     const m = mats.current;
     if (m) {
-      const u = Math.min(1, Math.max(0, (t - XRAY[0]) / XRAY[1]));
+      faded.current = THREE.MathUtils.damp(faded.current, xrayRef.current ? 1 : 0, 3.5, dt);
+      const u = Math.min(1, Math.max(0, faded.current));
       const xray = u * u * (3 - 2 * u);
       m.housing.opacity = 1 - 0.95 * xray;
       m.insert.opacity = 1 - 0.85 * xray;
@@ -145,7 +147,6 @@ function Build({ timeRef }: { timeRef: Time }) {
       m.insert.depthWrite = m.insert.opacity > 0.98;
     }
     if (turn.current) turn.current.rotation.y = -0.6 + Math.sin(t * 0.25) * 0.55 + Math.min(t, SETTLED) * 0.05;
-    void dt;
   });
 
   return (
@@ -170,6 +171,8 @@ function Scene({ className }: { className?: string }) {
   const [active, setActive] = useState(false);
   const [seen, setSeen] = useState(false);
   const timeRef = useRef(0);
+  const xrayRef = useRef(false);
+  const [xray, setXray] = useState(false);
   useEffect(() => {
     const section = wrap.current?.closest('section');
     if (!section) {
@@ -181,7 +184,11 @@ function Scene({ className }: { className?: string }) {
       const on = section.classList.contains('present');
       setActive(on);
       if (on) {
-        timeRef.current = 0;
+        /* every arrival starts over: the cubes drop in, black */
+        /* no drop-in: the microscope stands assembled */
+        timeRef.current = SETTLED + 1;
+        xrayRef.current = false;
+        setXray(false);
         setSeen(true);
       }
     };
@@ -194,8 +201,13 @@ function Scene({ className }: { className?: string }) {
     <div
       ref={wrap}
       className={className}
+      style={{ cursor: 'pointer' }}
+      onClick={() => {
+        xrayRef.current = !xrayRef.current;
+        setXray(xrayRef.current);
+      }}
       role="img"
-      aria-label="A fluorescence microscope built from openUC2 cubes, in 3D, as exported by Optikit: a fiber holder, a laser, a mirror, a dichroic, an objective, a second mirror, the sample stage, a camera and the controller snap into place one after the other, as black cubes. Then the black housings fade to transparent, and the optics inside show: the mirrors, the dichroic and emission filters and the lenses. The build turns slowly."
+      aria-label="A fluorescence microscope built from openUC2 cubes, in 3D, as exported by Optikit: a fiber holder, a laser, a mirror, a dichroic, an objective, a second mirror, the sample stage, a camera and the controller, as black cubes, turning slowly. A click fades the black housings to transparent, and the optics inside show: the mirrors, the dichroic and emission filters and the lenses."
     >
       {seen ? (
         <Canvas dpr={[1, 2]} frameloop={active ? 'always' : 'never'} resize={{ offsetSize: true }} camera={{ position: [0.3, 0.25, 0.38], fov: 32, near: 0.01, far: 10 }} onCreated={({ camera }) => camera.lookAt(0, 0.085, 0)} gl={{ antialias: true, alpha: true }} style={{ background: 'transparent' }}>
@@ -205,7 +217,7 @@ function Scene({ className }: { className?: string }) {
           <directionalLight position={[-1.2, 0.8, -1]} intensity={0.6} />
           <Suspense fallback={null}>
             <Ticker timeRef={timeRef} />
-            <Build timeRef={timeRef} />
+            <Build timeRef={timeRef} xrayRef={xrayRef} />
           </Suspense>
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.001, 0]}>
             <circleGeometry args={[0.16, 64]} />
@@ -213,6 +225,9 @@ function Scene({ className }: { className?: string }) {
           </mesh>
         </Canvas>
       ) : null}
+      <span aria-hidden className="pointer-events-none absolute bottom-3 left-4 rounded-full border border-fd-border bg-fd-card/80 px-2.5 py-1 font-mono text-[11px] text-fd-muted-foreground">
+        {xray ? 'click · housings back on' : 'click · look inside'}
+      </span>
     </div>
   );
 }

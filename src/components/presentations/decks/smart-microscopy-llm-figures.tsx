@@ -9,7 +9,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { Check, Lock, ScrollText, ShieldCheck, X } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
 import { cn } from '@/lib/cn';
-import { LoopStyles, delay, useUid } from './smart-microscopy-anim';
+import { LoopStyles, Steps, delay, useUid } from './smart-microscopy-anim';
 
 /* --- the cast ------------------------------------------------------------------ */
 
@@ -85,10 +85,12 @@ const BASE_CSS = (u: string) => `
 
 /* --- Kim's pitch ---------------------------------------------------------------- */
 
-/** Kim, bored again, with a plan; Arkitekt, with two problems. */
+/** Kim, bored again, with a plan; one click, and Arkitekt answers with two
+    problems. */
 export function PitchFigure() {
   return (
-    <div className="mx-auto flex w-[1000px] flex-col gap-6" role="img" aria-label="Kim: still boring, I think I can just tell Claude to run my experiment and the user will chat with it. Arkitekt: two problems with that. One, what is it allowed to do? Two, what does the user chat with?">
+    <div className="mx-auto w-[1000px]" role="img" aria-label="Kim: still boring, I think I can just tell Claude to run my experiment and the user will chat with it. Arkitekt: two problems with that. One, what is it allowed to do? Two, what does the user chat with?">
+      <Steps cues={[1, 3.9]} className="relative flex flex-col gap-6">
       <div className="sm-in flex items-start justify-end gap-4" style={delay(0.3)}>
         <p className="max-w-[760px] rounded-2xl rounded-tr-sm bg-fd-primary/12 px-6 py-4 text-[26px] leading-snug">
           <span className="sr-only">Kim: </span>Still boring. I think I can just tell <span className="font-semibold">Claude</span> to run my experiment, and the user will <span className="font-semibold">chat</span> with it.
@@ -114,6 +116,7 @@ export function PitchFigure() {
           ))}
         </div>
       </div>
+      </Steps>
     </div>
   );
 }
@@ -122,10 +125,13 @@ export function PitchFigure() {
 
 /** Claude on Arkitekt is just another app: it asks Kim for the rights it
     needs, scope by scope, calls typed actions with them, asks again for
-    anything more, and every call lands on the record with who allowed it. */
+    anything more, and every call lands on the record with who allowed it.
+    Five beats, one per click: Kim asks; Claude asks for rights; Kim
+    approves and it runs; it asks for one more; allowed once, and done. */
 export function AgentRightsFigure() {
   const u = useUid();
   const t = { ask: 1.3, consent: 1.7, approve: 3.4, run: 4.0, more: 5.2, once: 6.5, done: 7.2 };
+  const cues = [1.1, 3.3, 5, 6.3, 8];
   const css = [
     BASE_CSS(u),
     swapCss(u, 'consent', t.approve + 0.35),
@@ -148,9 +154,10 @@ export function AgentRightsFigure() {
       aria-label="Kim asks Claude to run the four-stain panel on slide HE-07. Claude asks Kim's hub for rights: to call process_slides on the stainstorm app and read the slides HE-07 dataset, but not to move the arm by hand or delete data. Kim approves; Claude runs the workflow. To segment CD20 again it asks once more, to use the GPU server once, and Kim allows it. Both calls are on the record with who allowed them."
     >
       <LoopStyles css={css} />
+      <Steps cues={cues} className="relative size-full">
 
       {/* the chat */}
-      <div className="sm-fade absolute left-0 top-0 flex h-[430px] w-[560px] flex-col gap-3 rounded-2xl border border-fd-border bg-fd-card/70 p-4" style={delay(0.1)}>
+      <div className="sm-fade absolute left-0 top-0 flex h-[430px] w-[560px] flex-col gap-3 p-4" style={delay(0.1)}>
         <Say who="kim" at={0.4}>Run the four-stain panel on slide HE-07.</Say>
         <Say who="claude" at={t.ask}>I need a few rights on Kim’s hub first. Asking.</Say>
         <Say who="claude" at={t.run}>
@@ -224,6 +231,7 @@ export function AgentRightsFigure() {
           ))}
         </div>
       </div>
+      </Steps>
     </div>
   );
 }
@@ -236,10 +244,12 @@ const PREVIEW = (bright: number) =>
 /** People do want to chat; the chat just shouldn't answer with text or a
     generated UI. Claude hands over the capture blok the openuc2 app ships:
     Kim turns the exposure up and captures, then tries 900 ms, which the
-    action's own range stops before anything reaches the laser. */
+    action's own range stops before anything reaches the laser. Four beats,
+    one per click: Kim asks; the blok; 35 ms and capture; 900 ms refused. */
 export function BlokChatFigure() {
   const u = useUid();
-  const t = { blok: 1.5, turn: 2.8, capture: 3.8, typo: 5.4 };
+  const t = { blok: 1.5, turn: 2.9, capture: 3.8, typo: 5.4 };
+  const cues = [0.95, 2.75, 5.2, 6.5];
   const css = [
     BASE_CSS(u),
     `.${u}-knob { transform: translateX(28px); }`,
@@ -271,10 +281,11 @@ export function BlokChatFigure() {
       aria-label="Kim asks to tune the exposure herself. Claude answers with the capture blok that ships with the openuc2 app. She turns the exposure from 20 to 35 milliseconds and captures; the preview gets brighter and the call is recorded. Then she types 900 milliseconds, which is outside the action's range of 1 to 500, and the blok refuses it."
     >
       <LoopStyles css={css} />
+      <Steps cues={cues} className="relative size-full">
 
       {/* the chat, answering with a blok */}
-      <div className="sm-fade absolute left-0 top-0 flex h-[430px] w-[640px] flex-col gap-3 rounded-2xl border border-fd-border bg-fd-card/70 p-4" style={delay(0.1)}>
-        <Say who="kim" at={0.4}>Let me tune the exposure on HE-07 myself.</Say>
+      <div className="sm-fade absolute left-0 top-0 flex h-[430px] w-[640px] flex-col gap-3 p-4" style={delay(0.1)}>
+        <Say who="kim" at={0.3}>Let me tune the exposure on HE-07 myself.</Say>
         <Say who="claude" at={1.0} className="w-[520px]">
           Here’s the capture blok for openuc2:
           <div className="sm-pop mt-2.5 rounded-xl border-2 border-fd-primary/60 bg-fd-primary/5 p-3" style={delay(t.blok)}>
@@ -325,6 +336,7 @@ export function BlokChatFigure() {
           </div>
         ))}
       </div>
+      </Steps>
     </div>
   );
 }

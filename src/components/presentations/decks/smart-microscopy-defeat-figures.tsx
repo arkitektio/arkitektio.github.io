@@ -2,8 +2,10 @@
 
 /* Defeating the four horsemen of Kim's nights, one slide each: the
    horseman stands small in the top-right corner, what Arkitekt does about
-   him plays in the middle, and one click (a reveal.js fragment) strikes him
-   down where he stands.
+   him sits in the middle, and one keypress (a reveal.js fragment) strikes him
+   down where he stands. The figures in the middle that tell a story in beats
+   are `Steps`: they arrive on their first beat, and each click on the figure
+   plays the next one.
 
    Connection → no IPs: a coordination server, briefly, then straight to the hub; Error handling & observability → the
    record, resumable workflows, and task.hold to ask a person; Data management → mikro and its
@@ -18,7 +20,7 @@ import { Check, Compass, Database, Download, GitBranch, Heart, Image as ImageIco
 import type { LucideIcon } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
 import { cn } from '@/lib/cn';
-import { Arrowheads, LoopStyles, PRIMARY, Path, delay, useUid } from './smart-microscopy-anim';
+import { Arrowheads, LoopStyles, PRIMARY, Path, Steps, delay, useUid } from './smart-microscopy-anim';
 import { HORSEMEN, HorsemanArt, HorsemanBanner, horsemanAmbientCss } from './smart-microscopy-figures';
 import type { HorsemanKey, NIGHTS } from './smart-microscopy-figures';
 
@@ -38,14 +40,14 @@ const TAUNTS: Record<HorsemanKey, string> = {
   communication: 'You still need to connect to the hub!',
   threads: 'If your connection fails, your workflow fails. lol',
   data: 'lol, on your server you still just have folders. You don’t solve that.',
-  repro: 'You still need to run the code somewhere. How should we reproduce these environments?',
+  repro: 'You still need to run the code somewhere. How should we reproduce these environments? And who packages it into a usable desktop application? Mac? Windows? HTML?',
   ai: 'LLMs will make all of that obsolete! WHERE IS THE CHAT INTERFACE?',
 };
 
 /** A horseman's own slide, at the start of his fight: he strides in from off
     the slide wearing Reviewer 2's face and rears, his banner unfurls, and
-    Reviewer 2 has his say. The strike comes later, on the last slide of the
-    fight. */
+    Reviewer 2 has his say: one entrance, played once. The strike comes
+    later, on the last slide of the fight. */
 export function HorsemanDuelFigure({ night }: { night: HorsemanKey }) {
   const u = useUid();
   const t = { stride: 0.2, rear: 1.5, banner: 1.1, taunt: 2.1 };
@@ -69,6 +71,7 @@ section.present .${u}-rear { animation: ${u}-rear 1.1s ease-in-out ${t.rear}s bo
   return (
     <div className="relative mx-auto h-[600px] w-[1180px]" role="img" aria-label={`${h.ordinal}, ${h.name}, rides in wearing Reviewer 2's face and says: ${TAUNTS[night]}`}>
       <LoopStyles css={css} />
+      <Steps cues={[t.taunt + 0.7]} className="absolute inset-0">
       <div className="absolute inset-x-0 top-[24px] flex justify-center">
         <div className="sm-pop" style={delay(t.banner)}>
           <HorsemanBanner night={night} />
@@ -88,13 +91,15 @@ section.present .${u}-rear { animation: ${u}-rear 1.1s ease-in-out ${t.rear}s bo
           <ReviewerTag className="left-[170px] top-[-14px] px-2 text-[20px]" />
         </div>
       </div>
+      </Steps>
     </div>
   );
 }
 
 /** The figure in the middle, and the horseman small in the top-right corner
-    of the slide (up beside the title). With `kill`, one click (a reveal.js
-    fragment) strikes him down there. */
+    of the slide (up beside the title). With `kill`, one keypress (a reveal.js
+    fragment) strikes him down there; clicks on the figure in the middle are
+    that figure's own steps and leave the strike alone. */
 export function DefeatFrame({
   night,
   weapon,
@@ -169,7 +174,9 @@ ${horsemanAmbientCss(u)}
 /** No IP addresses: the address Kim used to paste is struck out. The app
     asks a coordination server, briefly, where its hub is; the hub registered
     there too. Then the coordination server steps aside and the app talks to
-    the Arkitekt server directly, over WireGuard. */
+    the Arkitekt server directly, over WireGuard. Four beats, one per click
+    (`cues`): the address and the three parties; the address struck out; the
+    question and its answer; the direct connection. */
 export function CoordinationWinFigure() {
   const u = useUid();
   const W = 810;
@@ -181,9 +188,11 @@ export function CoordinationWinFigure() {
   const directY = app.y + app.h / 2;
   const direct = `M${app.x + app.w} ${directY} L${hub.x} ${directY}`;
   const midX = (app.x + app.w + hub.x) / 2;
-  // the timeline, seconds after arrival
-  const at = { ip: 0.2, strike: 0.9, nodes: 1.6, brief: 2.2, ask: 3.1, reply: 4.0, direct: 5.4 };
-  const brief = (at.direct + 0.2 - at.brief).toFixed(1);
+  // the timeline, in seconds on the figure's clock; it stops at each cue
+  const at = { ip: 0.1, nodes: 0.2, strike: 1.4, brief: 2.8, ask: 3.7, reply: 4.7, direct: 6.1 };
+  const cues = [1.2, 2.6, 5.9, 8.2];
+  /* the coordination step stays up until the direct line comes (85 % of it) */
+  const brief = ((at.direct - at.brief) / 0.85).toFixed(2);
   const css = `
 .${u}-run { position: absolute; left: 0; top: 0; }
 .${u}-dot { display: block; width: 11px; height: 11px; border-radius: 9999px; background: var(--color-fd-primary); box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-fd-primary) 25%, transparent); }
@@ -221,6 +230,7 @@ section.present .${u}-reply { animation: ${u}-reply 0.8s ease-in-out ${at.reply}
       aria-label="No IP addresses: the address 192.168.0.42:8000 is crossed out. The app asks a coordination server where its Arkitekt server is and gets back a route and keys; the coordination server then steps aside and the app connects to the Arkitekt server directly, over WireGuard."
     >
       <LoopStyles css={css} />
+      <Steps cues={cues} className="relative size-full">
 
       {/* the IP address nobody types any more */}
       <div className="absolute left-1/2 top-[4px] -translate-x-1/2">
@@ -230,7 +240,7 @@ section.present .${u}-reply { animation: ${u}-reply 0.8s ease-in-out ${at.reply}
             <span className="relative font-mono text-[26px] font-semibold leading-tight text-fd-muted-foreground">
               192.168.0.42:8000
               <svg className="pointer-events-none absolute inset-x-[-6px] top-1/2 h-[14px] w-[calc(100%+12px)] -translate-y-1/2 overflow-visible" viewBox="0 0 100 14" preserveAspectRatio="none" aria-hidden>
-                <path className="sm-draw" style={delay(at.strike)} pathLength={1} strokeDasharray="1" d="M0 7 L100 7" fill="none" stroke="#dc2626" strokeWidth={4} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+                <path className="sm-grow" style={delay(at.strike)} d="M0 7 L100 7" fill="none" stroke="#dc2626" strokeWidth={4} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
               </svg>
             </span>
           </span>
@@ -314,6 +324,7 @@ section.present .${u}-reply { animation: ${u}-reply 0.8s ease-in-out ${at.reply}
           <span className="whitespace-nowrap font-mono text-[12px] opacity-90">no IPs · no open ports</span>
         </div>
       </div>
+      </Steps>
     </div>
   );
 }
@@ -367,21 +378,24 @@ function RecordLine({ r, at, replayAt }: { r: RecordRow; at: number; replayAt?: 
   );
 }
 
-/** The hub's log of run 41, in two acts. `observe`: the log fills in, call by
-    call and line by line, from every machine: the measurement you watch a run
-    with. `recover`: the same log is already there when the workflow's process
-    dies; it resumes, the finished calls come back from the log, and the run
-    carries on without staining the slide twice. */
+/** The hub's log of run 41, in two acts. `observe`: the whole log, every
+    call and log line from every machine, there on arrival: the measurement
+    you watch a run with. `recover`: the same log, and three clicks: the
+    workflow's process dies; it resumes and the finished calls come back from
+    the log; the run carries on without staining the slide twice. */
 export function RecordWinFigure({ mode }: { mode: 'observe' | 'recover' }) {
   const observe = mode === 'observe';
-  const at = (i: number) => (observe ? 0.6 + i * 0.32 : 0.3 + i * 0.06);
-  const crashAt = observe ? 0 : at(RECORD_BEFORE.length) + 0.6;
-  const resumeAt = crashAt + 1.5;
-  const doneAt = observe ? at(RECORD_BEFORE.length) + 0.3 : resumeAt + 2.6;
+  const at = (i: number) => 0.2 + i * 0.03;
+  const crashAt = 1.4;
+  const resumeAt = 2.4;
+  const doneAt = observe ? 0.4 : 6;
+  /* recover, on the figure's clock: the log, the crash, the resume with its
+     replays, the rest of the run */
+  const cues = observe ? [1.2] : [1.2, 2.2, 4.3, 6.8];
   const head = 'grid grid-cols-[76px_1fr_80px_150px] items-center gap-x-3 px-4';
   return (
     <div
-      className="flex size-full flex-col gap-2 pt-1"
+      className="size-full"
       role="img"
       aria-label={
         observe
@@ -389,6 +403,7 @@ export function RecordWinFigure({ mode }: { mode: 'observe' | 'recover' }) {
           : "The same log of run 41. The workflow's process dies when Kim closes her laptop. It is resumed in a new process, the finished calls come back from the log without running again, so the slide is not stained twice, and the run carries on: CD20 reaches 0.86 and the next stain is Ki-67."
       }
     >
+      <Steps cues={cues} className="relative flex size-full flex-col gap-2 pt-1">
       <div className="sm-in flex items-center gap-3" style={delay(0.2)}>
         <span className="flex size-[32px] items-center justify-center rounded-lg bg-fd-primary">
           <span className="flex size-[26px] items-center justify-center rounded-md bg-white/95">
@@ -420,7 +435,7 @@ export function RecordWinFigure({ mode }: { mode: 'observe' | 'recover' }) {
               <RotateCcw className="size-[16px]" strokeWidth={2.4} /> 14:17:40 · resumed in a new process · finished calls come back from the log
             </div>
             {RECORD_AFTER.map((r, i) => (
-              <RecordLine key={r.t} r={r} at={resumeAt + 1.2 + i * 0.45} />
+              <RecordLine key={r.t} r={r} at={4.5 + i * 0.45} />
             ))}
           </>
         )}
@@ -428,6 +443,7 @@ export function RecordWinFigure({ mode }: { mode: 'observe' | 'recover' }) {
       <div className="sm-pop self-start rounded-full bg-emerald-500 px-4 py-1.5 text-[15px] font-semibold text-white shadow-md" style={delay(doneAt)}>
         {observe ? 'One log, for every machine, in one place.' : 'Same run, same answers. The slide is not stained twice.'}
       </div>
+      </Steps>
     </div>
   );
 }
@@ -483,11 +499,15 @@ function StainBottle({ fill, low = false }: { fill: number; low?: boolean }) {
   );
 }
 
+/** When code can't fix it: the workflow calls `task.hold`. Four beats, one
+    per click: the code; the hold (Orkestrator and Kim's phone both ask);
+    Kim swaps the bottle; she taps resume and the run carries on. */
 export function HoldWinFigure() {
   const u = useUid();
-  const holdAt = 2.2;
-  const swapAt = 3.6;
-  const resumeAt = 5;
+  const holdAt = 1.6;
+  const swapAt = 3;
+  const resumeAt = 4.9;
+  const cues = [1, 2.8, 4.6, 7];
   const css = `
 .${u}-hl { opacity: 0; }
 section.present .${u}-hl { animation: ${u}-hl 0.5s ease-out ${holdAt - 0.4}s both; }
@@ -500,7 +520,8 @@ section.present .${u}-in { animation: ${u}-in 0.8s cubic-bezier(.2,.7,.3,1) ${sw
 @keyframes ${u}-in { from { opacity: 0; transform: translateY(-110px); } to { opacity: 1; transform: none; } }
 section.present .${u}-press { animation: ${u}-press 0.35s ease-out ${resumeAt}s both; }
 @keyframes ${u}-press { 0%, 100% { transform: none; } 45% { transform: scale(0.9); } }
-.${u}-held, .${u}-go { opacity: 0; }
+/* off the current slide: the end state, resumed */
+.${u}-held { opacity: 0; }
 section.present .${u}-held { animation: ${u}-on 0.3s ease-out ${holdAt}s both, ${u}-off 0.25s ease-out ${resumeAt + 0.3}s forwards; }
 section.present .${u}-go { animation: ${u}-on 0.3s ease-out ${resumeAt + 0.3}s both; }
 @keyframes ${u}-on { from { opacity: 0; } to { opacity: 1; } }
@@ -517,12 +538,13 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
   return (
     <div className="relative size-full" role="img" aria-label="Kim's process_slides workflow calls task.hold when a stain is still below target after the last round. The run pauses; Orkestrator and the Arkitekt app on Kim's phone both show the message: HE-07, CD20 at 52%, swap the bottle, then resume. She swaps the nearly empty CD20 bottle on the OT-2 for a full one and taps resume on her phone. Orkestrator shows the run resumed by Kim, and it carries on with the next stain, Ki-67.">
       <LoopStyles css={css} />
+      <Steps cues={cues} className="relative size-full">
       {/* the code */}
       <div className="sm-pop absolute left-0 top-[6px] w-[466px] overflow-hidden rounded-2xl border-2 border-fd-border bg-fd-card shadow-sm" style={delay(0.2)}>
         <div className="flex h-[34px] items-center border-b border-fd-border px-4 font-mono text-[13px] font-semibold">process_slides.py</div>
         <pre className="relative px-4 py-2.5 font-mono text-[12px] leading-[1.5]">
           {HOLD_CODE.map((line, i) => (
-            <span key={i} className="sm-fade relative block whitespace-pre" style={delay(0.4 + i * 0.08)}>
+            <span key={i} className="relative block whitespace-pre">
               {HOLD_LINES.includes(i) ? <span className={`${u}-hl absolute inset-y-0 -left-4 -right-4 bg-amber-400/25`} /> : null}
               <span className="relative">
                 {line.map(([text, kind], j) => (
@@ -644,6 +666,7 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
           the same hold, on Kim’s phone
         </span>
       </div>
+      </Steps>
     </div>
   );
 }
@@ -670,14 +693,18 @@ const CD20_BG = (dx = 0, dy = 0) =>
 /** StarDist's labels: a ring round every cell of the first grid. */
 const LABELS_BG = (dx = 0, dy = 0) => `${RING('rgba(52,211,153,0.95)', 5.6)} ${dx}px ${dy}px / 17px 15px`;
 
+/** Data with coordinates: four beats, one per click. The stage and the
+    slide; the three tiles land and form the mosaic; round 2 lands on the same
+    coordinates and its record in mikro fills in; the filename is retired. */
 export function DataWinFigure() {
   const stage = 360;
   // the three tiles of HE-07, in stage pixels; they overlap by 8 px
   const tile = 92;
   const tiles = [76, 160, 244];
   const mo = { x: 76, y: 134, w: 244 + tile - 76, h: tile };
-  const tileAt = (i: number) => 1 + i * 0.45;
-  const r2At = 3.3;
+  const tileAt = (i: number) => 1.1 + i * 0.45;
+  const r2At = 4;
+  const cues = [0.9, 3.8, 6.5, 7.5];
   const meta: [string, string][] = [
     ['pixel size', '0.5 µm'],
     ['stage position', 'x 16.9 · y 29.8 mm'],
@@ -688,14 +715,15 @@ export function DataWinFigure() {
   ];
   return (
     <div className="relative size-full" role="img" aria-label="On the stage, three tiles of slide HE-07 land on their stage coordinates and form the stitched mosaic. The round-2 CD20 image lands on exactly the same coordinates, so the stains overlay cell by cell. It is stored in mikro with its pixel size, stage position, stain and round, the call that made it and its dataset, slides / 2026-11-10 / HE-07; the long filename is no longer needed.">
+      <Steps cues={cues} className="relative size-full">
       {/* the stage */}
       <div className="absolute left-[30px] top-[18px]" style={{ width: stage, height: stage }}>
         <div
           className="sm-fade absolute inset-0 rounded-md border-2 border-fd-border"
-          style={{ ...delay(0.2), backgroundImage: 'linear-gradient(var(--color-fd-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-fd-border) 1px, transparent 1px)', backgroundSize: '36px 36px' }}
+          style={{ ...delay(0.1), backgroundImage: 'linear-gradient(var(--color-fd-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-fd-border) 1px, transparent 1px)', backgroundSize: '36px 36px' }}
         />
         {/* the slide, its label end on the left */}
-        <div className="sm-in absolute left-[14px] top-[100px] h-[162px] w-[332px] overflow-hidden rounded-md border-2 border-fd-border bg-fd-card/70 shadow-sm" style={delay(0.5)}>
+        <div className="sm-in absolute left-[14px] top-[100px] h-[162px] w-[332px] overflow-hidden rounded-md border-2 border-fd-border bg-fd-card/70 shadow-sm" style={delay(0.2)}>
           <span className="absolute inset-y-0 left-0 flex w-[46px] items-center justify-center bg-fd-muted font-mono text-[11px] font-semibold">HE-07</span>
         </div>
         {/* the tiles, each landing on its own stage coordinates */}
@@ -719,7 +747,7 @@ export function DataWinFigure() {
         <span className="sm-fade absolute whitespace-nowrap rounded bg-fd-primary px-1.5 py-0.5 font-mono text-[11px] font-semibold text-fd-primary-foreground" style={{ left: mo.x, top: mo.y + mo.h + 8, ...delay(r2At + 1.5) }}>
           round 2 · CD20 · same x, y
         </span>
-        <span className="sm-fade absolute bottom-[-24px] left-0 right-0 flex justify-between font-mono text-[11px] text-fd-muted-foreground" style={delay(0.4)}>
+        <span className="sm-fade absolute bottom-[-24px] left-0 right-0 flex justify-between font-mono text-[11px] text-fd-muted-foreground" style={delay(0.1)}>
           <span>0</span>
           <span>stage x · mm</span>
           <span>80</span>
@@ -727,7 +755,7 @@ export function DataWinFigure() {
       </div>
 
       {/* the record in mikro */}
-      <div className="sm-pop absolute right-0 top-[18px] w-[390px] rounded-2xl border-2 border-fd-border bg-fd-card p-4 shadow-sm" style={delay(1.4)}>
+      <div className="sm-pop absolute right-0 top-[18px] w-[390px] rounded-2xl border-2 border-fd-border bg-fd-card p-4 shadow-sm" style={delay(r2At + 0.6)}>
         <div className="flex items-center gap-2.5">
           <span className="flex size-[36px] items-center justify-center rounded-lg bg-fd-primary/12 text-fd-primary">
             <Database className="size-[20px]" strokeWidth={2} />
@@ -740,17 +768,18 @@ export function DataWinFigure() {
         </div>
         <div className="mt-3 flex flex-col">
           {meta.map(([k, val], i) => (
-            <div key={k} className="sm-in grid grid-cols-[112px_1fr] gap-2 border-t border-fd-border py-1.5" style={delay(2.2 + i * 0.3)}>
+            <div key={k} className="sm-in grid grid-cols-[112px_1fr] gap-2 border-t border-fd-border py-1.5" style={delay(r2At + 1 + i * 0.15)}>
               <span className="text-[12.5px] text-fd-muted-foreground">{k}</span>
               <span className="font-mono text-[12.5px] font-semibold">{val}</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="sm-in absolute bottom-[14px] right-0 w-[390px]" style={delay(4.3)}>
+      <div className="sm-in absolute bottom-[14px] right-0 w-[390px]" style={delay(6.7)}>
         <span className="block font-mono text-[11.5px] text-fd-muted-foreground line-through decoration-red-500 decoration-2">HE07_CD20_r2_x16.9_y29.8_0.5um_final2.tif</span>
         <span className="text-[13px] font-semibold text-emerald-600">the filename doesn’t have to carry anything any more</span>
       </div>
+      </Steps>
     </div>
   );
 }
@@ -777,8 +806,14 @@ const LINEAGE: LineageNode[] = [
   { name: 'acquire … measure', sub: 'the same calls, round 2', kind: 'call', col: 2, row: 3 },
   { name: '0.86', sub: 'CD20 · next: Ki-67', kind: 'value', col: 1, row: 3, badge: '86%' },
 ];
-const L_STEP = 0.55;
-const lAt = (i: number) => 0.5 + i * L_STEP;
+/* Six beats, one per click, each a call and what it made: acquire → tiles,
+   stitch → mosaic, segment → labels, measure → 0.41, stain again, round 2 →
+   0.86. `L_BEAT[i]` is the beat node `i` belongs to; a beat starts with the
+   edge into its first node. */
+const L_BEAT = [0, 0, 1, 1, 2, 2, 3, 3, 4, 5, 5];
+const L_START = [1, 3.2, 5.4, 7.6, 9.8, 11.4];
+const lAt = (i: number) => L_START[L_BEAT[i]] + (i > 0 && L_BEAT[i - 1] === L_BEAT[i] ? 0.6 : 0.3);
+const L_CUES = [0.9, 3.05, 5.25, 7.45, 9.65, 11.25, 13.5];
 const L_TARGET = 0.8;
 
 function LineageThumb({ node }: { node: LineageNode }) {
@@ -821,7 +856,7 @@ function UptakeTag({ x, y, v }: { x: number; y: number; v: number }) {
 /** Left: the lineage graph of one staining round and the next: every image,
     label mask and value knows the call that made it. Right: the same items on
     the stage, in one coordinate system, each placed the moment it appears in
-    the graph. */
+    the graph. One click per call (`L_CUES`). */
 export function LineageFigure() {
   const colX = [0, 198, 396];
   const rowY = [34, 130, 226, 322];
@@ -867,10 +902,11 @@ export function LineageFigure() {
       role="img"
       aria-label="Left, the lineage graph of one staining round of slide HE-07 and the next: acquire_image makes three tiles, stitch_images makes the mosaic, segment_image makes the labels, and calculate_stain_percentage gives a CD20 uptake of 0.41, below target. So run_protocol stains CD20 again in round 2, and the same calls give 0.86; the next stain is Ki-67. Right, the same items on the stage in one coordinate system: the tiles, the mosaic they form, the labels on it, the uptake of each cell, and round 2 landing on the same cells."
     >
-      <span className="sm-fade absolute left-0 top-0 text-[12px] font-semibold uppercase tracking-[0.08em] text-fd-muted-foreground" style={delay(0.2)}>
+      <Steps cues={L_CUES} className="relative size-full">
+      <span className="sm-fade absolute left-0 top-0 text-[12px] font-semibold uppercase tracking-[0.08em] text-fd-muted-foreground" style={delay(0.1)}>
         lineage graph · what made what
       </span>
-      <span className="sm-fade absolute top-0 text-[12px] font-semibold uppercase tracking-[0.08em] text-fd-muted-foreground" style={{ left: st.x, ...delay(0.2) }}>
+      <span className="sm-fade absolute top-0 text-[12px] font-semibold uppercase tracking-[0.08em] text-fd-muted-foreground" style={{ left: st.x, ...delay(0.1) }}>
         one coordinate system · stage <span className="normal-case">mm</span>
       </span>
 
@@ -920,10 +956,10 @@ export function LineageFigure() {
       <div className="absolute" style={{ left: st.x, top: st.y, width: st.s, height: st.s }}>
         <div
           className="sm-fade absolute inset-0 rounded-md border-2 border-fd-border"
-          style={{ ...delay(0.3), backgroundImage: 'linear-gradient(var(--color-fd-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-fd-border) 1px, transparent 1px)', backgroundSize: '33px 33px' }}
+          style={{ ...delay(0.1), backgroundImage: 'linear-gradient(var(--color-fd-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-fd-border) 1px, transparent 1px)', backgroundSize: '33px 33px' }}
         />
         {/* the slide, its label end on the left */}
-        <div className="sm-in absolute left-[8px] top-[100px] h-[132px] w-[314px] overflow-hidden rounded-md border-2 border-fd-border bg-fd-card/70 shadow-sm" style={delay(0.4)}>
+        <div className="sm-in absolute left-[8px] top-[100px] h-[132px] w-[314px] overflow-hidden rounded-md border-2 border-fd-border bg-fd-card/70 shadow-sm" style={delay(0.2)}>
           <span className="absolute inset-y-0 left-0 flex w-[38px] items-center justify-center bg-fd-muted font-mono text-[10px] font-semibold">HE-07</span>
         </div>
         {/* the tiles, each on its own coordinates; together, the mosaic */}
@@ -938,7 +974,7 @@ export function LineageFigure() {
         <div className="sm-fade absolute" style={{ left: mo.x, top: mo.y, width: mo.w, height: mo.h, background: LABELS_BG(), ...delay(at.labels) }} />
         <div className="sm-fade absolute" style={{ left: mo.x, top: mo.y, width: mo.w, height: mo.h, background: CD20_BG(), ...delay(at.restain + 0.2) }} />
         {/* the zoomed patch */}
-        <div className="sm-pop absolute rounded-sm border-2 border-dashed border-white" style={{ left: roi.x, top: roi.y, width: roi.s, height: roi.s, ...delay(at.mosaic + 0.5) }} />
+        <div className="sm-pop absolute rounded-sm border-2 border-dashed border-white" style={{ left: roi.x, top: roi.y, width: roi.s, height: roi.s, ...delay(at.mosaic + 0.3) }} />
         {/* the mosaic's uptake: round 1, then round 2 on top of it */}
         <span className="sm-pop absolute whitespace-nowrap rounded bg-amber-700 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-white" style={{ left: mo.x, top: mo.y + mo.h + 8, ...delay(at.value) }}>
           CD20 · 0.41 · round 1
@@ -946,7 +982,7 @@ export function LineageFigure() {
         <span className="sm-pop absolute whitespace-nowrap rounded bg-emerald-600 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-white" style={{ left: mo.x, top: mo.y + mo.h + 8, ...delay(at.final) }}>
           CD20 · 0.86 · round 2
         </span>
-        <span className="sm-fade absolute bottom-[-22px] left-0 right-0 flex justify-between font-mono text-[11px] text-fd-muted-foreground" style={delay(0.4)}>
+        <span className="sm-fade absolute bottom-[-22px] left-0 right-0 flex justify-between font-mono text-[11px] text-fd-muted-foreground" style={delay(0.1)}>
           <span>0</span>
           <span>stage x · mm</span>
           <span>80</span>
@@ -955,12 +991,12 @@ export function LineageFigure() {
 
       {/* the zoom: cells, labels and the uptake of each, where they belong */}
       <svg width={1180} height={440} viewBox="0 0 1180 440" className="pointer-events-none absolute left-0 top-0" aria-hidden>
-        <g className="sm-fade" style={delay(at.mosaic + 0.6)}>
+        <g className="sm-fade" style={delay(at.mosaic + 0.4)}>
           <path d={`M${st.x + roi.x + roi.s} ${st.y + roi.y} L${inset.x} ${inset.y}`} stroke={PRIMARY} strokeWidth={1.4} strokeDasharray="4 4" fill="none" />
           <path d={`M${st.x + roi.x + roi.s} ${st.y + roi.y + roi.s} L${inset.x} ${inset.y + inset.s}`} stroke={PRIMARY} strokeWidth={1.4} strokeDasharray="4 4" fill="none" />
         </g>
       </svg>
-      <div className="sm-pop absolute overflow-hidden rounded-lg border-2 border-fd-primary shadow-lg" style={{ left: inset.x, top: inset.y, width: inset.s, height: inset.s, background: 'linear-gradient(135deg, #f2b8cf, #e595b6)', ...delay(at.mosaic + 0.6) }}>
+      <div className="sm-pop absolute overflow-hidden rounded-lg border-2 border-fd-primary shadow-lg" style={{ left: inset.x, top: inset.y, width: inset.s, height: inset.s, background: 'linear-gradient(135deg, #f2b8cf, #e595b6)', ...delay(at.mosaic + 0.4) }}>
         <svg viewBox="0 0 100 100" className="absolute inset-0 size-full" aria-hidden>
           {L_CELLS.map((c) => (
             <g key={`${c.x}-${c.y}`}>
@@ -1007,6 +1043,7 @@ export function LineageFigure() {
           </span>
         ))}
       </div>
+      </Steps>
     </div>
   );
 }
@@ -1014,11 +1051,12 @@ export function LineageFigure() {
 /* --- 4 · reproducibility: sharing is caring, code and data ------------------------ */
 
 /** Sharing is caring: a result someone else can check needs both halves,
-    the code that made it and the data it ran on. */
+    the code that made it and the data it ran on. It arrives whole; only the
+    heart beats. */
 export function SharingFigure() {
   const u = useUid();
   const css = `
-section.present .${u}-beat { animation: ${u}-beat 1.4s ease-in-out 3.2s infinite; transform-origin: center; }
+section.present .${u}-beat { animation: ${u}-beat 1.4s ease-in-out 0.8s infinite; transform-origin: center; }
 @keyframes ${u}-beat { 0%, 100% { transform: none; } 15% { transform: scale(1.14); } 30% { transform: none; } 45% { transform: scale(1.08); } }
 @media (prefers-reduced-motion: reduce) { section.present .${u}-beat { animation: none; } }
 `;
@@ -1073,15 +1111,18 @@ section.present .${u}-beat { animation: ${u}-beat 1.4s ease-in-out 3.2s infinite
 }
 
 /** Share code: the script becomes an app, the app goes to GitHub, and from
-    there any hub can install it, with the versions it ran with. */
+    there any hub can install it, with the versions it ran with. One click per
+    card (script, bundle, publish, the other hub), and one more presses
+    Install. */
 export function ShareCodeFigure() {
   const u = useUid();
   const cw = 183;
   const gap = 26;
   const top = 40;
   const ch = 236;
-  const at = (i: number) => 0.3 + i * 1.1;
-  const installAt = at(3) + 0.9;
+  const at = (i: number) => 0.2 + i * 1.6;
+  const installAt = 6.6;
+  const cues = [1.2, 3, 4.6, 6.2, 8.3];
   const css = `
 section.present .${u}-press { animation: ${u}-press 0.35s ease-out ${installAt}s both; }
 @keyframes ${u}-press { 0%, 100% { transform: none; } 45% { transform: scale(0.9); } }
@@ -1169,6 +1210,7 @@ section.present .${u}-after { animation: ${u}-on 0.3s ease-out ${installAt + 0.3
   return (
     <div className="relative size-full" role="img" aria-label="Kim's script, stainstorm, becomes an app with arkitekt plugin build, is published to GitHub as kim-lab/stainstorm with arkitekt plugin publish, and from there another lab's hub installs it with one click: the process_slides workflow with its pinned versions, running on that lab's own arm, OT-2, microscope and analysis apps.">
       <LoopStyles css={css} />
+      <Steps cues={cues} className="relative size-full">
       {steps.map((s, i) => (
         <div key={s.title} className="absolute" style={{ left: i * (cw + gap), top: 0, width: cw }}>
           <span className="sm-in flex items-center gap-2 text-[14px] font-semibold" style={delay(at(i))}>
@@ -1192,18 +1234,19 @@ section.present .${u}-after { animation: ${u}-on 0.3s ease-out ${installAt + 0.3
         <Arrowheads id="code" />
         {[0, 1, 2].map((i) => {
           const x1 = (i + 1) * cw + i * gap + 3;
-          return <Path key={i} d={`M${x1} ${top + ch / 2} L${x1 + gap - 6} ${top + ch / 2}`} stroke={PRIMARY} width={2.4} head="code-primary" className="sm-draw" style={delay(at(i + 1) - 0.2)} />;
+          return <Path key={i} d={`M${x1} ${top + ch / 2} L${x1 + gap - 6} ${top + ch / 2}`} stroke={PRIMARY} width={2.4} head="code-primary" className="sm-draw" style={delay(at(i + 1) - 0.3)} />;
         })}
       </svg>
       <span className="sm-in absolute inset-x-0 top-[300px] text-center text-[16px] text-fd-muted-foreground" style={delay(installAt + 0.8)}>
         The versions travel with the app: it runs the same on their hub as on Kim’s.
       </span>
+      </Steps>
     </div>
   );
 }
 
 /** Share data: a recording of pressing share on the left; on the right, once
-    the other lab accepts (one click, a reveal.js fragment), a WireGuard
+    the other lab accepts (one keypress, a reveal.js fragment), a WireGuard
     connection opens between the two hubs that reaches that one dataset and
     nothing else. */
 export function ShareDataFigure({ src }: { src: string }) {

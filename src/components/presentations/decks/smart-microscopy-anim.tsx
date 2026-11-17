@@ -2,12 +2,16 @@
 
 /* The animation kit behind the smart microscopy deck's figures.
 
-   Two kinds of motion:
+   Three kinds of motion:
    - Builds (`sm-in`, `sm-pop`, `sm-draw`, …) run once each time a slide is
      shown. They are scoped to `section.present`, the class reveal.js puts on
      the current slide, so arriving at a slide replays its build and every
      other slide (thumbnails, overview, print) shows the finished state.
-     Stagger them with `delay(seconds)`, which sets `--d`.
+     They only animate inside <Steps>; a plain slide has no entrance at all.
+   - Steps (`<Steps cues={…}>`): a figure that tells a story in time is a
+     movie that plays one segment per click. Inside it the builds keep their
+     `delay(seconds)` (`--d`), and so do the figure's own keyframes; the
+     presenter clicks the figure to play on to the next cue.
    - Flows (`Token`) loop forever: SMIL `animateMotion` along a path, phased
      with a negative `begin` so several tokens on one path spread out instead
      of starting together at the origin.
@@ -15,7 +19,8 @@
    `prefers-reduced-motion` drops the builds to their end state and hides the
    tokens. */
 
-import { useId } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useReveal } from '@revealjs/react';
 import type { CSSProperties, ReactNode } from 'react';
 
 export const PRIMARY = 'var(--color-fd-primary)';
@@ -39,19 +44,27 @@ export function useUid() {
 }
 
 const CSS = `
+/* A build's delay only counts inside <Steps>; everywhere else the slide
+   arrives in one piece. */
+.reveal .slides section :is(.sm-in, .sm-pop, .sm-fade, .sm-draw, .sm-grow, .sm-grow-y, .sm-ping, .sm-converge) { --sm-at: calc(var(--d, 0s) * var(--sm-stagger, 0)); }
+.sm-steps { --sm-stagger: 1; }
+.sm-steps-live { cursor: pointer; }
 .sm-in, .sm-pop, .sm-grow, .sm-ping, .sm-converge { transform-box: fill-box; }
 .sm-pop, .sm-ping { transform-origin: center; }
 .sm-grow { transform-origin: left center; }
 .sm-grow-y { transform-box: fill-box; transform-origin: center bottom; }
 
-section.present .sm-in { animation: sm-in 0.6s cubic-bezier(.2,.7,.2,1) var(--d, 0s) both; }
-section.present .sm-pop { animation: sm-pop 0.55s cubic-bezier(.3,1.5,.5,1) var(--d, 0s) both; }
-section.present .sm-fade { animation: sm-fade 0.7s ease-out var(--d, 0s) both; }
-section.present .sm-draw { stroke-dasharray: 1; animation: sm-draw 0.9s ease-in-out var(--d, 0s) both; }
-section.present .sm-grow { animation: sm-grow 0.6s cubic-bezier(.4,0,.2,1) var(--d, 0s) both; }
-section.present .sm-grow-y { animation: sm-grow-y 0.6s cubic-bezier(.4,0,.2,1) var(--d, 0s) both; }
-section.present .sm-ping { animation: sm-ping 1.1s ease-out var(--d, 0s) both; }
-section.present .sm-converge { animation: sm-converge 1.6s cubic-bezier(.6,0,.2,1) var(--d, 0s) both; }
+section.present .sm-steps .sm-in { animation: sm-in 0.6s cubic-bezier(.2,.7,.2,1) var(--sm-at) both; }
+section.present .sm-steps .sm-pop { animation: sm-pop 0.55s cubic-bezier(.3,1.5,.5,1) var(--sm-at) both; }
+section.present .sm-steps .sm-fade { animation: sm-fade 0.7s ease-out var(--sm-at) both; }
+section.present .sm-steps .sm-draw { stroke-dasharray: 1; animation: sm-draw 0.9s ease-in-out var(--sm-at) both; }
+section.present .sm-steps .sm-grow { animation: sm-grow 0.6s cubic-bezier(.4,0,.2,1) var(--sm-at) both; }
+section.present .sm-steps .sm-grow-y { animation: sm-grow-y 0.6s cubic-bezier(.4,0,.2,1) var(--sm-at) both; }
+section.present .sm-steps .sm-ping { animation: sm-ping 1.1s ease-out var(--sm-at) both; }
+section.present .sm-steps .sm-converge { animation: sm-converge 1.6s cubic-bezier(.6,0,.2,1) var(--sm-at) both; }
+/* The few entrances that are wanted: opt in by name. */
+.sm-entrance-pop { transform-box: fill-box; transform-origin: center; }
+section.present .sm-entrance-pop { animation: sm-pop 0.55s cubic-bezier(.3,1.5,.5,1) var(--d, 0.5s) both; }
 section.present .sm-glow { animation: sm-glow 2.2s ease-in-out var(--d, 0s) infinite; }
 .sm-pulse { animation: sm-pulse 2.4s ease-in-out var(--d, 0s) infinite; }
 
@@ -81,7 +94,7 @@ section.present .sm-glow { animation: sm-glow 2.2s ease-in-out var(--d, 0s) infi
 section.present .sm-still :is(.sm-in, .sm-pop, .sm-fade, .sm-draw, .sm-grow, .sm-grow-y, .sm-converge) { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  section.present :is(.sm-in, .sm-pop, .sm-fade, .sm-draw, .sm-grow, .sm-grow-y, .sm-converge, .sm-glow) { animation: none; }
+  section.present :is(.sm-in, .sm-pop, .sm-fade, .sm-draw, .sm-grow, .sm-grow-y, .sm-converge, .sm-glow, .sm-entrance-pop) { animation: none; }
   .sm-pulse, section.present .sm-loop { animation: none !important; }
   .sm-token { display: none; }
 }
@@ -90,6 +103,36 @@ section.present .sm-still :is(.sm-in, .sm-pop, .sm-fade, .sm-draw, .sm-grow, .sm
 /** The kit's stylesheet. Rendered once, on the cover; styles are global, and
     every slide stays mounted, so one copy serves the whole deck. */
 export function AnimStyles() {
+  const deck = useReveal();
+  // No entrances: when a slide comes up, every one-shot animation on it that
+  // is not part of a <Steps> movie jumps straight to its end. Animations that
+  // start later (a reveal.js fragment, a click) are not touched.
+  useEffect(() => {
+    if (!deck) return;
+    let raf = 0;
+    const settle = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const slide = deck.getCurrentSlide();
+        if (!slide) return;
+        for (const a of slide.getAnimations({ subtree: true })) {
+          if (!(a instanceof CSSAnimation)) continue;
+          const target = (a.effect as KeyframeEffect | null)?.target;
+          if (target?.closest('.sm-steps, [class*="sm-entrance-"]')) continue;
+          if (a.effect?.getComputedTiming().iterations === Infinity) continue;
+          a.finish();
+        }
+      });
+    };
+    deck.on('ready', settle);
+    deck.on('slidechanged', settle);
+    settle();
+    return () => {
+      cancelAnimationFrame(raf);
+      deck.off('ready', settle);
+      deck.off('slidechanged', settle);
+    };
+  }, [deck]);
   return <style>{CSS}</style>;
 }
 
@@ -340,4 +383,169 @@ export function Token({
     on the current slide. */
 export function LoopStyles({ css }: { css: string }) {
   return <style>{css}</style>;
+}
+
+/* --- steps ------------------------------------------------------------------ */
+
+/** A figure that plays one segment per click.
+
+    Everything timed inside it (the `sm-*` builds with their `delay()`, and the
+    figure's own keyframes) is one movie on one clock, in seconds since the
+    slide came up. On arrival it stands at `cues[0]`, without an entrance. Each click on the figure plays on to the next cue; a
+    click while it is playing jumps to that cue; a click after the last one
+    starts over.
+
+    Loops that are not part of the story (a blinking cursor, a flame) keep
+    running: an infinite animation only follows the clock if it lasts
+    `period` seconds. Animations that start later (a reveal.js fragment) are
+    left alone too. Clicks on a `data-no-step` element do not count. */
+export function Steps({
+  cues,
+  period,
+  children,
+  className = 'relative shrink-0',
+  pips = true,
+}: {
+  /** Where the movie stops, in seconds, ascending. */
+  cues: number[];
+  /** The length of the figure's story loop, when it has one. */
+  period?: number;
+  children: ReactNode;
+  className?: string;
+  /** The row of dots that says how many clicks are left. */
+  pips?: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [step, setStep] = useState(0);
+  const run = useRef<{ tracks: Animation[]; step: number; timer: number; target: number | null }>({
+    tracks: [],
+    step: 0,
+    timer: 0,
+    target: null,
+  });
+  const key = cues.join(',');
+
+  const seek = useCallback((t: number) => {
+    for (const a of run.current.tracks) {
+      a.pause();
+      setTime(a, t * 1000);
+    }
+  }, []);
+
+  const play = useCallback(
+    (from: number, to: number) => {
+      const r = run.current;
+      window.clearTimeout(r.timer);
+      for (const a of r.tracks) {
+        setTime(a, from * 1000);
+        // play() rewinds an animation that is already over, so those stay put.
+        const end = Number(a.effect?.getComputedTiming().endTime ?? Infinity);
+        if (from * 1000 < end) a.play();
+        else a.pause();
+      }
+      r.target = to;
+      r.timer = window.setTimeout(
+        () => {
+          seek(to);
+          r.target = null;
+        },
+        Math.max(0, to - from) * 1000,
+      );
+    },
+    [seek],
+  );
+
+  const start = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    const r = run.current;
+    r.tracks = el.getAnimations({ subtree: true }).filter((a) => {
+      if (!(a instanceof CSSAnimation)) return false;
+      const t = a.effect?.getComputedTiming();
+      if (!t) return false;
+      if (t.iterations !== Infinity) return true;
+      return period !== undefined && Math.abs(Number(t.duration) - period * 1000) < 1;
+    });
+    r.step = 0;
+    setStep(0);
+    // no entrance: the slide arrives at its first cue
+    seek(cues[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, period, seek]);
+
+  // (Re)start whenever the slide comes up: that is when its animations exist.
+  useEffect(() => {
+    const section = ref.current?.closest('section');
+    if (!section) return;
+    const r = run.current;
+    let present = false;
+    let raf = 0;
+    const sync = () => {
+      const now = section.classList.contains('present');
+      if (now === present) return;
+      present = now;
+      window.clearTimeout(r.timer);
+      cancelAnimationFrame(raf);
+      r.target = null;
+      if (now) raf = requestAnimationFrame(() => (raf = requestAnimationFrame(start)));
+    };
+    const mo = new MutationObserver(sync);
+    mo.observe(section, { attributes: true, attributeFilter: ['class'] });
+    sync();
+    return () => {
+      mo.disconnect();
+      window.clearTimeout(r.timer);
+      cancelAnimationFrame(raf);
+    };
+  }, [start]);
+
+  const advance = (e: { target: EventTarget | null }) => {
+    if (e.target instanceof Element && e.target.closest('[data-no-step], a, button, video, input')) return;
+    const r = run.current;
+    if (r.target !== null) {
+      // still playing: jump to where it was going
+      window.clearTimeout(r.timer);
+      seek(r.target);
+      r.target = null;
+      return;
+    }
+    if (r.step >= cues.length - 1) {
+      r.step = 0;
+      setStep(0);
+      seek(cues[0]);
+      return;
+    }
+    r.step += 1;
+    setStep(r.step);
+    play(cues[r.step - 1], cues[r.step]);
+  };
+
+  return (
+    <div
+      ref={ref}
+      onClick={advance}
+      className={cn_('sm-steps', cues.length > 1 && 'sm-steps-live', className)}
+    >
+      {children}
+      {pips && cues.length > 1 ? (
+        <div aria-hidden className="pointer-events-none absolute right-0 top-0 flex -translate-y-[14px] gap-[5px]">
+          {cues.map((_, i) => (
+            <span
+              key={i}
+              className="block size-[6px] rounded-full"
+              style={{ background: i <= step ? PRIMARY : BORDER }}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function setTime(a: Animation, ms: number) {
+  a.currentTime = ms;
+}
+
+function cn_(...parts: (string | false | undefined)[]) {
+  return parts.filter(Boolean).join(' ');
 }

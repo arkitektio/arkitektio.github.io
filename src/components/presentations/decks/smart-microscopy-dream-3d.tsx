@@ -72,20 +72,26 @@ const DECK_SPOTS: [number, number][] = [
   [0.04, -0.14],
 ];
 
-/* Before the first round the three arrive one after the other, each popping
-   up with its name and a burst of hearts; then the rounds begin. `anchor` is
-   where the name floats, in the lab's metres. */
+/* The dream starts empty. Each click brings one device in, popping up with
+   its name and a burst of hearts; once all three are there the rounds begin.
+   `anchor` is where the name floats, in the lab's metres. */
 const CAST = [
-  { key: 'frame', at: 0.5, says: 'Open source microscopy', anchor: [AT.frame[0], 0.5, AT.frame[2]] },
-  { key: 'ot2', at: 2.4, says: 'Perfect automated staining', anchor: [AT.ot2[0] - 0.16, 0.74, AT.ot2[2]] },
-  { key: 'arm', at: 4.3, says: 'A universal robot arm with a slide holder', anchor: [AT.arm[0], 0.78, AT.arm[2]] },
+  { key: 'frame', says: 'Open source microscopy', anchor: [AT.frame[0], 0.5, AT.frame[2]] },
+  { key: 'ot2', says: 'Perfect automated staining', anchor: [AT.ot2[0] - 0.16, 0.74, AT.ot2[2]] },
+  { key: 'arm', says: 'A universal robot arm with a slide holder', anchor: [AT.arm[0], 0.78, AT.arm[2]] },
 ] as const;
-const INTRO = 6.6;
+/* Seconds between the last device arriving and the first round. */
+const SETTLE = 1.6;
 const HEARTS = 8;
 
 type Time = RefObject<number>;
-/** Seconds into the current round; 0 until the introductions are over. */
-const roundTime = (time: number) => Math.max(0, time - INTRO) % ROUND;
+/** When each of the cast was clicked in, on the dream's clock; Infinity until then. */
+type Shown = RefObject<number[]>;
+const NOBODY = () => CAST.map(() => Infinity);
+/** When the rounds begin: a moment after the last device has arrived. */
+const roundsFrom = (shown: number[]) => Math.max(...shown) + SETTLE;
+/** Seconds into the current round; 0 until everyone is there. */
+const roundTime = (time: number, shown: number[]) => (time > roundsFrom(shown) ? (time - roundsFrom(shown)) % ROUND : 0);
 /** 0 to 1 with a little overshoot: how far a device that arrives `at` has popped up. */
 const popped = (time: number, at: number) => {
   const u = Math.min(1, Math.max(0, (time - at) / 0.7));
@@ -97,7 +103,7 @@ const within = (t: number, [from, to]: [number, number]) => t >= from && t <= to
 const smooth = (u: number) => u * u * (3 - 2 * u);
 
 /** The FR5, moving through the round's poses, a slide at its flange. */
-function Arm({ timeRef }: { timeRef: Time }) {
+function Arm({ timeRef, shownRef }: { timeRef: Time; shownRef: Shown }) {
   const { scene } = useGLTF(ARM, DRACO);
   const group = useRef<THREE.Group>(null);
   const joints = useRef<{ node?: THREE.Object3D; axis: THREE.Vector3 }[]>([]);
@@ -116,8 +122,8 @@ function Arm({ timeRef }: { timeRef: Time }) {
   }, [scene, slide]);
 
   useFrame(() => {
-    group.current?.scale.setScalar(Math.max(1e-4, popped(timeRef.current, CAST[2].at)));
-    const t = roundTime(timeRef.current);
+    group.current?.scale.setScalar(Math.max(1e-4, popped(timeRef.current, shownRef.current[2])));
+    const t = roundTime(timeRef.current, shownRef.current);
     const next = Math.max(
       1,
       PATH.findIndex(([at]) => at > t),
@@ -135,7 +141,7 @@ function Arm({ timeRef }: { timeRef: Time }) {
 }
 
 /** The OT-2: its head visits the deck and its pipette dips while it stains. */
-function Opentrons({ timeRef }: { timeRef: Time }) {
+function Opentrons({ timeRef, shownRef }: { timeRef: Time; shownRef: Shown }) {
   const { scene } = useGLTF(OT2, DRACO);
   const group = useRef<THREE.Group>(null);
   const nodes = useRef<{ x?: THREE.Object3D; y?: THREE.Object3D; pipette?: THREE.Object3D }>({});
@@ -144,10 +150,10 @@ function Opentrons({ timeRef }: { timeRef: Time }) {
   }, [scene]);
   const glow = useRef<THREE.PointLight>(null);
   useFrame((_, dt) => {
-    group.current?.scale.setScalar(Math.max(1e-4, popped(timeRef.current, CAST[1].at)));
+    group.current?.scale.setScalar(Math.max(1e-4, popped(timeRef.current, shownRef.current[1])));
     const parts = nodes.current;
-    const t = roundTime(timeRef.current);
-    const on = timeRef.current > INTRO && within(t, STAINING);
+    const t = roundTime(timeRef.current, shownRef.current);
+    const on = timeRef.current > roundsFrom(shownRef.current) && within(t, STAINING);
     const step = (t - STAINING[0]) / 0.55;
     const [x, y] = on ? DECK_SPOTS[Math.floor(step) % DECK_SPOTS.length] : [0, 0];
     const down = on && step % 1 > 0.5 ? 0.09 : 0;
@@ -165,7 +171,7 @@ function Opentrons({ timeRef }: { timeRef: Time }) {
 }
 
 /** The FRAME: its stage scans and its light is on while it images. */
-function Frame({ timeRef }: { timeRef: Time }) {
+function Frame({ timeRef, shownRef }: { timeRef: Time; shownRef: Shown }) {
   const { scene } = useGLTF(FRAME, DRACO);
   const group = useRef<THREE.Group>(null);
   const nodes = useRef<{ x?: THREE.Object3D; y?: THREE.Object3D; light?: THREE.Object3D }>({});
@@ -184,10 +190,10 @@ function Frame({ timeRef }: { timeRef: Time }) {
   }, [scene]);
   const glow = useRef<THREE.PointLight>(null);
   useFrame((_, dt) => {
-    group.current?.scale.setScalar(Math.max(1e-4, popped(timeRef.current, CAST[0].at)));
+    group.current?.scale.setScalar(Math.max(1e-4, popped(timeRef.current, shownRef.current[0])));
     const parts = nodes.current;
-    const t = roundTime(timeRef.current);
-    const on = timeRef.current > INTRO && within(t, IMAGING);
+    const t = roundTime(timeRef.current, shownRef.current);
+    const on = timeRef.current > roundsFrom(shownRef.current) && within(t, IMAGING);
     const s = t - IMAGING[0];
     /* shown three times as far as it travels: 8 mm is little on a 30 cm device */
     if (parts.x) parts.x.position.x = THREE.MathUtils.damp(parts.x.position.x, on ? 0.024 * Math.sin(s * 3.4) : 0, 8, dt);
@@ -232,12 +238,17 @@ type Tags = RefObject<(HTMLDivElement | null)[]>;
 /** Keeps each name over its device as the camera sways, pops it in when the
     device arrives and throws its hearts. The names are plain HTML over the
     canvas, placed in percent, so the deck's scaling does not touch them. */
-function Names({ timeRef, tagsRef }: { timeRef: Time; tagsRef: Tags }) {
+function Names({ timeRef, shownRef, tagsRef }: { timeRef: Time; shownRef: Shown; tagsRef: Tags }) {
   const point = useMemo(() => new THREE.Vector3(), []);
   useFrame(({ camera }) => {
-    CAST.forEach(({ at, anchor }, i) => {
+    CAST.forEach(({ anchor }, i) => {
       const tag = tagsRef.current[i];
       if (!tag) return;
+      const at = shownRef.current[i];
+      if (!Number.isFinite(at)) {
+        for (const el of Array.from(tag.children) as HTMLElement[]) el.style.opacity = '0';
+        return;
+      }
       point.set(anchor[0], anchor[1], anchor[2]).project(camera);
       tag.style.left = `${(point.x + 1) * 50}%`;
       tag.style.top = `${(1 - point.y) * 50}%`;
@@ -260,7 +271,7 @@ function Names({ timeRef, tagsRef }: { timeRef: Time; tagsRef: Tags }) {
   return null;
 }
 
-function Dream({ timeRef, tagsRef }: { timeRef: Time; tagsRef: Tags }) {
+function Dream({ timeRef, shownRef, tagsRef }: { timeRef: Time; shownRef: Shown; tagsRef: Tags }) {
   return (
     <>
       <ambientLight intensity={1.1} />
@@ -270,9 +281,9 @@ function Dream({ timeRef, tagsRef }: { timeRef: Time; tagsRef: Tags }) {
 
       <Suspense fallback={null}>
         <Ticker timeRef={timeRef} />
-        <Arm timeRef={timeRef} />
-        <Opentrons timeRef={timeRef} />
-        <Frame timeRef={timeRef} />
+        <Arm timeRef={timeRef} shownRef={shownRef} />
+        <Opentrons timeRef={timeRef} shownRef={shownRef} />
+        <Frame timeRef={timeRef} shownRef={shownRef} />
       </Suspense>
 
       {/* the floor of the dream */}
@@ -292,7 +303,7 @@ function Dream({ timeRef, tagsRef }: { timeRef: Time; tagsRef: Tags }) {
       <Sparkles position={[AT.arm[0], 0.4, AT.arm[2]]} count={30} scale={[0.6, 0.9, 0.6]} size={1.9} speed={0.9} color="#ffffff" />
 
       <Sway timeRef={timeRef} />
-      <Names timeRef={timeRef} tagsRef={tagsRef} />
+      <Names timeRef={timeRef} shownRef={shownRef} tagsRef={tagsRef} />
     </>
   );
 }
@@ -304,6 +315,9 @@ function Scene({ className }: { className?: string }) {
   const [active, setActive] = useState(false);
   const [seen, setSeen] = useState(false);
   const timeRef = useRef(0);
+  const shownRef = useRef<number[]>(NOBODY());
+  /* how many of the cast are in; only for the cursor */
+  const [count, setCount] = useState(0);
   const tagsRef = useRef<(HTMLDivElement | null)[]>([]);
   useEffect(() => {
     const section = wrap.current?.closest('section');
@@ -316,8 +330,10 @@ function Scene({ className }: { className?: string }) {
       const on = section.classList.contains('present');
       setActive(on);
       if (on) {
-        /* every arrival at the slide starts the dream over */
+        /* every arrival at the slide starts the dream over, empty */
         timeRef.current = 0;
+        shownRef.current = NOBODY();
+        setCount(0);
         setSeen(true);
       }
     };
@@ -327,11 +343,23 @@ function Scene({ className }: { className?: string }) {
     return () => observer.disconnect();
   }, []);
   return (
-    <div ref={wrap} className={className} role="img" aria-label="Kim's dream, in 3D and full of sparkles. Three devices appear one after the other, each with a burst of hearts: open source microscopy, perfect automated staining, a universal robot arm with a slide holder. Then the robot arm carries a slide to the Opentrons OT-2, whose pipette head moves over the deck, then on to the openUC2 FRAME microscope, whose stage scans under its light, and back home">
+    <div
+      ref={wrap}
+      className={className}
+      style={{ cursor: count < CAST.length ? 'pointer' : undefined }}
+      onClick={() => {
+        const next = shownRef.current.findIndex((at) => !Number.isFinite(at));
+        if (next < 0) return;
+        shownRef.current[next] = timeRef.current;
+        setCount(next + 1);
+      }}
+      role="img"
+      aria-label="Kim's dream, in 3D and full of sparkles. Three devices appear, one per click, each with a burst of hearts: open source microscopy, perfect automated staining, a universal robot arm with a slide holder. Then the robot arm carries a slide to the Opentrons OT-2, whose pipette head moves over the deck, then on to the openUC2 FRAME microscope, whose stage scans under its light, and back home"
+    >
       {seen ? (
         /* offsetSize: the deck is scaled with a CSS transform, which the default measuring would count twice */
         <Canvas dpr={[1, 2]} frameloop={active ? 'always' : 'never'} resize={{ offsetSize: true }} camera={{ position: eye(VIEW.azimuth), fov: 34, near: 0.05, far: 20 }} gl={{ antialias: true, alpha: true }} style={{ background: 'transparent' }}>
-          <Dream timeRef={timeRef} tagsRef={tagsRef} />
+          <Dream timeRef={timeRef} shownRef={shownRef} tagsRef={tagsRef} />
         </Canvas>
       ) : null}
       {CAST.map(({ key, says }, i) => (
