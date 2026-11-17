@@ -9,9 +9,10 @@
      other slide (thumbnails, overview, print) shows the finished state.
      They only animate inside <Steps>; a plain slide has no entrance at all.
    - Steps (`<Steps cues={…}>`): a figure that tells a story in time is a
-     movie that plays one segment per click. Inside it the builds keep their
-     `delay(seconds)` (`--d`), and so do the figure's own keyframes; the
-     presenter clicks the figure to play on to the next cue.
+     movie that plays one segment per press of "next" (right arrow, space,
+     the clicker). Inside it the builds keep their `delay(seconds)` (`--d`),
+     and so do the figure's own keyframes. Nothing in the deck is stepped by
+     a mouse click: every step is a reveal.js fragment (`useKeySteps`).
    - Flows (`Token`) loop forever: SMIL `animateMotion` along a path, phased
      with a negative `begin` so several tokens on one path spread out instead
      of starting together at the origin.
@@ -48,7 +49,6 @@ const CSS = `
    arrives in one piece. */
 .reveal .slides section :is(.sm-in, .sm-pop, .sm-fade, .sm-draw, .sm-grow, .sm-grow-y, .sm-ping, .sm-converge) { --sm-at: calc(var(--d, 0s) * var(--sm-stagger, 0)); }
 .sm-steps { --sm-stagger: 1; }
-.sm-steps-live { cursor: pointer; }
 .sm-in, .sm-pop, .sm-grow, .sm-ping, .sm-converge { transform-box: fill-box; }
 .sm-pop, .sm-ping { transform-origin: center; }
 .sm-grow { transform-origin: left center; }
@@ -104,9 +104,10 @@ section.present .sm-still :is(.sm-in, .sm-pop, .sm-fade, .sm-draw, .sm-grow, .sm
     every slide stays mounted, so one copy serves the whole deck. */
 export function AnimStyles() {
   const deck = useReveal();
-  // No entrances: when a slide comes up, every one-shot animation on it that
-  // is not part of a <Steps> movie jumps straight to its end. Animations that
-  // start later (a reveal.js fragment, a click) are not touched.
+  // Nothing moves unless it was asked to: when a slide comes up, or one of its
+  // fragments is shown, every one-shot animation on it jumps straight to its
+  // end and every loop (CSS or SMIL) is stopped. Only a live <Steps> movie,
+  // which runs on key presses, and anything marked `sm-animate` are left alone.
   useEffect(() => {
     if (!deck) return;
     let raf = 0;
@@ -118,19 +119,27 @@ export function AnimStyles() {
         for (const a of slide.getAnimations({ subtree: true })) {
           if (!(a instanceof CSSAnimation)) continue;
           const target = (a.effect as KeyframeEffect | null)?.target;
-          if (target?.closest('.sm-steps, [class*="sm-entrance-"]')) continue;
-          if (a.effect?.getComputedTiming().iterations === Infinity) continue;
+          if (a.effect?.getComputedTiming().iterations === Infinity) {
+            if (!target?.closest('.sm-steps-live, .sm-animate')) a.pause();
+            continue;
+          }
+          if (target?.closest('.sm-steps, .sm-animate')) continue;
           a.finish();
         }
+        for (const svg of slide.querySelectorAll('svg')) svg.pauseAnimations();
       });
     };
     deck.on('ready', settle);
     deck.on('slidechanged', settle);
+    deck.on('fragmentshown', settle);
+    deck.on('fragmenthidden', settle);
     settle();
     return () => {
       cancelAnimationFrame(raf);
       deck.off('ready', settle);
       deck.off('slidechanged', settle);
+      deck.off('fragmentshown', settle);
+      deck.off('fragmenthidden', settle);
     };
   }, [deck]);
   return <style>{CSS}</style>;
@@ -387,36 +396,90 @@ export function LoopStyles({ css }: { css: string }) {
 
 /* --- steps ------------------------------------------------------------------ */
 
-/** A figure that plays one segment per click.
+/** Steps driven by the deck's "next" key instead of the mouse: `count` empty
+    reveal.js fragments, and how many of them are showing. Render `marks`
+    anywhere inside the figure (`svg` for inside an <svg>); `step` goes from 0
+    to `count` as the presenter presses on, and back down on "previous".
+    Arriving at the slide from the one after it, every step is already taken. */
+export function useKeySteps(count: number, svg = false) {
+  const deck = useReveal();
+  const ref = useRef<Element | null>(null);
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    if (!deck || count <= 0) return;
+    const sync = () => {
+      const el = ref.current;
+      if (el) setStep(el.querySelectorAll(':scope > .fragment.visible').length);
+    };
+    const events = ['ready', 'slidechanged', 'fragmentshown', 'fragmenthidden'] as const;
+    for (const e of events) deck.on(e, sync);
+    sync();
+    return () => {
+      for (const e of events) deck.off(e, sync);
+    };
+  }, [deck, count]);
+  const items = Array.from({ length: Math.max(0, count) }, (_, i) =>
+    svg ? <g key={i} className="fragment" /> : <span key={i} className="fragment" />,
+  );
+  const setRef = (el: Element | null) => {
+    ref.current = el;
+  };
+  const marks = svg ? (
+    <g ref={setRef} aria-hidden>
+      {items}
+    </g>
+  ) : (
+    <span ref={setRef} aria-hidden className="pointer-events-none absolute size-0 overflow-hidden">
+      {items}
+    </span>
+  );
+  return { step: Math.min(step, Math.max(0, count)), marks };
+}
+
+/** A figure that plays one segment per press of "next".
 
     Everything timed inside it (the `sm-*` builds with their `delay()`, and the
     figure's own keyframes) is one movie on one clock, in seconds since the
-    slide came up. On arrival it stands at `cues[0]`, without an entrance. Each click on the figure plays on to the next cue; a
-    click while it is playing jumps to that cue; a click after the last one
-    starts over.
+    slide came up. On arrival it stands at `cues[0]`, without an entrance.
+    Each press of "next" plays on to the next cue (the steps are reveal.js
+    fragments, so "previous" steps back, and after the last cue "next" moves
+    on to the next slide). A press while it is playing carries on from the
+    cue it was heading for.
 
     Loops that are not part of the story (a blinking cursor, a flame) keep
     running: an infinite animation only follows the clock if it lasts
     `period` seconds. Animations that start later (a reveal.js fragment) are
-    left alone too. Clicks on a `data-no-step` element do not count. */
+    left alone too. */
 export function Steps({
   cues,
   period,
   children,
   className = 'relative shrink-0',
   pips = true,
+  live = false,
+  speed = 1,
+  onStep,
 }: {
+  /** Told which cue the figure now stands at (0 on arrival and after a restart). */
+  onStep?: (step: number) => void;
+  /** How much faster than written the segments play (the cues stay the same). */
+  speed?: number;
+  /** Plays one segment per press of "next". Off by default: the figure simply stands at
+      its last cue, complete, and nothing in it moves. */
+  live?: boolean;
   /** Where the movie stops, in seconds, ascending. */
   cues: number[];
   /** The length of the figure's story loop, when it has one. */
   period?: number;
   children: ReactNode;
   className?: string;
-  /** The row of dots that says how many clicks are left. */
+  /** The row of dots that says how many presses are left. */
   pips?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [step, setStep] = useState(0);
+  const stepped = live && cues.length > 1;
+  const { step, marks } = useKeySteps(stepped ? cues.length - 1 : 0);
+  const stepRef = useRef(step);
   const run = useRef<{ tracks: Animation[]; step: number; timer: number; target: number | null }>({
     tracks: [],
     step: 0,
@@ -424,6 +487,10 @@ export function Steps({
     target: null,
   });
   const key = cues.join(',');
+  const onStepRef = useRef(onStep);
+  useEffect(() => {
+    onStepRef.current = onStep;
+  }, [onStep]);
 
   const seek = useCallback((t: number) => {
     for (const a of run.current.tracks) {
@@ -438,6 +505,7 @@ export function Steps({
       window.clearTimeout(r.timer);
       for (const a of r.tracks) {
         setTime(a, from * 1000);
+        setRate(a, speed);
         // play() rewinds an animation that is already over, so those stay put.
         const end = Number(a.effect?.getComputedTiming().endTime ?? Infinity);
         if (from * 1000 < end) a.play();
@@ -449,10 +517,10 @@ export function Steps({
           seek(to);
           r.target = null;
         },
-        Math.max(0, to - from) * 1000,
+        (Math.max(0, to - from) * 1000) / speed,
       );
     },
-    [seek],
+    [seek, speed],
   );
 
   const start = useCallback(() => {
@@ -466,12 +534,13 @@ export function Steps({
       if (t.iterations !== Infinity) return true;
       return period !== undefined && Math.abs(Number(t.duration) - period * 1000) < 1;
     });
-    r.step = 0;
-    setStep(0);
-    // no entrance: the slide arrives at its first cue
-    seek(cues[0]);
+    // no entrance: a live figure arrives at the cue its fragments say (the
+    // first, or the last when coming back from the next slide), any other at
+    // its last
+    r.step = stepRef.current;
+    seek(live ? cues[Math.min(r.step, cues.length - 1)] : cues[cues.length - 1]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, period, seek]);
+  }, [key, period, seek, live]);
 
   // (Re)start whenever the slide comes up: that is when its animations exist.
   useEffect(() => {
@@ -499,35 +568,32 @@ export function Steps({
     };
   }, [start]);
 
-  const advance = (e: { target: EventTarget | null }) => {
-    if (e.target instanceof Element && e.target.closest('[data-no-step], a, button, video, input')) return;
+  // The fragments moved: one step forward plays its segment, anything else
+  // (a step back, a jump) just stands at its cue.
+  useEffect(() => {
+    stepRef.current = step;
+    onStepRef.current?.(step);
     const r = run.current;
-    if (r.target !== null) {
-      // still playing: jump to where it was going
+    if (!stepped || step === r.step) return;
+    const forward = step === r.step + 1;
+    r.step = step;
+    if (forward) play(cues[step - 1], cues[step]);
+    else {
       window.clearTimeout(r.timer);
-      seek(r.target);
       r.target = null;
-      return;
+      seek(cues[step]);
     }
-    if (r.step >= cues.length - 1) {
-      r.step = 0;
-      setStep(0);
-      seek(cues[0]);
-      return;
-    }
-    r.step += 1;
-    setStep(r.step);
-    play(cues[r.step - 1], cues[r.step]);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, stepped, key, play, seek]);
 
   return (
     <div
       ref={ref}
-      onClick={advance}
-      className={cn_('sm-steps', cues.length > 1 && 'sm-steps-live', className)}
+      className={cn_('sm-steps', stepped && 'sm-steps-live', className)}
     >
       {children}
-      {pips && cues.length > 1 ? (
+      {marks}
+      {pips && stepped ? (
         <div aria-hidden className="pointer-events-none absolute right-0 top-0 flex -translate-y-[14px] gap-[5px]">
           {cues.map((_, i) => (
             <span
@@ -544,6 +610,10 @@ export function Steps({
 
 function setTime(a: Animation, ms: number) {
   a.currentTime = ms;
+}
+
+function setRate(a: Animation, rate: number) {
+  a.playbackRate = rate;
 }
 
 function cn_(...parts: (string | false | undefined)[]) {

@@ -6,7 +6,7 @@
    of text. Times, values and scopes are illustrative. */
 
 import type { CSSProperties, ReactNode } from 'react';
-import { Check, Lock, ScrollText, ShieldCheck, X } from 'lucide-react';
+import { Bot, Check, Lock, ScrollText, ShieldCheck, X } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
 import { cn } from '@/lib/cn';
 import { LoopStyles, Steps, delay, useUid } from './smart-microscopy-anim';
@@ -123,11 +123,15 @@ export function PitchFigure() {
 
 /* --- problem one: the agent asks for rights ---------------------------------- */
 
-/** Claude on Arkitekt is just another app: it asks Kim for the rights it
-    needs, scope by scope, calls typed actions with them, asks again for
-    anything more, and every call lands on the record with who allowed it.
-    Five beats, one per click: Kim asks; Claude asks for rights; Kim
-    approves and it runs; it asks for one more; allowed once, and done. */
+/** The agent on Arkitekt is just another app, and this is what talking to
+    it looks like: a chat window in Arkitekt. Kim is signed in, the model
+    behind the agent is a setting, and the things an agent normally does
+    silently happen in the conversation: it asks Kim for the rights it needs,
+    scope by scope, as a card she answers; every action it calls shows up as
+    a line; and the pane on the right is the record, with who was behind
+    each call. Five beats, one per press of "next": Kim asks; the agent asks
+    for rights; Kim approves and it runs; it asks for one more; allowed once,
+    and done. */
 export function AgentRightsFigure() {
   const u = useUid();
   const t = { ask: 1.3, consent: 1.7, approve: 3.4, run: 4.0, more: 5.2, once: 6.5, done: 7.2 };
@@ -140,97 +144,134 @@ export function AgentRightsFigure() {
     `section.present .${u}-p2 { animation: ${u}-press 0.35s ease-out ${t.once}s both; }`,
   ].join('\n');
   const scopes: { text: string; ok: boolean }[] = [
-    { text: 'call process_slides · stainstorm', ok: true },
+    { text: 'call process_slides', ok: true },
     { text: 'read slides / HE-07', ok: true },
     { text: 'move the arm by hand', ok: false },
     { text: 'delete data', ok: false },
   ];
-  const card = 'rounded-2xl border-2 bg-fd-card shadow-sm';
-  const btn = 'flex h-[30px] items-center justify-center rounded-lg text-[13px] font-semibold';
+  const btn = 'flex h-[26px] items-center justify-center rounded-md px-3 text-[12.5px] font-semibold';
+  const agent = (
+    <span aria-hidden className="flex size-[28px] shrink-0 items-center justify-center rounded-lg bg-fd-foreground text-fd-background">
+      <Bot className="size-[18px]" strokeWidth={2.2} />
+    </span>
+  );
+  /** A line the agent says. */
+  const says = (at: number, children: ReactNode) => (
+    <div className="sm-in flex items-start gap-2.5" style={delay(at)}>
+      {agent}
+      <div className="rounded-2xl rounded-tl-sm bg-fd-muted px-3.5 py-1.5 text-[14.5px] leading-snug">{children}</div>
+    </div>
+  );
+  /** An action the agent called, as it shows in the conversation. */
+  const ran = (at: number, call: string, on: string) => (
+    <div className="sm-in ml-[38px] flex w-fit items-center gap-2 rounded-md border border-fd-border px-2.5 py-0.5 font-mono text-[12px]" style={delay(at)}>
+      <Check className="size-[13px] text-emerald-600" strokeWidth={3} />
+      <span>
+        ran <span className="font-semibold">{call}</span> · {on}
+      </span>
+    </div>
+  );
   return (
     <div
-      className="relative mx-auto h-[440px] w-[1180px]"
+      className="relative mx-auto h-[500px] w-[1100px]"
       role="img"
-      aria-label="Kim asks Claude to run the four-stain panel on slide HE-07. Claude asks Kim's hub for rights: to call process_slides on the stainstorm app and read the slides HE-07 dataset, but not to move the arm by hand or delete data. Kim approves; Claude runs the workflow. To segment CD20 again it asks once more, to use the GPU server once, and Kim allows it. Both calls are on the record with who allowed them."
+      aria-label="A chat window in Arkitekt. Kim is signed in and asks the agent to run the four-stain panel on slide HE-07. In the conversation, the agent asks for rights on Kim's hub: to call process_slides on the stainstorm app and read the slides HE-07 dataset, but not to move the arm by hand or delete data. Kim approves in the chat; the agent runs the workflow. To segment CD20 again it asks once more, to use the GPU server, and Kim allows it once. A pane beside the chat shows the record: both calls, each by Kim, with an agent."
     >
       <LoopStyles css={css} />
-      <Steps cues={cues} className="relative size-full">
-
-      {/* the chat */}
-      <div className="sm-fade absolute left-0 top-0 flex h-[430px] w-[560px] flex-col gap-3 p-4" style={delay(0.1)}>
-        <Say who="kim" at={0.4}>Run the four-stain panel on slide HE-07.</Say>
-        <Say who="claude" at={t.ask}>I need a few rights on Kim’s hub first. Asking.</Say>
-        <Say who="claude" at={t.run}>
-          Thanks. Running <code className="font-mono text-[14px] font-semibold">process_slides</code> on stainstorm…
-        </Say>
-        <Say who="claude" at={t.more}>CD20 looks patchy. To segment it again I need the GPU server. That’s new, so I’m asking again.</Say>
-        <Say who="claude" at={t.done}>
-          Done: four stains, CD20 took two rounds. It’s all on the record.
-        </Say>
-      </div>
-
-      {/* the consent */}
-      <div className="absolute left-[600px] top-0 w-[580px]">
-        <div className={cn('sm-pop p-4', card, 'border-fd-primary/60')} style={delay(t.consent)}>
-          <div className="mb-2 flex items-center gap-2.5">
-            <ClaudeAvatar size={30} />
-            <span className="text-[16px] font-semibold">Claude is asking for</span>
-            <span className="ml-auto flex items-center gap-1.5 text-[12px] text-fd-muted-foreground">
-              <ShieldCheck className="size-[14px] text-fd-primary" strokeWidth={2.2} /> Kim’s hub
+      <Steps live cues={cues} className="relative size-full">
+        <div className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl border-2 border-fd-border bg-fd-card shadow-md">
+          {/* the window's title bar */}
+          <div className="flex h-[40px] shrink-0 items-center gap-2.5 border-b-2 border-fd-border bg-fd-muted px-4">
+            <Logo className="size-[20px]" />
+            <span className="text-[15px] font-semibold">Arkitekt · chat</span>
+            <span className="ml-3 flex items-center gap-1.5 rounded-full border border-fd-border bg-fd-card px-2.5 py-0.5 font-mono text-[11.5px] text-fd-muted-foreground">
+              agent: <span className="font-semibold text-fd-foreground">local LLM</span> ▾
+            </span>
+            <span className="ml-auto flex items-center gap-2 text-[13px] text-fd-muted-foreground">
+              signed in as <span className="font-semibold text-fd-foreground">Kim</span>
+              <KimAvatar size={24} />
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-            {scopes.map((s, i) => (
-              <span key={s.text} className={cn('sm-in flex items-center gap-1.5 rounded-md px-2 py-1 font-mono text-[12px]', s.ok ? 'bg-fd-primary/8' : 'text-fd-muted-foreground line-through')} style={delay(t.consent + 0.3 + i * 0.2)}>
-                {s.ok ? <Check className="size-[13px] shrink-0 text-emerald-600" strokeWidth={3} /> : <X className="size-[13px] shrink-0 text-red-600" strokeWidth={3} />}
-                {s.text}
+          <div className="flex min-h-0 flex-1">
+            {/* the conversation */}
+            <div className="flex min-w-0 flex-1 flex-col">
+              <div className="flex min-h-0 flex-1 flex-col gap-[5px] overflow-hidden px-5 py-2.5">
+                <div className="flex justify-end">
+                  <div className="rounded-2xl rounded-tr-sm bg-fd-primary px-3.5 py-1.5 text-[14.5px] leading-snug text-fd-primary-foreground">Run the four-stain panel on slide HE-07.</div>
+                </div>
+                {says(t.ask, 'I need a few rights on your hub first.')}
+                {/* the request, in the conversation */}
+                <div className="sm-pop ml-[38px] w-[560px] rounded-xl border-2 border-fd-primary/60 bg-fd-card p-2.5" style={delay(t.consent)}>
+                  <div className="mb-1.5 flex items-center gap-2">
+                    <ShieldCheck className="size-[15px] text-fd-primary" strokeWidth={2.2} />
+                    <span className="text-[14px] font-semibold">The agent is asking for</span>
+                    <span className="ml-auto text-[12px] text-fd-muted-foreground">on Kim’s hub</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                    {scopes.map((sc, i) => (
+                      <span key={sc.text} className={cn('sm-in flex items-center gap-1.5 rounded-md px-2 py-0.5 font-mono text-[12px]', sc.ok ? 'bg-fd-primary/8' : 'text-fd-muted-foreground line-through')} style={delay(t.consent + 0.3 + i * 0.2)}>
+                        {sc.ok ? <Check className="size-[13px] shrink-0 text-emerald-600" strokeWidth={3} /> : <X className="size-[13px] shrink-0 text-red-600" strokeWidth={3} />}
+                        {sc.text}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="relative mt-2 h-[26px]">
+                    <span className={`${u}-consent-b absolute inset-0 flex gap-2`}>
+                      <span className={cn(`${u}-p1 bg-fd-primary text-fd-primary-foreground`, btn)}>Approve</span>
+                      <span className={cn('border border-fd-border text-fd-muted-foreground', btn)}>Deny</span>
+                    </span>
+                    <span className={`${u}-consent-a absolute inset-0 flex items-center gap-1.5 text-[13px] font-semibold text-emerald-600`}>
+                      <Check className="size-[15px]" strokeWidth={3} /> granted by Kim · these scopes only · until 18:00
+                    </span>
+                  </div>
+                </div>
+                {ran(t.run, 'process_slides', 'stainstorm')}
+                {says(t.more, 'CD20 looks patchy. To segment it again I need the GPU server. That’s new, so I’m asking.')}
+                <div className="sm-pop ml-[38px] flex w-[560px] items-center gap-2.5 rounded-xl border-2 border-amber-500/60 bg-fd-card px-2.5 py-1.5" style={delay(t.more + 0.3)}>
+                  <Lock className="size-[15px] shrink-0 text-amber-600" strokeWidth={2.4} />
+                  <span className="text-[13.5px] font-semibold">One more:</span>
+                  <span className="font-mono text-[12px] text-fd-muted-foreground">call segment_image · gpu-server</span>
+                  <div className="relative ml-auto h-[26px] w-[130px]">
+                    <span className={cn(`${u}-once-b ${u}-p2 absolute inset-0 bg-fd-primary text-fd-primary-foreground`, btn)}>Allow once</span>
+                    <span className={`${u}-once-a absolute inset-0 flex items-center justify-end gap-1.5 text-[13px] font-semibold text-emerald-600`}>
+                      <Check className="size-[15px]" strokeWidth={3} /> allowed once
+                    </span>
+                  </div>
+                </div>
+                {ran(t.once + 0.6, 'segment_image', 'gpu-server')}
+                {says(t.done, 'Done: four stains, CD20 took two rounds.')}
+              </div>
+              {/* the composer */}
+              <div className="flex h-[46px] shrink-0 items-center gap-2 border-t border-fd-border px-4">
+                <span className="flex h-[30px] flex-1 items-center rounded-full border border-fd-border bg-fd-background px-4 text-[13.5px] text-fd-muted-foreground">Message the agent…</span>
+                <span className="flex size-[30px] items-center justify-center rounded-full bg-fd-primary text-[15px] font-bold text-fd-primary-foreground">↑</span>
+              </div>
+            </div>
+            {/* the record, beside the conversation */}
+            <div className="flex w-[300px] shrink-0 flex-col gap-2 border-l-2 border-fd-border bg-fd-muted/40 p-3.5">
+              <span className="flex items-center gap-1.5 text-[13.5px] font-semibold">
+                <ScrollText className="size-[15px] text-fd-primary" strokeWidth={2} /> the record
               </span>
-            ))}
-          </div>
-          <div className="relative mt-3 h-[30px]">
-            <span className={`${u}-consent-b absolute inset-0 flex gap-2`}>
-              <span className={cn(`${u}-p1 flex-1 bg-fd-primary text-fd-primary-foreground`, btn)}>Approve</span>
-              <span className={cn('w-[100px] border border-fd-border text-fd-muted-foreground', btn)}>Deny</span>
-            </span>
-            <span className={`${u}-consent-a absolute inset-0 flex items-center gap-1.5 text-[14px] font-semibold text-emerald-600`}>
-              <Check className="size-[16px]" strokeWidth={3} /> granted by Kim · these scopes only · until 18:00
-            </span>
-          </div>
-        </div>
-
-        <div className={cn('sm-pop mt-3 flex items-center gap-3 p-3', card, 'border-amber-500/60')} style={delay(t.more + 0.3)}>
-          <Lock className="size-[18px] shrink-0 text-amber-600" strokeWidth={2.4} />
-          <span className="flex flex-col">
-            <span className="text-[14px] font-semibold">Claude asks for one more</span>
-            <span className="font-mono text-[12px] text-fd-muted-foreground">call segment_image · gpu-server</span>
-          </span>
-          <div className="relative ml-auto h-[30px] w-[170px]">
-            <span className={cn(`${u}-once-b ${u}-p2 absolute inset-0 bg-fd-primary text-fd-primary-foreground`, btn)}>Allow once</span>
-            <span className={`${u}-once-a absolute inset-0 flex items-center justify-end gap-1.5 text-[13px] font-semibold text-emerald-600`}>
-              <Check className="size-[15px]" strokeWidth={3} /> allowed once
-            </span>
+              {[
+                { at: t.run + 0.3, time: '14:21', call: 'process_slides', on: 'stainstorm', who: 'granted until 18:00' },
+                { at: t.once + 0.9, time: '15:02', call: 'segment_image', on: 'gpu-server', who: 'allowed once' },
+              ].map((r) => (
+                <div key={r.call} className="sm-in flex flex-col gap-0.5 border-t border-fd-border pt-2 font-mono text-[12px]" style={delay(r.at)}>
+                  <span className="flex justify-between">
+                    <span className="font-semibold">{r.call}</span>
+                    <span className="text-fd-muted-foreground">{r.time}</span>
+                  </span>
+                  <span className="text-fd-muted-foreground">on {r.on}</span>
+                  <span className="font-sans text-[12.5px]">
+                    by <span className="font-semibold text-fd-primary">Kim · with an agent</span>
+                  </span>
+                  <span className="font-sans text-[11.5px] text-fd-muted-foreground">{r.who}</span>
+                </div>
+              ))}
+              <span className="mt-auto text-[12px] leading-snug text-fd-muted-foreground">Every call the agent makes lands here, under the name of whoever was chatting.</span>
+            </div>
           </div>
         </div>
-
-        {/* the record */}
-        <div className={cn('sm-pop mt-3 p-3', card, 'border-fd-border')} style={delay(t.run)}>
-          <span className="mb-1.5 flex items-center gap-1.5 text-[13px] font-semibold">
-            <ScrollText className="size-[15px] text-fd-primary" strokeWidth={2} /> the record
-          </span>
-          {[
-            { at: t.run + 0.3, time: '14:21', call: 'process_slides', on: 'stainstorm', who: 'Claude, granted by Kim' },
-            { at: t.once + 0.6, time: '15:02', call: 'segment_image', on: 'gpu-server', who: 'Claude, allowed once by Kim' },
-          ].map((r) => (
-            <span key={r.call} className="sm-in grid grid-cols-[44px_1fr_auto] items-center gap-2 border-t border-fd-border py-1.5 font-mono text-[12px]" style={delay(r.at)}>
-              <span className="text-fd-muted-foreground">{r.time}</span>
-              <span>
-                <span className="font-semibold">{r.call}</span> · {r.on}
-              </span>
-              <span className="font-sans text-[11.5px] text-fd-muted-foreground">{r.who}</span>
-            </span>
-          ))}
-        </div>
-      </div>
       </Steps>
     </div>
   );

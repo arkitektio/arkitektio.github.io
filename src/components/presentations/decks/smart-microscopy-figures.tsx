@@ -31,6 +31,7 @@ import {
   Token,
   WARN,
   delay,
+  useKeySteps,
   useUid,
 } from './smart-microscopy-anim';
 
@@ -176,8 +177,6 @@ section.present .${u}-w { animation: sm-fade 0.25s ease-out var(--d) both; }
 
 type Night = {
   night: string;
-  /** The clock on the wall when she asks. */
-  clock: string;
   /** All Kim wants, in one line. */
   ask: string;
   /** Claude's cheerful answer: how it opens, the options (she takes the first), what it says when she has chosen. */
@@ -187,8 +186,10 @@ type Night = {
   /** Her script, in the background, before and after Claude is done with it. */
   file: [string, string];
   lines: [string, string][];
-  /** The errors that follow. */
+  /** The errors that follow, one after the other. */
   errors: string[];
+  /** Claude's fix for each error: what it says, and the lines it adds to the script. */
+  fixes: [string, string[]][];
   /** Her doubts: what the horseman carts in behind him. */
   worries: string[];
 };
@@ -200,9 +201,8 @@ type Night = {
     one, Claude rewrites her script, and the errors come. */
 export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Night> = {
   communication: {
-    night: 'NIGHT 1',
-    clock: '23:41',
-    ask: 'I just need to connect the devices.',
+    night: 'The first night',
+    ask: 'Okay, let’s connect the robot to my script.',
     tip: 'Easy! You can use',
     options: ['HTTP APIs', 'gRPC', 'SiLA2', 'ROS', 'MQTT', 'raw sockets'],
     close: 'Great choice! I’ll just hardcode the IPs. ✨',
@@ -216,13 +216,18 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
       ['if (uptake < 0.8) print("stain again");', '# TODO: what if the IPs change??'],
     ],
     errors: ['ConnectionRefusedError: 10.0.0.12:8000', 'MemoryError in json.dumps', 'Max retries exceeded: /tiles', 'OT-2 not found on network'],
+    fixes: [
+      ['Easy fix: a retry loop!', ['for attempt in range(5):', '    try: labels = post(STARDIST, body); break', '    except ConnectionError: time.sleep(2 ** attempt)']],
+      ['No problem: we chunk it, and base64 it.', ['for i in range(0, len(mosaic), 512):', '    chunk = b64encode(mosaic[i:i + 512].tobytes())', '    post(f"{STARDIST}/chunk/{i}", chunk)']],
+      ['Got it: a health check before every call.', ['def alive(url): return get(url + "/health").ok', 'while not alive(SCOPE): time.sleep(5)', '# TODO: what if it never comes back?']],
+      ['Simple: we scan the subnet for it.', ['for ip in ip_network("10.0.0.0/24"):', '    if port_open(ip, 31950): OT2 = ip; break', 'else: raise RuntimeError("where is the OT-2??")']],
+    ],
     worries: ['numpy arrays as JSON over the wire?', 'What if the IPs change?', 'I didn’t secure my server…'],
   },
   threads: {
-    night: 'NIGHT 2',
-    clock: '00:12',
-    ask: 'I just need it to wait until the robot is done.',
-    tip: 'Easy! You can use',
+    night: 'A week later',
+    ask: 'Wait, why did my robot just stop? It’s frozen!',
+    tip: 'Ah, that was a deadlock. Easy to fix! Do you want to use',
     options: ['threads', 'asyncio', 'multiprocessing', 'Celery', 'a job queue', 'time.sleep(1)'],
     close: 'Great choice! And a join at the end. ✨',
     file: ['kim_pipeline.py', 'kim_pipeline_threaded.py · 2 GPUs'],
@@ -235,13 +240,18 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
       ['', 'results.append(uptake)  # race condition?'],
     ],
     errors: ['Exception in thread Thread-2', 'Thread-1 still alive after 120 s', 'RuntimeError: dict changed size', 'Segmentation fault (core dumped)'],
+    fixes: [
+      ['Easy fix: wrap the thread in a try/except.', ['def safe(fn, *args):', '    try: fn(*args)', '    except Exception as e: errors.append(e)  # then?']],
+      ['No problem: a timeout and a watchdog.', ['t1.join(timeout=120)', 'if t1.is_alive(): Thread(target=kill, args=(t1,)).start()', '# you cannot kill a thread in Python…']],
+      ['Got it: a lock! Locks fix everything.', ['lock = threading.Lock()', 'with lock: results[slide] = uptake', 'with lock: progress.update(results)  # deadlock?']],
+      ['Simple: its own process, until it works.', ['while True:', '    p = Process(target=segment); p.start(); p.join()', '    if p.exitcode == 0: break  # else: again']],
+    ],
     worries: ['What even is a join?', 'If the GPU server dies, does the thread?', 'Which machine failed? Where are the logs?'],
   },
   data: {
-    night: 'NIGHT 3',
-    clock: '22:58',
-    ask: 'I just need to save the images.',
-    tip: 'Easy! You can use',
+    night: 'Three weeks later',
+    ask: 'Okay, now my images are on five computers. How do I get them?',
+    tip: 'No worries, just use this script! It can collect them with',
     options: ['a shared drive', 'OME-TIFF', 'OME-Zarr', 'OMERO', 'S3', 'the filename'],
     close: 'Great choice! Here’s a script that collects it all. ✨',
     file: ['kim_sequential.ijm', 'collect_results_v4.py · 5 machines'],
@@ -254,13 +264,18 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
       ['', '# where is experiment_one???'],
     ],
     errors: ['OSError: No space left on device', 'FileNotFoundError: experiment_one/', 'Path longer than 260 characters', 'IT: stop writing to the GPU server!'],
+    fixes: [
+      ['Easy fix: we delete the oldest files first.', ['if disk_usage("/tmp").free < 2e9:', '    for f in sorted(glob("/tmp/*.npy"), key=getmtime)[:50]:', '        os.remove(f)  # hopefully copied already']],
+      ['No problem: we search all five machines.', ['for host in HOSTS:', '    found = ssh(host, "find / -name experiment_one*")', '    if found: scp(f"{host}:{found}", "D:/backup/")']],
+      ['Got it: we hash the name, and keep a lookup.', ['short = md5(name.encode()).hexdigest()[:8] + ".tif"', 'lookup[short] = name', 'json.dump(lookup, open("names_v2_final.json", "w"))']],
+      ['Simple: we write to your laptop instead.', ['OUT = "C:/Users/kim/Desktop/data_new/"', 'shutil.move("/tmp/results", OUT)  # 180 GB', '# TODO: the laptop has 256 GB']],
+    ],
     worries: ['Metadata in the filename? Really?', 'Which of five machines has run 41?', 'I should have used OMERO…'],
   },
   repro: {
-    night: 'NIGHT 4',
-    clock: '23:05',
-    ask: 'I just need to run it again.',
-    tip: 'Easy! You can use',
+    night: 'Three months later',
+    ask: 'Madonna! The last weeks it worked. What happened?',
+    tip: 'Ah, a version changed for CUDA. No worries, I’ll update! We can pin it with',
     options: ['requirements.txt', 'Conda', 'Docker', 'Nix', 'Pixi', 'a Streamlit GUI'],
     close: 'Great choice! We’ll pip freeze it later. ✨',
     file: ['kim_sequential.ijm · v1.2 · has a DOI', 'kim_pipeline_FINAL_v7.py · run 41 of 76'],
@@ -272,7 +287,14 @@ export const NIGHTS: Record<'communication' | 'threads' | 'data' | 'repro', Nigh
       ['uptake = getResult("Positive", 0);  // per cell', 'cfg = load("C:/Users/kim/Desktop/cfg_old.json")'],
       ['if (uptake < 0.8) print("stain again");', '# pip freeze > requirements.txt  (too late)'],
     ],
-    errors: ['AttributeError: st.experimental_rerun', 'CUDA 11.2 ≠ CUDA 12.1', 'FileNotFoundError: cfg_old.json', 'run 41: 0.78 · run 42: 0.83'],
+    /* a cascade: every fix is an update, and every update breaks the next thing */
+    errors: ['torch 2.0 not compiled for CUDA 12.1', 'AttributeError: np.float was removed', 'AttributeError: st.experimental_rerun', 'run 41: 0.78 · run 42: 0.83'],
+    fixes: [
+      ['Ah, the update broke torch. Let me fix that.', ['pip install --upgrade torch  # 2.0 → 2.3', 'pip install --upgrade torchvision  # has to match', '# that pulled in numpy 2, by the way']],
+      ['Ah, that broke numpy. Let me fix that.', ['if not hasattr(np, "float"): np.float = float', 'os.system("pip install --upgrade stardist streamlit")', '# everything is on latest now. latest of what?']],
+      ['Ah, that broke the GUI. Let me fix that.', ['try: rerun = st.rerun', 'except AttributeError: rerun = st.experimental_rerun', '# works on 1.27 and 1.31, probably']],
+      ['Ah, the numbers changed. Let me fix that.', ['runs = [pipeline(slide) for _ in range(5)]', 'uptake = np.mean(runs)', '# five times the staining, same answer-ish']],
+    ],
     worries: ['Which version made run 41?', 'Did my PI’s rerun use the old model?', 'My vibe-coded GUI: will it even run next year?'],
   },
 };
@@ -290,27 +312,29 @@ function ClaudeMark({ size = 30 }: { size?: number }) {
   );
 }
 
-/** Where the errors land round Kim and Claude's answer, and how they tilt. */
-const NIGHT_ERROR_SLOTS: [number, number, number][] = [
-  [204, 252, -3],
-  [228, 306, 2],
-  [500, 398, -2],
-  [790, 412, 2],
-];
-
 /** One night, one click per beat (`NIGHTMARE_CUES`): Kim's one small wish;
     Claude's cheerful answer, six ways to do it, and her question marks; she
-    picks one; Claude rewrites her script in the background while the errors
-    pile up. Kim gets more upset with every beat, and starts every night a
-    little more worn than the last. Then, on a keypress, the night's horseman
-    rides in over it all, a cart of her doubts behind him. */
-const NIGHTMARE_CUES = [0.5, 2.6, 4.2, 9.2];
+    picks one, and Claude rewrites her script; then the errors, one click
+    each: an error, Claude's cheerful fix, and three more lines on the script,
+    which gets longer and longer. Kim gets more upset with every beat, and
+    starts every night a little more worn than the last. Then, on a keypress,
+    the night's horseman appears over it all, a cart of her doubts behind him. */
+const NIGHT_AT = { answer: 1, option: 1.25, marks: 2.15, decide: 3, rewrite: 3.4, step: 0.3, errors: 6, every: 2.4 };
+const NIGHT_ERROR_CUES = [0, 1, 2, 3].map((k) => NIGHT_AT.errors + k * NIGHT_AT.every + 2.2);
+/* the last cue is the horseman's: nothing more plays in the figure, he rides in over it */
+const NIGHTMARE_CUES = [0.5, 2.6, 5.6, ...NIGHT_ERROR_CUES, NIGHT_ERROR_CUES[3] + 0.05];
+/* The same night in three presses, played faster: her question through to the
+   rewritten script; the four errors and their fixes in one run; the horseman. */
+const NIGHTMARE_COMPACT_CUES = [0.5, 5.6, NIGHT_ERROR_CUES[3], NIGHT_ERROR_CUES[3] + 0.05];
 
-export function NightmareFigure({ night: which }: { night: keyof typeof NIGHTS }) {
+export function NightmareFigure({ night: which, compact = false }: { night: keyof typeof NIGHTS; compact?: boolean }) {
+  const cues = compact ? NIGHTMARE_COMPACT_CUES : NIGHTMARE_CUES;
   const u = useUid();
   const night = NIGHTS[which];
+  const [horseman, setHorseman] = useState(false);
   const tired = Object.keys(NIGHTS).indexOf(which);
-  const at = { answer: 1, option: 1.25, marks: 2.15, decide: 3, rewrite: 4.7, step: 0.55, stressed: 5, errors: 5.5 };
+  const at = NIGHT_AT;
+  const errorAt = (k: number) => at.errors + k * at.every;
   const v = (o: Record<string, number | string>) =>
     Object.fromEntries(Object.entries(o).map(([k, x]) => [`--${k}`, typeof x === 'number' ? `${x.toFixed(2)}s` : x])) as CSSProperties;
   const css = `
@@ -326,48 +350,53 @@ section.present .${u}-old { animation: ${u}-old 0.45s ease-in var(--d) both; }
 .${u}-type { display: inline-block; overflow: hidden; vertical-align: top; white-space: pre; width: calc((var(--n) + 1) * 1ch); }
 section.present .${u}-type { animation: ${u}-type var(--t) steps(var(--n)) var(--d) both; }
 @keyframes ${u}-type { from { width: 0; } }
-section.present .${u}-shake { animation: ${u}-shake 0.14s ease-in-out ${at.errors}s 26 alternate; }
+section.present .${u}-shake { animation: ${[0, 1, 2, 3].map((k) => `${u}-shake 0.14s ease-in-out ${errorAt(k)}s 10 alternate`).join(', ')}; }
 @keyframes ${u}-shake { from { transform: translateX(-3px) rotate(-1.2deg); } to { transform: translateX(3px) rotate(1.2deg); } }
 @media (prefers-reduced-motion: reduce) { section.present :is(.${u}-old, .${u}-type, .${u}-shake) { animation: none; } }
 `;
   const lineAt = (i: number) => at.rewrite + i * at.step;
+  const typed = (text: string, d: number) => (
+    <span className={`${u}-type`} style={{ ...v({ d, t: text.length * 0.008 }), ['--n' as string]: text.length } as CSSProperties}>
+      {text}
+    </span>
+  );
+  const lines = night.lines.length + night.fixes.length * 4;
   return (
     <div className="relative mx-auto h-[440px] w-[1130px]">
-      <Steps cues={NIGHTMARE_CUES} className="absolute inset-0">
+      <Steps live cues={cues} speed={compact ? 1.6 : 1} onStep={(step) => setHorseman(step === cues.length - 1)} className="absolute inset-0">
         <LoopStyles css={css} />
         <div
           className="absolute inset-0"
           role="img"
-          aria-label={`${night.night}, ${night.clock}. Kim: ${night.ask} Claude: ${night.tip} ${night.options.join(', or ')}. Kim picks ${night.options[0]}. Claude rewrites her script, and the errors follow: ${night.errors.join('; ')}. Kim gets more and more upset.`}
+          aria-label={`${night.night}. Kim: ${night.ask} Claude: ${night.tip} ${night.options.join(', or ')}. Kim picks ${night.options[0]} and Claude rewrites her script. Then the errors, one after the other, and for each one Claude has a fix that makes the script longer: ${night.errors.map((e, i) => `${e}: ${night.fixes[i][0]}`).join(' ')} The script ends up ${lines} lines long, and Kim gets more and more upset.`}
         >
-          {/* the night, and the clock */}
-          <span className="absolute left-0 top-0 flex items-center gap-3 rounded-xl bg-[#111827] px-3.5 py-1.5 font-mono">
-            <span className="text-[13px] font-bold tracking-[0.08em] text-[#f59e0b]">{night.night}</span>
-            <span className="text-[22px] font-bold leading-none text-[#ef4444]">{night.clock}</span>
-          </span>
-
-          {/* her script, in the background: Claude rewrites it line by line */}
-          <div className="absolute right-0 top-0 w-[450px] overflow-hidden font-mono text-[12.5px] leading-[22px] text-fd-muted-foreground/75" aria-hidden>
-            <div className="relative h-[22px] font-bold">
+          {/* her script: Claude rewrites it, then makes it longer with every fix */}
+          <div className="absolute right-0 top-[-18px] w-[480px] overflow-hidden font-mono text-[12px] leading-[19px] text-fd-muted-foreground/80" aria-hidden>
+            <div className="relative h-[21px] font-bold">
               <span className={`${u}-until absolute inset-0`} style={v({ len: at.rewrite })}>
                 ~ {night.file[0]}
               </span>
               <span className={`${u}-from absolute inset-0 flex items-center gap-1.5 text-[#d97706]`} style={v({ d: at.rewrite })}>
-                <ClaudeMark size={16} /> {night.file[1]}
+                <ClaudeMark size={15} /> {night.file[1]}
               </span>
             </div>
             {night.lines.map(([before, after], i) => (
-              <div key={i} className="relative h-[22px]">
+              <div key={i} className="relative h-[19px]">
                 {before ? (
                   <span className={`${u}-old absolute inset-0 block whitespace-pre`} style={v({ d: lineAt(i) })}>
                     {before}
                   </span>
                 ) : null}
-                <span className="absolute inset-0 text-[#d97706]">
-                  <span className={`${u}-type`} style={{ ...v({ d: lineAt(i) + 0.25, t: after.length * 0.01 }), ['--n' as string]: after.length } as CSSProperties}>
-                    {after}
-                  </span>
-                </span>
+                <span className="absolute inset-0 text-[#d97706]">{typed(after, lineAt(i) + 0.2)}</span>
+              </div>
+            ))}
+            {night.fixes.map(([, added], k) => (
+              <div key={k} className={`${u}-from mt-[5px] border-l-[3px] border-[#d97757] pl-2 text-[#b45309] dark:text-[#f0a98f]`} style={v({ d: errorAt(k) + 0.9 })}>
+                {added.map((line, i) => (
+                  <div key={i} className="h-[19px]">
+                    {typed(line, errorAt(k) + 1 + i * 0.28)}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
@@ -377,39 +406,47 @@ section.present .${u}-shake { animation: ${u}-shake 0.14s ease-in-out ${at.error
             <div className={`${u}-until absolute inset-0`} style={v({ len: at.answer + 0.4 })}>
               <KimFigure size={180} mood={tired ? 'worried' : 'neutral'} tired={tired} />
             </div>
-            <div className={`${u}-span absolute inset-0`} style={v({ d: at.answer + 0.3, len: at.stressed - at.answer })}>
+            <div className={`${u}-span absolute inset-0`} style={v({ d: at.answer + 0.3, len: errorAt(0) - at.answer })}>
               <KimFigure size={180} mood="worried" tired={tired} />
             </div>
-            <div className={`${u}-from absolute inset-0`} style={v({ d: at.stressed })}>
+            <div className={`${u}-span absolute inset-0`} style={v({ d: errorAt(0), len: errorAt(2) - errorAt(0) + 0.3 })}>
               <div className={`${u}-shake`}>
                 <KimFigure size={180} mood="stressed" tired={tired} />
               </div>
             </div>
+            <div className={`${u}-from absolute inset-0`} style={v({ d: errorAt(2) + 0.1 })}>
+              <div className={`${u}-shake`}>
+                <KimFigure size={180} mood="panic" tired={tired} />
+              </div>
+            </div>
           </div>
-          <p className="absolute left-[196px] top-[58px] max-w-[450px] rounded-[30px] rounded-bl-md border-2 border-fd-border bg-fd-card px-7 py-4 text-[30px] font-bold leading-[1.15] tracking-[-0.02em] shadow-sm">
+          {/* a long ask is set smaller, so it stays on two lines and clear of Claude's answer */}
+          <p className={cn('absolute left-[196px] top-[30px] max-w-[430px] rounded-[28px] rounded-bl-md border-2 border-fd-border bg-fd-card px-6 py-3.5 font-bold leading-[1.15] tracking-[-0.02em] shadow-sm', night.ask.length > 50 ? 'text-[22px]' : 'text-[27px]')}>
             <span className="sr-only">Kim: </span>“{night.ask}”
           </p>
 
-          {/* Claude: so many ways */}
-          <div className="sm-pop absolute right-0 top-[226px] flex w-[630px] items-start gap-3" style={delay(at.answer)}>
-            <ClaudeMark size={38} />
-            <div className="flex flex-1 flex-col gap-2.5 rounded-[26px] rounded-tl-md border-2 border-fd-border bg-fd-card px-6 py-4 shadow-sm">
-              <span className="text-[24px] font-semibold leading-tight">{night.tip}</span>
-              <span className="flex flex-wrap items-center gap-x-2 gap-y-2">
-                {night.options.map((o, i) => (
-                  <span key={o} className="sm-pop flex items-center gap-2" style={delay(at.option + i * 0.13)}>
-                    {i > 0 ? <span className="text-[19px] italic text-fd-muted-foreground">or</span> : null}
-                    <span className="relative rounded-lg bg-[#d97757]/15 px-2.5 py-1 font-mono text-[19px] font-semibold text-[#9a4a2e] dark:text-[#f0a98f]">
-                      {o}
-                      {/* the one she takes */}
-                      {i === 0 ? <span className={`${u}-from absolute inset-[-4px] rounded-xl border-[3px] border-[#d97757]`} style={v({ d: at.decide + 0.1 })} /> : null}
+          {/* Claude: so many ways. Gone once the errors start. */}
+          <div className={`${u}-until absolute left-[206px] top-[186px] w-[420px]`} style={v({ len: errorAt(0) })}>
+            <div className="sm-pop flex items-start gap-2.5" style={delay(at.answer)}>
+              <ClaudeMark size={34} />
+              <div className="flex flex-1 flex-col gap-2 rounded-[24px] rounded-tl-md border-2 border-fd-border bg-fd-card px-5 py-3.5 shadow-sm">
+                <span className="text-[22px] font-semibold leading-tight">{night.tip}</span>
+                <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1.5">
+                  {night.options.map((o, i) => (
+                    <span key={o} className="sm-pop flex items-center gap-1.5" style={delay(at.option + i * 0.13)}>
+                      {i > 0 ? <span className="text-[17px] italic text-fd-muted-foreground">or</span> : null}
+                      <span className="relative rounded-lg bg-[#d97757]/15 px-2 py-0.5 font-mono text-[17px] font-semibold text-[#9a4a2e] dark:text-[#f0a98f]">
+                        {o}
+                        {/* the one she takes */}
+                        {i === 0 ? <span className={`${u}-from absolute inset-[-4px] rounded-xl border-[3px] border-[#d97757]`} style={v({ d: at.decide + 0.1 })} /> : null}
+                      </span>
                     </span>
-                  </span>
-                ))}
-              </span>
-              <span className="sm-in text-[21px] text-fd-muted-foreground" style={delay(at.decide + 0.6)}>
-                {night.close}
-              </span>
+                  ))}
+                </span>
+                <span className="sm-in text-[18px] text-fd-muted-foreground" style={delay(at.decide + 0.5)}>
+                  {night.close}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -417,9 +454,9 @@ section.present .${u}-shake { animation: ${u}-shake 0.14s ease-in-out ${at.error
           <div className={`${u}-until absolute inset-0`} style={v({ len: at.decide })} aria-hidden>
             {(
               [
-                [168, 236, 64, -14],
-                [222, 196, 86, 6],
-                [286, 232, 58, 18],
+                [30, 168, 46, -14],
+                [84, 140, 62, 6],
+                [142, 170, 42, 18],
               ] as const
             ).map(([x, y, size, turn], i) => (
               <span key={x} className="absolute" style={{ left: x, top: y, transform: `rotate(${turn}deg)` }}>
@@ -431,22 +468,26 @@ section.present .${u}-shake { animation: ${u}-shake 0.14s ease-in-out ${at.error
           </div>
 
           {/* she decides */}
-          <p className="sm-pop absolute left-[196px] top-[184px] whitespace-nowrap rounded-[20px] rounded-bl-md border-2 border-fd-border bg-fd-card px-3.5 py-1.5 text-[18px] font-semibold shadow-sm" style={delay(at.decide + 0.2)}>
+          <p className="sm-pop absolute left-[196px] top-[136px] whitespace-nowrap rounded-[18px] rounded-bl-md border-2 border-fd-border bg-fd-card px-3.5 py-1 text-[18px] font-semibold shadow-sm" style={delay(at.decide + 0.2)}>
             <span className="sr-only">Kim: </span>“Okay… <span className="font-mono text-[#9a4a2e] dark:text-[#f0a98f]">{night.options[0]}</span>, then.”
           </p>
 
-          {/* the errors */}
-          {night.errors.map((text, i) => (
-            <div key={text} className="absolute z-10" style={{ left: NIGHT_ERROR_SLOTS[i][0], top: NIGHT_ERROR_SLOTS[i][1], transform: `rotate(${NIGHT_ERROR_SLOTS[i][2]}deg)` }}>
-              <span className="sm-pop block whitespace-nowrap rounded-md border border-red-500/70 bg-red-50 px-2.5 py-1 font-mono text-[14px] font-bold text-red-700 shadow-lg" style={delay(at.errors + i * 0.85)}>
+          {/* the errors, one click each, and Claude's fix for every one */}
+          {night.errors.map((text, k) => (
+            <div key={text} className="absolute left-[210px] flex w-[430px] flex-col gap-1" style={{ top: 190 + k * 62 }}>
+              <span className="sm-pop self-start whitespace-nowrap rounded-md border border-red-500/70 bg-red-50 px-2.5 py-0.5 font-mono text-[14px] font-bold text-red-700 shadow-md" style={{ transform: `rotate(${[-1.5, 1, -1, 1.5][k]}deg)`, ...delay(errorAt(k)) }}>
                 ✕ {text}
+              </span>
+              <span className="sm-in flex items-center gap-2 pl-4 text-[17px] font-semibold leading-tight" style={delay(errorAt(k) + 0.6)}>
+                <ClaudeMark size={22} />
+                {night.fixes[k][0]}
               </span>
             </div>
           ))}
         </div>
       </Steps>
-      {/* outside the steps: he rides in on a keypress, on his own clock */}
-      <Horseman night={which} />
+      {/* outside the steps' clock: he rides in on the last click */}
+      <Horseman night={which} shown={horseman} />
     </div>
   );
 }
@@ -454,9 +495,10 @@ section.present .${u}-shake { animation: ${u}-shake 0.14s ease-in-out ${at.error
 /* --- it worked -------------------------------------------------------------- */
 
 /** "It worked": Kim's face, close up, after three nights. Eyes wide and
-    bloodshot, pupils twitching (the only thing that moves), a manic grin,
-    and the stamp across her chin. One keypress (a reveal.js fragment): her PI creeps in from the
-    right, Kim slides aside, and the PI has a question. */
+    bloodshot, pupils twitching (the only thing that moves), a manic grin.
+    Two keypresses (reveal.js fragments): first "It worked." is stamped
+    across her chin, in one hit; then her PI creeps in from the right, Kim
+    slides aside, and the PI has a question. */
 export function ItWorkedFigure() {
   const u = useUid();
   const skin = '#c68863';
@@ -465,6 +507,13 @@ export function ItWorkedFigure() {
   const css = `
 .${u}-pupil { animation: ${u}-pupil 1.7s steps(1) infinite; }
 @keyframes ${u}-pupil { 0% { transform: translate(0, 0); } 20% { transform: translate(5px, -3px); } 45% { transform: translate(-4px, 2px); } 70% { transform: translate(2px, 4px); } 85% { transform: translate(-3px, -4px); } }
+.${u}-ink { opacity: 0; transform: scale(2.8) rotate(-12deg); }
+.${u}-stamp.visible .${u}-ink { opacity: 1; transform: none; transition: transform 0.26s cubic-bezier(.5,0,.9,.4), opacity 0.08s; }
+/* her face takes the hit (sm-animate: the deck leaves this one-shot alone) */
+.${u}-kim:has(.${u}-stamp.visible) .${u}-jolt { animation: ${u}-jolt 0.35s ease-out 0.26s; }
+@keyframes ${u}-jolt { 0% { transform: translateY(0); } 25% { transform: translateY(7px); } 60% { transform: translateY(-3px); } 100% { transform: none; } }
+/* off the current slide: stamped */
+.reveal .slides section:not(.present) .${u}-ink { opacity: 1; transform: none; }
 .${u}-kim { transition: transform 1.2s cubic-bezier(.6,0,.2,1); }
 .${u}-pi.visible ~ .${u}-kim { transform: translateX(-250px); }
 .${u}-person { transform: translateX(115%) rotate(10deg); transform-origin: bottom left; transition: transform 1.5s cubic-bezier(.3,0,.2,1); }
@@ -473,7 +522,8 @@ export function ItWorkedFigure() {
 .${u}-pi.visible .${u}-say { opacity: 1; transform: none; transition: opacity 0.3s var(--sd), transform 0.45s cubic-bezier(.3,1.5,.5,1) var(--sd); }
 @media (prefers-reduced-motion: reduce) {
   .${u}-pupil { animation: none; }
-  .${u}-kim, .${u}-person, .${u}-say { transition: none !important; }
+  .${u}-kim, .${u}-person, .${u}-say, .${u}-ink { transition: none !important; }
+  .${u}-jolt { animation: none !important; }
 }
 `;
   const spikes = Array.from({ length: 13 }, (_, i) => {
@@ -508,7 +558,7 @@ export function ItWorkedFigure() {
     <div className="relative h-[460px] w-full">
       <LoopStyles css={css} />
 
-      {/* the PI, creeping in (one keypress) */}
+      {/* the PI, creeping in (the second keypress) */}
       <Fragment as="div" index={1} className={`custom ${u}-pi absolute inset-y-0 right-0 w-[640px]`}>
         <div className="absolute bottom-0 right-0 h-[440px] w-[300px] overflow-hidden">
           <svg className={`${u}-person absolute bottom-0 left-[20px]`} width={250} height={340} viewBox="0 0 250 340" role="img" aria-label="Kim's PI, beaming, holding a mug">
@@ -549,8 +599,8 @@ export function ItWorkedFigure() {
 
       {/* Kim, close up */}
       <div className={`${u}-kim absolute inset-y-0 left-1/2 w-[420px] -translate-x-1/2`}>
-        <div className="sm-pop absolute left-0 top-0" style={delay(0.1)}>
-          <svg width={420} height={420} viewBox="0 0 400 400" role="img" aria-label="Kim, wide-eyed after three nights: bloodshot eyes, twitching pupils, a manic grin">
+        <div className={`${u}-jolt sm-animate absolute left-0 top-0`}>
+          <svg width={420} height={420} viewBox="0 0 400 400" role="img" aria-label="Kim, wide-eyed after five months: bloodshot eyes, twitching pupils, a manic grin">
             <circle cx={200} cy={200} r={150} fill={hair} />
             <path d={spikes} fill={hair} />
             <circle cx={200} cy={218} r={122} fill={skin} />
@@ -567,132 +617,105 @@ export function ItWorkedFigure() {
             <path d="M70 200 C 64 212, 64 220, 71 223 C 78 220, 78 212, 70 200 Z" fill="#60a5fa" />
           </svg>
         </div>
-        <div className="absolute bottom-[-34px] left-1/2" style={{ transform: 'translateX(-50%) rotate(-8deg)' }}>
-          <div className="sm-pop flex flex-col items-center rounded-xl border-[6px] border-emerald-600 bg-fd-card/90 px-8 py-3 text-emerald-600 shadow-lg" style={delay(0.9)}>
-            <span className="whitespace-nowrap text-[54px] font-black uppercase leading-none tracking-[0.04em]">It worked.</span>
-            <span className="mt-1 font-mono text-[16px] font-bold">once · 1 run in 76</span>
+        {/* the stamp: one keypress, one hit */}
+        <Fragment as="div" index={0} className={`custom ${u}-stamp pointer-events-none absolute inset-0`}>
+          <div className="absolute bottom-[-34px] left-1/2" style={{ transform: 'translateX(-50%) rotate(-8deg)' }}>
+            <div className={`${u}-ink flex flex-col items-center rounded-xl border-[6px] border-emerald-600 bg-fd-card/90 px-8 py-3 text-emerald-600 shadow-lg`}>
+              <span className="whitespace-nowrap text-[54px] font-black uppercase leading-none tracking-[0.04em]">It worked.</span>
+              <span className="mt-1 font-mono text-[16px] font-bold">once · 1 run in 76</span>
+            </div>
           </div>
-        </div>
+        </Fragment>
       </div>
     </div>
   );
 }
 
-/* The three nights, coming back at once: the script, the folders, the race
-   and the IP addresses. Positioned around the standing Kim of CollapseFigure. */
-const SCRIPT_LINES: [number, number, string][] = [
-  [0, 70, '#a78bfa'], [1, 120, '#94a3b8'], [1, 90, '#94a3b8'], [2, 140, '#60a5fa'], [2, 60, '#94a3b8'],
-  [1, 40, '#f87171'], [0, 0, ''], [0, 90, '#a78bfa'], [1, 150, '#94a3b8'], [1, 110, '#34d399'],
-  [2, 80, '#94a3b8'], [3, 130, '#60a5fa'], [3, 70, '#94a3b8'], [2, 50, '#f87171'], [1, 100, '#94a3b8'],
-  [0, 0, ''], [0, 60, '#a78bfa'], [1, 160, '#94a3b8'], [2, 90, '#fbbf24'], [2, 120, '#94a3b8'],
-  [1, 70, '#94a3b8'], [1, 130, '#60a5fa'], [2, 40, '#f87171'], [0, 0, ''],
+/* What the nights left her with: five scripts on five computers, the data in
+   a folder on each of them, and no idea how to package any of it. Positioned
+   round the standing Kim of CollapseFigure. */
+const LEFTOVERS: { machine: string; script: string; lines: string; folder: string; huh: string; x: number; y: number; turn: number }[] = [
+  { machine: 'her laptop', script: 'pipeline_FINAL_v7.py', lines: '10,212', folder: 'Desktop/data_new/', huh: 'what does line 4,812 do?', x: -130, y: -26, turn: -2 },
+  { machine: 'acquisition PC', script: 'scope_acquire.py', lines: '2,480', folder: 'D:/2024-03-12 run3 (copy)/', huh: 'why is there a sleep(7)?', x: -150, y: 100, turn: 1.5 },
+  { machine: 'arm controller', script: 'arm_server.py', lines: '940', folder: '~/logs/ · which run?', huh: 'who wrote this? …me?', x: -124, y: 226, turn: -1.5 },
+  { machine: 'OT-2', script: 'ot2_protocol_api.py', lines: '1,310', folder: '/data/user_storage/', huh: '# don’t touch, it works', x: 770, y: 2, turn: 2 },
+  { machine: 'GPU server', script: 'stardist_server.py', lines: '1,840', folder: '/tmp/*.npy', huh: 'thread-2 does WHAT?', x: 794, y: 122, turn: -1.5 },
 ];
-const FOLDERS = ['data/', 'kim/', 'final/', 'final_v2/', 'REAL_final/', '2024-03-12 run3 (copy)/'];
-const IPS: [number, number, number, string, boolean][] = [
-  [196, 18, -7, '192.168.0.12', true],
-  [570, 0, 6, '192.168.0.21 ?', false],
-  [214, 104, 5, '10.0.0.7:8000', true],
-  [568, 96, -5, '169.254.17.3 ??', false],
-  [190, 196, -4, 'localhost???', false],
-  [580, 192, 7, '0.0.0.0:5000 !!', false],
-];
+const LEFTOVER_AT = { scripts: 1, crazy: 2.6, folders: 6.2, pack: 7.6 };
 
 function CollapseHorrors({ u }: { u: string }) {
-  const card = 'rounded-xl border-2 bg-fd-card shadow-lg';
   return (
     <div aria-hidden className={`${u}-dim absolute inset-0`}>
-      {/* the massive script */}
-      <div className="absolute left-[-170px] top-[-24px] -rotate-3">
-        <div className={cn('sm-pop w-[300px] overflow-hidden border-fd-border', card)} style={delay(0.1)}>
-          <div className="flex items-center justify-between border-b border-fd-border bg-fd-muted px-3 py-1.5 font-mono text-[13px]">
-            <span className="font-semibold">pipeline_FINAL_v7.py</span>
-            <span className="rounded bg-red-500/15 px-1.5 text-red-600">10,212 lines</span>
-          </div>
-          <div className="relative h-[330px] overflow-hidden px-3">
-            <div>
-              {[0, 1].map((k) => (
-                <div key={k} className="flex flex-col gap-[7px] py-[4px]">
-                  {SCRIPT_LINES.map(([indent, w, color], i) => (
-                    <div key={i} className="flex h-[6px] items-center gap-2">
-                      <span className="w-[26px] shrink-0 text-right font-mono text-[8px] leading-none text-fd-muted-foreground">{9930 + k * 24 + i}</span>
-                      <span className="h-[5px] rounded-full" style={{ marginLeft: indent * 14, width: w, background: color || 'transparent', opacity: 0.8 }} />
-                    </div>
-                  ))}
-                </div>
+      {LEFTOVERS.map((l, i) => (
+        <div key={l.machine} className="absolute w-[262px]" style={{ left: l.x, top: l.y, transform: `rotate(${l.turn}deg)` }}>
+          {/* a script, on its own computer */}
+          <div className="sm-pop flex items-center gap-3 rounded-xl border-2 border-fd-border bg-fd-card px-3 py-2 shadow-lg" style={delay(LEFTOVER_AT.scripts + i * 0.12)}>
+            <svg width={38} height={34} viewBox="0 0 38 34" className="shrink-0">
+              <rect x={2} y={2} width={34} height={22} rx={3} fill="#0f172a" stroke="#1f2937" strokeWidth={2} />
+              {[7, 12, 17].map((y, k) => (
+                <rect key={y} x={6} y={y} width={[18, 24, 12][k]} height={2.4} rx={1.2} fill={k === 2 ? '#f59e0b' : '#94a3b8'} />
               ))}
-            </div>
-            <span className="absolute right-1 top-[190px] h-[8px] w-[5px] rounded-full bg-fd-muted-foreground/60" />
-          </div>
-        </div>
-      </div>
-
-      {/* the nested folders */}
-      <div className="absolute left-[750px] top-[-20px] rotate-2">
-        <div className={cn('sm-pop w-[320px] border-fd-border px-4 py-3 font-mono text-[15px]', card)} style={delay(0.2)}>
-          {FOLDERS.map((f, i) => (
-            <div key={f} className="sm-in flex items-center gap-1.5 whitespace-nowrap leading-[1.55]" style={{ ...delay(0.3 + i * 0.05), paddingLeft: i * 12 }}>
-              <span className="text-amber-500">▸</span>
-              <span>{f}</span>
-            </div>
-          ))}
-          <div className="sm-in whitespace-nowrap leading-[1.55] text-red-600" style={{ ...delay(0.3 + FOLDERS.length * 0.05), paddingLeft: FOLDERS.length * 12 }}>
-            HE07_CD20_r2_tile42_x…
-          </div>
-        </div>
-      </div>
-
-      {/* the race condition */}
-      <div className="absolute left-[730px] top-[262px] -rotate-2">
-        <div className={cn('sm-pop w-[340px] border-red-500/60 px-4 py-3 font-mono text-[13px]', card)} style={delay(0.3)}>
-          {[
-            ['thread-1', 'write mask_0042.tif', 0.3],
-            ['thread-2', 'read  mask_0042.tif', 0.35],
-          ].map(([t, what, d]) => (
-            <div key={t as string} className="flex items-center gap-2 leading-[1.9]">
-              <span className="w-[66px] whitespace-nowrap text-fd-muted-foreground">{t}</span>
-              <span className="relative h-[8px] w-[46px] overflow-hidden rounded-full bg-fd-muted">
-                <span className={`${u}-race absolute inset-0 rounded-full bg-red-500/70`} style={{ '--d': `${d}s` } as CSSProperties} />
-              </span>
-              <span className="whitespace-pre">{what}</span>
-            </div>
-          ))}
-          <div className="sm-pop mt-1 inline-block rounded bg-red-600 px-2 py-0.5 text-[14px] font-bold uppercase tracking-wide text-white" style={delay(0.8)}>
-            race condition · 0 bytes
-          </div>
-        </div>
-      </div>
-
-      {/* IP address madness */}
-      {IPS.map(([x, y, r, ip, struck], i) => (
-        <div key={ip} className="absolute" style={{ left: x, top: y, transform: `rotate(${r}deg)` }}>
-          <div className="sm-pop" style={delay(0.2 + i * 0.08)}>
-            <span
-              className={cn(
-                `inline-block whitespace-nowrap rounded-full border-2 bg-fd-card px-3.5 py-1 font-mono text-[19px] font-semibold shadow-md`,
-                struck ? 'border-red-500/60 text-red-600 line-through' : 'border-amber-500/70 text-amber-700',
-              )}
-            >
-              {ip}
+              <path d="M19 24 V30 M10 31 H28" stroke="#1f2937" strokeWidth={2.6} strokeLinecap="round" />
+            </svg>
+            <span className="flex min-w-0 flex-col">
+              <span className="text-[12.5px] leading-tight text-fd-muted-foreground">{l.machine}</span>
+              <span className="truncate font-mono text-[14.5px] font-semibold leading-tight">{l.script}</span>
+              <span className="font-mono text-[11px] leading-tight text-red-600">{l.lines} lines</span>
             </span>
+          </div>
+          {/* she reads it, and no longer knows what it does */}
+          <div className={cn('absolute top-[10px]', l.x < 300 ? 'left-[272px]' : 'right-[272px]')} style={{ transform: `rotate(${-l.turn * 2}deg)` }}>
+            <span className="sm-pop block whitespace-nowrap rounded-full border-2 border-fd-foreground/70 bg-[#fef9c3] px-3 py-1 text-[15px] font-semibold italic text-[#422006] shadow-md" style={delay(LEFTOVER_AT.crazy + 0.2 + i * 0.5)}>
+              {l.huh}
+            </span>
+          </div>
+          {/* …and the data it left there */}
+          <div className="sm-pop ml-9 mt-1.5 flex w-fit items-center gap-1.5 whitespace-nowrap rounded-lg border-2 border-amber-500/70 bg-amber-50 px-2.5 py-0.5 font-mono text-[13px] font-semibold text-amber-800 shadow-md" style={delay(LEFTOVER_AT.folders + i * 0.12)}>
+            <span>📁</span>
+            {l.folder}
           </div>
         </div>
       ))}
+
+      {/* and nobody knows how to hand it to anyone */}
+      <div className="absolute left-[742px] top-[252px] rotate-[-2deg]">
+        <div className="sm-pop flex w-[320px] flex-col gap-1.5 rounded-xl border-2 border-red-500/60 bg-fd-card px-4 py-3 shadow-lg" style={delay(LEFTOVER_AT.pack)}>
+          <span className="text-[19px] font-bold leading-tight">How do I package this?</span>
+          <span className="flex flex-wrap gap-1.5 font-mono text-[13px]">
+            {['a .zip?', 'Docker?', 'an .exe?', 'a README?'].map((o) => (
+              <span key={o} className="rounded-md bg-red-500/12 px-2 py-0.5 font-semibold text-red-700">
+                {o}
+              </span>
+            ))}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
 
-/** Kim has had enough, in three beats, one per click: the horrors of three
-    nights stand round her; she wobbles and keels over backwards, x-ed out
-    eyes and stars circling; and from the floor she asks for the one thing
-    that used to work. */
+/** Kim has had enough, one click per beat: she stands alone; five scripts
+    turn up round her, each on its own computer; she tries to read them, eyes
+    darting from one to the next, and no longer understands her own code;
+    then the data, in a folder on
+    every one of them; then the question of how to package any of it; then
+    she says it out loud: she doesn't understand anything any more, it is not
+    her code, and she doesn't know its shortcomings. On the next press she
+    wobbles, keels over backwards, x-ed out eyes and stars circling, and from
+    the floor asks for the one thing that used to work. Then Claude, helpful
+    as ever, offers to write the paper too, and she shouts STOP. */
 export function CollapseFigure() {
   const u = useUid();
   const skin = '#c68863';
   const hair = '#5b3a29';
   const ink = '#1f2937';
   const coat = '#f4f4f5';
-  const startAt = 1.5; // the click after the entrance
+  const lineAt = 8.8; // what she says, once everything is on the table
+  const startAt = 10; // the fall: after the scripts, the reading, the folders, the packaging and her line
+  const crazy = { from: LEFTOVER_AT.crazy, darts: 12 };
   const fallAt = startAt + 3.6;
+  const claudeAt = fallAt + 3; // Claude offers one more thing
+  const stopAt = claudeAt + 1.3; // and she has had enough
   const css = `
 .${u}-fall { transform-box: view-box; transform-origin: 470px 372px; transform: translateY(-50px) rotate(-90deg); }
 section.present .${u}-fall { animation: ${u}-fall 4.4s ${startAt}s both; }
@@ -711,12 +734,17 @@ section.present .${u}-fall { animation: ${u}-fall 4.4s ${startAt}s both; }
   96% { transform: translateY(-58px) rotate(-85deg); animation-timing-function: ease-in; }
   100% { transform: translateY(-50px) rotate(-90deg); }
 }
+.${u}-dart, .${u}-twitch { transform-box: fill-box; transform-origin: center; }
+section.present .${u}-dart { animation: ${u}-dart 0.24s ease-in-out ${crazy.from}s ${crazy.darts} alternate; }
+@keyframes ${u}-dart { from { transform: translate(-4.5px, 1px); } to { transform: translate(4.5px, -1px); } }
+section.present .${u}-twitch { animation: ${u}-twitch 0.12s ease-in-out ${crazy.from}s ${crazy.darts * 2} alternate; }
+@keyframes ${u}-twitch { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
 .${u}-until { opacity: 0; }
 section.present .${u}-until { animation: ${u}-until ${fallAt}s linear both; }
 @keyframes ${u}-until { 0%, 97% { opacity: 1; } 100% { opacity: 0; } }
 .${u}-stars { transform-box: fill-box; transform-origin: center; animation: ${u}-stars 2.2s linear infinite; }
 @keyframes ${u}-stars { to { transform: rotate(360deg); } }
-/* the horrors: loud while she wobbles, faded once she is down */
+/* what the nights left: loud while she wobbles, faded once she is down */
 .${u}-dim { opacity: 0.22; }
 section.present .${u}-dim { animation: ${u}-dim 0.8s ease-out ${fallAt + 0.3}s both; }
 @keyframes ${u}-dim { from { opacity: 1; } to { opacity: 0.22; } }
@@ -724,16 +752,17 @@ section.present .${u}-dim { animation: ${u}-dim 0.8s ease-out ${fallAt + 0.3}s b
 section.present .${u}-race { animation: ${u}-race 0.6s cubic-bezier(.4,0,.6,1) var(--d) both; }
 @keyframes ${u}-race { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (prefers-reduced-motion: reduce) {
+  section.present .${u}-dart, section.present .${u}-twitch,
   section.present .${u}-fall, section.present .${u}-until, .${u}-stars,
   section.present .${u}-dim, section.present .${u}-race { animation: none; }
 }
 `;
   const star = (x: number, y: number) => `M${x} ${y - 9} L${x + 3} ${y - 3} L${x + 9} ${y - 2} L${x + 4} ${y + 2} L${x + 6} ${y + 9} L${x} ${y + 5} L${x - 6} ${y + 9} L${x - 4} ${y + 2} L${x - 9} ${y - 2} L${x - 3} ${y - 3} Z`;
   return (
-    <Steps cues={[startAt, fallAt + 1.3, fallAt + 2.6]} className="relative mx-auto h-[420px] w-[900px]">
+    <Steps live cues={[0.5, LEFTOVER_AT.scripts + 1.1, LEFTOVER_AT.crazy + 3.2, LEFTOVER_AT.folders + 1.1, LEFTOVER_AT.pack + 1, lineAt + 0.7, fallAt + 2.6, claudeAt + 0.9, stopAt + 0.9]} className="relative mx-auto h-[420px] w-[900px]">
       <LoopStyles css={css} />
       <CollapseHorrors u={u} />
-      <svg width={900} height={420} viewBox="110 66 700 327" role="img" aria-label="Kim keels over backwards and lies on the floor, eyes crossed out, stars circling her head" className="absolute inset-0">
+      <svg width={900} height={420} viewBox="110 66 700 327" role="img" aria-label="Kim stands among five scripts on five computers, her laptop, the acquisition PC, the arm controller, the OT-2 and the GPU server, each with its own folder of data, and the question of how to package any of it. She keels over backwards and lies on the floor, eyes crossed out, stars circling her head, and says: I want my Fiji script back." className="absolute inset-0">
         <path className="sm-fade" d="M60 374 H840" stroke={BORDER} strokeWidth={4} strokeLinecap="round" />
         <ellipse className="sm-fade" cx={340} cy={378} rx={210} ry={8} fill={MUTED} fillOpacity={0.15} />
         <g className={`${u}-fall`}>
@@ -760,8 +789,12 @@ section.present .${u}-race { animation: ${u}-race 0.6s cubic-bezier(.4,0,.6,1) v
           <g className={`${u}-until`}>
             <circle cx={458} cy={146} r={8} fill="#ffffff" stroke={ink} strokeWidth={1.5} />
             <circle cx={482} cy={146} r={8} fill="#ffffff" stroke={ink} strokeWidth={1.5} />
-            <circle cx={459} cy={147} r={2.5} fill={ink} />
-            <circle cx={481} cy={145} r={2.5} fill={ink} />
+            <circle className={`${u}-dart`} cx={459} cy={147} r={2.5} fill={ink} />
+            <circle className={`${u}-dart`} cx={481} cy={145} r={2.5} fill={ink} />
+            {/* trying to follow her own code */}
+            <g className={`${u}-twitch`}>
+              <path className="sm-fade" style={delay(crazy.from + 0.2)} d="M446 128 L466 134 M494 128 L474 134" stroke={hair} strokeWidth={4} strokeLinecap="round" />
+            </g>
             <path d="M458 166 Q464 162 470 166 Q476 170 482 166" stroke="#7c2d12" strokeWidth={2.5} fill="none" strokeLinecap="round" />
           </g>
           {/* after: out */}
@@ -770,6 +803,20 @@ section.present .${u}-race { animation: ${u}-race 0.6s cubic-bezier(.4,0,.6,1) v
             <ellipse cx={470} cy={168} rx={6} ry={4} fill="#7c2d12" />
           </g>
         </g>
+        {/* what on earth */}
+        {(
+          [
+            [412, 92, 30, -16, 0.6],
+            [528, 84, 40, 12, 1.4],
+            [398, 150, 24, -24, 2.2],
+          ] as const
+        ).map(([x, y, size, turn, d]) => (
+          <g key={x} className={`${u}-until`}>
+            <text className="sm-pop" style={delay(crazy.from + d)} x={x} y={y} fontSize={size} fontWeight={900} fill="#f59e0b" textAnchor="middle" transform={`rotate(${turn} ${x} ${y})`}>
+              ?
+            </text>
+          </g>
+        ))}
         {/* stars round her head, once she is down */}
         <g className="sm-fade" style={delay(fallAt + 0.5)}>
           <g className={`${u}-stars`}>
@@ -788,6 +835,25 @@ section.present .${u}-race { animation: ${u}-race 0.6s cubic-bezier(.4,0,.6,1) v
         </div>
         <span className="sm-pop absolute bottom-[-30px] left-[24px] size-[18px] rounded-full border-2 border-fd-border bg-fd-card" style={delay(fallAt + 1.6)} />
         <span className="sm-pop absolute bottom-[-58px] left-[10px] size-[12px] rounded-full border-2 border-fd-border bg-fd-card" style={delay(fallAt + 1.45)} />
+      </div>
+      {/* what she says, standing, before she goes down */}
+      <div className={`${u}-until absolute left-[548px] top-[172px] w-[188px]`}>
+        <p className="sm-pop rounded-2xl rounded-bl-sm border-2 border-fd-border bg-fd-card px-4 py-3 text-[17px] font-semibold leading-snug shadow-md" style={delay(lineAt)}>
+          <span className="sr-only">Kim: </span>“I don’t understand anything anymore. This is not my code anymore. I don’t know its shortcomings.”
+        </p>
+      </div>
+      {/* Claude, helpful as ever */}
+      <div className="sm-pop absolute left-[470px] top-[150px] flex items-start gap-2.5" style={delay(claudeAt)}>
+        <ClaudeMark size={38} />
+        <p className="whitespace-nowrap rounded-[24px] rounded-tl-md border-2 border-fd-border bg-fd-card px-5 py-3 text-[24px] font-semibold leading-snug shadow-md">
+          <span className="sr-only">Claude: </span>I can also write that paper for you? ✨
+        </p>
+      </div>
+      {/* and she has had enough */}
+      <div className="absolute left-[196px] top-[160px] rotate-[-5deg]">
+        <p className="sm-pop whitespace-nowrap rounded-2xl rounded-bl-sm border-[3px] border-red-600 bg-fd-card px-6 py-2 text-[58px] font-black uppercase leading-none tracking-[0.02em] text-red-600 shadow-lg" style={delay(stopAt)}>
+          <span className="sr-only">Kim: </span>Stoppp!
+        </p>
       </div>
     </Steps>
   );
@@ -1337,12 +1403,12 @@ export function SerialSectionsFigure() {
 }
 
 /** What Kim hears about: chromogenic cycling as an idea, and the presenter
-    drives it. One section in the middle, the cycle round it, and the four
-    stations are buttons: press "stain" and the round's antibody marks its
-    cells, "image" files the round's image, "wash" takes the colour off, and
-    "next antibody" moves on (CD3, CD20, Ki-67, PanCK). After the last round
-    "next antibody" overlays all four on the same cells: the answer to the
-    serial sections. Once more starts over. Outside the current slide it shows
+    drives it with the deck's "next" key. One section in the middle, the
+    cycle round it, and each press takes the next station: "stain" and the
+    round's antibody marks its cells, "image" files the round's image, "wash"
+    takes the colour off, and "next antibody" moves on (CD3, CD20, Ki-67,
+    PanCK). After the last round "next antibody" overlays all four on the
+    same cells: the answer to the serial sections. Outside the current slide it shows
     that end state. */
 export function CyclingIdeaFigure() {
   const u = useUid();
@@ -1357,28 +1423,30 @@ export function CyclingIdeaFigure() {
   const Y = (y: number) => Math.round((C.y + y * disc.s) * 10) / 10;
   const marks = (key: StainKey, c: Cell) => (key === 'ki67' ? c.ki67 : c.kind === key);
 
-  /* where the presenter is: which round, the last station pressed in it
-     (-1: none yet), which rounds have their image, and how often it was
-     washed (each wash replays the rinse) */
-  const [at, setAt] = useState<{ round: number; stage: number; imaged: number[]; washes: number }>({ round: 0, stage: -1, imaged: [], washes: 0 });
+  /* where the presenter is, from how often "next" was pressed (four
+     stations a round): which round, the last station taken in it (-1: none
+     yet), which rounds have their image, and how often it was washed (each
+     wash replays the rinse) */
+  /* Round one is taken station by station; after that one press per antibody
+     (stained and imaged), and a last one for the overlay. */
+  const SEQ = [0, 1, 2, 3, 4, 6, 10, 14, 16];
+  const { step: beat, marks: keyMarks } = useKeySteps(SEQ.length - 1, true);
+  const pressed = SEQ[beat];
+  const round = Math.floor(pressed / 4);
+  const at = {
+    round,
+    stage: (pressed % 4) - 1,
+    imaged: ROUNDS.map((_, r) => r).filter((r) => pressed >= r * 4 + 2),
+    washes: Math.min(ROUNDS.length, Math.floor((pressed + 1) / 4)),
+  };
   const all = at.round >= ROUNDS.length;
-  const press = (k: number) =>
-    setAt((s) => {
-      if (s.round >= ROUNDS.length) return k === 3 ? { round: 0, stage: -1, imaged: [], washes: 0 } : s;
-      if (k === 1) return { ...s, stage: 1, imaged: s.imaged.includes(s.round) ? s.imaged : [...s.imaged, s.round] };
-      if (k === 2) return { ...s, stage: 2, washes: s.washes + 1 };
-      if (k === 3) return { ...s, round: s.round + 1, stage: -1 };
-      return { ...s, stage: 0 };
-    });
   /* a layer shows from "stain" until "wash"; in the end all of them do */
   const stained = (r: number) => all || (r === at.round && (at.stage === 0 || at.stage === 1));
-  /* the next station to press: it gets a quiet ring, so the presenter never hunts */
+  /* the station the next press takes: it gets a quiet ring */
   const hint = all ? 3 : at.stage + 1;
 
   const css = `
     .${u}-layer, .${u}-tile, .${u}-hl, .${u}-label { transition: opacity 0.5s ease; }
-    .${u}-station { cursor: pointer; }
-    .${u}-station:hover .${u}-plate { stroke: ${PRIMARY}; }
     .${u}-rinse { opacity: 0; }
     section.present .${u}-rinse { animation: ${u}-rinse 1.1s ease-in-out both; }
     @keyframes ${u}-rinse { 0% { opacity: 0; } 35% { opacity: 1; } 100% { opacity: 0; } }
@@ -1396,8 +1464,9 @@ export function CyclingIdeaFigure() {
   const sh = 58;
 
   return (
-    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="group" aria-label="Chromogenic cycling, as an idea: one tissue section in the middle and a cycle round it: stain with an antibody and its chromogen, image the slide, wash until the colour is gone, take the next antibody. Four rounds: CD3, CD20, Ki-67 and PanCK, each marking its own cells, one image per round. In the end all four markers show together on the same cells. The four stations are buttons." className="sm-in shrink-0">
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="group" aria-label="Chromogenic cycling, as an idea: one tissue section in the middle and a cycle round it: stain with an antibody and its chromogen, image the slide, wash until the colour is gone, take the next antibody. Four rounds: CD3, CD20, Ki-67 and PanCK, each marking its own cells, one image per round. In the end all four markers show together on the same cells." className="sm-in shrink-0">
       <LoopStyles css={css} />
+      {keyMarks}
       {/* the cycle */}
       <circle cx={C.x} cy={C.y} r={R} fill="none" stroke={BORDER} strokeWidth={2.5} strokeDasharray="2 9" strokeLinecap="round" />
       {[45, 135, 225, 315].map((a) => {
@@ -1442,22 +1511,9 @@ export function CyclingIdeaFigure() {
         every marker, on the same cells
       </T>
 
-      {/* the stations: press them */}
+      {/* the stations, taken in turn */}
       {stations.map((st, k) => (
-        <g
-          key={st.title}
-          className={`${u}-station`}
-          role="button"
-          tabIndex={0}
-          aria-label={st.title}
-          onClick={() => press(k)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.stopPropagation();
-              press(k);
-            }
-          }}
-        >
+        <g key={st.title}>
           <rect className={`${u}-plate`} x={st.x - sw / 2} y={st.y - sh / 2} width={sw} height={sh} rx={14} fill={SURFACE} stroke={BORDER} strokeWidth={1.8} />
           <rect className={`${u}-hl`} style={{ opacity: !all && k === at.stage ? 1 : 0 }} x={st.x - sw / 2} y={st.y - sh / 2} width={sw} height={sh} rx={14} fill={PRIMARY} fillOpacity={0.1} stroke={PRIMARY} strokeWidth={2.5} />
           <rect className={`${u}-hl`} style={{ opacity: k === hint ? 0.55 : 0 }} x={st.x - sw / 2 - 5} y={st.y - sh / 2 - 5} width={sw + 10} height={sh + 10} rx={18} fill="none" stroke={PRIMARY} strokeWidth={1.6} strokeDasharray="3 6" strokeLinecap="round" />
@@ -2011,7 +2067,7 @@ export function MacroChainFigure() {
   );
   const tileClip = (k: number) => `url(#${u}-t${k})`;
   return (
-    <Steps cues={[0.35, 2.4, 3.6, 6, 9, 11.1]} className="relative mx-auto w-fit">
+    <Steps live speed={3} cues={[0.35, 2.4, 3.6, 6, 9, 11.1]} className="relative mx-auto w-fit">
     <svg width={1020} height={260} viewBox="0 0 1020 260" role="img" aria-label="Zooming out from Kim's tissue until it is one tile of a tiled slide; then her Fiji macro: stitch the tiles, segment the cells, measure the stain in every cell, then a verdict: CD20 at 41 percent uptake, stain again" className="mx-auto block" overflow="visible">
       <defs>
         <g id={`${u}-mosaic`}>
@@ -2320,27 +2376,38 @@ const MACRO_LINES: [string, string][] = [
 /** Kim's preprint: title, byline, DOI, and the macro itself in the methods,
     typing in line by line. A persona's paper: the title is illustrative. */
 export function PaperCard() {
+  /* a twelve-pointed seal */
+  const seal = Array.from({ length: 24 }, (_, i) => {
+    const r = i % 2 ? 46 : 58;
+    const t = (i * Math.PI) / 12;
+    return `${(60 + r * Math.sin(t)).toFixed(1)},${(60 - r * Math.cos(t)).toFixed(1)}`;
+  }).join(' ');
   return (
-    <div className="sm-in flex flex-col gap-3 rounded-2xl border border-fd-border bg-fd-card p-6 shadow-sm" style={delay(0.3)}>
-      <div className="flex items-center justify-between gap-3">
-        <span className="font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-fd-muted-foreground">
-          preprint · methods attached
-        </span>
-        <span className="sm-pop rounded-full bg-fd-primary/15 px-2.5 py-0.5 font-mono text-[12px] font-bold text-fd-primary" style={delay(1.2)}>
-          DOI ✓
-        </span>
-      </div>
-      <span className="text-[21px] font-bold leading-snug">
-        Per-cell QC makes five-plex sequential staining on one H&amp;E slide reliable
-      </span>
-      <span className="text-[15px] text-fd-muted-foreground">Kim et al. · macro and data on a DOI</span>
-      <pre className="mt-1 overflow-hidden rounded-xl border border-fd-border bg-fd-muted/60 px-4 py-3 font-mono text-[13px] leading-[1.65]">
+    <div className="relative flex w-[760px] flex-col gap-4 rounded-2xl border border-fd-border bg-fd-card p-8 shadow-md">
+      <span className="font-mono text-[14px] font-bold uppercase tracking-[0.16em] text-fd-muted-foreground">preprint · methods attached</span>
+      <span className="text-[34px] font-bold leading-[1.15] tracking-[-0.02em]">Per-cell QC makes five-plex sequential staining on one H&amp;E slide reliable</span>
+      <span className="text-[19px] text-fd-muted-foreground">Kim et al.</span>
+      <pre className="overflow-hidden rounded-xl border border-fd-border bg-fd-muted/60 px-4 py-3 font-mono text-[13px] leading-[1.6]">
         {MACRO_LINES.map(([line, kind], i) => (
-          <span key={i} className={`sm-in block ${kind === 'comment' ? 'text-fd-muted-foreground' : ''}`} style={delay(1.4 + i * 0.22)}>
+          <span key={i} className={`block ${kind === 'comment' ? 'text-fd-muted-foreground' : ''}`}>
             {line}
           </span>
         ))}
       </pre>
+      {/* what matters: it is all there to rerun */}
+      <div className="mt-1 flex items-center gap-4 pr-[120px]">
+        <span className="text-[32px] font-bold leading-tight tracking-[-0.02em] text-fd-primary">Macro and data on a DOI</span>
+      </div>
+      <svg width={130} height={130} viewBox="0 0 120 120" className="absolute bottom-[-30px] right-[-26px] rotate-[10deg] drop-shadow-lg" aria-hidden>
+        <polygon points={seal} fill="#facc15" stroke="#a16207" strokeWidth={2.5} strokeLinejoin="round" />
+        <circle cx={60} cy={60} r={36} fill="none" stroke="#a16207" strokeWidth={1.6} strokeDasharray="3 3" />
+        <text x={60} y={58} textAnchor="middle" fontSize={34} fill="#713f12">
+          ★
+        </text>
+        <text x={60} y={78} textAnchor="middle" fontSize={13} fontWeight={800} fontFamily="var(--font-mono, monospace)" fill="#713f12">
+          DOI ✓
+        </text>
+      </svg>
     </div>
   );
 }
@@ -2443,11 +2510,12 @@ function LensSlide({ cx, cy, r: lensR, u }: { cx: number; cy: number; r: number;
   );
 }
 
-/** Kim's dream, as a loop. Top row, left to right, the bench and the scope:
-    the slide rack (with a lens on her slide), the robot arm, the OT-2 that
-    stains and washes it, the openUC2 that images it in tiles. Bottom row,
-    right to left, the analysis: StarDist segments the cells, the stain is
-    measured per cell, and a decision: a stained slide, or one with stain
+/** Kim's dream, as a loop. On the left the hardware, with the robot arm in
+    the middle of it, drawn large: it takes the slide from the rack (with a
+    lens on her slide) to the OT-2 that stains and washes it, and from there
+    to the openUC2 that images it in tiles. On the right the analysis:
+    Cellpose segments the cells, the stain is measured per cell, and a
+    decision: a stained slide, or one with stain
     left after a wash, goes back to the OT-2 for a wash; a clean one goes
     back for the next stain; and a finished panel goes back to the rack.
 
@@ -2473,7 +2541,7 @@ export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' |
   const CYCLE = 13;
   const CYCLE_FROM = 0.8;
   const P = DREAM_PASSES;
-  /** One pass down the chain from the OT-2: to the scope, StarDist, the
+  /** One pass down the chain from the OT-2: to the scope, Cellpose, the
       measurement, the decision, and out of it. */
   const leg = (p: number, k: number): [number, number] => [p + k * 0.04, p + k * 0.04 + (k === 4 ? 0.06 : 0.05)];
   const passes = [P.stain, P.wash, P.washAgain, P.next];
@@ -2488,6 +2556,9 @@ export function DreamWorkflowFigure({ variant = 'dream' }: { variant?: 'dream' |
     [926, 376, 13],
   ];
   const lens = { x: 96, y: 150, r: 56 };
+  /** The arm, drawn at its lab size round (299, 158), stands large in the
+      middle of the dream's hardware. */
+  const ARM = { x: 300, y: 236, k: 1.7 };
 
   const pc = (t: number) => `${(Math.max(0, Math.min(1, t)) * 100).toFixed(2)}%`;
   const onClock = (name: string) => `section.present .${u}-${name} { animation: ${u}-${name} ${CYCLE}s linear ${CYCLE_FROM}s infinite both; }`;
@@ -2513,16 +2584,17 @@ ${onClock(name)}
   };
   // the same nine connections, as drawn in the dream and in the building
   const arrows: { dream: string; lab: string; spans: [number, number][]; head: 'fg' | 'primary' }[] = [
-    { dream: 'M182 150 L230 150', lab: 'M182 150 L230 150', spans: [[0.01, 0.05]], head: 'fg' },
-    { dream: 'M350 150 L430 150', lab: 'M350 150 L430 150', spans: [[0.04, 0.08]], head: 'fg' },
-    { dream: 'M550 150 L644 150', lab: 'M452 220 C 440 262, 300 240, 293 272', spans: passes.map((p) => leg(p, 0)), head: 'fg' },
-    { dream: 'M756 150 C 900 150, 900 200, 900 272', lab: 'M348 320 L682 320', spans: passes.map((p) => leg(p, 1)), head: 'fg' },
-    { dream: 'M844 330 L756 330', lab: 'M798 320 L844 320', spans: passes.map((p) => leg(p, 2)), head: 'fg' },
-    { dream: 'M644 330 L548 330', lab: 'M890 266 C 880 214, 820 192, 802 180', spans: passes.map((p) => leg(p, 3)), head: 'fg' },
+    { dream: 'M184 240 L246 240', lab: 'M182 150 L230 150', spans: [[0.01, 0.05]], head: 'fg' },
+    { dream: 'M372 214 C 390 178, 408 158, 434 152', lab: 'M350 150 L430 150', spans: [[0.04, 0.08]], head: 'fg' },
+    /* OT-2 to the openUC2, through the arm's hand */
+    { dream: 'M436 184 C 380 210, 380 316, 438 358', lab: 'M452 220 C 440 262, 300 240, 293 272', spans: passes.map((p) => leg(p, 0)), head: 'fg' },
+    { dream: 'M542 366 C 590 366, 592 338, 640 338', lab: 'M348 320 L682 320', spans: passes.map((p) => leg(p, 1)), head: 'fg' },
+    { dream: 'M756 338 L840 338', lab: 'M798 320 L844 320', spans: passes.map((p) => leg(p, 2)), head: 'fg' },
+    { dream: 'M900 284 C 900 214, 880 152, 820 142', lab: 'M890 266 C 880 214, 820 192, 802 180', spans: passes.map((p) => leg(p, 3)), head: 'fg' },
     /* out of the decision: wash (twice), next stain, panel done */
-    { dream: 'M468 280 L468 212', lab: 'M706 134 L552 134', spans: [leg(P.stain, 4), leg(P.wash, 4)], head: 'fg' },
-    { dream: 'M512 280 L512 212', lab: 'M706 166 L552 166', spans: [leg(P.washAgain, 4)], head: 'primary' },
-    { dream: 'M436 330 L96 330 L96 212', lab: 'M760 84 C 760 6, 160 6, 150 90', spans: [[P.next + 0.16, 0.98]], head: 'primary' },
+    { dream: 'M706 134 L552 134', lab: 'M706 134 L552 134', spans: [leg(P.stain, 4), leg(P.wash, 4)], head: 'fg' },
+    { dream: 'M706 166 L552 166', lab: 'M706 166 L552 166', spans: [leg(P.washAgain, 4)], head: 'primary' },
+    { dream: 'M760 84 C 760 0, 96 0, 96 178', lab: 'M760 84 C 760 6, 160 6, 150 90', spans: [[P.next + 0.16, 0.98]], head: 'primary' },
   ];
   const drawn = (which: 'dream' | 'lab', build: boolean) =>
     arrows.map((a, i) => (
@@ -2560,11 +2632,13 @@ ${onClock(name)}
   const css = `
 .${u}-mv { transition: transform 1.1s cubic-bezier(.6,0,.2,1) 0.2s; }
 .${u}-on.visible ~ .${u}-mv { transform: translate(calc(var(--dx) * 1px), calc(var(--dy) * 1px)); }
+.${u}-arm { transition: transform 1.1s cubic-bezier(.6,0,.2,1) 0.2s; }
+.${u}-on.visible ~ .${u}-arm { transform: translate(299px, 158px) scale(${(1 / ARM.k).toFixed(4)}) translate(${-ARM.x}px, ${-ARM.y}px); }
 .${u}-dream { transition: opacity 0.3s; }
 .${u}-on.visible ~ .${u}-dream { opacity: 0; }
 .${u}-lab { opacity: 0; transition: opacity 0.3s; }
 .${u}-on.visible ~ .${u}-lab { opacity: 1; transition: opacity 0.6s ease-out var(--ld, 0s); }
-@media (prefers-reduced-motion: reduce) { .${u}-mv, .${u}-dream, .${u}-lab { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .${u}-mv, .${u}-arm, .${u}-dream, .${u}-lab { transition: none !important; } }
 `;
   /** A computer and its name: which machine a step runs on. */
   const computer = (x: number, y: number, kind: 'desktop' | 'server' | 'laptop', name: string, anchor: 'middle' | 'start' = 'middle') => {
@@ -2641,8 +2715,8 @@ ${onClock(name)}
       role="img"
       aria-label={
         lab
-          ? "The same workflow in Kim's building: the robot arm and the OT-2 on the bench and the openUC2 with its acquisition PC, all in the imaging room; StarDist and the per-cell measurement on a GPU server and the decision on her laptop, in an office down the hall. Every step shows the machine it runs on, and connections cross between rooms."
-          : "Kim's dream workflow: a robot arm takes the slide from the rack to the OT-2, which stains it; the openUC2 images it in tiles, StarDist segments the cells, and the stain is measured per cell. Then the OT-2 washes it, and it is imaged and measured again. Stain left: wash again. Gone: the next stain. Panel done: back to the rack."
+          ? "The same workflow in Kim's building: the robot arm and the OT-2 on the bench and the openUC2 with its acquisition PC, all in the imaging room; Cellpose and the per-cell measurement on a GPU server and the decision on her laptop, in an office down the hall. Every step shows the machine it runs on, and connections cross between rooms."
+          : "Kim's dream workflow, with a robot arm at the centre of the hardware: it takes the slide from the rack to the OT-2, which stains it, and on to the openUC2, which images it in tiles; Cellpose segments the cells, and the stain is measured per cell. Then the OT-2 washes it, and it is imaged and measured again. Stain left: wash again. Gone: the next stain. Panel done: back to the rack."
       }
       className="mx-auto block"
       /* the build arrives in one piece; only the cycle is stepped */
@@ -2653,7 +2727,7 @@ ${onClock(name)}
       {lab ? (
         <>
           <LoopStyles css={css} />
-          <Fragment as="g" index={1} className={`${u}-on`} />
+          <g className={`${u}-on visible`} />
           {/* the building, under everything else */}
           <g {...labOnly(0)}>
             {room(0, 600, 'IMAGING ROOM', 'start')}
@@ -2675,18 +2749,15 @@ ${onClock(name)}
 
       {/* what the decision says, on its arrows */}
       <g className={dreamOnly}>
-        <T className="sm-in" style={delay(1.9)} x={597} y={136} size={12} mono weight={700} fill={MUTED}>
-          by arm
-        </T>
-        <T className="sm-in" style={delay(2)} x={456} y={246} anchor="end" size={14} mono weight={700} fill={MUTED}>
-          wash · until gone
-        </T>
-        <T className="sm-in" style={delay(2.1)} x={524} y={246} anchor="start" size={14} mono weight={700} fill={PRIMARY}>
-          next stain
-        </T>
-        <T className="sm-in" style={delay(2.2)} x={266} y={316} size={14} mono weight={700} fill={PRIMARY}>
-          panel done
-        </T>
+        <g className="sm-in" style={delay(2)}>
+          {pill(624, 134, 'wash', MUTED)}
+        </g>
+        <g className="sm-in" style={delay(2.1)}>
+          {pill(624, 166, 'next stain', PRIMARY)}
+        </g>
+        <g className="sm-in" style={delay(2.2)}>
+          {pill(428, 33, 'panel done', PRIMARY)}
+        </g>
       </g>
       {lab ? (
         <g {...labOnly(1.3)}>
@@ -2696,39 +2767,72 @@ ${onClock(name)}
         </g>
       ) : null}
 
-      {/* the bench and the rack: they stay where they are */}
+      {/* how far the arm reaches: everything on the bench is inside it */}
+      <g className={dreamOnly}>
+        <circle className="sm-fade" style={delay(0.3)} cx={ARM.x} cy={ARM.y} r={102} fill={PRIMARY} fillOpacity={0.05} stroke={PRIMARY} strokeOpacity={0.45} strokeWidth={1.6} strokeDasharray="3 7" strokeLinecap="round" />
+      </g>
+
+      {/* the rack: beside the arm in the dream, back on its shelf in the lab */}
+      <g {...mv(0, -90)}>
+        <g transform="translate(0 90)">
+          {/* the rack, with a lens on Kim's slide */}
+          <g className="sm-pop" style={delay(0.2)}>
+            <rect x={16} y={100} width={160} height={100} rx={12} {...icon} strokeWidth={2} />
+            {Array.from({ length: 6 }, (_, i) => (
+              <g key={i}>
+                <rect x={30 + i * 24} y={114} width={13} height={72} rx={2} fill={SURFACE} stroke={BORDER} strokeWidth={1.5} />
+                <rect x={31 + i * 24} y={115} width={11} height={14} fill={MUTED} fillOpacity={0.25} />
+                <circle cx={36.5 + i * 24} cy={160} r={4.5} fill={EOSIN} />
+              </g>
+            ))}
+          </g>
+          <g className="sm-pop" style={delay(0.5)}>
+            <circle cx={lens.x + 3} cy={lens.y + 5} r={lens.r} fill={FG} fillOpacity={0.12} />
+            <LensSlide cx={lens.x} cy={lens.y} r={lens.r} u={u} />
+          </g>
+        </g>
+      </g>
+
+      {/* the arm: large and in the middle of the dream, its lab size on the bench */}
+      <g className={`${still} ${u}-arm`}>
+        <g transform={`translate(${ARM.x} ${ARM.y}) scale(${ARM.k}) translate(-299 -158)`}>
+          {/* the robot arm, holding a slide */}
+          <g className="sm-pop" style={delay(0.35)}>
+            <rect x={252} y={190} width={52} height={14} rx={4} {...icon} />
+            {link('M278 182 L298 120')}
+            {link('M298 120 L334 140')}
+            <circle cx={278} cy={182} r={8} {...icon} />
+            <circle cx={298} cy={120} r={7} {...icon} />
+            <circle cx={334} cy={140} r={6} {...icon} />
+            <path d="M328 146 V160 M340 146 V160" stroke={stroke} strokeWidth={3} strokeLinecap="round" />
+            <rect x={322} y={160} width={24} height={6} rx={1.5} fill={SURFACE} stroke={stroke} strokeWidth={1.5} />
+            <circle cx={334} cy={163} r={2.2} fill={EOSIN} />
+          </g>
+        </g>
+      </g>
+      <g className={dreamOnly}>
+        {title(96, 356, 'Slide rack', 'HE-07', 0.3)}
+        {title(ARM.x, 356, 'Robot arm', 'carries every slide', 0.4)}
+      </g>
+      {lab ? (
+        <g {...labOnly(1.4)}>
+          <T x={96} y={62} size={19} weight={600}>
+            Slide rack
+          </T>
+          <T x={96} y={82} size={14} fill={MUTED}>
+            HE-07
+          </T>
+          <T x={290} y={62} size={19} weight={600}>
+            Robot arm
+          </T>
+          <T x={290} y={82} size={14} fill={MUTED}>
+            carries the slide
+          </T>
+        </g>
+      ) : null}
+
+      {/* the OT-2: it stays where it is */}
       <g className={still}>
-        {/* the rack, with a lens on Kim's slide */}
-        <g className="sm-pop" style={delay(0.2)}>
-          <rect x={16} y={100} width={160} height={100} rx={12} {...icon} strokeWidth={2} />
-          {Array.from({ length: 6 }, (_, i) => (
-            <g key={i}>
-              <rect x={30 + i * 24} y={114} width={13} height={72} rx={2} fill={SURFACE} stroke={BORDER} strokeWidth={1.5} />
-              <rect x={31 + i * 24} y={115} width={11} height={14} fill={MUTED} fillOpacity={0.25} />
-              <circle cx={36.5 + i * 24} cy={160} r={4.5} fill={EOSIN} />
-            </g>
-          ))}
-        </g>
-        <g className="sm-pop" style={delay(0.5)}>
-          <circle cx={lens.x + 3} cy={lens.y + 5} r={lens.r} fill={FG} fillOpacity={0.12} />
-          <LensSlide cx={lens.x} cy={lens.y} r={lens.r} u={u} />
-        </g>
-        {title(96, 62, 'Slide rack', 'HE-07', 0.3)}
-
-        {/* the robot arm, holding a slide */}
-        <g className="sm-pop" style={delay(0.35)}>
-          <rect x={252} y={190} width={52} height={14} rx={4} {...icon} />
-          {link('M278 182 L298 120')}
-          {link('M298 120 L334 140')}
-          <circle cx={278} cy={182} r={8} {...icon} />
-          <circle cx={298} cy={120} r={7} {...icon} />
-          <circle cx={334} cy={140} r={6} {...icon} />
-          <path d="M328 146 V160 M340 146 V160" stroke={stroke} strokeWidth={3} strokeLinecap="round" />
-          <rect x={322} y={160} width={24} height={6} rx={1.5} fill={SURFACE} stroke={stroke} strokeWidth={1.5} />
-          <circle cx={334} cy={163} r={2.2} fill={EOSIN} />
-        </g>
-        {title(290, 62, 'Robot arm', 'carries the slide', 0.4)}
-
         {/* the OT-2, with the protocol it is running */}
         <g className="sm-pop" style={delay(0.5)}>
           <rect x={440} y={96} width={100} height={108} rx={8} {...icon} />
@@ -2761,21 +2865,23 @@ ${onClock(name)}
       </g>
 
       {/* the openUC2: cubes, an objective, a camera */}
-      <g {...mv(-410, 180)}>
-        <g className="sm-pop" style={delay(0.65)}>
-          <rect x={678} y={100} width={44} height={44} rx={6} {...icon} />
-          <circle cx={700} cy={122} r={11} fill="none" stroke={stroke} strokeWidth={2} />
-          <path d="M700 113 V131 M691 122 H709" stroke={stroke} strokeWidth={1.5} />
-          <polygon points="692,144 708,144 704,154 696,154" fill={PRIMARY} fillOpacity={0.4} />
-          <rect x={668} y={154} width={64} height={5} rx={1.5} fill={SURFACE} stroke={stroke} strokeWidth={1.5} />
-          <circle cx={700} cy={156.5} r={2.2} fill={EOSIN} />
-          <rect x={654} y={160} width={44} height={44} rx={6} {...icon} />
-          <rect x={702} y={160} width={44} height={44} rx={6} {...icon} />
-          <circle cx={676} cy={182} r={7} fill={PRIMARY} fillOpacity={0.5} />
-          <rect x={714} y={174} width={20} height={16} rx={3} fill="none" stroke={stroke} strokeWidth={2} />
+      <g {...mv(-200, -5)}>
+        <g transform="translate(-210 185)">
+          <g className="sm-pop" style={delay(0.65)}>
+            <rect x={678} y={100} width={44} height={44} rx={6} {...icon} />
+            <circle cx={700} cy={122} r={11} fill="none" stroke={stroke} strokeWidth={2} />
+            <path d="M700 113 V131 M691 122 H709" stroke={stroke} strokeWidth={1.5} />
+            <polygon points="692,144 708,144 704,154 696,154" fill={PRIMARY} fillOpacity={0.4} />
+            <rect x={668} y={154} width={64} height={5} rx={1.5} fill={SURFACE} stroke={stroke} strokeWidth={1.5} />
+            <circle cx={700} cy={156.5} r={2.2} fill={EOSIN} />
+            <rect x={654} y={160} width={44} height={44} rx={6} {...icon} />
+            <rect x={702} y={160} width={44} height={44} rx={6} {...icon} />
+            <circle cx={676} cy={182} r={7} fill={PRIMARY} fillOpacity={0.5} />
+            <rect x={714} y={174} width={20} height={16} rx={3} fill="none" stroke={stroke} strokeWidth={2} />
+          </g>
         </g>
       </g>
-      <g className={dreamOnly}>{title(700, 62, 'openUC2', 'tiles', 0.7)}</g>
+      <g className={dreamOnly}>{title(490, 247, 'openUC2', 'tiles', 0.7)}</g>
       {lab ? (
         <g {...labOnly(1.4)}>
           <T x={226} y={318} anchor="end" size={19} weight={600}>
@@ -2787,55 +2893,61 @@ ${onClock(name)}
         </g>
       ) : null}
 
-      {/* segment: StarDist outlines */}
-      <g {...mv(-160, -10)}>
-        <g className="sm-pop" style={delay(0.8)}>
-          <rect x={850} y={280} width={100} height={100} rx={12} fill="#2b1b4d" stroke={stroke} strokeWidth={2.5} />
-          {nuclei.map(([x, y, r], i) => (
-            <polygon key={i} className="sm-pop" style={delay(1 + i * 0.1)} points={starPoly(x - 6, y - 6, r * 0.85, i)} fill={LABELS[i % LABELS.length]} fillOpacity={0.35} stroke={LABELS[i % LABELS.length]} strokeWidth={2} />
-          ))}
+      {/* segment: Cellpose outlines */}
+      <g {...mv(40, -18)}>
+        <g transform="translate(-200 8)">
+          <g className="sm-pop" style={delay(0.8)}>
+            <rect x={850} y={280} width={100} height={100} rx={12} fill="#2b1b4d" stroke={stroke} strokeWidth={2.5} />
+            {nuclei.map(([x, y, r], i) => (
+              <polygon key={i} className="sm-pop" style={delay(1 + i * 0.1)} points={starPoly(x - 6, y - 6, r * 0.85, i)} fill={LABELS[i % LABELS.length]} fillOpacity={0.35} stroke={LABELS[i % LABELS.length]} strokeWidth={2} />
+            ))}
+          </g>
+          {title(900, 402, 'Cellpose', 'segment cells', 0.85)}
         </g>
-        {title(900, 402, 'StarDist', 'segment cells', 0.85)}
       </g>
 
       {/* measure: the stain in every cell, against the target */}
-      <g {...mv(200, -10)}>
-        <g className="sm-pop" style={delay(0.95)}>
-          <rect x={650} y={282} width={100} height={96} rx={12} {...icon} />
-          {[30, 12, 38, 22, 44, 8, 34].map((h, i) => (
-            <rect key={i} x={661 + i * 12} y={368 - h} width={8} height={h} rx={1.5} fill={STAIN.cd20.color} fillOpacity={0.6} />
-          ))}
-          <path d="M656 334 H744" stroke={WARN} strokeWidth={1.8} strokeDasharray="4 3" />
-          {(
-            [
-              ['m1', 'CD20 91 %', PRIMARY],
-              ['m2', 'left 44 %', WARN],
-              ['m3', 'left 0 %', PRIMARY],
-              ['m4', 'Ki-67 88 %', PRIMARY],
-            ] as const
-          ).map(([name, text, fill]) => (
-            <g key={name} className={`${u}-${name}`} opacity={0}>
-              <T x={700} y={302} size={13} mono weight={700} fill={fill}>
-                {text}
-              </T>
-            </g>
-          ))}
+      <g {...mv(0, -18)}>
+        <g transform="translate(200 8)">
+          <g className="sm-pop" style={delay(0.95)}>
+            <rect x={650} y={282} width={100} height={96} rx={12} {...icon} />
+            {[30, 12, 38, 22, 44, 8, 34].map((h, i) => (
+              <rect key={i} x={661 + i * 12} y={368 - h} width={8} height={h} rx={1.5} fill={STAIN.cd20.color} fillOpacity={0.6} />
+            ))}
+            <path d="M656 334 H744" stroke={WARN} strokeWidth={1.8} strokeDasharray="4 3" />
+            {(
+              [
+                ['m1', 'CD20 91 %', PRIMARY],
+                ['m2', 'left 44 %', WARN],
+                ['m3', 'left 0 %', PRIMARY],
+                ['m4', 'Ki-67 88 %', PRIMARY],
+              ] as const
+            ).map(([name, text, fill]) => (
+              <g key={name} className={`${u}-${name}`} opacity={0}>
+                <T x={700} y={302} size={13} mono weight={700} fill={fill}>
+                  {text}
+                </T>
+              </g>
+            ))}
+          </g>
+          {title(700, 402, 'Measure', 'stain per cell', 1)}
         </g>
-        {title(700, 402, 'Measure', 'stain per cell', 1)}
       </g>
 
       {/* decide */}
-      <g {...mv(270, -190)}>
-        <g className="sm-pop" style={delay(1.1)}>
-          <circle cx={490} cy={330} r={52} {...icon} />
-          <T x={490} y={320} size={15} weight={700}>
-            stain
-          </T>
-          <T x={490} y={340} size={15} mono weight={700} fill={WARN}>
-            gone?
-          </T>
+      <g {...mv(0, 0)}>
+        <g transform="translate(270 -190)">
+          <g className="sm-pop" style={delay(1.1)}>
+            <circle cx={490} cy={330} r={52} {...icon} />
+            <T x={490} y={320} size={15} weight={700}>
+              stain
+            </T>
+            <T x={490} y={340} size={15} mono weight={700} fill={WARN}>
+              gone?
+            </T>
+          </g>
+          {title(490, 402, 'Decide', 'wash again · next · done', 1.15)}
         </g>
-        {title(490, 402, 'Decide', 'wash again · next · done', 1.15)}
       </g>
 
       {/* which machine each step runs on */}
@@ -3226,157 +3338,6 @@ export function MultiplyFigure() {
   );
 }
 
-/** What Kim asks for, in three beats, one per click: one script,
-    ImageJ-style; Run is pressed and it runs on the machines; and the answer
-    comes back as her data. */
-export function BetterFigure() {
-  const u = useUid();
-  const ink = '#1f2937';
-  const OK = '#16a34a';
-  /* the script, as she would write it for one machine */
-  const lines: [string, string][] = [
-    ['slide', ' = pickUp("rack A");'],
-    ['stain', '(slide, "antibody 1");'],
-    ['image1', ' = acquire(slide);'],
-    ['washUntilGone', '(slide);'],
-    ['stain', '(slide, "antibody 2");'],
-    ['image2', ' = acquire(slide);'],
-    ['overlay', '(image1, image2);'],
-  ];
-  const win = { x: 14, y: 8, w: 344, h: 236 };
-  const machines = ['robot arm', 'OT-2', 'microscope'];
-  const chip = { x: 420, w: 166, h: 54 };
-  const chipY = (i: number) => 22 + i * 76;
-  const run = { x: win.x + win.w - 92, y: win.y + win.h - 40, w: 80, h: 28 };
-  const T_RUN = 1.3;
-  const T_DATA = T_RUN + 2.8;
-  /* the data: the overlay, both stains on one tissue */
-  const thumb = { x: 404, y: 300, s: 112 };
-  const cells = tissueCells(0, 0, thumb.s, thumb.s).filter((c) => c.x > 10 && c.x < thumb.s - 10 && c.y > 10 && c.y < thumb.s - 10);
-  return (
-    <Steps cues={[1.1, T_DATA - 0.1, T_DATA + 1.5]}>
-    <svg
-      width={600}
-      height={470}
-      viewBox="0 0 600 470"
-      role="img"
-      aria-label="A script in an ImageJ-style editor: pick up the slide, stain with antibody 1, acquire, wash until gone, stain with antibody 2, acquire, overlay. Run is pressed, the robot arm, the OT-2 and the microscope each do their part, and the answer comes back: yes, here is your data, the overlay of both stains"
-      className="shrink-0"
-    >
-      <Arrowheads id={u} />
-      {/* the editor */}
-      <g className="sm-in" style={delay(0.1)}>
-        <rect x={win.x} y={win.y} width={win.w} height={win.h} rx={8} fill="#ffffff" stroke={ink} strokeWidth={2} />
-        <path d={`M${win.x} ${win.y + 26} H${win.x + win.w}`} stroke={ink} strokeWidth={2} />
-        <path d={`M${win.x + 1} ${win.y + 26} V${win.y + 9} a8 8 0 0 1 8 -8 H${win.x + win.w - 9} a8 8 0 0 1 8 8 V${win.y + 26} Z`} fill="#e5e7eb" />
-        {[0, 1, 2].map((i) => (
-          <circle key={i} cx={win.x + 16 + i * 14} cy={win.y + 13} r={4} fill={['#f87171', '#fbbf24', '#4ade80'][i]} />
-        ))}
-        <T x={win.x + win.w / 2} y={win.y + 18} size={13} weight={600} fill={ink} mono>
-          multi_staining.ijm
-        </T>
-        <T x={win.x + 12} y={win.y + 43} size={11.5} fill="#6b7280" anchor="start">
-          File · Edit · Language · Run · Help
-        </T>
-        <path d={`M${win.x} ${win.y + 50} H${win.x + win.w}`} stroke="#d1d5db" strokeWidth={1} />
-      </g>
-      {lines.map(([name, rest], i) => (
-        <text key={i} className="sm-in" style={delay(0.2 + i * 0.04)} x={win.x + 40} y={win.y + 72 + i * 20} fontSize={13.5} fontFamily="var(--font-mono, ui-monospace, monospace)" fill={ink}>
-          <tspan x={win.x + 24} textAnchor="end" fill="#9ca3af">
-            {i + 1}
-          </tspan>
-          <tspan x={win.x + 36} fill="#1d4ed8" fontWeight={600}>
-            {name}
-          </tspan>
-          {rest}
-        </text>
-      ))}
-      <g className="sm-pop" style={delay(0.4)}>
-        <rect x={run.x} y={run.y} width={run.w} height={run.h} rx={6} fill={OK} />
-        <T x={run.x + run.w / 2} y={run.y + 19} size={14} weight={700} fill="#ffffff">
-          ▶ Run
-        </T>
-      </g>
-      <circle className="sm-ping" style={delay(T_RUN)} cx={run.x + run.w / 2} cy={run.y + run.h / 2} r={22} fill="none" stroke={OK} strokeWidth={3} />
-
-      {/* the machines it runs on */}
-      <T x={chip.x + chip.w / 2} y={12} size={13} fill={MUTED} className="sm-fade" style={delay(T_RUN + 0.2)}>
-        runs on the machines
-      </T>
-      {machines.map((name, i) => {
-        const y = chipY(i);
-        const at = T_RUN + 0.3 + i * 0.6;
-        return (
-          <g key={name}>
-            <Path className="sm-draw" style={delay(at - 0.15)} d={`M${win.x + win.w + 4} ${win.y + 70 + i * 50} C${win.x + win.w + 36} ${win.y + 70 + i * 50}, ${chip.x - 34} ${y + chip.h / 2}, ${chip.x - 8} ${y + chip.h / 2}`} stroke={PRIMARY} width={2} head={`${u}-primary`} />
-            <g className="sm-pop" style={delay(at)}>
-              <rect x={chip.x} y={y} width={chip.w} height={chip.h} rx={12} fill={SURFACE} stroke={BORDER} strokeWidth={2} />
-              <T x={chip.x + 16} y={y + chip.h / 2 + 6} size={17} weight={600} anchor="start">
-                {name}
-              </T>
-            </g>
-            <g className="sm-pop" style={delay(at + 0.55)}>
-              <circle cx={chip.x + chip.w - 24} cy={y + chip.h / 2} r={12} fill={OK} />
-              <path d={`M${chip.x + chip.w - 30} ${y + chip.h / 2} l4.5 4.5 l8 -9`} fill="none" stroke="#ffffff" strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
-            </g>
-          </g>
-        );
-      })}
-
-      {/* the answer */}
-      <g className="sm-pop" style={delay(T_DATA)}>
-        <circle cx={46} cy={356} r={30} fill={PRIMARY} />
-        <T x={46} y={367} size={32} weight={700} fill="var(--color-fd-primary-foreground)">
-          ?
-        </T>
-      </g>
-      <g className="sm-in" style={delay(T_DATA + 0.25)}>
-        <path d="M92 356 l14 -10 v20 Z" fill={SURFACE} stroke={BORDER} strokeWidth={2} strokeLinejoin="round" />
-        <rect x={104} y={318} width={262} height={76} rx={16} fill={SURFACE} stroke={BORDER} strokeWidth={2} />
-        <path d="M105 348 v16" stroke={SURFACE} strokeWidth={3} />
-        <T x={124} y={352} size={25} weight={700} anchor="start">
-          Yes.
-        </T>
-        <T x={124} y={380} size={21} weight={600} anchor="start" fill={PRIMARY}>
-          Here’s your data.
-        </T>
-      </g>
-      <Path className="sm-draw" style={delay(T_DATA + 0.5)} d={`M368 356 H${thumb.x - 10}`} stroke={PRIMARY} width={2} head={`${u}-primary`} />
-      <g className="sm-pop" style={delay(T_DATA + 0.7)}>
-        <rect x={thumb.x - 8} y={thumb.y - 8} width={thumb.s + 76} height={thumb.s + 40} rx={12} fill={SURFACE} stroke={OK} strokeWidth={2.5} />
-        <rect x={thumb.x} y={thumb.y} width={thumb.s} height={thumb.s} rx={6} fill={TISSUE_BG} />
-        {cells.map((c) => {
-          const one = c.kind === 'cd3' || c.kind === 'cd20';
-          const two = c.kind === 'panck';
-          return (
-            <ellipse
-              key={c.n}
-              cx={thumb.x + c.x}
-              cy={thumb.y + c.y}
-              rx={Math.min(c.rx, 9) * 0.8}
-              ry={Math.min(c.ry, 9) * 0.8}
-              fill={EOSIN}
-              fillOpacity={0.55}
-              stroke={one ? STAIN.cd3.color : two ? STAIN.ki67.color : EOSIN_EDGE}
-              strokeWidth={one || two ? 2.6 : 0.8}
-            />
-          );
-        })}
-        {['image 1', 'image 2', 'overlay'].map((name, i) => (
-          <T key={name} x={thumb.x + thumb.s + 10} y={thumb.y + 20 + i * 24} size={12.5} anchor="start" mono weight={i === 2 ? 700 : 400}>
-            {name}
-          </T>
-        ))}
-        <T x={thumb.x + (thumb.s + 60) / 2} y={thumb.y + thumb.s + 22} size={14} weight={700} fill={OK}>
-          multi-staining ✓
-        </T>
-      </g>
-    </svg>
-    </Steps>
-  );
-}
-
-
 /* --- meme: "you solved a distributed system…" ------------------------------ */
 
 const anton = Anton({ weight: '400', subsets: ['latin'] });
@@ -3397,11 +3358,10 @@ function MemeComputer({ x, y, color = '#1f2937' }: { x: number; y: number; color
   );
 }
 
-/** Original meme panel: Reviewer 2 peers over their glasses at "the fix"
-    (a hub in the middle of Kim's machines). Two beats: the top text and the
-    picture on arrival; one click for the look, the raised eyebrow, the red
-    circle and the bottom text. Fixed colours: it's a picture, not themed UI. */
-export function DistributedMemeFigure() {
+/** Kim's lab before and after "the fix": her tangle of machines, then the
+    same machines round a hub, which is circled in red: also distributed?!
+    What the first horseman points at. Fixed colours: it's a picture. */
+export function DistributedFixDiagram({ width = 440, className }: { width?: number; className?: string }) {
   const u = useUid();
   const before: [number, number][] = [
     [40, 70],
@@ -3424,6 +3384,49 @@ export function DistributedMemeFigure() {
     'M40 70 C 0 160, 90 180, 36 270',
     'M190 58 C 250 140, 140 200, 196 262',
   ];
+  return (
+    <svg width={width} height={(width * 340) / 580} viewBox="-20 4 580 340" className={className} role="img" aria-label="Kim's lab, four machines in a tangle of connections, and the fix: the same four machines round a hub, circled in red: also distributed?!">
+      <Arrowheads id={u} />
+      <rect x={-14} y={8} width={256} height={330} rx={14} fill="#fff" fillOpacity={0.8} stroke="#cbd5e1" strokeWidth={2} />
+      <rect x={290} y={8} width={256} height={330} rx={14} fill="#fff" fillOpacity={0.8} stroke="#cbd5e1" strokeWidth={2} />
+      {tangle.map((d, i) => (
+        <Path key={i} d={d} stroke="#d97706" width={2.6} />
+      ))}
+      {before.map(([x, y]) => (
+        <MemeComputer key={`b${x}${y}`} x={x} y={y} />
+      ))}
+      <text x={114} y={326} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontSize={19} fontWeight={700} fill="#334155">
+        Kim’s lab
+      </text>
+      <Path d="M248 172 L284 172" stroke="#334155" width={3.5} head={`${u}-fg`} />
+      {after.map(([x, y], i) => (
+        <Path key={`l${i}`} d={`M${x} ${y} L${hub[0]} ${hub[1]}`} stroke={PRIMARY} width={3} />
+      ))}
+      {after.map(([x, y]) => (
+        <MemeComputer key={`a${x}${y}`} x={x} y={y} />
+      ))}
+      <circle cx={hub[0]} cy={hub[1]} r={28} fill={PRIMARY} stroke="#fff" strokeWidth={3} />
+      <text x={hub[0]} y={hub[1] + 6} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontSize={16} fontWeight={800} fill="#fff">
+        hub
+      </text>
+      <text x={418} y={326} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontSize={19} fontWeight={700} fill="#334155">
+        “the fix”
+      </text>
+      {/* the red circle of doubt */}
+      <Path d="M478 140 C 470 104, 394 102, 372 140 C 352 176, 380 226, 436 224 C 490 222, 506 178, 476 132" stroke="#dc2626" width={4.5} />
+      <text x={436} y={258} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontStyle="italic" fontSize={21} fontWeight={800} fill="#dc2626" stroke="#fff" strokeWidth={5} paintOrder="stroke" strokeLinejoin="round">
+        also distributed?!
+      </text>
+    </svg>
+  );
+}
+
+/** Original meme panel: Reviewer 2 peers over their glasses at "the fix"
+    (a hub in the middle of Kim's machines). Two beats: the top text and the
+    picture on arrival; one click for the look, the raised eyebrow, the red
+    circle and the bottom text. Fixed colours: it's a picture, not themed UI. */
+export function DistributedMemeFigure() {
+  const u = useUid();
   const css = `
 .${u}-brow, .${u}-squint, .${u}-look { transform-box: fill-box; transform-origin: center; }
 .${u}-brow { transform: translateY(-13px) rotate(-7deg); }
@@ -3447,12 +3450,12 @@ section.present .${u}-slam { animation: ${u}-slam 0.45s cubic-bezier(.2,1.4,.4,1
       className="sm-pop relative h-[560px] w-[1060px] overflow-hidden rounded-2xl border-4 border-black/80 shadow-2xl"
       style={{ ...delay(0.05), background: 'radial-gradient(ellipse at 30% 40%, #e8eef5 0%, #c9d5e2 55%, #a9b9cb 100%)' }}
       role="img"
-      aria-label="Meme: a grumpy reviewer looks over their glasses at a diagram where Kim's tangled machines are replaced by a hub that is circled as also distributed. Top text: you solved a distributed system. Bottom text: by adding another distributed system."
+      aria-label="Meme: a sceptical Reviewer 2 looks over their glasses, one eyebrow up. Top text: cool little UI plays. Bottom text: but how does this solve Kim's problem?."
     >
       <LoopStyles css={css} />
 
       {/* Reviewer 2 */}
-      <svg width={430} height={473} viewBox="0 0 400 440" className="absolute bottom-0 left-[20px]" aria-hidden>
+      <svg width={430} height={473} viewBox="0 0 400 440" className="absolute bottom-0 left-1/2 -translate-x-1/2" aria-hidden>
         <path d="M24 440 C 34 352, 116 330, 200 330 C 284 330, 366 352, 376 440 Z" fill="#5b6472" />
         <path d="M168 334 L200 384 L232 334 Z" fill="#eef2f6" />
         <rect x={176} y={276} width={48} height={62} fill="#d99a73" />
@@ -3485,56 +3488,15 @@ section.present .${u}-slam { animation: ${u}-slam 0.45s cubic-bezier(.2,1.4,.4,1
         </g>
       </svg>
 
-      {/* what they're looking at: the tangle, and "the fix" */}
-      <svg width={580} height={360} viewBox="-20 0 580 360" className="absolute right-[24px] top-[96px]" aria-hidden>
-        <Arrowheads id={u} />
-        <g className="sm-fade" style={delay(0.2)}>
-          <rect x={-14} y={8} width={256} height={330} rx={14} fill="#fff" fillOpacity={0.55} />
-          <rect x={290} y={8} width={256} height={330} rx={14} fill="#fff" fillOpacity={0.55} />
-        </g>
-        {tangle.map((d, i) => (
-          <Path key={i} className="sm-draw" style={delay(0.4 + i * 0.05)} d={d} stroke="#d97706" width={2.6} />
-        ))}
-        <g className="sm-fade" style={delay(0.3)}>
-          {before.map(([x, y]) => (
-            <MemeComputer key={`b${x}${y}`} x={x} y={y} />
-          ))}
-          <text x={114} y={326} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontSize={17} fontWeight={700} fill="#334155">
-            Kim’s lab
-          </text>
-        </g>
-        <Path className="sm-draw" style={delay(0.8)} d="M248 172 L284 172" stroke="#334155" width={3.5} head={`${u}-fg`} />
-        {after.map(([x, y], i) => (
-          <Path key={`l${i}`} className="sm-draw" style={delay(1 + i * 0.04)} d={`M${x} ${y} L${hub[0]} ${hub[1]}`} stroke={PRIMARY} width={3} />
-        ))}
-        <g className="sm-fade" style={delay(0.9)}>
-          {after.map(([x, y]) => (
-            <MemeComputer key={`a${x}${y}`} x={x} y={y} />
-          ))}
-          <circle cx={hub[0]} cy={hub[1]} r={28} fill={PRIMARY} stroke="#fff" strokeWidth={3} />
-          <text x={hub[0]} y={hub[1] + 6} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontSize={16} fontWeight={800} fill="#fff">
-            hub
-          </text>
-          <text x={418} y={326} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontSize={17} fontWeight={700} fill="#334155">
-            “the fix”
-          </text>
-        </g>
-        {/* the red circle of doubt */}
-        <Path className="sm-draw" style={delay(3.1)} d="M478 140 C 470 104, 394 102, 372 140 C 352 176, 380 226, 436 224 C 490 222, 506 178, 476 132" stroke="#dc2626" width={4.5} />
-        <text className="sm-fade" style={delay(3.5)} x={436} y={258} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontStyle="italic" fontSize={19} fontWeight={800} fill="#dc2626" stroke="#fff" strokeWidth={5} paintOrder="stroke" strokeLinejoin="round">
-          also distributed?!
-        </text>
-      </svg>
-
       {/* top and bottom text */}
       <div className="absolute inset-x-0 top-[18px] text-center">
         <span className={`${u}-slam inline-block whitespace-nowrap text-[52px] uppercase leading-none tracking-[0.01em] ${anton.className}`} style={{ ...MEME_TEXT, ...delay(0.35) }}>
-          You solved a distributed system
+          Cool little UI plays
         </span>
       </div>
       <div className="absolute inset-x-0 bottom-[18px] text-center">
         <span className={`${u}-slam inline-block whitespace-nowrap text-[52px] uppercase leading-none tracking-[0.01em] ${anton.className}`} style={{ ...MEME_TEXT, ...delay(3.9) }}>
-          by adding another distributed system
+          but how does this solve Kim’s problem?
         </span>
       </div>
     </div>
@@ -3551,8 +3513,8 @@ export const HORSEMEN: Record<keyof typeof NIGHTS | 'ai', { kind: HorsemanKind; 
   communication: {
     kind: 'connection',
     ordinal: 'The first horseman',
-    name: 'Connection',
-    epithet: 'who scatters your machines across the network',
+    name: 'The Network',
+    epithet: '“it’s always the network”',
     horse: '#e5e7eb',
     mane: '#9ca3af',
     cloak: '#374151',
@@ -3561,7 +3523,7 @@ export const HORSEMEN: Record<keyof typeof NIGHTS | 'ai', { kind: HorsemanKind; 
   threads: {
     kind: 'errors',
     ordinal: 'The second horseman',
-    name: 'Error handling & Observability',
+    name: 'The Silent Crash',
     epithet: 'who swallows every exception, and the logs with it',
     horse: '#b91c1c',
     mane: '#f97316',
@@ -3571,8 +3533,8 @@ export const HORSEMEN: Record<keyof typeof NIGHTS | 'ai', { kind: HorsemanKind; 
   data: {
     kind: 'data',
     ordinal: 'The third horseman',
-    name: 'Data Management',
-    epithet: 'who renames every file final_v3_REALLY_final',
+    name: 'The Folder',
+    epithet: 'final_v3_REALLY_final',
     horse: '#111827',
     mane: '#4b5563',
     cloak: '#0b0f19',
@@ -3581,7 +3543,7 @@ export const HORSEMEN: Record<keyof typeof NIGHTS | 'ai', { kind: HorsemanKind; 
   repro: {
     kind: 'repro',
     ordinal: 'The fourth horseman',
-    name: 'Reproducibility',
+    name: 'Works On My Machine',
     epithet: 'who lets it work exactly once',
     horse: '#a8b49a',
     mane: '#6b7563',
@@ -3590,8 +3552,8 @@ export const HORSEMEN: Record<keyof typeof NIGHTS | 'ai', { kind: HorsemanKind; 
   },
   ai: {
     kind: 'ai',
-    ordinal: 'And a fifth horseman',
-    name: 'The AI Horse',
+    ordinal: 'The fifth horseman',
+    name: 'AI Hype',
     epithet: 'who answers everything, confidently',
     horse: '#c4b5fd',
     mane: '#22d3ee',
@@ -3689,7 +3651,7 @@ export function horsemanAmbientCss(u: string) {
 /** Reviewer 2, as a caricature big enough to read at corner size: grey hair,
     one eyebrow up, eyes over reading glasses, the frown. Same look as the
     meme panel. */
-function ReviewerFace() {
+export function ReviewerFace() {
   return (
     <g>
       <ellipse cx={284} cy={108} rx={23} ry={26} fill="#eab08c" stroke="#000" strokeWidth={2.5} />
@@ -3714,6 +3676,7 @@ export function HorsemanArt({
   width,
   className,
   face = 'hood',
+  plain = false,
 }: {
   night: HorsemanKey;
   u: string;
@@ -3721,8 +3684,11 @@ export function HorsemanArt({
   className?: string;
   /** Under the hood: the dark with glowing eyes, or Reviewer 2. */
   face?: 'hood' | 'reviewer';
+  /** Not a horseman at all: an ordinary brown horse and a rider in a grey
+      jacket, with no cape, no emblem and no glowing eye. */
+  plain?: boolean;
 }) {
-  const h = HORSEMEN[night];
+  const h = plain ? { ...HORSEMEN[night], kind: 'plain' as const, horse: '#a9703f', mane: '#4a2f1b', cloak: '#64748b' } : HORSEMEN[night];
   const outline = h.kind === 'data' ? '#000' : '#111';
   const leg = (hip: [number, number], d: string, a: number) => (
     <g className={`${u}-leg`} style={{ transformOrigin: `${hip[0]}px ${hip[1]}px`, '--a': a } as CSSProperties}>
@@ -3732,7 +3698,7 @@ export function HorsemanArt({
   );
   const arm = h.kind === 'data' ? 'M270 152 L 205 140' : 'M270 152 L 222 135';
   return (
-    <svg width={width} height={(width * 362) / 470} viewBox="60 0 470 362" className={cn('overflow-visible', className)} role="img" aria-label={`${h.ordinal}: ${h.name}, ${h.epithet}`}>
+    <svg width={width} height={(width * 362) / 470} viewBox="60 0 470 362" className={cn('overflow-visible', className)} role="img" aria-label={plain ? 'A reviewer on an ordinary horse' : `${h.ordinal}: ${h.name}, ${h.epithet}`}>
       <g className={`${u}-bob`}>
         <g className={`${u}-rear`}>
           {/* far legs, behind the body */}
@@ -3746,7 +3712,7 @@ export function HorsemanArt({
           <path d="M162 114 L 114 134 C 98 142, 98 160, 114 162 L 150 152 L 204 104 Z" fill={h.horse} stroke={outline} strokeWidth={3.5} strokeLinejoin="round" />
           <path d="M176 104 L 182 80 L 194 103 Z" fill={h.horse} stroke={outline} strokeWidth={3} strokeLinejoin="round" />
           <path d="M184 100 C 208 112, 220 146, 242 176 C 222 162, 212 128, 196 116 C 200 134, 190 120, 184 100 Z" fill={h.mane} stroke={outline} strokeWidth={2.5} />
-          <circle className={`${u}-glow`} cx={142} cy={128} r={5} fill="#ef4444" />
+          {plain ? <circle cx={142} cy={128} r={4} fill={outline} /> : <circle className={`${u}-glow`} cx={142} cy={128} r={5} fill="#ef4444" />}
           <circle cx={110} cy={152} r={2.5} fill={outline} />
           {h.kind === 'ai' ? (
             <text x={290} y={236} textAnchor="middle" fontFamily="ui-sans-serif, system-ui" fontSize={40} fontWeight={900} fill="#6d28d9" stroke="#fff" strokeWidth={4} paintOrder="stroke">
@@ -3757,7 +3723,7 @@ export function HorsemanArt({
           {leg([190, 246], 'M190 246 L 150 286 L 118 298', -18)}
           {leg([340, 236], 'M340 236 L 392 284 L 432 294', 18)}
           {/* the rider */}
-          <path className={`${u}-cape`} d="M312 126 C 360 118, 392 140, 428 116 C 410 152, 374 168, 322 172 Z" fill={h.cloak} stroke="#000" strokeWidth={2} />
+          {plain ? null : <path className={`${u}-cape`} d="M312 126 C 360 118, 392 140, 428 116 C 410 152, 374 168, 322 172 Z" fill={h.cloak} stroke="#000" strokeWidth={2} />}
           <path d="M234 178 C 238 122, 298 100, 320 132 C 336 166, 330 200, 320 216 L 238 216 Z" fill={h.cloak} stroke="#000" strokeWidth={2.5} />
           <path d="M262 112 C 260 80, 306 76, 306 112 C 306 128, 296 136, 284 136 C 270 136, 262 128, 262 112 Z" fill={h.cloak} stroke="#000" strokeWidth={2.5} />
           {face === 'reviewer' ? (
@@ -3769,7 +3735,7 @@ export function HorsemanArt({
               <circle className={`${u}-glow`} cx={284} cy={112} r={2.6} fill="#ef4444" />
             </>
           )}
-          <HorsemanEmblem kind={h.kind} u={u} />
+          {h.kind === 'plain' ? null : <HorsemanEmblem kind={h.kind} u={u} />}
           <path d={arm} stroke={h.cloak} strokeWidth={13} strokeLinecap="round" />
           <path d={arm} stroke="#000" strokeWidth={13} strokeLinecap="round" opacity={0.25} />
         </g>
@@ -3796,10 +3762,11 @@ export function HorsemanBanner({ night, className, small = false, tiny = false, 
   );
 }
 
-/** The cart behind a horseman: a wooden wagon, loaded with Kim's doubts. */
-function DoubtCart({ doubts }: { doubts: string[] }) {
+/** The cart behind a horseman: a wooden wagon, tipped up and already empty.
+    What it carried, Kim's doubts, is on Kim. */
+function DoubtCart() {
   return (
-    <div className="absolute left-[486px] top-[152px] h-[230px] w-[330px]">
+    <div className="absolute left-[486px] top-[152px] h-[230px] w-[330px] origin-[75%_85%] rotate-[-16deg]">
       <svg width={330} height={230} viewBox="0 0 330 230" className="absolute inset-0 overflow-visible" aria-hidden>
         {/* the shaft, up to the horse */}
         <path d="M34 150 C -20 150, -60 120, -112 104" fill="none" stroke="#111" strokeWidth={9} strokeLinecap="round" />
@@ -3822,27 +3789,16 @@ function DoubtCart({ doubts }: { doubts: string[] }) {
           </g>
         ))}
       </svg>
-      {/* the load */}
-      <div className="absolute inset-x-[26px] bottom-[112px] flex flex-col-reverse items-center gap-[3px]">
-        {doubts.map((doubt, i) => (
-          <span
-            key={doubt}
-            className="block max-w-full rounded-md border-2 border-[#3b0d0d] bg-[#f3e6c8] px-3 py-1 text-center text-[15px] font-semibold italic leading-tight text-[#3b0d0d] shadow-md"
-            style={{ transform: `rotate(${[-3, 2.5, -2][i % 3]}deg) translateX(${[-8, 10, -2][i % 3]}px)` }}
-          >
-            “{doubt}”
-          </span>
-        ))}
-      </div>
     </div>
   );
 }
 
 /** A horseman of the lab apocalypse, riding in over a night on one keypress
     (a reveal.js fragment): the scene darkens, lightning, the horse gallops in
-    from the right and rears, a cart of Kim's doubts rolling behind him; the
-    night's errors pop up, Kim panics, and the banner unfurls. */
-function Horseman({ night }: { night: keyof typeof NIGHTS }) {
+    with a cart behind him, and tips what it carries, Kim's doubts, over
+    Kim: they fly out of the cart and land on her one after the other
+    (`sm-animate`: this is allowed to move). Kim panics under them. */
+function Horseman({ night, shown }: { night: keyof typeof NIGHTS; shown: boolean }) {
   const u = useUid();
   const h = HORSEMEN[night];
   const { worries } = NIGHTS[night];
@@ -3857,6 +3813,15 @@ function Horseman({ night }: { night: keyof typeof NIGHTS }) {
 .${u}-hm.visible .${u}-leg { animation: ${u}-swing 0.3s ease-in-out 0.1s 5 alternate; }
 .${u}-hm.visible .${u}-banner { animation: ${u}-unfurl 0.6s cubic-bezier(.2,1.3,.4,1) 1.75s both; }
 .${u}-hm.visible .${u}-kim { animation: ${u}-fade 0.4s ease-out 0.5s both; }
+.${u}-dump { opacity: 0; }
+.${u}-hm.visible .${u}-dump { animation: ${u}-dump 0.95s cubic-bezier(.45,0,.55,1) var(--d) both; }
+@keyframes ${u}-dump {
+  0% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(24deg) scale(0.7); }
+  12% { opacity: 1; }
+  50% { opacity: 1; transform: translate(calc(var(--dx) * 0.45), calc(var(--dy) - 170px)) rotate(-14deg) scale(1); }
+  88% { transform: translate(0, 6px) rotate(3deg); }
+  100% { opacity: 1; transform: none; }
+}
 .${u}-hm.visible .${u}-panic { animation: ${u}-panic 0.13s ease-in-out 1.2s 16 alternate; }
 @keyframes ${u}-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ${u}-flash { 0% { opacity: 0; } 12% { opacity: 0.85; } 30% { opacity: 0.1; } 42% { opacity: 0.6; } 100% { opacity: 0; } }
@@ -3872,13 +3837,13 @@ function Horseman({ night }: { night: keyof typeof NIGHTS }) {
 }
 ${horsemanAmbientCss(u)}`;
   return (
-    <Fragment as="div" index={1} className={`custom ${u}-hm absolute inset-0 z-20`}>
+    <div className={cn(`${u}-hm sm-animate absolute inset-0 z-20`, shown && 'visible')}>
       <LoopStyles css={css} />
       <div className={`${u}-dark absolute -inset-x-4 -bottom-12 -top-9 rounded-3xl`} style={{ background: `radial-gradient(ellipse 52% 56% at 52% 44%, ${h.aura} 0%, rgba(22,4,4,0.93) 70%, rgba(6,1,1,0.98) 100%), rgba(14,4,6,0.86)` }} />
       <div className={`${u}-flash absolute -inset-x-4 -bottom-12 -top-9 rounded-3xl bg-white`} />
       {/* the horseman, and what he carts in */}
       <div className={`${u}-ride absolute left-[236px] top-[-46px] h-[440px] w-[830px]`}>
-        <DoubtCart doubts={worries} />
+        <DoubtCart />
         <HorsemanArt night={night} u={u} width={520} />
       </div>
       {/* Kim, in a panic */}
@@ -3888,9 +3853,27 @@ ${horsemanAmbientCss(u)}`;
           <span className="absolute left-[150px] top-[-6px] rotate-[10deg] text-[58px] font-black leading-none text-[#ef4444]">!!</span>
         </div>
       </div>
-      <div className="absolute bottom-[-34px] left-[190px] flex w-[660px] justify-center">
+      {/* the doubts, dumped out of the cart and onto her */}
+      {worries.map((doubt, i) => {
+        const at = [
+          { left: 6, top: 338, turn: -4 },
+          { left: 30, top: 376, turn: 3 },
+          { left: 0, top: 414, turn: -2 },
+        ][i % 3];
+        return (
+          <div key={doubt} className="absolute z-30" style={{ left: at.left, top: at.top, transform: `rotate(${at.turn}deg)` }}>
+            <span
+              className={`${u}-dump sm-animate block whitespace-nowrap rounded-md border-2 border-[#3b0d0d] bg-[#f3e6c8] px-2.5 py-1 text-[14px] font-semibold italic leading-tight text-[#3b0d0d] shadow-lg`}
+              style={{ '--dx': `${770 - at.left}px`, '--dy': `${130 - at.top}px`, '--d': `${0.3 + i * 0.45}s` } as CSSProperties}
+            >
+              “{doubt}”
+            </span>
+          </div>
+        );
+      })}
+      <div className="absolute bottom-[-34px] left-[300px] flex w-[660px] justify-center">
         <HorsemanBanner night={night} className={`${u}-banner`} intro={`Kim has just met ${h.ordinal.replace(/^The/, 'the')}`} />
       </div>
-    </Fragment>
+    </div>
   );
 }

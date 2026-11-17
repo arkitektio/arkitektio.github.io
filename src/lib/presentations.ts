@@ -24,10 +24,10 @@ export const presentations: Presentation[] = [
     slug: 'smart-microscopy',
     title: 'Infrastructure for smart microscopy',
     description:
-      'From workflows to optics: Kim’s AI-built sequential-staining loop works, and still leaves the same debt behind. Arkitekt pays it down line by line, with openUC2 and Optikit as the outlook.',
+      'Kim’s AI-built sequential-staining loop works, and still leaves the same debt behind. Arkitekt pays it down, one horseman at a time, on open source hardware.',
     topic: 'Arkitekt',
     tags: ['Smart microscopy', 'Workflows', 'openUC2'],
-    slides: 68,
+    slides: 61,
     minutes: 45,
   },
   {

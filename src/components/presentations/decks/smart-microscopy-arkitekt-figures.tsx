@@ -12,10 +12,10 @@
 import { Fragment as ReactFragment } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Fragment } from '@revealjs/react';
-import { Bot, Building2, Check, Cpu, LayoutDashboard, Laptop, Layers, Lock, Microchip, Microscope, Network, NotebookPen, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
+import { Bot, BrickWall, Building2, Check, Cpu, LayoutDashboard, Laptop, Layers, Lock, Microchip, Microscope, Network, NotebookPen, Pipette, Radio, ScanSearch, Server, Workflow } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
-import { FrameModel3D } from './smart-microscopy-frame-3d';
+import { ArmModel3D, FrameModel3D } from './smart-microscopy-frame-3d';
 import { cn } from '@/lib/cn';
 import {
   Arrowheads,
@@ -303,6 +303,101 @@ function PhoneScreen({ at }: { at: number }) {
 function sCurve(x1: number, y1: number, x2: number, y2: number) {
   const mx = (x1 + x2) / 2;
   return `M${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+}
+
+/* What Kim would like to drive, and the script she would like to write. */
+const WISH_MACHINES: HubNode[] = [
+  { name: 'Robot arm', what: 'carries the slide', icon: Bot },
+  { name: 'OT-2', what: 'stains · washes', icon: Pipette },
+  { name: 'Microscope', what: 'openUC2 · images', icon: Microscope },
+  { name: 'GPU server', what: 'segments · measures', icon: Cpu },
+];
+const WISH_SCRIPT: [string, string][] = [
+  ['slide', ' = pickUp("rack A");'],
+  ['stain', '(slide, "antibody 1");'],
+  ['image1', ' = acquire(slide);'],
+  ['washUntilGone', '(slide);'],
+  ['stain', '(slide, "antibody 2");'],
+  ['image2', ' = acquire(slide);'],
+  ['overlay', '(image1, image2);'],
+];
+
+/** "Can we do better?", drawn like the middleman slide two slides on, with
+    the middle still unknown: the machines on the left, Kim and the one script
+    she wants to write on the right, and a question mark where the hub will
+    be. Same geometry as `MiddlemanFigure`, so the next slide answers it. */
+export function BetterMiddleFigure() {
+  const W = 1000;
+  const left = { w: 236, ys: [0, 104, 208, 312] };
+  const hub = { x: 330, y: 100, w: 230, h: 220 };
+  const editor = { x: 612, y: 20, w: 370, h: 232 };
+  const kim = { x: 620, y: 272, size: 120 };
+  const rows = left.ys.map((y) => y + 38);
+  const inPorts = [0, 1, 2, 3].map((i) => hub.y + 50 + i * 40);
+  const out: [number, number] = [hub.x + hub.w, hub.y + hub.h / 2];
+  const front: [number, number] = [editor.x, editor.y + editor.h / 2];
+  const dots: [number, number][] = [...rows.map((cy) => [left.w, cy] as [number, number]), ...inPorts.map((py) => [hub.x, py] as [number, number]), out, front];
+  return (
+    <div
+      className="relative mx-auto h-[420px] w-[1000px]"
+      role="img"
+      aria-label="What Kim wants: on the left her machines, the robot arm, the OT-2, the microscope and the GPU server; on the right Kim and one ImageJ-style script with a Run button; in the middle, where something has to connect the two, a question mark"
+    >
+      <svg width={W} height={420} viewBox={`0 0 ${W} 420`} className="absolute inset-0" aria-hidden>
+        {rows.map((cy, i) => (
+          <path key={i} d={sCurve(left.w, cy, hub.x, inPorts[i])} fill="none" stroke={BORDER} strokeWidth={2.2} strokeDasharray="7 6" />
+        ))}
+        <path d={sCurve(front[0], front[1], out[0], out[1])} fill="none" stroke={BORDER} strokeWidth={2.2} strokeDasharray="7 6" />
+        {dots.map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r={5} fill={SURFACE} stroke={PRIMARY} strokeWidth={2} />
+        ))}
+      </svg>
+
+      {WISH_MACHINES.map((n, i) => (
+        <HubCard key={n.name} node={n} x={0} y={left.ys[i]} w={left.w} at={0} />
+      ))}
+
+      {/* the middle: nobody knows yet */}
+      <div className="absolute" style={{ left: hub.x, top: hub.y, width: hub.w, height: hub.h }}>
+        <div className="flex size-full flex-col items-center justify-center rounded-[26px] border-[3px] border-dashed border-fd-primary/60 bg-fd-primary/8">
+          <span className="text-[130px] font-black leading-none text-fd-primary">?</span>
+        </div>
+      </div>
+      <p className="absolute text-center text-[15px] italic leading-snug text-fd-muted-foreground" style={{ left: hub.x - 30, top: hub.y + hub.h + 16, width: hub.w + 60 }}>
+        something has to sit
+        <br />
+        in the middle
+      </p>
+
+      {/* the one script she wants to write */}
+      <div className="absolute flex flex-col overflow-hidden rounded-xl border-2 border-[#1f2937] bg-white text-[#1f2937] shadow-md" style={{ left: editor.x, top: editor.y, width: editor.w, height: editor.h }}>
+        <div className="flex h-[28px] shrink-0 items-center gap-1.5 border-b-2 border-[#1f2937] bg-[#e5e7eb] px-3">
+          {['#f87171', '#fbbf24', '#4ade80'].map((c) => (
+            <span key={c} className="size-[9px] rounded-full" style={{ background: c }} />
+          ))}
+          <span className="flex-1 pr-8 text-center font-mono text-[13px] font-semibold">multi_staining.ijm</span>
+        </div>
+        <div className="flex flex-1 flex-col px-3 py-2 font-mono text-[14px] leading-[22px]">
+          {WISH_SCRIPT.map(([name, rest], i) => (
+            <span key={i} className="whitespace-pre">
+              <span className="mr-3 inline-block w-[14px] text-right text-[#9ca3af]">{i + 1}</span>
+              <span className="font-semibold text-[#1d4ed8]">{name}</span>
+              {rest}
+            </span>
+          ))}
+        </div>
+        <span className="absolute bottom-3 right-3 flex h-[30px] items-center rounded-md bg-[#16a34a] px-3.5 text-[15px] font-bold text-white">▶ Run</span>
+      </div>
+
+      {/* Kim, and all she asks */}
+      <div className="absolute" style={{ left: kim.x, top: kim.y }}>
+        <KimFigure size={kim.size} mood="happy" />
+      </div>
+      <p className="absolute rounded-3xl rounded-bl-sm border-2 border-fd-border bg-fd-card px-4 py-3 text-[18px] font-semibold leading-snug shadow-sm" style={{ left: kim.x + kim.size, top: kim.y - 6, width: 262 }}>
+        <span className="sr-only">Kim: </span>“Could I not have a <span className="text-fd-primary">multi-computer ImageJ</span> that does these tasks for me, and I just write a script for it?”
+      </p>
+    </div>
+  );
 }
 
 /** Arkitekt as the middleman: the apps on the left offer their actions, Kim
@@ -618,7 +713,8 @@ ${run(3, 'result', k('in', 0.4, 2.75))}
 `;
   /* a column, not a card: no border, no fill; the action rows inside are the boxes */
   const card = 'rounded-2xl';
-  const marker = (n: number) => <Fragment as="span" index={n} className={`${u}-s${n} absolute`} />;
+  /* no steps: all three markers are on from the start, so the figure stands at its last state */
+  const marker = (n: number) => <span className={`${u}-s${n} visible absolute`} />;
   const travel = (dx: number) => ({ '--dx': dx }) as CSSProperties;
   const caption = (n: number, step: string, text: string) => (
     <div className={`${u}-cap${n} absolute inset-x-0 top-[408px] text-center text-[17px] font-semibold`}>
@@ -924,7 +1020,7 @@ section.present .${u}-hands { animation: ${u}-juggle 0.35s ease-in-out ${from}s 
 `;
   const hand = (x: number, y: number) => <circle cx={x} cy={y} r={14} fill="#fff" stroke="#111" strokeWidth={3} />;
   return (
-    <Steps cues={[0.5, from + dur + 0.6]} className="relative shrink-0" pips={false}>
+    <Steps live cues={[0.5, from + dur + 0.6]} className="relative shrink-0" pips={false}>
       <div className="relative" style={{ width: W, height: H }} role="img" aria-label="The Arkitekt logo, with big proud eyes, holds a stack of its actions, shuffles them in its hands and lays them out in a circle around itself">
         <LoopStyles css={css} />
         <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 size-full overflow-visible" aria-hidden>
@@ -998,6 +1094,181 @@ section.present .${u}-hands { animation: ${u}-juggle 0.35s ease-in-out ${from}s 
         </svg>
       </div>
     </Steps>
+  );
+}
+
+/* --- the hub keeps the state of the devices -------------------------------------- */
+
+/** What the arm publishes about itself, and what the hub holds for every
+    device at this moment. */
+const ARM_STATES: { name: string; value: string; type: string }[] = [
+  { name: 'pose', value: 'x 0.41 · y 0.12 · z 0.23 m', type: 'position in 3D · 6 joints' },
+  { name: 'gripper', value: 'holding HE-07', type: 'slide · or empty' },
+  { name: 'status', value: 'moving · to_scope', type: 'idle · moving · fault' },
+];
+const HUB_STATES: { app: string; state: string; value: string; arm?: boolean }[] = [
+  { app: 'arkirino', state: 'pose', value: 'x 0.41 · y 0.12 · z 0.23 m', arm: true },
+  { app: 'arkirino', state: 'gripper', value: 'holding HE-07', arm: true },
+  { app: 'openuc2', state: 'stage', value: 'x 16.9 · y 29.8 mm' },
+  { app: 'ot2', state: 'deck', value: 'slot 3 · free' },
+];
+
+/** The same three columns as the offer slide, for state instead of actions:
+    the arm (arkirino) publishes where it is, the hub keeps the latest state
+    of every device, and Orkestrator can draw the whole lab in one 3D space,
+    the arm's tool where it really is. Nothing moves. */
+export function DeviceStateFigure() {
+  const pw = 300;
+  const hubX = 440;
+  const fx = 880;
+  const yLane = 150;
+  const head = (icon: ReactNode, title: string, sub: string) => (
+    <div className="flex items-center gap-3">
+      {icon}
+      <span className="flex flex-col">
+        <span className="text-[19px] font-semibold leading-tight">{title}</span>
+        <span className="text-[13px] text-fd-muted-foreground">{sub}</span>
+      </span>
+    </div>
+  );
+  const label = (x: number, step: string, text: string) => (
+    <span className="absolute top-[404px] text-center text-[15px]" style={{ left: x, width: pw }}>
+      <span className="font-semibold text-fd-primary">{step}</span> <span className="text-fd-muted-foreground">{text}</span>
+    </span>
+  );
+  /* the lab from above and a little to the side: bench, OT-2, microscope, the arm between them */
+  const tool: [number, number] = [176, 96];
+  return (
+    <div
+      className="relative mx-auto h-[440px] w-[1180px]"
+      role="img"
+      aria-label="The robot arm, arkirino, publishes its state to the Arkitekt hub: its pose, a position in 3D space of x 0.41, y 0.12, z 0.23 metres, what its gripper holds, and whether it is moving. The hub keeps the latest state of every device, the arm's pose next to the microscope's stage position and the OT-2's deck. Orkestrator draws them in one 3D space, with the arm's tool where it really is."
+    >
+      <svg width={1180} height={440} viewBox="0 0 1180 440" className="absolute inset-0" aria-hidden>
+        <Arrowheads id="state" />
+        <Path d={`M${pw + 8} ${yLane} L${hubX - 10} ${yLane}`} stroke={PRIMARY} width={2.6} head="state-primary" />
+        <Path d={`M${hubX + pw + 8} ${yLane} L${fx - 10} ${yLane}`} stroke={PRIMARY} width={2.6} head="state-primary" />
+      </svg>
+      <span className="absolute text-center font-mono text-[12px] text-fd-muted-foreground" style={{ left: pw, width: hubX - pw, top: yLane - 26 }}>
+        every change
+      </span>
+      <span className="absolute text-center font-mono text-[12px] text-fd-muted-foreground" style={{ left: hubX + pw, width: fx - hubX - pw, top: yLane - 26 }}>
+        live
+      </span>
+
+      {/* the arm, as an app: it says where it is */}
+      <div className="absolute left-0 top-[6px]" style={{ width: pw }}>
+        <div className="relative isolate flex h-[388px] flex-col gap-2.5 overflow-hidden rounded-2xl p-3.5">
+          {/* the arm itself, behind its app */}
+          <ArmModel3D className="pointer-events-none absolute inset-0 -z-10 opacity-60" />
+          {head(
+            <span className="flex size-[44px] items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
+              <Bot className="size-[25px]" strokeWidth={1.8} />
+            </span>,
+            'arkirino',
+            'the robot arm, as an app',
+          )}
+          {ARM_STATES.map((st, i) => (
+            <div key={st.name} className={cn('flex flex-col gap-0.5 rounded-xl border bg-fd-background/70 px-3 py-2', i === 0 ? 'border-2 border-fd-primary/70' : 'border-fd-border')}>
+              <span className="flex items-center justify-between">
+                <span className="font-mono text-[16px] font-semibold">{st.name}</span>
+                <span className="rounded-full bg-fd-primary/12 px-2 py-px font-mono text-[10px] font-bold uppercase tracking-wide text-fd-primary">state</span>
+              </span>
+              <span className="font-mono text-[13.5px]">{st.value}</span>
+              <span className="text-[11.5px] text-fd-muted-foreground">{st.type}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* the hub: the latest state of every device */}
+      <div className="absolute top-[6px]" style={{ left: hubX, width: pw }}>
+        <div className="flex h-[388px] flex-col gap-2.5 rounded-2xl p-3.5">
+          {head(
+            <span className="flex size-[44px] items-center justify-center rounded-xl bg-fd-primary">
+              <span className="flex size-[36px] items-center justify-center rounded-lg bg-white/95">
+                <Logo className="size-[32px]" />
+              </span>
+            </span>,
+            'Arkitekt hub',
+            'where every device is, right now',
+          )}
+          {HUB_STATES.map((st) => (
+            <div key={st.app + st.state} className={cn('flex flex-col rounded-xl border border-l-4 bg-fd-background/60 px-3 py-1.5', st.arm ? 'border-fd-primary/50 border-l-fd-primary' : 'border-fd-border border-l-fd-primary/40')}>
+              <span className="flex items-baseline justify-between">
+                <span className="font-mono text-[14px] font-semibold">
+                  {st.app}.{st.state}
+                </span>
+                <span className="font-mono text-[10.5px] text-fd-muted-foreground">now</span>
+              </span>
+              <span className="font-mono text-[12.5px] text-fd-muted-foreground">{st.value}</span>
+            </div>
+          ))}
+          <span className="mt-auto text-[13px] leading-snug text-fd-muted-foreground">Kept with its history: where the arm was at 14:08, too.</span>
+        </div>
+      </div>
+
+      {/* Orkestrator: the lab, in one 3D space */}
+      <div className="absolute top-[6px]" style={{ left: fx, width: pw }}>
+        <div className="flex h-[388px] flex-col gap-2.5 rounded-2xl p-3.5">
+          {head(
+            <span className="flex size-[44px] items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
+              <Workflow className="size-[25px]" strokeWidth={1.8} />
+            </span>,
+            'Orkestrator',
+            'the lab, in one 3D space',
+          )}
+          <svg viewBox="0 0 272 236" className="w-full rounded-xl border border-fd-border bg-fd-background/60" aria-hidden>
+            {/* the floor grid, in perspective */}
+            {[0, 1, 2, 3, 4].map((i) => (
+              <path key={`h${i}`} d={`M${24 - i * 5} ${96 + i * 30} L${248 + i * 5} ${96 + i * 30}`} stroke={BORDER} strokeWidth={1} />
+            ))}
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <path key={`v${i}`} d={`M${24 + i * 44.8} 96 L${4 + i * 52.8} 216`} stroke={BORDER} strokeWidth={1} />
+            ))}
+            {/* the OT-2, and the microscope */}
+            <g stroke={FG} strokeWidth={1.8} strokeLinejoin="round" fill={SURFACE}>
+              <path d="M30 150 L30 104 L88 104 L88 150 Z M30 104 L44 92 L102 92 L88 104 M88 150 L102 138 L102 92" />
+              <path d="M196 196 L196 160 L236 160 L236 196 Z M196 160 L206 150 L246 150 L236 160 M236 196 L246 186 L246 150" />
+            </g>
+            <text x={59} y={166} textAnchor="middle" fontSize={10.5} fontFamily="var(--font-mono, monospace)" fill={MUTED}>
+              ot2
+            </text>
+            <text x={216} y={212} textAnchor="middle" fontSize={10.5} fontFamily="var(--font-mono, monospace)" fill={MUTED}>
+              openuc2
+            </text>
+            {/* the arm: base, two links, the tool, and its shadow on the floor */}
+            <ellipse cx={tool[0]} cy={186} rx={9} ry={3.5} fill={PRIMARY} fillOpacity={0.25} />
+            <path d={`M${tool[0]} 186 L${tool[0]} ${tool[1] + 8}`} stroke={PRIMARY} strokeWidth={1.2} strokeDasharray="3 3" />
+            <path d={`M128 178 L118 104 L${tool[0]} ${tool[1]}`} fill="none" stroke={FG} strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={`M128 178 L118 104 L${tool[0]} ${tool[1]}`} fill="none" stroke={SURFACE} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
+            <ellipse cx={128} cy={182} rx={16} ry={6} fill={SURFACE} stroke={FG} strokeWidth={1.8} />
+            <circle cx={118} cy={104} r={5} fill={SURFACE} stroke={FG} strokeWidth={1.8} />
+            <rect x={tool[0] - 13} y={tool[1] - 4} width={26} height={7} rx={1.5} fill="#f9a8d4" stroke="#be185d" strokeWidth={1.2} />
+            <circle cx={tool[0]} cy={tool[1]} r={4} fill={PRIMARY} stroke="#fff" strokeWidth={1.5} />
+            <text x={128} y={202} textAnchor="middle" fontSize={10.5} fontFamily="var(--font-mono, monospace)" fill={MUTED}>
+              arkirino
+            </text>
+            {/* where the tool is */}
+            <rect x={80} y={52} width={164} height={22} rx={6} fill={PRIMARY} />
+            <path d={`M${tool[0]} 74 L${tool[0] - 6} 74 L${tool[0]} ${tool[1] - 8} L${tool[0] + 6} 74 Z`} fill={PRIMARY} />
+            <text x={162} y={67} textAnchor="middle" fontSize={11} fontWeight={700} fontFamily="var(--font-mono, monospace)" fill="var(--color-fd-primary-foreground)">
+              x 0.41 · y 0.12 · z 0.23
+            </text>
+            {/* the axes */}
+            <g strokeWidth={2} strokeLinecap="round">
+              <path d="M18 30 L44 30" stroke="#ef4444" />
+              <path d="M18 30 L18 6" stroke="#22c55e" />
+              <path d="M18 30 L6 40" stroke="#3b82f6" />
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      {label(0, '① publish', 'the arm says where it is')}
+      {label(hubX, '② accumulate', 'the state of every device')}
+      {label(fx, '③ place', 'all of it, in one space')}
+    </div>
   );
 }
 
@@ -1395,87 +1666,356 @@ export function ReplayFigure() {
 
 /* --- a billion files, no pixel size: coordinate systems --------------------- */
 
-/** "MDA asks which index? Smart microscopy asks where, and why?" — the cube
-    fills in index order; on the right, tiles land on the overview where
-    something was worth a look, each with its reason. */
+/** Every database needs a schema, and this is where the classic MDA breaks.
+    Left: the MDA schema, which is an index (t, c, z, p), and the cube it
+    describes. Right: what a smart acquisition actually took, tiles of
+    different sizes placed where something was worth a look, one of them
+    inside another. Three beats, one per press of "next": both sides; the
+    tiles are forced into the index and come out as p = 0…6, all the same
+    size, in a row, and where they were, how big, and which one sits inside
+    which is gone; then what the schema needs instead. */
 export function CoordsFigure() {
+  const u = useUid();
+  const flyAt = 1.3;
+  const askAt = 2.8;
+  const fixAt = 4.1;
+  const cues = [1, 3.8, 5.4];
+  const RED = '#dc2626';
   const cube: ReactNode[] = [];
-  let k = 0;
-  for (let z = 0; z < 4; z++) {
+  for (let z = 0; z < 3; z++) {
     for (let r = 0; r < 3; r++) {
       for (let c = 0; c < 3; c++) {
-        cube.push(
-          <rect
-            key={`${z}-${r}-${c}`}
-            className="sm-pop"
-            style={delay(0.2 + k * 0.05)}
-            x={150 + z * 34 + c * 58}
-            y={130 - z * 34 + r * 58}
-            width={52}
-            height={52}
-            rx={4}
-            fill={MUTED}
-            fillOpacity={0.15 + z * 0.12}
-            stroke={MUTED}
-            strokeOpacity={0.4}
-          />,
-        );
-        k++;
+        cube.push(<rect key={`${z}-${r}-${c}`} x={290 + z * 24 + c * 42} y={104 - z * 24 + r * 42} width={38} height={38} rx={4} fill={MUTED} fillOpacity={0.15 + z * 0.14} stroke={MUTED} strokeOpacity={0.4} />);
       }
     }
   }
+  /* x, y, size, why: where the acquisition went, and at what magnification */
   const tiles: [number, number, number, string?][] = [
     [630, 70, 46, 'patchy stain'],
     [790, 55, 30],
-    [900, 135, 68, 'rare event'],
+    [900, 135, 68, 'rare event · 10x'],
+    [928, 164, 20, '40x, inside it'],
     [680, 215, 26],
     [800, 200, 74, 'refocus'],
     [990, 250, 22],
-    [615, 250, 30],
   ];
+  const SLOT = { x: 34, y: 246, s: 40, gap: 52 };
   const blobs = Array.from({ length: 26 }, (_, i) => ({
     x: 612 + ((i * 131) % 440),
     y: 52 + ((i * 71 + 23) % 230),
     r: 4 + ((i * 5) % 9),
   }));
+  const fields = ['t', 'c', 'z', 'p'];
+  /* each tile's copy leaves its place and its size behind for a slot in the index */
+  const css = `
+${tiles
+  .map(([x, y, size], i) => {
+    const to = `translate(${SLOT.x + i * SLOT.gap - x}px, ${SLOT.y - y}px) scale(${(SLOT.s / size).toFixed(4)})`;
+    return `.${u}-g${i} { transform-box: fill-box; transform-origin: 0 0; transform: ${to}; }
+section.present .${u}-g${i} { animation: ${u}-g${i} 1s cubic-bezier(.6,0,.2,1) ${flyAt + i * 0.12}s both; }
+@keyframes ${u}-g${i} { from { transform: none; } to { transform: ${to}; } }`;
+  })
+  .join('\n')}
+@media (prefers-reduced-motion: reduce) { section.present [class*="${u}-g"] { animation: none; } }
+`;
   return (
-    <svg width={1100} height={400} viewBox="0 0 1100 400" role="img" aria-label="Left: a multi-dimensional acquisition filling a regular cube, index by index. Right: tiles landing on an overview where something was worth a look, each tagged with why." className="mx-auto block">
-      <rect x={10} y={10} width={520} height={310} rx={16} fill={SURFACE} fillOpacity={0.6} stroke={BORDER} strokeWidth={1.6} />
-      {cube}
-      <rect className="sm-fade" style={delay(0.1)} x={570} y={10} width={520} height={310} rx={16} fill={PRIMARY} fillOpacity={0.05} stroke={PRIMARY} strokeOpacity={0.4} strokeWidth={1.6} />
-      <rect className="sm-fade" style={delay(0.6)} x={600} y={40} width={460} height={250} rx={8} fill="none" stroke={PRIMARY} strokeOpacity={0.4} strokeWidth={2} strokeDasharray="8 6" />
-      <g className="sm-fade" style={delay(0.8)}>
+    <Steps live cues={cues} className="relative mx-auto w-fit">
+      <LoopStyles css={css} />
+      <svg width={1100} height={400} viewBox="0 0 1100 400" role="img" aria-label="Left: the schema of a multi-dimensional acquisition is an index, t, c, z and p, a regular cube. Right: what a smart acquisition took: tiles of different sizes placed on the slide where something was worth a look, one of them a 40x tile inside a 10x tile. Forced into the index, the tiles become p = 0 to 6, all the same size, in a row: where each one was, how big it was, and which one sits inside which no longer fits. The schema needs a transform into a shared coordinate system instead of an index." className="block">
+        <rect x={10} y={10} width={520} height={310} rx={16} fill={SURFACE} fillOpacity={0.6} stroke={BORDER} strokeWidth={1.6} />
+        <T x={30} y={36} anchor="start" size={13} mono weight={700} fill={MUTED}>
+          MDA · AN INDEX
+        </T>
+        {/* the schema: four integers */}
+        <rect x={30} y={54} width={196} height={150} rx={10} fill={SURFACE} stroke={BORDER} strokeWidth={1.6} />
+        <rect x={30} y={54} width={196} height={30} rx={10} fill={MUTED} fillOpacity={0.14} />
+        <T x={44} y={70} anchor="start" size={14} mono weight={700}>
+          images
+        </T>
+        {fields.map((f, i) => (
+          <g key={f}>
+            {f === 'p' ? <rect x={34} y={84 + i * 29 + 2} width={188} height={26} rx={6} fill={WARN} fillOpacity={0.16} /> : null}
+            <T x={48} y={99 + i * 29} anchor="start" size={15} mono weight={700}>
+              {f}
+            </T>
+            <T x={84} y={99 + i * 29} anchor="start" size={13} mono fill={MUTED}>
+              {['int · time point', 'int · channel', 'int · z-slice', 'int · position'][i]}
+            </T>
+          </g>
+        ))}
+        {cube}
+
+        {/* the index, as slots: every position the same size, in a row */}
+        <g className="sm-fade" style={delay(flyAt - 0.1)}>
+          {tiles.map((_, i) => (
+            <g key={i}>
+              <rect x={SLOT.x + i * SLOT.gap} y={SLOT.y} width={SLOT.s} height={SLOT.s} rx={3} fill="none" stroke={MUTED} strokeOpacity={0.6} strokeWidth={1.5} strokeDasharray="4 3" />
+              <T x={SLOT.x + i * SLOT.gap + SLOT.s / 2} y={SLOT.y + SLOT.s + 14} size={11.5} mono weight={700} fill={MUTED}>
+                {`p = ${i}`}
+              </T>
+            </g>
+          ))}
+        </g>
+        {/* what no longer fits */}
+        {['✕ where on the slide?', '✕ how big, which objective?', '✕ which one is inside which?'].map((q, i) => (
+          <T key={q} className="sm-pop" style={delay(askAt + i * 0.18)} x={402} y={SLOT.y + 4 + i * 19} anchor="start" size={10.5} weight={700} fill={RED}>
+            {q}
+          </T>
+        ))}
+        <T className="sm-in" style={delay(askAt + 0.5)} x={514} y={36} anchor="end" size={13.5} weight={700} fill={RED}>
+          the spatial context doesn’t fit in the index
+        </T>
+
+        {/* the acquisition, on the slide */}
+        <rect x={570} y={10} width={520} height={310} rx={16} fill={PRIMARY} fillOpacity={0.05} stroke={PRIMARY} strokeOpacity={0.4} strokeWidth={1.6} />
+        <T x={590} y={30} anchor="start" size={13} mono weight={700} fill={PRIMARY}>
+          THE ACQUISITION · ON THE SLIDE
+        </T>
+        <rect x={600} y={40} width={460} height={250} rx={8} fill="none" stroke={PRIMARY} strokeOpacity={0.4} strokeWidth={2} strokeDasharray="8 6" />
         {blobs.map((b, i) => (
           <circle key={i} cx={b.x} cy={b.y} r={b.r} fill={MUTED} fillOpacity={0.16} />
         ))}
-      </g>
-      {tiles.map(([x, y, s, why], i) => (
+        {tiles.map(([x, y, size, why], i) => (
+          <g key={i}>
+            <rect x={x} y={y} width={size} height={size} rx={3} fill={PRIMARY} fillOpacity={i === 3 ? 0.75 : 0.3 + (i % 3) * 0.15} stroke={PRIMARY} strokeWidth={1.5} />
+            {why ? (
+              <T x={i === 3 ? 976 : x + size + 8} y={i === 3 ? 166 : y + 10} anchor="start" size={13.5} weight={700} fill={PRIMARY}>
+                {why}
+              </T>
+            ) : null}
+          </g>
+        ))}
+        {/* the same tiles, forced into the index */}
+        {tiles.map(([x, y, size], i) => (
+          <rect key={i} className={`${u}-g${i}`} x={x} y={y} width={size} height={size} rx={3} fill={PRIMARY} fillOpacity={0.45} stroke={PRIMARY} strokeWidth={1.5} />
+        ))}
+
+        <T x={270} y={350} size={22} weight={600}>
+          <tspan>MDA asks </tspan>
+          <tspan fill={MUTED}>which index?</tspan>
+        </T>
+        <T x={270} y={382} size={15} fill={MUTED}>
+          A cube: t, c, z, position. The schema is the array.
+        </T>
+        <T x={830} y={350} size={22} weight={600}>
+          <tspan>Smart microscopy asks </tspan>
+          <tspan fill={PRIMARY}>where, and why?</tspan>
+        </T>
+        <T className="sm-in" style={delay(fixAt)} x={830} y={382} size={15} weight={600} fill={PRIMARY}>
+          So the schema stores a place in a coordinate system, not an index.
+        </T>
+      </svg>
+    </Steps>
+  );
+}
+
+/* --- where, and what ------------------------------------------------------------ */
+
+/** What a smart acquisition leaves behind, on the slide: tiles of different
+    sizes, placed where something was worth a look, one inside another. Each
+    carries two things: where it is (spatial data) and what was found there
+    (analysis). Nothing moves. */
+export function WhereWhatFigure() {
+  /* x, y, size, then where it is and what was found there */
+  const tiles: [number, number, number, string?, string?][] = [
+    [40, 104, 46, 'x 4.1 · y 3.2 mm', 'patchy stain · CD20 41 %'],
+    [250, 82, 26],
+    [262, 160, 68, 'x 26.2 · y 9.6 mm', 'rare event · 3 mitoses'],
+    [290, 188, 20],
+    [90, 262, 26],
+    [200, 232, 74, 'x 21.3 · y 16.0 mm', '1 812 cells · labels'],
+    [462, 300, 22],
+  ];
+  const blobs = Array.from({ length: 26 }, (_, i) => ({
+    x: 34 + ((i * 131) % 470),
+    y: 84 + ((i * 71 + 23) % 250),
+    r: 4 + ((i * 5) % 9),
+  }));
+  return (
+    <svg width={540} height={440} viewBox="0 0 540 440" role="img" aria-label="Where, and what? A slide with image tiles of different sizes placed on it, one of them inside another. Each tile carries where it is, its position on the slide, which is spatial data, and what was found there, which is analysis: a patchy stain with CD20 at 41 percent, a rare event with three mitoses, 1812 segmented cells." className="shrink-0">
+      <T x={20} y={30} anchor="start" size={32} weight={800}>
+        <tspan fill={FG}>Where</tspan>
+        <tspan fill={MUTED}>, and </tspan>
+        <tspan fill={PRIMARY}>what?</tspan>
+      </T>
+      {/* the slide */}
+      <rect x={20} y={64} width={500} height={286} rx={10} fill={PRIMARY} fillOpacity={0.04} stroke={PRIMARY} strokeOpacity={0.4} strokeWidth={2} strokeDasharray="8 6" />
+      {blobs.map((b, i) => (
+        <circle key={i} cx={b.x} cy={b.y} r={b.r} fill={MUTED} fillOpacity={0.16} />
+      ))}
+      {tiles.map(([x, y, size, where, what], i) => (
         <g key={i}>
-          <circle className="sm-ping" style={delay(1.4 + i * 0.4)} cx={x + s / 2} cy={y + s / 2} r={s / 2} fill="none" stroke={PRIMARY} strokeWidth={2} />
-          <rect className="sm-pop" style={delay(1.4 + i * 0.4)} x={x} y={y} width={s} height={s} rx={3} fill={PRIMARY} fillOpacity={0.3 + (i % 3) * 0.2} stroke={PRIMARY} strokeWidth={1.5} />
-          {why ? (
-            <T className="sm-in" style={delay(1.7 + i * 0.4)} x={x + s + 8} y={y + 10} anchor="start" size={14} weight={700} fill={PRIMARY}>
-              {why}
-            </T>
+          <rect x={x} y={y} width={size} height={size} rx={3} fill={PRIMARY} fillOpacity={i === 3 ? 0.75 : 0.3 + (i % 3) * 0.15} stroke={PRIMARY} strokeWidth={1.5} />
+          {where ? (
+            <>
+              <T x={x + size + 9} y={y + size / 2 - 9} anchor="start" size={12} mono weight={700} fill={FG}>
+                {where}
+              </T>
+              <T x={x + size + 9} y={y + size / 2 + 9} anchor="start" size={13.5} weight={700} fill={PRIMARY}>
+                {what}
+              </T>
+            </>
           ) : null}
         </g>
       ))}
-
-      <T x={270} y={350} size={22} weight={600}>
-        <tspan>MDA asks </tspan>
-        <tspan fill={MUTED}>which index?</tspan>
+      <T x={318} y={150} anchor="start" size={11.5} mono weight={700} fill={MUTED}>
+        40x, inside the 10x
       </T>
-      <T x={270} y={382} size={15} fill={MUTED}>
-        A cube: t, c, z, position. The structure is the array.
+      {/* the two halves */}
+      <T x={20} y={380} anchor="start" size={15} weight={700} fill={FG}>
+        Where: spatial data.
       </T>
-      <T x={830} y={350} size={22} weight={600}>
-        <tspan>Smart microscopy asks </tspan>
-        <tspan fill={PRIMARY}>where, and why?</tspan>
+      <T x={186} y={380} anchor="start" size={15} fill={MUTED}>
+        A place and a size on the slide.
       </T>
-      <T x={830} y={382} size={15} fill={MUTED}>
-        No cube. Every image placed in shared coordinate systems.
+      <T x={20} y={408} anchor="start" size={15} weight={700} fill={PRIMARY}>
+        What: analysis.
+      </T>
+      <T x={186} y={408} anchor="start" size={15} fill={MUTED}>
+        What was found there.
       </T>
     </svg>
+  );
+}
+
+/* --- the agent, behind Arkitekt ------------------------------------------------ */
+
+/** Three ways to put an agent in a lab, one per beat. First, what we don't
+    want: the agent talks to every device directly, and nothing limits or
+    records it. Second (one press of "next"), what we don't want either: the
+    agent drives Arkitekt on its own. Now there are rights and a log, but the
+    log says "claude", and nobody knows who was behind it. Third: a person
+    talks through Arkitekt, and the agent is one more app on the far side of
+    it, next to the devices. It talks to Claude or to a local LLM, works with
+    that person's rights, and the log names them. Last press: the reason,
+    control and provenance, and the consequence: Arkitekt has a chat
+    interface. */
+export function AgentBarrierFigure() {
+  const u = useUid();
+  const devices = ['arm', 'OT-2', 'scope'];
+  const panel = (ox: number, w: number, good: boolean, title: string) => (
+    <>
+      <rect x={ox} y={10} width={w} height={300} rx={16} fill={good ? PRIMARY : WARN} fillOpacity={0.05} stroke={good ? PRIMARY : WARN} strokeOpacity={0.5} strokeWidth={1.6} />
+      <T x={ox + 14} y={32} anchor="start" size={12} mono weight={700} fill={good ? PRIMARY : WARN}>
+        {title}
+      </T>
+    </>
+  );
+  /** Arkitekt between the two sides, at `x`, with an arrow to every `y` on the app side at `to`. */
+  const barrier = (x: number, to: number, targets: number[]) => (
+    <>
+      <rect x={x} y={52} width={44} height={166} rx={12} fill={PRIMARY} fillOpacity={0.14} stroke={PRIMARY} strokeWidth={2.5} />
+      <foreignObject x={x + 6} y={60} width={32} height={32}>
+        <Logo className="size-[32px]" />
+      </foreignObject>
+      <text x={x + 22} y={158} fontSize={12} fontWeight={800} fill={PRIMARY} textAnchor="middle" dominantBaseline="middle" letterSpacing={2} transform={`rotate(-90 ${x + 22} 158)`} fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace">
+        RIGHTS · LOG
+      </text>
+      {targets.map((y, i) => (
+        <Path key={y} d={`M${x + 48} ${135 + (i - (targets.length - 1) / 2) * 18} L${to - 4} ${y}`} stroke={PRIMARY} head={`${u}-primary`} />
+      ))}
+    </>
+  );
+  /** What the log says about the call that just ran. */
+  const logLine = (ox: number, w: number, by: string, good: boolean) => (
+    <>
+      <rect x={ox + 14} y={233} width={w - 28} height={26} rx={7} fill="var(--color-fd-background)" stroke={good ? PRIMARY : WARN} strokeOpacity={0.6} strokeWidth={1.4} />
+      <T x={ox + 26} y={246} anchor="start" size={12} mono fill={MUTED}>
+        the log says · by:
+      </T>
+      <T x={ox + w - 26} y={246} anchor="end" size={12.5} mono weight={700} fill={good ? PRIMARY : WARN}>
+        {by}
+      </T>
+    </>
+  );
+  const P1 = 10;
+  const P2 = 325;
+  const P3 = 640;
+  const NARROW = 300;
+  const WIDE = 450;
+  const ys = [74, 118, 162];
+  return (
+    <Steps live cues={[1, 2.3, 3.7, 5.2]} className="relative mx-auto w-fit">
+      <svg width={1100} height={400} viewBox="0 0 1100 400" role="img" aria-label="Three ways to put an agent in a lab. First, what we don't want: the AI agent talks to the robot arm, the OT-2 and the microscope directly; nothing limits it and nothing records it. Second, what we don't want either: the agent drives Arkitekt on its own; there are rights and a log, but the log says claude and nobody knows who was behind it. Third, what we want: a person, Kim, talks through Arkitekt, and the agent is one more app behind Arkitekt, next to the devices; it talks to Claude or to a local LLM, works with her rights, and the log says Kim, with an agent. Because: control and provenance. So Arkitekt has a chat interface." className="block">
+        <Arrowheads id={u} />
+
+        {/* 1 · the agent, straight on the devices */}
+        {panel(P1, NARROW, false, '✕ AGENT → DEVICES')}
+        <Box x={P1 + 16} y={98} w={104} h={58} title="AI agent" sub="on its own" titleSize={15} tone="warn" />
+        {devices.map((d, i) => (
+          <g key={d}>
+            <Path d={`M${P1 + 124} ${117 + i * 10} L${P1 + 200} ${ys[i]}`} stroke={WARN} head={`${u}-warn`} />
+            <Box x={P1 + 204} y={ys[i] - 17} w={82} h={34} title={d} titleSize={14} />
+          </g>
+        ))}
+        <T x={P1 + 78} y={188} size={11.5} mono weight={700} fill={WARN}>
+          ssh · http · scripts
+        </T>
+        {logLine(P1, NARROW, 'nothing', false)}
+        <T x={P1 + 14} y={286} anchor="start" size={15} weight={700} fill={WARN}>
+          No limits. No record.
+        </T>
+
+        {/* 2 · the agent, driving Arkitekt by itself */}
+        <g className="sm-in" style={delay(1.3)}>
+          {panel(P2, NARROW, false, '✕ AGENT → ARKITEKT → DEVICES')}
+          <Box x={P2 + 10} y={106} w={86} h={58} title="AI agent" sub="on its own" titleSize={14} tone="warn" />
+          <Path d={`M${P2 + 100} 135 L${P2 + 112} 135`} stroke={WARN} head={`${u}-warn`} />
+          {barrier(P2 + 118, P2 + 204, ys)}
+          {devices.map((d, i) => (
+            <Box key={d} x={P2 + 204} y={ys[i] - 17} w={82} h={34} title={d} titleSize={14} />
+          ))}
+          {logLine(P2, NARROW, '“claude” ?', false)}
+          <T x={P2 + 14} y={280} anchor="start" size={15} weight={700} fill={WARN}>
+            A record. But of whom?
+          </T>
+          <T x={P2 + 14} y={298} anchor="start" size={13} fill={MUTED}>
+            Nobody knows who was behind it.
+          </T>
+        </g>
+
+        {/* 3 · a person, through Arkitekt; the agent is one more app behind it */}
+        <g className="sm-in" style={delay(2.6)}>
+          {panel(P3, WIDE, true, '✓ YOU → ARKITEKT → APPS, ONE OF THEM AN AGENT')}
+          <foreignObject x={P3 + 14} y={84} width={88} height={104}>
+            <KimFigure size={88} mood="happy" />
+          </foreignObject>
+          <Path d={`M${P3 + 104} 135 L${P3 + 132} 135`} stroke={PRIMARY} head={`${u}-primary`} />
+          <T x={P3 + 118} y={121} size={11.5} mono weight={700} fill={PRIMARY}>
+            chat
+          </T>
+          {barrier(P3 + 138, P3 + 234, [66, 104, 142, 190])}
+          {devices.map((d, i) => (
+            <Box key={d} x={P3 + 234} y={51 + i * 38} w={82} h={30} title={d} titleSize={14} tone="primary" />
+          ))}
+          {/* the agent: an app like the others, and what it talks to */}
+          <Box x={P3 + 234} y={172} w={82} h={36} title="agent" titleSize={15} tone="solid" />
+          <Path d={`M${P3 + 320} 184 L${P3 + 352} 164`} stroke={PRIMARY} head={`${u}-primary`} />
+          <Path d={`M${P3 + 320} 196 L${P3 + 352} 210`} stroke={PRIMARY} head={`${u}-primary`} />
+          <Box x={P3 + 356} y={144} w={82} h={32} title="Claude" titleSize={14} />
+          <T x={P3 + 397} y={187} size={11.5} mono weight={700} fill={MUTED}>
+            or
+          </T>
+          <Box x={P3 + 356} y={196} w={82} h={32} title="local LLM" titleSize={14} tone="primary" />
+          {logLine(P3, WIDE, 'Kim · with an agent', true)}
+          <T x={P3 + 14} y={280} anchor="start" size={15} weight={700} fill={PRIMARY}>
+            Rights, a record, and a name.
+          </T>
+          <T x={P3 + 14} y={298} anchor="start" size={13} fill={MUTED}>
+            We know who did it. And the agent only gets what Kim may do.
+          </T>
+        </g>
+
+        {/* why, and what follows */}
+        <T className="sm-in" style={delay(4)} x={550} y={352} size={24} weight={700}>
+          <tspan>Because: </tspan>
+          <tspan fill={PRIMARY}>control and provenance.</tspan>
+        </T>
+        <T className="sm-in" style={delay(4.4)} x={550} y={384} size={17} weight={600}>
+          So yes: Arkitekt has a chat interface. With a local LLM, nothing leaves the building.
+        </T>
+      </svg>
+    </Steps>
   );
 }
 
@@ -1817,10 +2357,10 @@ function ActionName({ name }: { name: string }) {
 /** Orkestrator's editor: the lab's actions are dragged out of the palette
     and wired by their types into one staining round of `process_slides`:
     arm to the OT-2, stain, image, stitch, segment, measure, with a loop back
-    while the uptake is below target (a three-second entrance that plays once
-    on arrival). One keypress for Run, and the hub assigns
-    each node to its own app: round 1 measures 41 %, so the loop sends the
-    slide round again; round 2 reaches 86 % and the result lands on the hub. */
+    while the uptake is below target. That wiring is the whole slide: a
+    three-second entrance that plays each time the slide comes up (the root
+    is `sm-steps sm-animate`, so its builds run and nobody stops them). The
+    workflow is not run here. One keypress: the red X. */
 export function WorkflowFigure() {
   const u = useUid();
   const nw = 216;
@@ -1903,9 +2443,9 @@ section.present .${u}-drag { animation: ${u}-drag 0.7s cubic-bezier(.5,0,.2,1) v
     { d: outD, warn: false, at: exitAt, m: 0.3 },
   ];
   return (
-    <div className="relative mx-auto h-[430px] w-[1180px]" style={STAGGERED} role="img" aria-label="Orkestrator's workflow editor: run_trajectory on the robot arm, run_protocol on the OT-2, acquire_image on the openUC2, stitch_images, segment_image with StarDist and calculate_stain_percentage are dragged out of the palette and wired by their types, with a loop back to the arm while the uptake is below target. On Run, the hub assigns each node to its own app: round 1 measures 41 percent and goes round again, round 2 reaches 86 percent and the result is stored on the hub.">
-      <Fragment as="span" index={1} className={`${u}-go absolute`} />
-      <Fragment as="span" index={2} className={`${u}-nope absolute`} />
+    <div className="sm-steps sm-animate relative mx-auto h-[430px] w-[1180px]" style={STAGGERED} role="img" aria-label="Orkestrator's workflow editor: run_trajectory on the robot arm, run_protocol on the OT-2, acquire_image on the openUC2, stitch_images, segment_image with StarDist and calculate_stain_percentage are dragged out of the palette and wired by their types, with a loop back to the arm while the uptake is below target. On Run, the hub assigns each node to its own app: round 1 measures 41 percent and goes round again, round 2 reaches 86 percent and the result is stored on the hub.">
+      {/* no run: the slide is about the wiring. Only the red X is a keypress. */}
+      <Fragment as="span" index={1} className={`${u}-nope absolute`} />
       <LoopStyles css={css} />
 
       {/* the editor window */}
@@ -2065,8 +2605,9 @@ section.present .${u}-drag { animation: ${u}-drag 0.7s cubic-bezier(.5,0,.2,1) v
         </svg>
       </div>
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <span className={`${u}-stamp rounded-2xl border-[6px] border-[#dc2626] bg-fd-card px-10 py-4 text-[64px] font-black uppercase leading-none tracking-[-0.01em] text-[#dc2626] shadow-2xl`}>
-          That is so 2023.
+        <span className={`${u}-stamp flex flex-col items-center gap-2 rounded-2xl border-[6px] border-[#dc2626] bg-fd-card px-10 py-4 text-[#dc2626] shadow-2xl`}>
+          <span className="text-[64px] font-black uppercase leading-none tracking-[-0.01em]">That is so 2023.</span>
+          <span className="text-[24px] font-semibold italic leading-tight">and honestly, it doesn’t simplify anything</span>
         </span>
       </div>
     </div>
@@ -2422,109 +2963,151 @@ export function BlokRemixFigure() {
 
 /* --- connect from anywhere, encrypted --------------------------------------------- */
 
-type Place = { place: string; name: string; sub: string; icon: LucideIcon; x: number; y: number; port: [number, number]; hubPort: [number, number]; tunnel: string };
+type NetApp = { name: string; sub: string; icon: LucideIcon };
 
-/** Where Kim's apps actually run: none of them reachable from outside, all of
-    them dialling out to the hub. The ESP32 speaks TLS, not WireGuard. */
-const PLACES: Place[] = [
-  { place: 'Lab network · behind NAT', name: 'openUC2 PC', sub: 'acquire · stage', icon: Microscope, x: 0, y: 0, port: [300, 62], hubPort: [480, 120], tunnel: 'WireGuard' },
-  { place: 'University HPC · firewalled', name: 'GPU node', sub: 'SLURM job · StarDist', icon: Server, x: 0, y: 232, port: [300, 294], hubPort: [480, 190], tunnel: 'WireGuard' },
-  { place: 'On the train', name: 'Kim’s laptop', sub: 'phone hotspot', icon: Laptop, x: 880, y: 0, port: [880, 62], hubPort: [700, 120], tunnel: 'WireGuard' },
-  { place: 'Partner institute', name: 'napari', sub: 'a collaborator’s PC', icon: Building2, x: 880, y: 232, port: [880, 294], hubPort: [700, 190], tunnel: 'WireGuard' },
+/** What runs inside the lab, next to the hub. */
+const LAB_APPS: (NetApp & { link: string })[] = [
+  { name: 'openUC2 PC', sub: 'acquire · stage', icon: Microscope, link: 'WireGuard' },
+  { name: 'ESP32', sub: 'LED controller · 520 kB', icon: Microchip, link: 'TLS' },
 ];
-const ESP = { x: 440, y: 316, w: 300, port: [590, 316] as [number, number], hubPort: [590, 236] as [number, number] };
+/** The networks outside it, each with one app that wants in. */
+const OUTSIDE: { title: string; note: string; app: NetApp }[] = [
+  { title: 'A cluster', note: 'university HPC', app: { name: 'GPU node', sub: 'SLURM job · StarDist', icon: Server } },
+  { title: 'Partner institute', note: 'another campus', app: { name: 'napari', sub: 'a collaborator’s PC', icon: Building2 } },
+  { title: 'Mobile', note: 'phone hotspot', app: { name: 'Kim’s laptop', sub: 'on the train', icon: Laptop } },
+];
 
-function PlaceCard({ place, name, sub, icon: Icon, at, w = 300 }: { place: string; name: string; sub: string; icon: LucideIcon; at: number; w?: number }) {
+function TunnelBadge({ x, y, label }: { x: number; y: number; label: string }) {
   return (
-    <div className="sm-pop flex flex-col gap-2 rounded-2xl border-2 border-dashed border-fd-border bg-fd-card/40 p-3" style={{ width: w, ...delay(at) }}>
-      <span className="text-[13px] text-fd-muted-foreground">{place}</span>
-      <div className="flex items-center gap-3 rounded-xl border-2 border-fd-border bg-fd-card px-3 py-2 shadow-sm">
-        <span className="flex size-[40px] shrink-0 items-center justify-center rounded-lg bg-fd-primary/12 text-fd-primary">
-          <Icon className="size-[22px]" strokeWidth={1.8} />
-        </span>
-        <span className="flex min-w-0 flex-col">
-          <span className="text-[18px] font-semibold leading-tight">{name}</span>
-          <span className="truncate font-mono text-[12px] text-fd-muted-foreground">{sub}</span>
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function TunnelBadge({ x, y, label, at }: { x: number; y: number; label: string; at: number }) {
-  return (
-    <span
-      className="sm-pop absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 whitespace-nowrap rounded-full border border-fd-primary/50 bg-fd-card px-2 py-0.5 font-mono text-[11.5px] font-semibold text-fd-primary shadow-sm"
-      style={{ left: x, top: y, ...delay(at) }}
-    >
+    <span className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 whitespace-nowrap rounded-full border border-fd-primary/50 bg-fd-card px-2 py-0.5 font-mono text-[11.5px] font-semibold text-fd-primary shadow-sm" style={{ left: x, top: y }}>
       <Lock className="size-[12px]" strokeWidth={2.6} /> {label}
     </span>
   );
 }
 
-/** Connection, the second blow: the same handshake works from anywhere. A
-    microscope PC behind the lab's NAT, a GPU node inside the HPC firewall, a
-    laptop on a hotspot, a collaborator's institute, and an ESP32 on the bench
-    all dial out to the hub through an encrypted tunnel. Nothing opens a port. */
+function NetCard({ app, x, y, w }: { app: NetApp; x: number; y: number; w: number }) {
+  return (
+    <div className="absolute flex h-[58px] items-center gap-3 rounded-xl border-2 border-fd-border bg-fd-card px-3 shadow-sm" style={{ left: x, top: y, width: w }}>
+      <span className="flex size-[38px] shrink-0 items-center justify-center rounded-lg bg-fd-primary/12 text-fd-primary">
+        <app.icon className="size-[21px]" strokeWidth={1.8} />
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="text-[17px] font-semibold leading-tight">{app.name}</span>
+        <span className="truncate font-mono text-[12px] text-fd-muted-foreground">{app.sub}</span>
+      </span>
+    </div>
+  );
+}
+
+/** "Connect from anywhere": the hub sits inside the lab, behind the lab's one
+    firewall, with the microscope PC and the ESP32 next to it. Three other
+    networks (a cluster, a partner institute, mobile) are drawn as boundaries
+    of their own, and each of their apps reaches the hub through that
+    firewall, in an encrypted tunnel, without a port being opened. Anything
+    else still bounces off the wall. Nothing moves. */
 export function AnywhereFigure() {
-  const hub = { x: 480, y: 84, w: 220, h: 152 };
-  const links = [
-    ...PLACES.map((p) => ({ d: sCurve(p.port[0], p.port[1], p.hubPort[0], p.hubPort[1]), back: sCurve(p.hubPort[0], p.hubPort[1], p.port[0], p.port[1]), mid: [(p.port[0] + p.hubPort[0]) / 2, (p.port[1] + p.hubPort[1]) / 2], label: p.tunnel })),
-    { d: `M${ESP.port[0]} ${ESP.port[1]} L${ESP.hubPort[0]} ${ESP.hubPort[1]}`, back: `M${ESP.hubPort[0]} ${ESP.hubPort[1]} L${ESP.port[0]} ${ESP.port[1]}`, mid: [ESP.port[0], (ESP.port[1] + ESP.hubPort[1]) / 2], label: 'TLS' },
-  ];
+  const u = useUid();
+  const W = 1180;
+  const lab = { x: 0, y: 6, w: 600, h: 412 };
+  const wall = { x: lab.x + lab.w, w: 18 };
+  const hub = { x: 352, y: 62, w: 216, h: 176 };
+  const card = { x: 18, w: 250, ys: [80, 164] };
+  const out = { x: 850, w: 330, h: 114, ys: [6, 152, 298] };
+  const hubIn = [hub.y + 62, hub.y + 118];
+  const hubOut = [hub.y + 48, hub.y + 88, hub.y + 128];
+  const local = LAB_APPS.map((a, i) => ({ d: sCurve(card.x + card.w, card.ys[i] + 29, hub.x, hubIn[i]), mid: [(card.x + card.w + hub.x) / 2, (card.ys[i] + 29 + hubIn[i]) / 2] as [number, number], label: a.link }));
+  const tunnels = OUTSIDE.map((_, i) => {
+    const from: [number, number] = [out.x + 12, out.ys[i] + 40 + 29];
+    const to: [number, number] = [hub.x + hub.w, hubOut[i]];
+    return { d: sCurve(from[0], from[1], to[0], to[1]), mid: [748, from[1] + (to[1] - from[1]) * 0.22] as [number, number] };
+  });
+  const blockedY = 398;
+  const face = wall.x + wall.w;
   return (
     <div
       className="relative mx-auto h-[430px] w-[1180px]"
       role="img"
-      aria-label="Five apps in five places dial out to the Arkitekt hub: the openUC2 PC behind the lab's NAT, a GPU node running a SLURM job inside the university HPC firewall, Kim's laptop on a phone hotspot on the train, napari at a partner institute, all over WireGuard, and an ESP32 on the bench over TLS. No open ports, no public IP."
+      aria-label="The Arkitekt hub sits inside the lab, behind the lab's firewall, next to the openUC2 PC and an ESP32. Three other networks are drawn outside it: a cluster with a GPU node, a partner institute with napari, and mobile, Kim's laptop on a phone hotspot. Each of them reaches the hub through the lab's firewall over a WireGuard tunnel, without an open port or a public IP; any other inbound connection is still blocked at the wall."
     >
-      <svg width={1180} height={430} viewBox="0 0 1180 430" className="absolute inset-0" aria-hidden>
-        {links.map((l, i) => (
-          <Path key={i} className="sm-draw" style={delay(1.1 + i * 0.12)} d={l.d} stroke={PRIMARY} width={3} opacity={0.45} />
+      <svg width={W} height={430} viewBox={`0 0 ${W} 430`} className="absolute inset-0" aria-hidden>
+        <defs>
+          <pattern id={`${u}-brick`} width={18} height={12} patternUnits="userSpaceOnUse">
+            <rect width={18} height={12} fill="#c2410c" />
+            <path d="M0 0 H18 M0 6 H18 M9 0 V6 M0 6 V12 M18 6 V12" stroke="#fed7aa" strokeWidth={1.4} />
+          </pattern>
+          <marker id={`${u}-in`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#dc2626" />
+          </marker>
+        </defs>
+        {/* the networks: the lab, and the three outside it */}
+        <rect x={lab.x + 1} y={lab.y} width={lab.w - 2} height={lab.h} rx={20} fill={PRIMARY} fillOpacity={0.05} stroke={BORDER} strokeWidth={2} strokeDasharray="8 6" />
+        {out.ys.map((y) => (
+          <rect key={y} x={out.x + 1} y={y + 1} width={out.w - 2} height={out.h - 2} rx={18} fill={PRIMARY} fillOpacity={0.03} stroke={BORDER} strokeWidth={2} strokeDasharray="8 6" />
         ))}
-        <g className="sm-fade" style={delay(1.9)}>
-          {links.map((l, i) => (
-            <g key={i}>
-              <Token path={l.d} dur={2.4} phase={i * 0.19}>
-                <circle r={5.5} fill={PRIMARY} />
-              </Token>
-              <Token path={l.back} dur={2.4} phase={0.5 + i * 0.19}>
-                <rect x={-5} y={-5} width={10} height={10} rx={2.5} fill={SURFACE} stroke={PRIMARY} strokeWidth={2} />
-              </Token>
-            </g>
-          ))}
-        </g>
+        {/* inside the lab */}
+        {local.map((l, i) => (
+          <path key={i} d={l.d} fill="none" stroke={PRIMARY} strokeOpacity={0.55} strokeWidth={2.6} />
+        ))}
+        {/* the tunnels from outside */}
+        {tunnels.map((t, i) => (
+          <path key={i} d={t.d} fill="none" stroke={PRIMARY} strokeWidth={3.4} />
+        ))}
+        {/* the lab's firewall: the tunnels go through it, nothing else does */}
+        <rect x={wall.x} y={lab.y - 6} width={wall.w} height={lab.h + 12} rx={4} fill={`url(#${u}-brick)`} stroke="#7c2d12" strokeWidth={1.6} />
+        {tunnels.map((t, i) => (
+          <path key={i} d={t.d} fill="none" stroke={PRIMARY} strokeWidth={3.4} clipPath={`inset(0 ${W - wall.x - wall.w}px 0 ${wall.x}px)`} style={{ clipPath: `inset(0 ${W - wall.x - wall.w}px 0 ${wall.x}px)` }} />
+        ))}
+        <path d={`M${face + 74} ${blockedY} L${face + 22} ${blockedY}`} stroke="#dc2626" strokeWidth={2.6} strokeDasharray="5 4" markerEnd={`url(#${u}-in)`} />
+        <circle cx={face + 10} cy={blockedY} r={8.5} fill={SURFACE} stroke="#dc2626" strokeWidth={2.2} />
+        <path d={`M${face + 6.6} ${blockedY - 3.4} l6.8 6.8 M${face + 13.4} ${blockedY - 3.4} l-6.8 6.8`} stroke="#dc2626" strokeWidth={2.2} strokeLinecap="round" />
       </svg>
 
-      <p className="sm-in absolute left-[310px] top-0 w-[560px] text-center text-[17px] leading-snug text-fd-muted-foreground" style={delay(2.3)}>
-        Every connection dials out. <span className="font-semibold text-fd-foreground">No open ports, no public IP.</span>
-      </p>
-
-      {PLACES.map((p, i) => (
-        <div key={p.name} className="absolute" style={{ left: p.x, top: p.y }}>
-          <PlaceCard {...p} at={0.3 + i * 0.12} />
-        </div>
+      {/* inside the lab */}
+      <span className="absolute text-[19px] font-bold leading-none" style={{ left: 20, top: lab.y + 16 }}>
+        Inside the lab
+      </span>
+      <span className="absolute flex items-center gap-1 font-mono text-[12px] font-semibold text-[#c2410c]" style={{ right: W - wall.x + 12, top: lab.y + 18 }}>
+        <BrickWall className="size-[14px]" strokeWidth={2.2} /> the lab’s firewall · NAT
+      </span>
+      {LAB_APPS.map((a, i) => (
+        <NetCard key={a.name} app={a} x={card.x} y={card.ys[i]} w={card.w} />
       ))}
-
-      {/* the ESP32 on the bench */}
-      <div className="absolute" style={{ left: ESP.x, top: ESP.y }}>
-        <PlaceCard place="On the bench · the lab Wi-Fi" name="ESP32" sub="LED controller · 520 kB" icon={Microchip} at={0.8} w={ESP.w} />
-      </div>
-
-      {/* the hub */}
       <div className="absolute" style={{ left: hub.x, top: hub.y, width: hub.w, height: hub.h }}>
-        <div className="sm-pop flex size-full flex-col items-center justify-center gap-2 rounded-[26px] bg-fd-primary text-fd-primary-foreground shadow-xl" style={delay(0.15)}>
+        <div className="flex size-full flex-col items-center justify-center gap-2 rounded-[26px] bg-fd-primary text-fd-primary-foreground shadow-xl">
           <span className="flex size-[54px] items-center justify-center rounded-2xl bg-white/95 shadow-sm">
             <Logo className="size-[44px]" />
           </span>
           <span className="text-[26px] font-bold leading-none tracking-[-0.02em]">Arkitekt</span>
-          <span className="font-mono text-[12px] opacity-85">your hub, wherever it runs</span>
+          <span className="font-mono text-[12px] opacity-85">the hub · no open port</span>
         </div>
       </div>
+      <p className="absolute text-[20px] font-semibold leading-snug" style={{ left: 22, top: 286, width: lab.w - 50 }}>
+        Everyone outside dials out, and meets the hub <span className="text-fd-primary">straight through the firewall.</span>
+        <span className="mt-1 block text-[16px] font-normal text-fd-muted-foreground">No open ports, no public IP, no VPN, no ticket with IT.</span>
+      </p>
 
-      {links.map((l, i) => (
-        <TunnelBadge key={i} x={l.mid[0]} y={l.mid[1]} label={l.label} at={1.5 + i * 0.12} />
+      {/* outside */}
+      {OUTSIDE.map((z, i) => (
+        <div key={z.title}>
+          <div className="absolute flex items-baseline justify-between" style={{ left: out.x + 14, top: out.ys[i] + 12, width: out.w - 28 }}>
+            <span className="text-[17px] font-bold leading-none">{z.title}</span>
+            <span className="font-mono text-[11.5px] text-fd-muted-foreground">{z.note}</span>
+          </div>
+          <NetCard app={z.app} x={out.x + 12} y={out.ys[i] + 40} w={out.w - 24} />
+        </div>
       ))}
+
+      {local.map((l, i) => (
+        <TunnelBadge key={i} x={l.mid[0]} y={l.mid[1]} label={l.label} />
+      ))}
+      {tunnels.map((t, i) => (
+        <TunnelBadge key={i} x={t.mid[0]} y={t.mid[1]} label="WireGuard" />
+      ))}
+      <span className="absolute text-[14px] leading-tight text-[#dc2626]" style={{ left: face + 82, top: blockedY - 17 }}>
+        <span className="font-semibold">anything else</span>
+        <br />
+        stays blocked
+      </span>
     </div>
   );
 }

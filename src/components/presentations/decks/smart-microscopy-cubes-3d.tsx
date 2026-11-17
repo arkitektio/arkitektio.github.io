@@ -18,6 +18,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { asset } from '@/lib/base-path';
+import { useKeySteps } from './smart-microscopy-anim';
 
 const MODEL = asset('/threed/optikit-fluorescence.glb');
 
@@ -172,7 +173,12 @@ function Scene({ className }: { className?: string }) {
   const [seen, setSeen] = useState(false);
   const timeRef = useRef(0);
   const xrayRef = useRef(false);
-  const [xray, setXray] = useState(false);
+  /* one press of "next" fades the housings */
+  const { step, marks } = useKeySteps(1);
+  const xray = step > 0;
+  useEffect(() => {
+    xrayRef.current = xray;
+  }, [xray]);
   useEffect(() => {
     const section = wrap.current?.closest('section');
     if (!section) {
@@ -187,8 +193,6 @@ function Scene({ className }: { className?: string }) {
         /* every arrival starts over: the cubes drop in, black */
         /* no drop-in: the microscope stands assembled */
         timeRef.current = SETTLED + 1;
-        xrayRef.current = false;
-        setXray(false);
         setSeen(true);
       }
     };
@@ -201,14 +205,10 @@ function Scene({ className }: { className?: string }) {
     <div
       ref={wrap}
       className={className}
-      style={{ cursor: 'pointer' }}
-      onClick={() => {
-        xrayRef.current = !xrayRef.current;
-        setXray(xrayRef.current);
-      }}
       role="img"
-      aria-label="A fluorescence microscope built from openUC2 cubes, in 3D, as exported by Optikit: a fiber holder, a laser, a mirror, a dichroic, an objective, a second mirror, the sample stage, a camera and the controller, as black cubes, turning slowly. A click fades the black housings to transparent, and the optics inside show: the mirrors, the dichroic and emission filters and the lenses."
+      aria-label="A fluorescence microscope built from openUC2 cubes, in 3D, as exported by Optikit: a fiber holder, a laser, a mirror, a dichroic, an objective, a second mirror, the sample stage, a camera and the controller, as black cubes, turning slowly. A key press fades the black housings to transparent, and the optics inside show: the mirrors, the dichroic and emission filters and the lenses."
     >
+      {marks}
       {seen ? (
         <Canvas dpr={[1, 2]} frameloop={active ? 'always' : 'never'} resize={{ offsetSize: true }} camera={{ position: [0.3, 0.25, 0.38], fov: 32, near: 0.01, far: 10 }} onCreated={({ camera }) => camera.lookAt(0, 0.085, 0)} gl={{ antialias: true, alpha: true }} style={{ background: 'transparent' }}>
           <ambientLight intensity={1.1} />
@@ -225,9 +225,11 @@ function Scene({ className }: { className?: string }) {
           </mesh>
         </Canvas>
       ) : null}
-      <span aria-hidden className="pointer-events-none absolute bottom-3 left-4 rounded-full border border-fd-border bg-fd-card/80 px-2.5 py-1 font-mono text-[11px] text-fd-muted-foreground">
-        {xray ? 'click · housings back on' : 'click · look inside'}
-      </span>
+      {xray ? null : (
+        <span aria-hidden className="pointer-events-none absolute bottom-3 left-4 rounded-full border border-fd-border bg-fd-card/80 px-2.5 py-1 font-mono text-[11px] text-fd-muted-foreground">
+          → · look inside
+        </span>
+      )}
     </div>
   );
 }

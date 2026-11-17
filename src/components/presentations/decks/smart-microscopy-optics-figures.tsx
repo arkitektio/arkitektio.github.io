@@ -8,11 +8,10 @@
    Built on `smart-microscopy-anim.tsx`. Example values (parts, pitches,
    lifetimes) are illustrative, not from a real bench. */
 
-import { useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { BORDER, FG, LoopStyles, MUTED, PRIMARY, Path, SURFACE, Steps, T, WARN, delay, useUid } from './smart-microscopy-anim';
+import { BORDER, FG, LoopStyles, MUTED, PRIMARY, Path, SURFACE, Steps, T, WARN, delay, useKeySteps, useUid } from './smart-microscopy-anim';
 
 /* --- openUC2: modularity is king -------------------------------------------- */
 
@@ -177,21 +176,21 @@ const BEADS: [number, number, number][] = [
 ];
 
 /** newswitch reads the Optikit design, so the instrument runs before it is
-    built. The `simulate:` switch is a real one: press "everything",
-    "unwired" or "nothing", and the parts flip between simulated and hardware
+    built. The `simulate:` switch moves on with the deck's "next" key, from
+    "everything" to "unwired" to "nothing", and the parts flip between simulated and hardware
     accordingly, while the same actions run against whatever is there. */
 export function SimulateFigure() {
   const u = useUid();
-  const [mode, setMode] = useState(0);
+  const { step: mode, marks } = useKeySteps(NS_MODES.length - 1);
   const css = `
 .${u}-x { transition: opacity 0.35s ease; }
-.${u}-mode { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .${u}-x { transition: none; } }
 `;
   const show = (on: boolean): CSSProperties => ({ opacity: on ? 1 : 0 });
   return (
-    <div className="relative mx-auto h-[400px] w-[1100px]" role="img" aria-label="newswitch reads the Optikit design. A switch, simulate, goes from everything, to unwired, to nothing: first every part is simulated and the frame shows beads drawn through the traced optics, then the wired stage and camera A are real, then the whole instrument is real. The same actions run in every mode. The three settings are buttons.">
+    <div className="relative mx-auto h-[400px] w-[1100px]" role="img" aria-label="newswitch reads the Optikit design. A switch, simulate, goes from everything, to unwired, to nothing: first every part is simulated and the frame shows beads drawn through the traced optics, then the wired stage and camera A are real, then the whole instrument is real. The same actions run in every mode.">
       <LoopStyles css={css} />
+      {marks}
 
       {/* from Optikit */}
       <div className="sm-in absolute left-0 top-[110px] flex w-[200px] flex-col gap-1.5 rounded-2xl border-2 border-dashed border-fd-border bg-fd-card/60 p-3.5" style={delay(0.1)}>
@@ -216,13 +215,13 @@ export function SimulateFigure() {
           <span className="text-fd-muted-foreground">simulate:</span>
           <span className="flex flex-1 rounded-lg border border-fd-border bg-fd-background/60 p-0.5">
             {NS_MODES.map((m, i) => (
-              <button key={m} type="button" aria-pressed={mode === i} onClick={() => setMode(i)} className={`${u}-mode relative flex-1 py-1 text-center`}>
+              <span key={m} className="relative flex-1 py-1 text-center">
                 <span className={`${u}-x absolute inset-0 rounded-md bg-fd-primary`} style={show(mode === i)} />
                 <span className="relative">
                   <span className={cn(`${u}-x`, 'absolute inset-0 font-semibold text-fd-primary-foreground')} style={show(mode === i)}>{m}</span>
                   <span className="text-fd-muted-foreground">{m}</span>
                 </span>
-              </button>
+              </span>
             ))}
           </span>
         </div>

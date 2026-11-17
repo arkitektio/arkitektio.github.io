@@ -18,6 +18,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Sparkles, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { asset } from '@/lib/base-path';
+import { useKeySteps } from './smart-microscopy-anim';
 
 const ARM = asset('/threed/fairino_robot.glb');
 const OT2 = asset('/threed/opentrons_parts.glb');
@@ -316,8 +317,17 @@ function Scene({ className }: { className?: string }) {
   const [seen, setSeen] = useState(false);
   const timeRef = useRef(0);
   const shownRef = useRef<number[]>(NOBODY());
-  /* how many of the cast are in; only for the cursor */
-  const [count, setCount] = useState(0);
+  /* how many of the cast are in: one per press of "next" */
+  const { step, marks } = useKeySteps(CAST.length);
+  const stepRef = useRef(step);
+  /** Bring the cast in line with the step: whoever is new arrives now. */
+  const cast = (n: number) => {
+    shownRef.current = shownRef.current.map((at, i) => (i >= n ? Infinity : Number.isFinite(at) ? at : timeRef.current));
+  };
+  useEffect(() => {
+    stepRef.current = step;
+    cast(step);
+  }, [step]);
   const tagsRef = useRef<(HTMLDivElement | null)[]>([]);
   useEffect(() => {
     const section = wrap.current?.closest('section');
@@ -333,7 +343,7 @@ function Scene({ className }: { className?: string }) {
         /* every arrival at the slide starts the dream over, empty */
         timeRef.current = 0;
         shownRef.current = NOBODY();
-        setCount(0);
+        cast(stepRef.current);
         setSeen(true);
       }
     };
@@ -346,16 +356,10 @@ function Scene({ className }: { className?: string }) {
     <div
       ref={wrap}
       className={className}
-      style={{ cursor: count < CAST.length ? 'pointer' : undefined }}
-      onClick={() => {
-        const next = shownRef.current.findIndex((at) => !Number.isFinite(at));
-        if (next < 0) return;
-        shownRef.current[next] = timeRef.current;
-        setCount(next + 1);
-      }}
       role="img"
-      aria-label="Kim's dream, in 3D and full of sparkles. Three devices appear, one per click, each with a burst of hearts: open source microscopy, perfect automated staining, a universal robot arm with a slide holder. Then the robot arm carries a slide to the Opentrons OT-2, whose pipette head moves over the deck, then on to the openUC2 FRAME microscope, whose stage scans under its light, and back home"
+      aria-label="Kim's dream, in 3D and full of sparkles. Three devices appear, one per key press, each with a burst of hearts: open source microscopy, perfect automated staining, a universal robot arm with a slide holder. Then the robot arm carries a slide to the Opentrons OT-2, whose pipette head moves over the deck, then on to the openUC2 FRAME microscope, whose stage scans under its light, and back home"
     >
+      {marks}
       {seen ? (
         /* offsetSize: the deck is scaled with a CSS transform, which the default measuring would count twice */
         <Canvas dpr={[1, 2]} frameloop={active ? 'always' : 'never'} resize={{ offsetSize: true }} camera={{ position: eye(VIEW.azimuth), fov: 34, near: 0.05, far: 20 }} gl={{ antialias: true, alpha: true }} style={{ background: 'transparent' }}>
