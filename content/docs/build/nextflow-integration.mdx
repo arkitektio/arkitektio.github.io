@@ -14,20 +14,29 @@ happy to discuss which one would be the best. We are also open to other options 
 
 This is the simplest way of doing it, and would just replace the Workflow Scheduling part of Arkitekt Apps with Nextflow. This would mean that
 Arkitekt Apps could still run on their specific resources but would be called through Rekuest by Nextflow. This could be done by creating a
-Nextflow process that would just call `arkitekt call remote $NODE_NAME` and then wait for this call to finish. This would be the simplest way
-of integrating Arkitekt Apps with Nextflow.
+Nextflow process that would just call `arkitekt call remote <action-hash> -a key=value` and then wait for this call to finish. This would be the simplest way
+of integrating Arkitekt Apps with Nextflow. Outside the app's own folder the CLI cannot look an action up by name, so the process
+passes its hash (`arkitekt inspect implementations` lists it).
 
 ```groovy
+params.image_id = "1234"
+params.action_hash = "<hash of maximum_intensity>"
 
-process maximum_intensity {
+process MAXIMUM_INTENSITY {
     input:
-    val image_id from params.image_id
+    val image_id
+
     output:
-    val output_image_id from stdout()
+    stdout
+
     script:
     """
-    arkitekt call remote maximum_intensity $image_name
+    arkitekt call remote ${params.action_hash} -a image=${image_id}
     """
+}
+
+workflow {
+    Channel.of(params.image_id) | MAXIMUM_INTENSITY | view
 }
 ```
 
@@ -50,20 +59,22 @@ of failure
 
 As Arkitekt Apps are just Docker container, they shold be easily runnable inside of Nextflow. What would change is
 that instead of starting the Arkitekt App with `arkitekt run`, causing them to connect to a Rekuest server, we would start them with
-`arkitekt call local $NODE_NAME` which would cause them to run in local mode, and not connect to a Rekuest server, but still using the same
-data infrastructure of the Arkitekt Ecosystem (connecting to Mikro or other data sources).
+`arkitekt call local <action> --online` which would cause them to run in local mode, and not connect to a Rekuest server, but still using the same
+data infrastructure of the Arkitekt Ecosystem (`--online` connects the app's services, such as Mikro).
 
 ```groovy
+process MAXIMUM_INTENSITY {
+    container 'arkitekt/maximum_intensity'   // the image of the Arkitekt App
 
-process maximum_intensity {
-    cotainer 'arkitekt/maximum_intensity' # This would be the name of the Arkitekt App
     input:
-    val image_id from params.image_id
+    val image_id
+
     output:
-    val output_image_id from stdout()
+    stdout
+
     script:
     """
-    arkitekt call local maximum_intensity $image_name
+    arkitekt call local maximum_intensity -a image=${image_id} --online
     """
 }
 ```

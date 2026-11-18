@@ -1,6 +1,6 @@
 ---
 title: "Example: a training plugin"
-description: Outdated. All the code for the Train CARE and Predict CARE actions used in the deep learning training tutorial.
+description: "The Train CARE Model and Predict CARE actions behind the Paper-era deep learning tutorial, ported to the current arkitekt and mikro packages."
 type: guide
 ---
 
@@ -11,167 +11,137 @@ This page shows the code behind the [Train a Deep Learning Model](/docs/use/adva
 If you are a developer and you want to know how to integrate your own deep learning app into Arkitekt, you can read our Developer Tutorial on how to do this [here](/docs/build/python).
 But also please just find here **ALL** the code for the `Train CARE` and `Predict CARE` actions, which are just a few lines of code, and should be easy to understand.
 
-This code was written for the Paper version of Arkitekt (`from arkitekt import register`,
-`mikro.api.schema` fragments). It shows the shape of a training action, but it will not run
-against the current `arkitekt` package. For the current way to declare actions, services and
-structures, see [Core concepts](/docs/build/python#core-concepts) and
+The tutorial was recorded with the Paper version of Arkitekt, where these actions used
+`from arkitekt import register` and `mikro.api.schema` fragments (`RepresentationFragment`,
+`ContextFragment`, `ModelFragment`). The code below is the same pair of actions ported to the current
+`arkitekt` and `mikro` packages, so the names you see in the tutorial's videos differ from the ones
+here:
+
+| Paper | Now |
+|---|---|
+| `@register()` | `app = App(...)` and `@app.action` |
+| `RepresentationFragment` | `SingleChannelVolume`, a lens from `mikro.arkitekt.specs` |
+| Training pairs found through a context and a `gt` link | two lists, `noisy` and `ground_truth`, in the same order |
+| `ModelFragment` and `create_model(...)` | the zipped model stored as a mikro `File` with `mikro.from_file_like(...)` |
+| `from_xarray(..., origins=[...])` | `mikro.create_array_dataset(...)` with a `derived_from` edge |
+| `from arkitekt.tqdm import tqdm` | `task.progress(...)` on an injected `Task` |
+
+For what each of these does, see [Core concepts](/docs/build/python#core-concepts) and
 [Types & data](/docs/build/python/types).
 
 ```python
-from arkitekt import register
-from mikro.api.schema import (
-    from_xarray,
-    ModelFragment,
-    create_model,
-    ModelKind,
-    RepresentationFragment,
-    links,
-    LinkableModels,
-    ContextFragment,
-)
-import numpy as np
-from csbdeep.io import load_training_data
-from csbdeep.models import Config, CARE
-import numpy as np
-import uuid
+"""CARE denoising: train a model on noisy/clean pairs, then apply it."""
+
 import shutil
-from csbdeep.data import RawData, create_patches
+import tempfile
+from pathlib import Path
+from typing import Annotated
+
 import numpy as np
-
+import xarray as xr
+from csbdeep.data import RawData, create_patches
 from csbdeep.io import load_training_data
-from csbdeep.models import Config, CARE
-from arkitekt.tqdm import tqdm
+from csbdeep.models import CARE, Config
+
+from arkitekt import App, Description, Task, run
+from mikro import Mikro, mikro_service
+from mikro.api.schema import File
+from mikro.arkitekt.specs import SingleChannelVolume
+
+app = App("care", "0.1.0", services=[mikro_service])
 
 
-@register()
+def as_zyx(volume: SingleChannelVolume) -> xr.DataArray:
+    """The stack behind the lens as a plain ZYX array (drops the size-1 channel and time axes)."""
+    return volume.data.squeeze().transpose("z", "y", "x")
+
+
+@app.action
 def train_care_model(
-    context: ContextFragment,
-    epochs: int = 100,
-    patches_per_image: int = 1024,
-    trainsteps_per_epoch: int = 400,
-    validation_split: float = 0.1,
-) -> ModelFragment:
-    """Train Care Model
+    noisy: Annotated[list[SingleChannelVolume], Description("The noisy stacks")],
+    ground_truth: Annotated[
+        list[SingleChannelVolume], Description("The clean stacks, in the same order")
+    ],
+    epochs: Annotated[int, Description("Number of epochs")] = 100,
+    patches_per_image: Annotated[int, Description("Patches cut from each stack")] = 1024,
+    trainsteps_per_epoch: Annotated[int, Description("Training steps per epoch")] = 400,
+    validation_split: Annotated[float, Description("Share of patches kept for validation")] = 0.1,
+    *,
+    mikro: Mikro,
+    task: Task,
+) -> File:
+    """Train CARE Model
 
-    Trains a care model according on a specific context.
-
-    Args:
-        context (ContextFragment): The context
-        epochs (int, optional): Number of epochs. Defaults to 10.
-        patches_per_image (int, optional): Number of patches per image. Defaults to 1024.
-        trainsteps_per_epoch (int, optional): Number of trainsteps per epoch. Defaults to 10.
-        validation_split (float, optional): Validation split. Defaults to 0.1.
-
-
-    Returns:
-        ModelFragment: The Model
+    Trains a CARE denoising model for {{epochs}} epochs on pairs of noisy and clean stacks,
+    and stores the trained model as a file.
     """
+    if len(noisy) != len(ground_truth):
+        raise ValueError("Pass exactly one clean stack for every noisy stack")
 
-    training_data_id = f"context_data{context.id}"
+    task.progress(5, f"Loading {len(noisy)} pairs")
+    X = [np.asarray(as_zyx(v)) for v in noisy]
+    Y = [np.asarray(as_zyx(v)) for v in ground_truth]
 
-    x = links(
-        LinkableModels.GRUNNLAG_REPRESENTATION, # only works with images
-        LinkableModels.GRUNNLAG_REPRESENTATION, # that are related to each other
-        "gt", # trhough the `gt` relationship
-        context=context, # inside the given context
-    ) # HERE WE ARE GETTING THE DATA FROM THE CONTEXT,
+    with tempfile.TemporaryDirectory() as workdir:
+        work = Path(workdir)
 
-    # we are getting computing data from boths sides of the relationship
-    X = [t.left.data.sel(t=0, c=0).compute() for t in x]
-    Y = [t.right.data.sel(t=0, c=0).compute() for t in x]
+        # Everything from here to the upload is plain CSBDeep, see the CARE paper.
+        create_patches(
+            raw_data=RawData.from_arrays(X, Y, axes="ZYX"),
+            patch_size=(16, 64, 64),
+            n_patches_per_image=patches_per_image,
+            save_file=str(work / "patches.npz"),
+        )
+        (X_train, Y_train), (X_val, Y_val), axes = load_training_data(
+            str(work / "patches.npz"), validation_split=validation_split
+        )
+        config = Config(axes, train_steps_per_epoch=trainsteps_per_epoch)
+        model = CARE(config, "care", basedir=str(work / "models"))
 
+        # One epoch at a time, so the progress bar in Orkestrator moves with the training.
+        for epoch in range(epochs):
+            task.progress(10 + int(85 * epoch / epochs), f"Epoch {epoch + 1}/{epochs}")
+            model.train(X_train, Y_train, validation_data=(X_val, Y_val), epochs=1)
 
-    # This is all CARE specific, and you can read more about it in the CARE paper
-    raw_data = RawData.from_arrays(X, Y, axes="ZYX")
-    print(raw_data)
-
-    X, Y, XY_axes = create_patches(
-        raw_data=raw_data,
-        patch_size=(16, 64, 64),
-        n_patches_per_image=patches_per_image,
-        save_file=f"data/{training_data_id}.npz",
-    )
-
-    (X, Y), (X_val, Y_val), axes = load_training_data(
-        f"data/{training_data_id}.npz",
-        validation_split=validation_split,
-        verbose=True,
-    )
-    config = Config(axes, train_steps_per_epoch=trainsteps_per_epoch)
-
-    model = CARE(config, training_data_id, basedir=".trainedmodels")
+        task.progress(95, "Uploading model")
+        archive = shutil.make_archive(str(work / "care-model"), "zip", work / "models" / "care")
+        return mikro.from_file_like(file=archive, file_name="care-model.zip")
 
 
-    # Here we are training the model, we are utilizing a patch tqdm progress bar, that will just update
-    # the progress bar every time we train on a new patch on the Arkitekt Interface
-    for i in tqdm(range(epochs)):
-        model.train(X, Y, validation_data=(X_val, Y_val), epochs=1)
+@app.action
+def predict_care(
+    volume: Annotated[SingleChannelVolume, Description("The stack to denoise")],
+    model: Annotated[File, Description("A model made by Train CARE Model")],
+    *,
+    mikro: Mikro,
+    task: Task,
+) -> SingleChannelVolume:
+    """Predict CARE
 
-    shutil.make_archive(
-        "active_model", "zip", f".trainedmodels/{training_data_id}"
-    )
-
-    # Here we are creating a model from the trained model, and we are saving it as an Akritekt Model
-    model = create_model(
-        "active_model.zip",
-        kind=ModelKind.TENSORFLOW,
-        name=f"Care Model of {context.name}",
-        contexts=[context],
-    )
-
-
-
-    shutil.rmtree(f"data")
-    return model
-
-
-@register()
-def predict(
-    representation: RepresentationFragment, model: ModelFragment
-) -> RepresentationFragment:
-    """Predict Care
-
-    Use a care model and some images to generate images
-
-    Args:
-        model (ImageToImageModelFragment): The model
-        representations (List[RepresentationFragment]): The images
-
-    Returns:
-        List[RepresentationFragment]: The predicted images
+    Denoises a stack with a trained CARE model and stores the result on the same grid.
     """
+    source = as_zyx(volume)
 
-    random_dir = str(uuid.uuid4())
-    generated = []
+    with tempfile.TemporaryDirectory() as workdir, model.as_path() as archive:
+        task.progress(10, "Unpacking model")
+        shutil.unpack_archive(archive, Path(workdir) / "care", format="zip")
+        care = CARE(config=None, name="care", basedir=workdir)
 
-    # We are downloading the model into a temporary directory
-    with model.data as f:
-        # We are unpacking the model into a temporary directory
+        task.progress(30, "Predicting")
+        restored = care.predict(np.asarray(source), "ZYX")
 
-        shutil.unpack_archive(f, f".modelcache/{random_dir}")
-
-        image_data = representation.data.sel(c=0, t=0).data.compute()
-        # We are loading the model from the temporary directory
-        care_model = CARE(config=None, name=random_dir, basedir=".modelcache")
-        # We are predicting the image
-        restored = care_model.predict(
-            image_data, "ZXY"
-        )
-
-        # We are creating a new representation from the predicted image
-        generated = from_xarray(
-            restored,
-            name=f"Care denoised of {representation.name}",
-            tags=["denoised"],
-            origins=[representation],
-        )
-
-        shutil.rmtree(f".modelcache/{random_dir}")
+    task.progress(80, "Uploading")
+    result = mikro.create_array_dataset(
+        data=xr.DataArray(restored, dims=source.dims),
+        scales=[],
+        name="CARE denoised",
+        axes=volume.carried_axes(source.dims),
+        # Same grid as the input, values transformed.
+        derived_from=[volume.derive_identity(value_relation="TRANSFORMED")],
+    )
+    return result.lens()
 
 
-    return generated
-
-
-
-
+if __name__ == "__main__":
+    run(app)
 ```

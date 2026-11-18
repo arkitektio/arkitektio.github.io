@@ -189,7 +189,7 @@ export function AsyncApiCard() {
         {/* progress() */}
         <div className="mt-5 flex items-center justify-between font-mono text-[11px] text-white/55">
           <span>
-            <span className="text-fd-primary">progress</span>({pct})
+            task.<span className="text-fd-primary">progress</span>({pct})
           </span>
           <span className="text-white/45">{pct}%</span>
         </div>
@@ -203,7 +203,7 @@ export function AsyncApiCard() {
         {/* yielded images */}
         <div className="mt-5 flex items-center justify-between font-mono text-[11px] text-white/55">
           <span>
-            <span className="text-fd-primary">yield</span> from_array_like
+            <span className="text-fd-primary">yield</span> segment(plane)
           </span>
           <span className="text-white/45">{tiles.length} images</span>
         </div>
