@@ -142,7 +142,6 @@ export function MikroCoordinateSystemDeck() {
         eyebrow="The question"
         title="You point at it and ask"
         lead="An axon initial segment, on screen, in front of you. The only thing you want is a number."
-        notes="Stay on the biology. Do not mention a single schema type yet."
       >
         <div className="flex flex-1 items-center">
           <Figure>

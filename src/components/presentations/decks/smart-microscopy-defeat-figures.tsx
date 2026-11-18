@@ -14,13 +14,13 @@
 import { useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Fragment } from '@revealjs/react';
-import { Check, Compass, Database, Download, Filter, GitBranch, Heart, Image as ImageIcon, KeyRound, Lock, Microscope, Package, Plus, RotateCcw, ScrollText, Server, Share2, Smartphone, Table2, Workflow, X } from 'lucide-react';
+import { Check, Compass, Database, Download, Eye, Filter, GitBranch, Heart, Image as ImageIcon, KeyRound, Layers, LayoutGrid, Lock, Microscope, Package, Plus, RotateCcw, ScrollText, Server, Share2, Smartphone, Table2, Workflow, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Logo } from '@/components/site/logo';
 import { ArmMoving3D, FrameModel3D } from './smart-microscopy-frame-3d';
 import { cn } from '@/lib/cn';
 import { Arrowheads, LoopStyles, PRIMARY, Path, Steps, delay, useUid } from './smart-microscopy-anim';
-import { DistributedFixDiagram, HORSEMEN, HorsemanArt, HorsemanBanner, ReviewerFace, horsemanAmbientCss } from './smart-microscopy-figures';
+import { DistributedFixDiagram, HORSEMEN, HorsemanArt, HorsemanBanner, KimFigure, ReviewerFace, horsemanAmbientCss } from './smart-microscopy-figures';
 import type { HorsemanKey, NIGHTS } from './smart-microscopy-figures';
 
 type NightKey = keyof typeof NIGHTS;
@@ -72,7 +72,7 @@ const ANSWERS: Partial<Record<HorsemanKey, string>> = {
 };
 const ANSWER = 'Well, we thought about that.';
 /** To the fifth horseman, AI Hype, Arkitekt disagrees, and says why, in two points. */
-const AI_REPLY = { open: 'Oh my god. I don’t agree, because:', points: ['AI shouldn’t just go rogue.', 'I don’t think people like chat that much.'] };
+const AI_REPLY = 'Siiigh…';
 
 /** A horseman's own slide, before the explanation: he strides in from off
     the slide wearing Reviewer 2's face and rears, then his banner and his
@@ -83,7 +83,7 @@ export function HorsemanDuelFigure({ night }: { night: HorsemanKey }) {
   const u = useUid();
   const h = HORSEMEN[night];
   /* The fifth rider arrives in disguise. Reviewer 2, still on the fourth
-     horse, has nothing left: "Okay. All good." Arkitekt thanks him. On the
+     horse, gives up for now: he has a million more questions, but will save them for the discussion. Arkitekt thanks him. On the
      next keypress he rides off and another reviewer steps in, Reviewer III,
      on a perfectly normal horse. Arkitekt: "Yeees?" And on the keypress
      after that the normal horse glitches, changes colour, flashes and comes
@@ -151,7 +151,7 @@ section.present .${u}-stride .${u}-rear { animation: ${u}-rear 1.1s ease-in-out 
     <div
       className="relative mx-auto h-[600px] w-[1180px]"
       role="img"
-      aria-label={mutates ? `Reviewer 2 is still on the fourth horse and says: okay, all good. Arkitekt answers: all good points, I appreciate the questions. Reviewer 2 rides off, and another reviewer steps in, Reviewer III, on a perfectly normal horse. Arkitekt: yes? Then the normal horse mutates into a new rider. ${h.ordinal}, ${h.name}, says: ${TAUNTS[night]} Arkitekt answers: ${AI_REPLY.open} a) ${AI_REPLY.points[0]} b) ${AI_REPLY.points[1]}` : `${h.ordinal}, ${h.name}, wearing Reviewer 2's face, says: ${TAUNTS[night]} Arkitekt answers: ${ANSWERS[night] ?? ANSWER}`}
+      aria-label={mutates ? `Reviewer 2 is still on the fourth horse and says: okay, I have a million more questions, but I will save them for the discussion. Arkitekt answers: all good points, I appreciate the questions. Reviewer 2 rides off, and another reviewer steps in, Reviewer III, on a perfectly normal horse. Arkitekt: yes? Then the normal horse mutates into a new rider. ${h.ordinal}, ${h.name}, says: ${TAUNTS[night]} Arkitekt answers: ${AI_REPLY}` : `${h.ordinal}, ${h.name}, wearing Reviewer 2's face, says: ${TAUNTS[night]} Arkitekt answers: ${ANSWERS[night] ?? ANSWER}`}
     >
       <LoopStyles css={css} />
       {mutates ? <Fragment as="span" index={2} className={`${u}-swap absolute`} /> : null}
@@ -165,15 +165,15 @@ section.present .${u}-stride .${u}-rear { animation: ${u}-rear 1.1s ease-in-out 
       <div className="absolute left-[90px] top-[160px] w-[470px]">
         <div className={cn('relative rounded-2xl border-2 border-black/70 bg-white px-5 py-3 font-semibold italic leading-snug text-zinc-900 shadow-lg', TAUNTS[night].length > 120 ? 'text-[19px]' : 'text-[21px]', late)} style={{ '--d': `${t.claim}s` } as CSSProperties}>
           <span className="sr-only">Reviewer 2: </span>“{TAUNTS[night]}”
-          <span className="absolute -right-[9px] bottom-[16px] size-[16px] rotate-45 border-r-2 border-t-2 border-black/70 bg-white" />
+          {/* what the first horseman is pointing at, inside his bubble: Kim's tangle, and "the fix" */}
+          {night === 'communication' ? (
+            <div className={`${u}-after sm-animate mt-3 flex justify-center not-italic`} style={{ '--d': `${t.claim + 0.3}s` } as CSSProperties}>
+              <DistributedFixDiagram width={316} />
+            </div>
+          ) : null}
+          <span className={cn('absolute -right-[9px] size-[16px] rotate-45 border-r-2 border-t-2 border-black/70 bg-white', night === 'communication' ? 'top-[92px]' : 'bottom-[16px]')} />
         </div>
       </div>
-      {/* what the first horseman is pointing at: Kim's tangle, and "the fix" */}
-      {night === 'communication' ? (
-        <div className={`${u}-after sm-animate absolute left-[166px] top-[308px]`} style={{ '--d': `${t.claim + 0.3}s` } as CSSProperties}>
-          <DistributedFixDiagram width={316} />
-        </div>
-      ) : null}
       {/* the horseman, as Reviewer 2 */}
       <div className="absolute left-[560px] top-[170px]">
         <div className="relative">
@@ -212,9 +212,9 @@ section.present .${u}-stride .${u}-rear { animation: ${u}-rear 1.1s ease-in-out 
       </div>
       {/* on arrival: Reviewer 2 has run out of arguments */}
       {mutates ? (
-        <div className={`${u}-pre1 sm-animate absolute left-[290px] top-[200px] w-[270px]`}>
-          <div className="relative rounded-2xl border-2 border-black/70 bg-white px-5 py-3 text-[26px] font-semibold italic leading-snug text-zinc-900 shadow-lg">
-            <span className="sr-only">Reviewer 2: </span>“Okay. All good.”
+        <div className={`${u}-pre1 sm-animate absolute left-[110px] top-[180px] w-[450px]`}>
+          <div className="relative rounded-2xl border-2 border-black/70 bg-white px-5 py-3 text-[23px] font-semibold italic leading-snug text-zinc-900 shadow-lg">
+            <span className="sr-only">Reviewer 2: </span>“Okay. I have a million more questions, but I will save them for the discussion…”
             <span className="absolute -right-[9px] bottom-[16px] size-[16px] rotate-45 border-r-2 border-t-2 border-black/70 bg-white" />
           </div>
         </div>
@@ -238,20 +238,12 @@ section.present .${u}-stride .${u}-rear { animation: ${u}-rear 1.1s ease-in-out 
           </span>
         </Fragment>
       ) : null}
-      {/* …and to AI Hype, it disagrees: two reasons, one keypress each */}
+      {/* …and to AI Hype, it only sighs */}
       {mutates ? (
         <Fragment as="div" index={5} className="absolute bottom-[-8px] left-[70px] flex items-center gap-4">
           <GooglyLogo size={104} />
-          <span className="relative flex w-[440px] flex-col gap-1.5 rounded-2xl bg-fd-primary px-6 py-3.5 text-fd-primary-foreground shadow-lg">
-            <span className="text-[26px] font-bold leading-tight tracking-[-0.02em]">
-              <span className="sr-only">Arkitekt: </span>“{AI_REPLY.open}
-            </span>
-            <span className="flex gap-2.5 text-[21px] font-semibold leading-snug">
-              <span className="font-mono font-bold opacity-80">a)</span> {AI_REPLY.points[0]}
-            </span>
-            <Fragment as="span" index={6} className="flex gap-2.5 text-[21px] font-semibold leading-snug">
-              <span className="font-mono font-bold opacity-80">b)</span> {AI_REPLY.points[1]}”
-            </Fragment>
+          <span className="relative rounded-2xl bg-fd-primary px-7 py-4 text-[34px] font-bold italic leading-tight tracking-[-0.01em] text-fd-primary-foreground shadow-lg">
+            <span className="sr-only">Arkitekt: </span>“{AI_REPLY}”
             <span className="absolute -left-[8px] top-1/2 size-[16px] -translate-y-1/2 rotate-45 bg-fd-primary" />
           </span>
         </Fragment>
@@ -271,164 +263,430 @@ export function DefeatFrame({ children }: { children: ReactNode }) {
 
 /* --- 1 · connection: no IPs, just coordination ------------------------------------- */
 
-/** No IP addresses: the address Kim used to paste is struck out. The app
-    asks a coordination server, briefly, where its hub is; the hub registered
-    there too. Then the coordination server steps aside and the app talks to
-    the Arkitekt server directly, over WireGuard. Four beats, one per click
-    (`cues`): the address and the three parties; the address struck out; the
-    question and its answer; the direct connection. */
-export function CoordinationWinFigure() {
-  const u = useUid();
-  const W = 810;
-  const coord = { x: 300, y: 122, w: 210, h: 84 };
-  const app = { x: 10, y: 300, w: 200, h: 92 };
-  const hub = { x: 590, y: 292, w: 215, h: 108 };
-  const appCoord = `M${app.x + 140} ${app.y} L${coord.x + 30} ${coord.y + coord.h}`;
-  const hubCoord = `M${hub.x + 70} ${hub.y} L${coord.x + coord.w - 30} ${coord.y + coord.h}`;
-  const directY = app.y + app.h / 2;
-  const direct = `M${app.x + app.w} ${directY} L${hub.x} ${directY}`;
-  const midX = (app.x + app.w + hub.x) / 2;
-  // the timeline, in seconds on the figure's clock; it stops at each cue
-  const at = { ip: 0.1, nodes: 0.2, strike: 1.4, brief: 2.8, ask: 3.7, reply: 4.7, direct: 6.1 };
-  const cues = [1.2, 2.6, 5.9, 8.2];
-  /* the coordination step stays up until the direct line comes (85 % of it) */
-  const brief = ((at.direct - at.brief) / 0.85).toFixed(2);
-  const css = `
-.${u}-run { position: absolute; left: 0; top: 0; }
-.${u}-dot { display: block; width: 11px; height: 11px; border-radius: 9999px; background: var(--color-fd-primary); box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-fd-primary) 25%, transparent); }
-section.present .${u}-run { animation: ${u}-along var(--t) linear var(--d) infinite both; }
-section.present .${u}-run.${u}-rev { animation-direction: reverse; }
-@keyframes ${u}-along { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+/* A real app, as it is written today: declared with App(...), one action on
+   it. Shown on the coordination slide and again on the publishing slide. */
+const OTSU_K = 'text-[#c4b5fd]'; // keyword
+const OTSU_F = 'text-[#7dd3fc]'; // the function
+const OTSU_S = 'text-[#86efac]'; // string
+const OTSU_D = 'text-[#fbbf24]'; // decorator
+const OTSU_LINES: [string, string?][][] = [
+  [['from', OTSU_K], [' skimage.filters '], ['import', OTSU_K], [' threshold_otsu']],
+  [['from', OTSU_K], [' arkitekt '], ['import', OTSU_K], [' App, run']],
+  [['from', OTSU_K], [' mikro '], ['import', OTSU_K], [' Mikro, mikro_service']],
+  [['from', OTSU_K], [' mikro.arkitekt.specs '], ['import', OTSU_K], [' LabelMask, SingleChannelImage, ensure']],
+  [],
+  [['app = App('], ['"otsu"', OTSU_S], [', '], ['"0.1.0"', OTSU_S], [', services=[mikro_service])']],
+  [],
+  [['@app.action', OTSU_D]],
+  [['def', OTSU_K], [' '], ['otsu_threshold', OTSU_F], ['(image: SingleChannelImage, *, mikro: Mikro) -> LabelMask:']],
+  [['    '], ['"""Otsu Threshold"""', OTSU_S]],
+  [['    mask = image.data > threshold_otsu(image.data.values)']],
+  [['    result = mikro.create_array_dataset(']],
+  [['        data=mask, scales=[], name='], ['"otsu mask"', OTSU_S], [',']],
+  [['        axes=image.carried_axes(mask.dims),']],
+  [['        derived_from=[image.derive_identity(value_relation='], ['"TRANSFORMED"', OTSU_S], [')],']],
+  [['    )']],
+  [['    '], ['return', OTSU_K], [' ensure(result.lens(), LabelMask)']],
+  [],
+  [['run(app)']],
+];
 
-/* the coordination step: there, then gone. Off the current slide, the end state. */
-.${u}-brief { opacity: 0.12; }
-.${u}-brief-say { opacity: 0; }
-.${u}-step { opacity: 0.5; }
-section.present .${u}-brief { animation: ${u}-brief ${brief}s linear ${at.brief}s both; }
-section.present .${u}-brief-say { animation: ${u}-brief-say ${brief}s linear ${at.brief}s both; }
-section.present .${u}-step { animation: ${u}-step 0.8s ease-out ${at.direct}s both; }
-@keyframes ${u}-brief { 0% { opacity: 0; } 6% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0.12; } }
-@keyframes ${u}-brief-say { 0%, 85% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes ${u}-step { from { opacity: 1; } to { opacity: 0.5; } }
-
-/* one question up, one answer back */
-.${u}-msg { position: absolute; left: 0; top: 0; opacity: 0; offset-path: path('${appCoord}'); }
-section.present .${u}-ask { animation: ${u}-ask 0.8s ease-in-out ${at.ask}s both; }
-section.present .${u}-reply { animation: ${u}-reply 0.8s ease-in-out ${at.reply}s both; }
-@keyframes ${u}-ask { 0% { offset-distance: 0%; opacity: 0; } 15%, 85% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
-@keyframes ${u}-reply { 0% { offset-distance: 100%; opacity: 0; } 15%, 85% { opacity: 1; } 100% { offset-distance: 0%; opacity: 0; } }
-
-@media (prefers-reduced-motion: reduce) {
-  section.present :is(.${u}-brief, .${u}-brief-say, .${u}-step, .${u}-run) { animation: none; }
-  .${u}-msg { display: none; }
-}
-`;
+/** The app's source in a code window, with what it never mentions ticked off
+    in the footer. Must sit inside a `.sm-steps` container. */
+function OtsuAppWindow({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
   return (
-    <div
-      className="relative size-full"
-      role="img"
-      aria-label="No IP addresses: the address 192.168.0.42:8000 is crossed out. The app asks a coordination server where its Arkitekt server is and gets back a route and keys; the coordination server then steps aside and the app connects to the Arkitekt server directly, over WireGuard."
-    >
-      <LoopStyles css={css} />
-      <Steps cues={cues} className="relative size-full">
-
-      {/* the IP address nobody types any more */}
-      <div className="absolute left-1/2 top-[4px] -translate-x-1/2">
-        <div className="sm-in relative flex items-center gap-4 rounded-2xl border-2 border-fd-border bg-fd-card px-5 py-3 shadow-sm" style={delay(at.ip)}>
-          <span className="flex flex-col">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-fd-muted-foreground">IP address</span>
-            <span className="relative font-mono text-[26px] font-semibold leading-tight text-fd-muted-foreground">
-              192.168.0.42:8000
-              <svg className="pointer-events-none absolute inset-x-[-6px] top-1/2 h-[14px] w-[calc(100%+12px)] -translate-y-1/2 overflow-visible" viewBox="0 0 100 14" preserveAspectRatio="none" aria-hidden>
-                <path className="sm-grow" style={delay(at.strike)} d="M0 7 L100 7" fill="none" stroke="#dc2626" strokeWidth={4} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-              </svg>
+    <div className="sm-pop absolute flex flex-col overflow-hidden rounded-2xl border-2 border-fd-primary/60 bg-[#0f172a] shadow-md" style={{ left: x, top: y, width: w, height: h, ...delay(0.1) }}>
+      <div className="flex h-[32px] shrink-0 items-center gap-1.5 border-b border-white/10 px-3">
+        {['#f87171', '#fbbf24', '#34d399'].map((c) => (
+          <span key={c} className="size-[9px] rounded-full" style={{ background: c }} />
+        ))}
+        <span className="ml-2 font-mono text-[13px] font-semibold text-slate-200">your app · otsu.py</span>
+      </div>
+      <pre className="flex-1 px-4 py-3 font-mono text-[11px] leading-[1.7] text-slate-200">
+        {OTSU_LINES.map((line, i) => (
+          <span key={i} className="block min-h-[1.7em] whitespace-pre">
+            {line.map(([text, cls], j) => (
+              <span key={j} className={cls}>
+                {text}
+              </span>
+            ))}
+          </span>
+        ))}
+      </pre>
+      <div className="flex h-[46px] shrink-0 items-center gap-4 border-t border-white/10 px-4">
+        {['No IP addresses', 'No storage addresses', 'No file paths'].map((t, i) => (
+          <span key={t} className="sm-in flex items-center gap-2 whitespace-nowrap text-[14.5px] font-semibold text-slate-100" style={delay(0.7 + i * 0.2)}>
+            <span className="flex size-[20px] items-center justify-center rounded-full bg-emerald-500 text-white">
+              <Check className="size-[13px]" strokeWidth={3.4} />
             </span>
+            {t}
           </span>
-          <span className="sm-pop flex size-[34px] items-center justify-center rounded-full border-[3px] border-red-600 bg-fd-card" style={delay(at.strike + 0.5)}>
-            <X className="size-[20px] text-red-600" strokeWidth={3.4} />
-          </span>
-        </div>
+        ))}
       </div>
-
-      {/* the brief coordination step */}
-      <svg width={W} height={440} viewBox={`0 0 ${W} 440`} className={`${u}-brief absolute inset-0`} aria-hidden>
-        <path className="sm-draw" style={delay(at.brief)} pathLength={1} strokeDasharray="1" d={hubCoord} fill="none" stroke={PRIMARY} strokeWidth={2.4} />
-        <path className="sm-draw" style={delay(at.brief + 0.4)} pathLength={1} strokeDasharray="1" d={appCoord} fill="none" stroke={PRIMARY} strokeWidth={2.4} />
-      </svg>
-      <svg width={W} height={440} viewBox={`0 0 ${W} 440`} className="absolute inset-0" aria-hidden>
-        {/* then directly */}
-        <path className="sm-draw" style={delay(at.direct)} pathLength={1} strokeDasharray="1" d={direct} fill="none" stroke={PRIMARY} strokeOpacity={0.2} strokeWidth={18} strokeLinecap="round" />
-        <path className="sm-draw" style={delay(at.direct + 0.2)} pathLength={1} strokeDasharray="1" d={direct} fill="none" stroke={PRIMARY} strokeWidth={3.2} />
-      </svg>
-
-      {/* what the coordination server is asked, and answers */}
-      <div className={`${u}-brief-say absolute inset-0`}>
-        <span className="sm-pop absolute whitespace-nowrap rounded-full border border-fd-border bg-fd-card px-2.5 py-1 font-mono text-[13px] shadow-sm" style={{ right: W - 228, top: 214, ...delay(at.ask - 0.1) }}>
-          where is my hub?
-        </span>
-        <span className="sm-pop absolute flex items-center gap-1.5 whitespace-nowrap rounded-full border border-fd-primary/50 bg-fd-card px-2.5 py-1 font-mono text-[13px] text-fd-primary shadow-sm" style={{ left: 256, top: 252, ...delay(at.reply - 0.1) }}>
-          <KeyRound className="size-[13px]" strokeWidth={2.4} /> route + keys
-        </span>
-      </div>
-      <span className={`${u}-msg ${u}-ask`}>
-        <span className={`${u}-dot`} />
-      </span>
-      <span className={`${u}-msg ${u}-reply`}>
-        <span className={`${u}-dot`} />
-      </span>
-
-      {/* traffic, both ways, straight to the hub */}
-      {[0, 1].map((i) => (
-        <span key={i} className="sm-fade absolute left-0 top-0" style={delay(at.direct + 0.9)}>
-          <span className={cn(`${u}-run`, i === 1 && `${u}-rev`)} style={{ offsetPath: `path('${direct}')`, '--t': `${1.5 + i * 0.3}s`, '--d': `${at.direct + 0.9 + i * 0.6}s` } as CSSProperties}>
-            <span className={`${u}-dot`} />
-          </span>
-        </span>
-      ))}
-      <span className="sm-pop absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-fd-primary/50 bg-fd-card px-2.5 py-0.5 text-[13px] font-semibold shadow-sm" style={{ left: midX, top: directY - 34, ...delay(at.direct + 0.8) }}>
-        <Lock className="size-[12px] text-fd-primary" strokeWidth={2.6} /> direct · WireGuard
-      </span>
-      {/* the point of the slide */}
-      <p className="absolute -translate-x-1/2 whitespace-nowrap text-center text-[23px] font-semibold tracking-[-0.01em]" style={{ left: W / 2, top: directY + 64 }}>
-        Apps never write an IP address. <span className="text-fd-primary">The framework handles that completely.</span>
-      </p>
-
-      {/* the coordination server */}
-      <div className="absolute" style={{ left: coord.x, top: coord.y, width: coord.w, height: coord.h }}>
-        <div className={`${u}-step size-full`}>
-          <div className="sm-pop flex size-full flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-dashed border-fd-primary/60 bg-fd-card shadow-sm" style={delay(at.nodes + 0.15)}>
-            <Compass className="size-[22px] text-fd-primary" strokeWidth={1.8} />
-            <span className="text-[17px] font-semibold leading-tight">coordination server</span>
-            <span className="text-[12px] text-fd-muted-foreground">knows who is where</span>
-          </div>
-        </div>
-      </div>
-
-      {/* the app */}
-      <div className="absolute" style={{ left: app.x, top: app.y, width: app.w, height: app.h }}>
-        <div className="sm-pop flex size-full flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-fd-border bg-fd-card shadow-sm" style={delay(at.nodes)}>
-          <Microscope className="size-[24px] text-fd-primary" strokeWidth={1.8} />
-          <span className="text-[17px] font-semibold leading-tight">your app</span>
-          <span className="text-[12px] text-fd-muted-foreground">anywhere, any network</span>
-        </div>
-      </div>
-
-      {/* the Arkitekt server */}
-      <div className="absolute" style={{ left: hub.x, top: hub.y, width: hub.w, height: hub.h }}>
-        <div className="sm-pop flex size-full flex-col items-center justify-center gap-1 rounded-2xl bg-fd-primary text-fd-primary-foreground shadow-xl" style={delay(at.nodes + 0.3)}>
-          <span className="flex items-center gap-2.5">
-            <span className="flex size-[44px] items-center justify-center rounded-xl bg-white/95">
-              <Logo className="size-[36px]" />
-            </span>
-            <span className="text-[20px] font-bold leading-tight">Arkitekt server</span>
-          </span>
-          <span className="whitespace-nowrap font-mono text-[12px] opacity-90">no IPs · no open ports</span>
-        </div>
-      </div>
-      </Steps>
     </div>
   );
 }
+
+/** No addresses in the code. On the left a small, real app with one action,
+    `otsu_threshold`, and what it never mentions: no IP addresses, no storage
+    addresses, no file paths. On the right, how it finds its hub anyway. A
+    dashed midline splits the public internet (above: the coordination server)
+    from the local network (below: the Arkitekt hub, and Kim). One key press
+    per beat (reveal fragments): the app connects to the coordination server;
+    a browser window pops up for Kim, far right, asking where that app should
+    go; she says yes, the app gets its route and keys, and the coordination
+    server greys out; the app then finds the hub on the local network and
+    talks to it directly. */
+export function CoordinationWinFigure() {
+  const u = useUid();
+  const W = 1230;
+  const H = 450;
+  const code = { x: 0, y: 0, w: 540, h: 450 }; // the whole left panel
+  const coord = { x: 596, y: 6, w: 220, h: 92 };
+  const hub = { x: 596, y: 338, w: 220, h: 96 };
+  const win = { x: 856, y: 0, w: 250, h: 196 }; // Kim's browser, next to her
+  const widget = { x: win.x + 50, y: 300, w: 170 }; // the app's controls, on the local side
+  const kim = 112; // Kim, all the way to the right, where the public/local line ends: she uses both sides
+  const yDirect = hub.y + hub.h / 2;
+  const ySplit = 225; // the midline: public internet above, local network below
+  const toCoord = `M${code.x + code.w} 60 L${coord.x} 52`;
+  const toUser = `M${coord.x + coord.w} 52 L${win.x} 52`;
+  const direct = `M${code.x + code.w} ${yDirect} L${hub.x} ${yDirect}`;
+  const on = (n: number, sel: string) => `.${u}-s${n}.visible ~ ${sel}, .${u}-s${n}.visible ~ * ${sel}`;
+  const css = `
+:is(.${u}-ask, .${u}-user, .${u}-pick, .${u}-tok, .${u}-direct, .${u}-lock, .${u}-widget, .${u}-wline) { opacity: 0; }
+:is(.${u}-lineA, .${u}-lineC, .${u}-glow) { stroke-dasharray: 1; stroke-dashoffset: 1; }
+/* press 1: the app connects to the coordination server, out on the internet */
+${on(1, `.${u}-lineA`)} { animation: ${u}-draw 0.6s ease-in-out 0s both; }
+${on(1, `.${u}-ask`)} { animation: ${u}-pop 0.4s ease-out 0.4s both; }
+/* press 2: a browser window pops up for Kim */
+${on(2, `.${u}-lineC`)} { animation: ${u}-draw 0.4s ease-in-out 0s both; }
+${on(2, `.${u}-user`)} { animation: ${u}-pop 0.45s ease-out 0.3s both; }
+/* press 3: she says yes; the app gets its route and keys, and the server is done */
+${on(3, `.${u}-pick`)} { animation: ${u}-fadein 0.25s ease-out 0s both; }
+${on(3, `.${u}-ask`)} { animation: ${u}-fadeout 0.3s ease-out 0.3s both; }
+${on(3, `.${u}-tok`)} { animation: ${u}-along 0.9s ease-in-out 0.6s both; }
+${on(3, `.${u}-aside`)} { animation: ${u}-aside 0.6s ease-out 1.6s both; }
+/* press 4: the app finds the hub on the local network, and they talk directly */
+${on(4, `.${u}-glow`)} { animation: ${u}-draw 0.7s ease-in-out 0s both; }
+${on(4, `.${u}-direct`)} { animation: ${u}-fadein 0.4s ease-out 0.5s both; }
+${on(4, `.${u}-lock`)} { animation: ${u}-pop 0.4s ease-out 0.6s both; }
+${on(4, `.${u}-widget`)} { animation: ${u}-pop 0.45s ease-out 1.3s both; }
+${on(4, `.${u}-wline`)} { animation: ${u}-fadein 0.4s ease-out 1.7s both; }
+@keyframes ${u}-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes ${u}-pop { 0% { opacity: 0; transform: scale(0.85); } 70% { opacity: 1; transform: scale(1.03); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes ${u}-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ${u}-fadeout { from { opacity: 1; } to { opacity: 0; } }
+@keyframes ${u}-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes ${u}-along { 0% { offset-distance: 0%; opacity: 0; } 15%, 85% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+@keyframes ${u}-aside { from { opacity: 1; } to { opacity: 0.35; } }
+.${u}-tok { position: absolute; left: 0; top: 0; offset-rotate: 0deg; }
+/* the direct connection stays open: its dashes never stop */
+.${u}-flow { animation: ${u}-flow 0.9s linear infinite; }
+@keyframes ${u}-flow { to { stroke-dashoffset: -28; } }
+@media (prefers-reduced-motion: reduce) { .${u}-flow { animation: none; } }
+`;
+  const bubble = 'rounded-2xl border border-fd-border bg-fd-card px-4 py-2.5 text-[16px] font-medium leading-snug shadow-sm';
+  const pill = 'flex h-[30px] items-center gap-1.5 whitespace-nowrap rounded-full bg-fd-primary px-3 font-mono text-[12.5px] font-bold text-fd-primary-foreground shadow-md';
+  return (
+    <div
+      className="relative mx-auto h-[450px] w-[1230px]"
+      role="img"
+      aria-label="On the left a small, real app, declared with App and with one action on it, otsu_threshold, with no IP addresses, no storage addresses and no file paths in it. On the right, how it connects: the app asks the coordination server where to go; a dashed midline separates the public internet above from the local network below. The coordination server, on the public internet, opens a browser window for Kim, on the right, asking where she wants to connect that app, and she picks her lab; the app gets a route and keys, and the coordination server greys out; the app then finds the Arkitekt hub on the local network and talks to it directly."
+    >
+      <div className="sm-steps sm-animate absolute inset-0" style={{ '--sm-stagger': 1 } as CSSProperties}>
+        {[1, 2, 3, 4].map((n) => (
+          <Fragment key={n} as="span" index={n} className={`${u}-s${n} absolute`} />
+        ))}
+        <LoopStyles css={css} />
+
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="pointer-events-none absolute inset-0" aria-hidden>
+          {/* the public internet above, the local network below */}
+          <line x1={code.x + code.w + 14} y1={ySplit} x2={W - kim - 10} y2={ySplit} stroke="var(--color-fd-muted-foreground)" strokeOpacity={0.55} strokeWidth={1.6} strokeDasharray="5 6" />
+          <text x={W - kim - 10} y={ySplit - 9} textAnchor="end" fontFamily="var(--font-mono, monospace)" fontSize={13} fill="var(--color-fd-muted-foreground)">
+            <tspan fill="#ef4444" fontWeight={800} fontSize={14}>
+              NO DATA EVER
+            </tspan>
+            {'  ·  public internet'}
+          </text>
+          <text x={W - kim - 10} y={ySplit + 20} textAnchor="end" fontFamily="var(--font-mono, monospace)" fontSize={13} fill="var(--color-fd-muted-foreground)">
+            <tspan fill="#10b981" fontWeight={800} fontSize={14}>
+              ALL YOUR DATA
+            </tspan>
+            {'  ·  local network'}
+          </text>
+          {/* the coordination step: there, then out of the way */}
+          <g className={`${u}-aside`}>
+            <path className={`${u}-lineA`} pathLength={1} d={toCoord} fill="none" stroke={PRIMARY} strokeWidth={2.4} />
+            <path className={`${u}-lineC`} pathLength={1} d={toUser} fill="none" stroke={PRIMARY} strokeWidth={2.4} />
+          </g>
+          {/* then directly */}
+          <path className={`${u}-glow`} pathLength={1} d={direct} fill="none" stroke={PRIMARY} strokeOpacity={0.22} strokeWidth={18} strokeLinecap="round" />
+          <g className={`${u}-direct`}>
+            <path className={`${u}-flow`} d={direct} fill="none" stroke={PRIMARY} strokeWidth={3} strokeDasharray="8 6" />
+          </g>
+          {/* and the widget that controls the app talks to the hub, too */}
+          <g className={`${u}-wline`}>
+            <path className={`${u}-flow`} d={`M${hub.x + hub.w} ${yDirect} L${widget.x} ${yDirect}`} fill="none" stroke={PRIMARY} strokeWidth={3} strokeDasharray="8 6" />
+            <circle cx={hub.x + hub.w} cy={yDirect} r={5} fill="var(--color-fd-card)" stroke={PRIMARY} strokeWidth={2} />
+            <circle cx={widget.x} cy={yDirect} r={5} fill="var(--color-fd-card)" stroke={PRIMARY} strokeWidth={2} />
+          </g>
+        </svg>
+
+        {/* the app: a primitive piece of image code, and what it never mentions */}
+        <OtsuAppWindow x={code.x} y={code.y} w={code.w} h={code.h} />
+
+        {/* the coordination server, top right */}
+        <div className="absolute" style={{ left: coord.x, top: coord.y, width: coord.w, height: coord.h }}>
+          <div className={`${u}-aside size-full`}>
+            <div className="sm-pop flex size-full items-center gap-3.5 rounded-2xl border-2 border-dashed border-fd-primary/60 bg-fd-card px-5 shadow-sm" style={delay(0.25)}>
+              <span className="flex size-[44px] shrink-0 items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
+                <Compass className="size-[25px]" strokeWidth={1.8} />
+              </span>
+              <span className="text-[18px] font-semibold leading-tight">Coordination server</span>
+            </div>
+          </div>
+        </div>
+
+        {/* the Arkitekt hub, bottom right */}
+        <div className="absolute" style={{ left: hub.x, top: hub.y, width: hub.w, height: hub.h }}>
+          <div className="sm-pop flex size-full items-center gap-3.5 rounded-[26px] bg-fd-primary px-5 text-fd-primary-foreground shadow-xl" style={delay(0.4)}>
+            <span className="flex size-[48px] shrink-0 items-center justify-center rounded-xl bg-white/95 shadow-sm">
+              <Logo className="size-[40px]" />
+            </span>
+            <span className="flex flex-col">
+              <span className="text-[24px] font-bold leading-none tracking-[-0.02em]">Arkitekt</span>
+              <span className="mt-1.5 font-mono text-[13px] opacity-85">Kim’s lab</span>
+            </span>
+          </div>
+        </div>
+
+        {/* press 1: the app asks */}
+        <div className={`${u}-ask absolute`} style={{ left: code.x + code.w + 14, top: 108, width: 150 }}>
+          <span className={cn(bubble, 'block rounded-tl-sm px-3 py-2 text-[15px]')}>
+            <span className="sr-only">The app: </span>I’m new here. Where do I connect?
+          </span>
+        </div>
+
+        {/* the user, on the right; press 2: a browser window pops up for her; press 3: she says yes */}
+        <div className="sm-in absolute" style={{ left: W - kim, top: ySplit - kim / 2, ...delay(0.5) }}>
+          <KimFigure size={kim} mood="happy" />
+        </div>
+        {/* press 4, once the hub is found: a small widget to control the app, on the local side */}
+        <div className={`${u}-widget absolute flex flex-col gap-2 overflow-hidden rounded-2xl border-2 border-fd-primary/60 bg-fd-card p-3 shadow-xl`} style={{ left: widget.x, top: widget.y, width: widget.w }}>
+          <span className="flex items-center gap-1.5 text-[13px] font-semibold">
+            <span className="size-[8px] rounded-full bg-emerald-500" /> otsu
+            <span className="ml-auto font-mono text-[10.5px] font-normal text-fd-muted-foreground">connected</span>
+          </span>
+          <span className="font-mono text-[12.5px] font-semibold">otsu_threshold</span>
+          <span className="flex h-[30px] items-center justify-between rounded-lg border border-fd-border bg-fd-background/60 px-2 font-mono text-[12px]">
+            image #0116 <span className="text-[10px] text-fd-muted-foreground">▼</span>
+          </span>
+          <span className="flex h-[32px] items-center justify-center rounded-lg bg-fd-primary text-[14px] font-semibold text-fd-primary-foreground">Run ▶</span>
+        </div>
+        <div className={`${u}-aside absolute`} style={{ left: win.x, top: win.y, width: win.w, height: win.h }}>
+        <div className={`${u}-user size-full overflow-hidden rounded-2xl border-2 border-fd-primary/60 bg-fd-card shadow-xl`}>
+          <div className="flex h-[30px] items-center gap-1.5 border-b border-fd-border bg-fd-muted px-3">
+            {['#f87171', '#fbbf24', '#34d399'].map((c) => (
+              <span key={c} className="size-[9px] rounded-full" style={{ background: c }} />
+            ))}
+            <span className="ml-2 flex items-center gap-1.5 text-[13px] font-semibold">
+              <Logo className="size-[15px]" /> Connect an app
+            </span>
+          </div>
+          <div className="flex flex-col gap-2.5 p-3.5">
+            <span className="text-[17px] font-semibold leading-snug">
+              <span className="sr-only">Coordination server: </span>Where do you want to connect that app?
+            </span>
+            <span className="relative flex h-[36px] items-center rounded-lg border border-fd-border bg-fd-background/60 px-3 text-[15px] font-semibold">
+              Kim’s lab
+              <span className={`${u}-pick pointer-events-none absolute inset-[-2px] flex items-center justify-end rounded-lg border-2 border-emerald-500 bg-emerald-500/15 pr-2.5`}>
+                <span className="flex size-[20px] items-center justify-center rounded-full bg-emerald-500 text-white">
+                  <Check className="size-[13px]" strokeWidth={3.4} />
+                </span>
+              </span>
+            </span>
+            <span className="flex h-[36px] items-center rounded-lg border border-fd-border bg-fd-background/60 px-3 text-[15px] text-fd-muted-foreground">The core facility</span>
+          </div>
+        </div>
+        </div>
+
+        {/* press 3: the app gets its route and keys; press 4: it finds the hub locally */}
+        <span className={`${u}-tok`} style={{ offsetPath: `path('M${coord.x + 40} 52 L${code.x + code.w - 70} 60')` }}>
+          <span className={pill}>
+            <KeyRound className="size-[13px]" strokeWidth={2.6} /> route + keys
+          </span>
+        </span>
+        <span className={`${u}-lock absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-fd-primary/50 bg-fd-card px-3 py-1 text-[14px] font-semibold shadow-sm`} style={{ left: hub.x + hub.w / 2, top: hub.y - 20 }}>
+          <Lock className="size-[13px] text-fd-primary" strokeWidth={2.6} /> found locally
+        </span>
+      </div>
+    </div>
+  );
+}
+
+
+/** Publishing an app. The same app as on the coordination slide stands on the
+    left, still with no address in it. To its right the steps run straight
+    down, one key press per beat (reveal fragments): bundle with Docker, as a
+    plugin; publish to GitHub, which gives a link; a user installs it from
+    that link on their hub; and the hub deploys it on a plugin engine, which
+    is just another app and can run anywhere. */
+export function PublishFlowFigure() {
+  const u = useUid();
+  const W = 1230;
+  const H = 450;
+  const code = { x: 0, y: 0, w: 540, h: 450 };
+  const col = { x: 592, w: 318 }; // the steps, straight down
+  const bundle = { y: 0, h: 96 };
+  const publish = { y: 134, h: 96 };
+  const link = { y: 268, h: 44 };
+  const hub = { y: 354, h: 96 };
+  const engine = { x: 966, y: 0, w: 264, h: 450 }; // the whole right panel
+  const mid = col.x + col.w / 2;
+  const on = (n: number, sel: string) => `.${u}-s${n}.visible ~ ${sel}, .${u}-s${n}.visible ~ * ${sel}`;
+  const css = `
+:is(.${u}-c1, .${u}-c2, .${u}-c3, .${u}-c4, .${u}-c5, .${u}-done, .${u}-run) { opacity: 0; }
+:is(.${u}-a1, .${u}-a2, .${u}-a3, .${u}-a4, .${u}-a5) { stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; }
+/* press 1: bundle */
+${on(1, `.${u}-a1`)} { animation: ${u}-draw 0.3s ease-in-out 0s both; }
+${on(1, `.${u}-c1`)} { animation: ${u}-pop 0.45s ease-out 0.2s both; }
+/* press 2: publish, and the link that gives */
+${on(2, `.${u}-a2`)} { animation: ${u}-draw 0.3s ease-in-out 0s both; }
+${on(2, `.${u}-c2`)} { animation: ${u}-pop 0.45s ease-out 0.2s both; }
+${on(2, `.${u}-a3`)} { animation: ${u}-draw 0.3s ease-in-out 0.9s both; }
+${on(2, `.${u}-c3`)} { animation: ${u}-pop 0.45s ease-out 1.1s both; }
+/* press 3: a user installs it on their hub */
+${on(3, `.${u}-a4`)} { animation: ${u}-draw 0.3s ease-in-out 0s both; }
+${on(3, `.${u}-c4`)} { animation: ${u}-pop 0.45s ease-out 0.2s both; }
+${on(3, `.${u}-btn`)} { animation: ${u}-press 0.4s ease-out 1s both; }
+${on(3, `.${u}-done`)} { animation: ${u}-fadein 0.4s ease-out 1.3s both; }
+/* press 4: the hub deploys it on a plugin engine */
+${on(4, `.${u}-a5`)} { animation: ${u}-draw 0.3s ease-in-out 0s both; }
+${on(4, `.${u}-c5`)} { animation: ${u}-pop 0.45s ease-out 0.2s both; }
+${on(4, `.${u}-run`)} { animation: ${u}-pop 0.4s ease-out 1s both; }
+/* hidden until drawn: an arrowhead shows even on an undrawn path */
+@keyframes ${u}-draw { from { stroke-dashoffset: 1; opacity: 1; } to { stroke-dashoffset: 0; opacity: 1; } }
+@keyframes ${u}-pop { 0% { opacity: 0; transform: scale(0.85); } 70% { opacity: 1; transform: scale(1.03); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes ${u}-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ${u}-press { 0%, 100% { transform: none; } 45% { transform: scale(0.9); } }
+`;
+  const brand = (d: string, label: string, size = 38) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" role="img" aria-label={label} className="shrink-0" fill="currentColor">
+      <path d={d} />
+    </svg>
+  );
+  const arrow = (cls: string, d: string) => <path className={cls} pathLength={1} d={d} fill="none" stroke={PRIMARY} strokeWidth={2.6} markerEnd={`url(#${u}-head)`} />;
+  const down = (cls: string, from: number, to: number) => arrow(cls, `M${mid} ${from} L${mid} ${to - 8}`);
+  const step = (cls: string, at: { y: number; h: number }, icon: ReactNode, title: string, cmd: string) => (
+    <div className={`${cls} absolute flex items-center gap-4 rounded-2xl border-2 border-fd-primary/60 bg-fd-card px-4 shadow-md`} style={{ left: col.x, top: at.y, width: col.w, height: at.h }}>
+      {icon}
+      <span className="flex min-w-0 flex-col gap-1.5">
+        <span className="text-[17px] font-semibold leading-tight">{title}</span>
+        <span className="self-start whitespace-nowrap rounded-md bg-[#0f172a] px-2 py-0.5 font-mono text-[12.5px] text-slate-100">
+          <span className="text-emerald-400">$</span> {cmd}
+        </span>
+      </span>
+    </div>
+  );
+  return (
+    <div
+      className="relative mx-auto h-[450px] w-[1230px]"
+      role="img"
+      aria-label="The same app as before, otsu.py, with no IP addresses, no storage addresses and no file paths in it. It is bundled with Docker as a plugin, with arkitekt plugin build; published to GitHub, with arkitekt plugin publish, which gives a link; a user installs it from that link on their own hub; and the hub deploys it on a plugin engine, which is just another app, can run anywhere, and already runs several other plugins next to it."
+    >
+      <div className="sm-steps sm-animate absolute inset-0" style={{ '--sm-stagger': 1 } as CSSProperties}>
+        {[1, 2, 3, 4].map((n) => (
+          <Fragment key={n} as="span" index={n} className={`${u}-s${n} absolute`} />
+        ))}
+        <LoopStyles css={css} />
+        <OtsuAppWindow x={code.x} y={code.y} w={code.w} h={code.h} />
+
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className="pointer-events-none absolute inset-0" aria-hidden>
+          <defs>
+            <marker id={`${u}-head`} viewBox="0 0 10 10" refX={8} refY={5} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill={PRIMARY} />
+            </marker>
+          </defs>
+          {arrow(`${u}-a1`, `M${code.x + code.w} ${bundle.y + bundle.h / 2} L${col.x - 8} ${bundle.y + bundle.h / 2}`)}
+          {down(`${u}-a2`, bundle.y + bundle.h, publish.y)}
+          {down(`${u}-a3`, publish.y + publish.h, link.y)}
+          {down(`${u}-a4`, link.y + link.h, hub.y)}
+          {arrow(`${u}-a5`, `M${col.x + col.w} ${hub.y + hub.h / 2} L${engine.x - 8} ${hub.y + hub.h / 2}`)}
+        </svg>
+
+        {step(`${u}-c1`, bundle, brand(DOCKER_MARK, 'Docker'), 'Bundle with Docker, as a plugin', 'arkitekt plugin build')}
+        {step(`${u}-c2`, publish, brand(GITHUB_MARK, 'GitHub'), 'Publish to GitHub', 'arkitekt plugin publish')}
+
+        {/* that gives a link */}
+        <div className={`${u}-c3 absolute flex items-center justify-center gap-2.5 rounded-full border-2 border-fd-primary bg-fd-card px-4 shadow-md`} style={{ left: col.x + 14, top: link.y, width: col.w - 28, height: link.h }}>
+          <Share2 className="size-[17px] shrink-0 text-fd-primary" strokeWidth={2.2} />
+          <span className="whitespace-nowrap font-mono text-[14px] font-semibold">github.com/kim-lab/otsu</span>
+        </div>
+
+        {/* a user installs it, on their own hub */}
+        <div className={`${u}-c4 absolute flex items-center gap-3.5 rounded-[26px] bg-fd-primary px-4 text-fd-primary-foreground shadow-xl`} style={{ left: col.x, top: hub.y, width: col.w, height: hub.h }}>
+          <span className="flex size-[46px] shrink-0 items-center justify-center rounded-xl bg-white/95 shadow-sm">
+            <Logo className="size-[38px]" />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+            <span className="whitespace-nowrap text-[17px] font-semibold leading-tight">A user installs it on their hub</span>
+            <span className="flex items-center gap-2">
+              <span className="whitespace-nowrap rounded-md bg-fd-card px-2 py-1 font-mono text-[12.5px] text-fd-foreground">otsu</span>
+              <span className={`${u}-btn flex h-[26px] items-center gap-1 rounded-md bg-fd-card px-2.5 text-[13px] font-semibold text-fd-foreground`}>
+                <Download className="size-[13px]" strokeWidth={2.6} /> Install
+              </span>
+              <Check className={`${u}-done size-[16px]`} strokeWidth={3.2} />
+            </span>
+          </span>
+        </div>
+
+        {/* and the hub deploys it on a plugin engine: just another app, anywhere */}
+        <div className={`${u}-c5 absolute flex flex-col gap-2.5 rounded-2xl border-2 border-fd-primary/60 bg-fd-card p-3.5 shadow-md`} style={{ left: engine.x, top: engine.y, width: engine.w, height: engine.h }}>
+          <span className="flex items-center gap-3">
+            <span className="flex size-[40px] shrink-0 items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
+              <Package className="size-[23px]" strokeWidth={1.8} />
+            </span>
+            <span className="flex flex-col leading-tight">
+              <span className="text-[18px] font-semibold">Plugin engine</span>
+              <span className="text-[12.5px] text-fd-muted-foreground">just an app · runs anywhere</span>
+            </span>
+          </span>
+          <span className="flex flex-wrap gap-1.5">
+            {['a GPU server', 'a cluster', 'a laptop'].map((m) => (
+              <span key={m} className="rounded-full border border-fd-border px-2 py-0.5 text-[11.5px] text-fd-muted-foreground">
+                {m}
+              </span>
+            ))}
+          </span>
+          {/* what it already runs, and the new one */}
+          <span className="mt-1 flex flex-1 flex-col gap-2">
+            {['stardist', 'cellpose', 'stitcher', 'analyzer'].map((name) => (
+              <span key={name} className="flex h-[38px] items-center gap-2.5 rounded-lg bg-[#0f172a] px-3 font-mono text-[13px] text-slate-100">
+                <span className="text-[#38bdf8]">{brand(DOCKER_MARK, 'Docker', 18)}</span> {name}
+                <span className="ml-auto flex items-center gap-1.5 text-[12px] text-emerald-400">
+                  <span className="size-[7px] rounded-full bg-emerald-400" /> running
+                </span>
+              </span>
+            ))}
+            <span className={`${u}-run mt-auto flex h-[42px] items-center gap-2.5 rounded-lg bg-[#0f172a] px-3 font-mono text-[13.5px] font-semibold text-slate-100 ring-2 ring-fd-primary`}>
+              <span className="text-[#38bdf8]">{brand(DOCKER_MARK, 'Docker', 18)}</span> otsu
+              <span className="ml-auto flex items-center gap-1.5 text-[12px] text-emerald-400">
+                <span className="size-[7px] rounded-full bg-emerald-400" /> running
+              </span>
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Docker's and GitHub's marks, from Simple Icons. */
+const DOCKER_MARK =
+  'M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.184-.186h-2.12a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.082.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 00-.75.748 11.376 11.376 0 00.692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 003.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288Z';
+const GITHUB_MARK =
+  'M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12';
 
 /* --- 2a · errors: one log of everything, and workflows that recover from it --------- */
 
@@ -651,7 +909,7 @@ section.present .${u}-fill { animation: ${u}-fill 2.4s cubic-bezier(.3,0,.4,1) $
     </span>
   );
   return (
-    <div className="relative mx-auto h-[440px] w-[1100px]" role="img" aria-label="Kim's process_slides workflow has been running on her laptop for ten hours. Reviewer 2 walks past and closes the lid; the workflow's process dies. The Arkitekt server has every call of those ten hours on its log. Kim opens the laptop and opts in to a replay: the server streams the log back, 1482 calls, and the workflow is where it was without running anything again. Then the next call runs for real. Ten hours, not lost. Caveat: replay is opt-in, and it only works if the workflow is deterministic.">
+    <div className="relative mx-auto h-[446px] w-[1100px]" role="img" aria-label="Kim's process_slides workflow has been running on her laptop for ten hours. Reviewer 2 walks past and closes the lid; the workflow's process dies. The Arkitekt server has every call of those ten hours on its log. Kim opens the laptop and opts in to a replay: the server streams the log back, 1482 calls, and the workflow is where it was without running anything again. Then the next call runs for real. Ten hours, not lost. Caveat: replay is opt-in, and it only works if the workflow is deterministic.">
       <LoopStyles css={css} />
       <Steps live cues={cues} className="relative size-full">
         {/* Kim's laptop */}
@@ -744,10 +1002,10 @@ section.present .${u}-fill { animation: ${u}-fill 2.4s cubic-bezier(.3,0,.4,1) $
           </div>
         </div>
         {/* the caveat: replay is a choice, and it has a condition */}
-        <div className="sm-in absolute right-0 top-[352px] flex w-[600px] items-start gap-2.5 rounded-xl border-2 border-dashed border-[#d97706]/60 bg-[#d97706]/5 px-4 py-2.5" style={delay(replayAt + 0.4)}>
-          <span className="mt-px font-mono text-[12px] font-bold uppercase tracking-[0.14em] text-[#d97706]">Caveat</span>
-          <span className="text-[15px] leading-snug">
-            Replay is <b>opt-in</b>, and it needs attention: it only works if your workflow is <b>deterministic</b>.
+        <div className="sm-in absolute inset-x-0 top-[398px] flex items-center justify-center gap-3 rounded-xl border-2 border-dashed border-[#d97706]/60 bg-[#d97706]/5 px-4 py-2.5" style={delay(replayAt + 0.4)}>
+          <span className="font-mono text-[12px] font-bold uppercase tracking-[0.14em] text-[#d97706]">Caveat</span>
+          <span className="text-[16px] leading-snug">
+            Great for large <b>deterministic</b> analysis pipelines, not always great for <b>“random”</b> robot automation.
           </span>
         </div>
         {/* the calls, on their way back to the laptop */}
@@ -895,9 +1153,6 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
           ))}
         </pre>
       </div>
-      <span className="sm-in absolute left-0 top-[364px] w-[466px] text-[14px] leading-snug text-fd-muted-foreground" style={delay(hlAt + 0.5)}>
-        <code className="font-mono font-semibold text-fd-foreground">task.hold</code> hands the run to the Arkitekt server, which asks Kim. Resume, and the code carries on after it. <span className="font-semibold text-fd-foreground">And you can always abort any task, immediately.</span>
-      </span>
       {/* control, on its way to the server */}
       <span aria-hidden className={`${u}-t1 absolute left-[330px] top-[316px] z-20 flex items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-amber-500 bg-fd-card px-2.5 py-0.5 font-mono text-[12px] font-bold text-amber-700 shadow-lg`}>
         ⏸ hold · run 42
@@ -1009,9 +1264,6 @@ section.present .${u}-tap { animation: ${u}-tap 0.7s ease-out ${resumeAt - 0.1}s
             <span className="absolute bottom-[7px] left-1/2 h-[4px] w-[56px] -translate-x-1/2 rounded-full bg-white/60" />
           </div>
         </div>
-        <span className="sm-fade text-center text-[12px] leading-tight text-fd-muted-foreground" style={delay(noteAt + 0.3)}>
-          it pops up on Kim’s phone
-        </span>
       </div>
       </Steps>
     </div>
@@ -1042,12 +1294,11 @@ const LABELS_BG = (dx = 0, dy = 0) => `${RING('rgba(52,211,153,0.95)', 5.6)} ${d
 
 /** Introducing the coordinate system: each image gets a place in a
     coordinate system, and everything made from it is related to it. The
-    example is Kim's own workflow, and the right half is its tree, growing
-    one node per press of "next", each node with the workflow call that made
-    it: the original image (the slide on the stage); the tiles, each placed
-    by an affine transform; the mosaic, stitched from them; the labels, on
-    the same coordinates; the table, one row per cell. Last press: nobody
-    writes these relations by hand. */
+    example is Kim's own workflow. On the left the stage; on the right its
+    lineage graph, growing to the right one step per press of "next": the
+    nodes are the images (the slide, the three tiles, the mosaic, the labels)
+    and finally the table, and every edge is a step of the workflow from
+    before: acquire, stitch, segment, analyse. */
 export function DataWinFigure() {
   const stage = 360;
   // the three tiles of HE-07, in stage pixels; they overlap by 8 px
@@ -1058,18 +1309,29 @@ export function DataWinFigure() {
   const stitchAt = 4.2; // the tiles become one mosaic
   const segAt = 5.4; // the labels, on the same coordinates
   const tabAt = 6.6; // the table, one row per cell
-  const handAt = 7.8; // nobody does this by hand
-  const cues = [0.9, 3.9, 5.1, 6.3, 7.5, 8.9];
-  /* the tree: what came from what, how it relates, and the workflow call that made it */
-  const tree: { name: string; rel: string; call: string; level: number; at: number; thumb?: string; strong?: boolean }[] = [
-    { name: 'original image', rel: 'HE-07 · on the stage', call: 'process_slides(slide)', level: 0, at: 0, thumb: HE_BG(-30, -12) },
-    { name: 'tiles ×3', rel: 'affine → stage', call: 'scope.acquire_image()', level: 1, at: tileAt(0) + 0.9, thumb: HE_BG(-4, -3) },
-    { name: 'mosaic', rel: 'stitched from the tiles', call: 'stitcher.stitch_images(tiles)', level: 2, at: stitchAt + 0.1, thumb: HE_BG() },
-    { name: 'labels', rel: 'same coordinates', call: 'stardist.segment_image(mosaic)', level: 3, at: segAt + 0.1, thumb: `${LABELS_BG()}, ${HE_BG()}` },
-    { name: 'table', rel: 'one row per cell', call: 'analyzer.calculate_stain_percentage(mask)', level: 4, at: tabAt + 0.1 },
+  const cues = [0.9, 3.9, 5.1, 6.3, 7.9];
+  /* the lineage graph, growing to the right: the images are its nodes, the
+     steps of the workflow from before are its edges */
+  const G = { w: 780, h: 400, y: 178 };
+  const node = { slide: 74, tiles: 236, mosaic: 404, labels: 582, table: 734 };
+  const tileYs = [G.y - 62, G.y, G.y + 62];
+  const acqAt = tileAt(0) + 0.9;
+  const steps: { name: string; call: string; x: number; at: number }[] = [
+    { name: 'acquire', call: 'acquire_image()', x: (node.slide + node.tiles) / 2 + 8, at: acqAt },
+    { name: 'stitch', call: 'stitch_images()', x: (node.tiles + node.mosaic) / 2 - 16, at: stitchAt + 0.1 },
+    { name: 'segment', call: 'segment_image()', x: (node.mosaic + node.labels) / 2, at: segAt + 0.1 },
+    { name: 'analyse', call: 'calculate_stain_percentage()', x: (node.labels + node.table) / 2 + 12, at: tabAt + 0.1 },
   ];
+  const fan = (x0: number, y0: number, x1: number, y1: number) => `M${x0} ${y0} C ${(x0 + x1) / 2} ${y0}, ${(x0 + x1) / 2} ${y1}, ${x1} ${y1}`;
+  const edge = (d: string, at: number, key: string) => <path key={key} className="sm-draw" style={delay(at)} pathLength={1} strokeDasharray="1" d={d} fill="none" stroke={PRIMARY} strokeWidth={2.4} />;
+  const caption = (x: number, y: number, name: string, rel: string, at: number) => (
+    <span className={at > 0 ? 'sm-in absolute flex -translate-x-1/2 flex-col items-center gap-1' : 'absolute flex -translate-x-1/2 flex-col items-center gap-1'} style={{ left: x, top: y, ...(at > 0 ? delay(at + 0.3) : {}) }}>
+      <span className="whitespace-nowrap font-mono text-[14px] font-semibold">{name}</span>
+      <span className="whitespace-nowrap rounded-full bg-fd-primary/12 px-2 py-px font-mono text-[11px] font-bold text-fd-primary">{rel}</span>
+    </span>
+  );
   return (
-    <div className="relative size-full" role="img" aria-label="Each image is placed in a coordinate system, and the workflow's results form a tree: the original image of slide HE-07; three tiles, each placed on the stage by an affine transform, from acquire_image; the mosaic, stitched from them by stitch_images; the labels, on the same coordinates, from segment_image; and a table with one row per cell, from calculate_stain_percentage. Nobody writes these relations by hand: with a little metadata, Arkitekt builds them.">
+    <div className="relative size-full" role="img" aria-label="Each image is placed in a coordinate system, and the workflow's results form a lineage graph that grows to the right, its edges the steps of the workflow, acquire, stitch, segment and analyse: the original image of slide HE-07; three tiles, each placed on the stage by an affine transform, from acquire_image; the mosaic, stitched from them by stitch_images; the labels, on the same coordinates, from segment_image; and a table with one row per cell, from calculate_stain_percentage.">
       <Steps live cues={cues} className="relative size-full">
       {/* the stage: one coordinate system */}
       <div className="absolute left-[30px] top-[18px]" style={{ width: stage, height: stage }}>
@@ -1121,41 +1383,45 @@ export function DataWinFigure() {
         </span>
       </div>
 
-      {/* the same thing, as a tree: what came from what, and the workflow call that made it */}
-      <div className="absolute right-0 top-[10px] flex w-[388px] flex-col">
-        <span className="mb-1.5 flex items-center gap-2 font-mono text-[12px] font-semibold text-fd-muted-foreground">
-          <Workflow className="size-[15px] text-fd-primary" strokeWidth={2.2} /> the tree, and the workflow line that made each node
+      {/* the same thing, as a lineage graph: images are the nodes, the workflow's steps the edges */}
+      <div className="absolute top-0" style={{ left: 440, width: G.w, height: G.h }}>
+        <span className="absolute left-0 top-0 flex items-center gap-2 text-[17px] font-semibold">
+          <Workflow className="size-[18px] text-fd-primary" strokeWidth={2.2} />
+          The lineage graph: every step of the workflow from before is an edge.
         </span>
-        {tree.map((n) => (
-          <div key={n.name} className={n.at > 0 ? 'sm-in relative' : 'relative'} style={{ paddingLeft: n.level * 13, ...(n.at > 0 ? delay(n.at) : {}) }}>
-            {/* the branch it hangs on */}
-            {n.level > 0 ? <span aria-hidden className="absolute top-0 h-[20px] w-[9px] rounded-bl-md border-b-2 border-l-2 border-fd-border" style={{ left: (n.level - 1) * 13 + 5 }} /> : null}
-            <div className="flex items-center gap-2 py-[4px]">
-              {n.thumb ? (
-                <span className={cn('size-[30px] shrink-0 rounded-md shadow-sm ring-1', n.strong ? 'ring-2 ring-fd-primary' : 'ring-fd-border')} style={{ background: n.thumb }} />
-              ) : (
-                <span className="flex size-[30px] shrink-0 items-center justify-center rounded-md bg-fd-card shadow-sm ring-1 ring-fd-border">
-                  <Table2 className="size-[17px] text-fd-primary" strokeWidth={2} />
-                </span>
-              )}
-              <span className="flex min-w-0 flex-col leading-tight">
-                <span className="flex items-center gap-1.5 whitespace-nowrap font-mono text-[13.5px]">
-                  <span className="font-semibold">{n.name}</span>
-                  <span className={cn('rounded-full px-1.5 py-px text-[10.5px] font-bold', n.strong ? 'bg-fd-primary text-fd-primary-foreground' : 'bg-fd-primary/12 text-fd-primary')}>{n.rel}</span>
-                </span>
-                <span className="whitespace-nowrap font-mono text-[10.5px] text-fd-muted-foreground">
-                  <span className="font-sans italic">workflow: </span>
-                  {n.call}
-                </span>
-              </span>
-            </div>
-          </div>
+        <svg width={G.w} height={G.h} viewBox={`0 0 ${G.w} ${G.h}`} className="absolute inset-0" aria-hidden>
+          {tileYs.map((ty, i) => edge(fan(node.slide + 44, G.y, node.tiles - 26, ty), acqAt + i * 0.1, `a${i}`))}
+          {tileYs.map((ty, i) => edge(fan(node.tiles + 26, ty, node.mosaic - 62, G.y), stitchAt + 0.1 + i * 0.1, `s${i}`))}
+          {edge(`M${node.mosaic + 62} ${G.y} L${node.labels - 62} ${G.y}`, segAt + 0.1, 'seg')}
+          {edge(`M${node.labels + 62} ${G.y} L${node.table - 34} ${G.y}`, tabAt + 0.1, 'ana')}
+        </svg>
+
+        {/* the nodes: the images, and at the end what was measured on them */}
+        {/* the root: the empty slide. No image, only the coordinate system everything else is placed in */}
+        <span className="absolute h-[46px] w-[88px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-md border-2 border-fd-border bg-fd-card/70 shadow-md" style={{ left: node.slide, top: G.y }}>
+          <span className="absolute inset-y-0 left-0 w-[18px] bg-fd-muted" />
+        </span>
+        {caption(node.slide, G.y + 32, 'slide HE-07', 'root coordinate system', 0)}
+        {tileYs.map((ty, i) => (
+          <span key={ty} className="sm-pop absolute size-[50px] -translate-x-1/2 -translate-y-1/2 rounded-md shadow-md ring-2 ring-fd-border" style={{ left: node.tiles, top: ty, background: HE_BG(mo.x - tiles[i], 0), ...delay(acqAt + 0.4 + i * 0.1) }} />
         ))}
-        {/* …and nobody writes these by hand */}
-        <div className="sm-in mt-2 flex flex-col gap-1 border-t-2 border-fd-foreground/70 pt-2.5" style={delay(handAt)}>
-          <span className="text-[19px] font-bold leading-tight">Of course, nobody does this by hand.</span>
-          <span className="text-[13.5px] leading-snug text-fd-muted-foreground">With a little metadata (pixel size, stage position), Arkitekt creates this tree for you: a lineage graph.</span>
-        </div>
+        {caption(node.tiles, tileYs[2] + 34, 'tiles ×3', 'affine → stage', acqAt + 0.4)}
+        <span className="sm-pop absolute h-[50px] w-[124px] -translate-x-1/2 -translate-y-1/2 rounded-md shadow-md ring-2 ring-fd-border" style={{ left: node.mosaic, top: G.y, background: HE_BG(), ...delay(stitchAt + 0.6) }} />
+        {caption(node.mosaic, G.y + 34, 'mosaic', 'one image', stitchAt + 0.6)}
+        <span className="sm-pop absolute h-[50px] w-[124px] -translate-x-1/2 -translate-y-1/2 rounded-md shadow-md ring-2 ring-fd-border" style={{ left: node.labels, top: G.y, background: `${LABELS_BG()}, ${HE_BG()}`, ...delay(segAt + 0.6) }} />
+        {caption(node.labels, G.y + 34, 'labels', 'same coordinates', segAt + 0.6)}
+        <span className="sm-pop absolute flex size-[68px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-lg bg-fd-card shadow-md ring-2 ring-fd-border" style={{ left: node.table, top: G.y, ...delay(tabAt + 0.6) }}>
+          <Table2 className="size-[36px] text-fd-primary" strokeWidth={1.8} />
+        </span>
+        {caption(node.table, G.y + 44, 'table', 'one row per cell', tabAt + 0.6)}
+
+        {/* the edges' names: the steps of the acquisition pipeline */}
+        {steps.map((st) => (
+          <span key={st.name} className="sm-pop absolute flex -translate-x-1/2 flex-col items-center gap-1" style={{ left: st.x, top: 46, ...delay(st.at + 0.2) }}>
+            <span className="rounded-full bg-fd-primary px-3 py-1 text-[15px] font-bold leading-none text-fd-primary-foreground shadow-sm">{st.name}</span>
+            <span className="whitespace-nowrap font-mono text-[10.5px] text-fd-muted-foreground">{st.call}</span>
+          </span>
+        ))}
       </div>
       </Steps>
     </div>
@@ -1312,16 +1578,16 @@ section.present .${u}-to-1 { animation: ${u}-to1 var(--len) linear var(--d) both
 /* --- the record: everything is a row ---------------------------------------------- */
 
 /** The `images` table: one row per image, with what made it, who asked,
-    where it was taken, when, and the stain. `hit` rows survive the filter. */
-const IMAGE_COLUMNS = ['image', 'what', 'who', 'where', 'when', 'stain'];
+    where it was taken, when, and its structured (OME) metadata. `hit` rows survive the filter. */
+const IMAGE_COLUMNS = ['image', 'what', 'who', 'where', 'when', 'OME metadata'];
 const IMAGE_ROWS: { cells: string[]; hit: boolean; fresh?: boolean }[] = [
-  { cells: ['#0116 · tile', 'acquire_image', 'process_slides', 'openuc2 · 10x', '14:08:40', 'CD20 · r1'], hit: true },
-  { cells: ['#0119 · mosaic', 'stitch_images', 'process_slides', 'stitcher', '14:09:02', 'CD20 · r1'], hit: false },
-  { cells: ['#0120 · labels', 'segment_image', 'process_slides', 'stardist', '14:09:05', 'CD20 · r1'], hit: false },
-  { cells: ['#0098 · tile', 'acquire_image', 'Anna', 'openuc2 · 20x', '11:42:10', 'Ki-67 · r1'], hit: false },
-  { cells: ['#0131 · tile', 'acquire_image', 'Kim', 'openuc2 · 10x', '14:17:58', 'CD20 · r2'], hit: true, fresh: true },
+  { cells: ['#0116 · tile', 'acquire_image', 'process_slides', 'openuc2 · 10x', '14:08:40', '0.65 µm · RGB'], hit: true },
+  { cells: ['#0119 · mosaic', 'stitch_images', 'process_slides', 'stitcher', '14:09:02', '0.65 µm · RGB'], hit: false },
+  { cells: ['#0120 · labels', 'segment_image', 'process_slides', 'stardist', '14:09:05', '0.65 µm · mask'], hit: false },
+  { cells: ['#0098 · tile', 'acquire_image', 'Anna', 'openuc2 · 20x', '11:42:10', '0.33 µm · RGB'], hit: false },
+  { cells: ['#0131 · tile', 'acquire_image', 'Kim', 'openuc2 · 10x', '14:17:58', '0.65 µm · RGB'], hit: true, fresh: true },
 ];
-const IMAGE_FILTERS = ['what = acquire_image', 'where = openuc2', 'stain = CD20'];
+const IMAGE_FILTERS = ['what = acquire_image', 'where = openuc2', 'pixel size = 0.65 µm'];
 
 /** Everything Arkitekt stores is a row in a relational database. Three
     beats, one per press of "next": on the left an app, the microscope's,
@@ -1342,7 +1608,7 @@ export function RecordTableFigure() {
 /* the file, with its what, who and where, on its way into the table */
 .${u}-fly { opacity: 0; }
 section.present .${u}-fly { animation: ${u}-fly 0.9s cubic-bezier(.5,0,.3,1) ${flyAt}s both; }
-@keyframes ${u}-fly { 0% { opacity: 0; transform: none; } 12%, 82% { opacity: 1; } 100% { opacity: 0; transform: translate(330px, 78px) scale(0.85); } }
+@keyframes ${u}-fly { 0% { opacity: 0; transform: none; } 12%, 82% { opacity: 1; } 100% { opacity: 0; transform: translate(400px, 120px) scale(0.85); } }
 section.present .${u}-sent { animation: ${u}-sent 0.4s ease-out ${flyAt}s both; }
 @keyframes ${u}-sent { 0%, 100% { transform: none; } 40% { transform: scale(0.96); } }
 section.present .${u}-fresh { animation: ${u}-fresh 1.2s ease-out ${rowAt}s both; }
@@ -1359,29 +1625,24 @@ section.present .${u}-dim { animation: ${u}-dim 0.4s ease-out ${dimAt}s both; }
     ['where', 'stage 12.4 · 8.1 mm', 'on the openUC2'],
   ];
   return (
-    <div className="mx-auto w-[1100px]" role="img" aria-label="An app, the openUC2 microscope, has run acquire_image and uploads the image to the database together with what made it (acquire_image), who caused it (Kim, through her process_slides workflow) and where it was taken (its stage position). It lands as a new row in the images table, which has a column for the image, what, who, where, when and the stain. Every column can be filtered: with what = acquire_image, where = openuc2 and stain = CD20, two of the five images are left.">
+    <div className="mx-auto w-[1230px]" role="img" aria-label="An app, the openUC2 microscope, has run acquire_image and uploads the image to the database together with what made it (acquire_image), who caused it (Kim, through her process_slides workflow) and where it was taken (its stage position). It lands as a new row in the images table, which has a column for the image, what, who, where, when and the stain. Every column can be filtered: with what = acquire_image, where = openuc2 and stain = CD20, two of the five images are left.">
       <LoopStyles css={css} />
       <Steps live cues={cues} className="relative flex w-full flex-col gap-4">
-        <p className="text-[24px] font-semibold leading-snug tracking-[-0.01em]">
-          An app uploads an image, <span className="text-fd-primary">and the database knows what, who and where.</span>
-        </p>
         <div className="relative flex items-stretch gap-7">
           {/* the app that made the image, and what is known about it */}
-          <div className={`${u}-sent flex w-[258px] shrink-0 flex-col gap-2.5 self-center`}>
-            <div className="flex flex-col gap-2 rounded-xl border-2 border-fd-border bg-fd-card p-3 shadow-sm">
-              <span className="flex items-center gap-2">
-                <Microscope className="size-[22px] shrink-0 text-fd-primary" strokeWidth={1.9} />
-                <span className="flex flex-col leading-tight">
-                  <span className="text-[11.5px] text-fd-muted-foreground">an app</span>
-                  <span className="font-mono text-[15px] font-semibold">openuc2</span>
-                </span>
-                <span className="ml-auto rounded-full bg-fd-primary/12 px-2 py-px font-mono text-[10.5px] font-bold uppercase tracking-[0.08em] text-fd-primary">uploads</span>
+          <div className={`${u}-sent flex w-[300px] shrink-0 flex-col gap-3.5 rounded-2xl border-2 border-fd-primary/60 bg-fd-card p-3.5 shadow-md`}>
+            <div className="flex items-center gap-3">
+              <span className="flex size-[44px] items-center justify-center rounded-xl bg-fd-primary/12 text-fd-primary">
+                <Microscope className="size-[25px]" strokeWidth={1.8} />
               </span>
+              <span className="text-[19px] font-semibold leading-tight">openUC2 FRAME</span>
+            </div>
+            <div className="flex flex-col gap-2 rounded-xl border border-fd-border bg-fd-background/60 p-3">
               <span className="flex items-center gap-2.5">
                 <span className="size-[52px] shrink-0 rounded-md shadow-sm ring-1 ring-fd-border" style={{ background: `${CD20_BG()}, ${HE_BG()}` }} />
                 <span className="flex min-w-0 flex-col leading-tight">
                   <span className="truncate font-mono text-[13.5px] font-semibold">acquire_image()</span>
-                  <span className="text-[12px] text-fd-muted-foreground">→ one image, 2048 × 2048</span>
+                  <span className="text-[12px] text-fd-muted-foreground">→ image + structured metadata (OME)</span>
                 </span>
               </span>
             </div>
@@ -1396,15 +1657,21 @@ section.present .${u}-dim { animation: ${u}-dim 0.4s ease-out ${dimAt}s both; }
             ))}
           </div>
           {/* …on its way in */}
-          <span aria-hidden className={`${u}-fly absolute left-[40px] top-[128px] z-20 flex items-center gap-2 whitespace-nowrap rounded-full border-2 border-fd-primary bg-fd-card px-3 py-1 font-mono text-[12.5px] font-bold text-fd-primary shadow-lg`}>
-            <span className="size-[18px] rounded-sm ring-1 ring-fd-primary/50" style={{ background: `${CD20_BG()}, ${HE_BG()}` }} /> image + what · who · where
+          <span aria-hidden className={`${u}-fly absolute left-[40px] top-[112px] z-20 flex items-center gap-2 whitespace-nowrap rounded-full border-2 border-fd-primary bg-fd-card px-3 py-1 font-mono text-[12.5px] font-bold text-fd-primary shadow-lg`}>
+            <span className="size-[18px] rounded-sm ring-1 ring-fd-primary/50" style={{ background: `${CD20_BG()}, ${HE_BG()}` }} /> image + structured metadata (OME)
           </span>
 
           {/* the database */}
-          <div className="relative min-w-0 flex-1">
-            <div className="relative overflow-hidden rounded-xl border-2 border-fd-border bg-fd-card shadow-sm">
+          <div className="relative flex min-w-0 flex-1 flex-col gap-2.5 rounded-[26px] bg-fd-primary p-3.5 shadow-xl">
+            <div className="flex items-center gap-3 text-fd-primary-foreground">
+              <span className="flex size-[44px] items-center justify-center rounded-xl bg-white/95 shadow-sm">
+                <Logo className="size-[36px]" />
+              </span>
+              <span className="text-[24px] font-bold leading-none tracking-[-0.02em]">Arkitekt</span>
+            </div>
+            <div className="relative overflow-hidden rounded-xl bg-fd-card shadow-sm">
               <div className="flex items-center gap-2 border-b-2 border-fd-border bg-fd-muted/80 px-4 py-2 font-mono text-[14px] font-semibold">
-                <Database className="size-[17px] text-fd-primary" strokeWidth={2} /> images <span className="font-normal text-fd-muted-foreground">· a Postgres table, on your hub</span>
+                <Database className="size-[17px] text-fd-primary" strokeWidth={2} /> images <span className="font-normal text-fd-muted-foreground">· a Postgres table</span>
               </div>
               {/* the filter bar: any column, all at once */}
               <div className="flex h-[38px] items-center gap-2 border-b border-fd-border px-4">
@@ -1419,9 +1686,9 @@ section.present .${u}-dim { animation: ${u}-dim 0.4s ease-out ${dimAt}s both; }
                   2 of 5 images
                 </span>
               </div>
-              <div className="grid grid-cols-[1.15fr_1.15fr_1.2fr_1.15fr_0.8fr_0.9fr] font-mono text-[13.5px]">
+              <div className="grid grid-cols-[1.2fr_1.1fr_1.15fr_1.1fr_0.75fr_1.15fr] font-mono text-[14.5px]">
                 {IMAGE_COLUMNS.map((c) => (
-                  <span key={c} className="flex items-center gap-1.5 border-b-2 border-fd-border px-4 py-1.5 font-sans text-[12.5px] font-bold uppercase tracking-[0.06em] text-fd-primary">
+                  <span key={c} className="flex items-center gap-1.5 whitespace-nowrap border-b-2 border-fd-border px-3 py-1.5 font-sans text-[12.5px] font-bold uppercase tracking-[0.06em] text-fd-primary">
                     {c}
                     <Filter className="size-[11px] opacity-60" strokeWidth={2.6} />
                   </span>
@@ -1429,7 +1696,7 @@ section.present .${u}-dim { animation: ${u}-dim 0.4s ease-out ${dimAt}s both; }
                 {IMAGE_ROWS.map((row, r) => (
                   <div key={row.cells[0]} className={cn('col-span-6 grid grid-cols-subgrid', r > 0 && 'border-t border-fd-border', row.fresh && `${u}-fresh bg-fd-primary/10`, !row.hit && `${u}-dim`)}>
                     {row.cells.map((cell, c) => (
-                      <span key={c} className={cn('truncate px-4 py-[7px]', c === 0 ? 'font-semibold' : 'text-fd-muted-foreground')}>
+                      <span key={c} className={cn('truncate px-3 py-[11px]', c === 0 ? 'font-semibold' : 'text-fd-muted-foreground')}>
                         {cell}
                       </span>
                     ))}
@@ -1905,6 +2172,156 @@ section.present .${u}-after { animation: ${u}-on 0.3s ease-out ${installAt + 0.3
         <span className="font-semibold text-fd-foreground">We use Docker for that:</span> the app is one image, and the <span className="font-semibold text-fd-primary">Arkitekt plugin engine</span> installs it on any Arkitekt hub.
       </span>
       </Steps>
+    </div>
+  );
+}
+
+/** What happens with the link Kim just made: somebody else opens it, and
+    their browser connects directly to one subspace of her hub, the
+    collaboration, and streams the data from there. Nothing else on the hub
+    is even visible to them. Two key presses (reveal fragments 1 and 2; the
+    video next to it takes fragment 0): the guest opens the link; the direct
+    connection to the subspace opens and the image streams in. */
+export function ShareSubspaceFigure() {
+  const u = useUid();
+  const W = 330;
+  const H = 556;
+  const hub = { h: 214 };
+  const sub = { x: 12, y: 108, w: W - 24, h: 96 }; // the collaboration, inside the hub
+  const win = { y: 384, h: H - 384 }; // the guest's browser
+  const lineX = 34;
+  const on = (n: number, sel: string) => `.${u}-s${n}.visible ~ ${sel}, .${u}-s${n}.visible ~ * ${sel}`;
+  const css = `
+:is(.${u}-guest, .${u}-click, .${u}-line, .${u}-how, .${u}-dot, .${u}-img, .${u}-ok) { opacity: 0; }
+/* press 1: somebody else opens the link */
+${on(1, `.${u}-guest`)} { animation: ${u}-pop 0.45s ease-out 0s both; }
+${on(1, `.${u}-click`)} { animation: ${u}-click 0.9s ease-out 0.8s both; }
+/* press 2: straight into the collaboration, and the data streams from there */
+${on(2, `.${u}-line`)} { animation: ${u}-fadein 0.4s ease-out 0s both; }
+${on(2, `.${u}-sub`)} { animation: ${u}-glow 0.9s ease-out 0.2s both; }
+${on(2, `.${u}-how`)} { animation: ${u}-pop 0.4s ease-out var(--d) both; }
+${on(2, `.${u}-dot`)} { animation: ${u}-stream 1.5s linear var(--d) infinite; }
+${on(2, `.${u}-wait`)} { animation: ${u}-fadeout 0.3s ease-out 1.5s both; }
+${on(2, `.${u}-img`)} { animation: ${u}-fadein 0.6s ease-out 1.6s both; }
+${on(2, `.${u}-ok`)} { animation: ${u}-fadein 0.4s ease-out 2s both; }
+@keyframes ${u}-pop { 0% { opacity: 0; transform: scale(0.85); } 70% { opacity: 1; transform: scale(1.03); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes ${u}-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ${u}-fadeout { from { opacity: 1; } to { opacity: 0; } }
+@keyframes ${u}-click { 0% { opacity: 0; transform: scale(0.6); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.8); } }
+@keyframes ${u}-glow { 0% { box-shadow: 0 0 0 0 rgb(255 255 255 / 0.9); } 100% { box-shadow: 0 0 0 12px rgb(255 255 255 / 0); } }
+@keyframes ${u}-stream { 0% { opacity: 0; transform: translateY(0); } 15%, 85% { opacity: 1; } 100% { opacity: 0; transform: translateY(${win.y - sub.y - sub.h - 12}px); } }
+.${u}-flow { animation: ${u}-flow 0.9s linear infinite; }
+@keyframes ${u}-flow { to { stroke-dashoffset: -28; } }
+@media (prefers-reduced-motion: reduce) { .${u}-flow { animation: none; } .${u}-dot { display: none; } }
+`;
+  const shared: [string, string][] = [
+    ['tile', HE_BG(-4, -3)],
+    ['stitched', HE_BG()],
+    ['labels', `${LABELS_BG()}, ${HE_BG()}`],
+  ];
+  /* how the data travels: what is said on the connection */
+  const how: [LucideIcon, string, string][] = [
+    [Lock, 'direct · encrypted', 'no upload, no copy'],
+    [Layers, 'pyramidal', 'the zoom level needed'],
+    [LayoutGrid, 'zarr', 'chunk by chunk'],
+    [Eye, 'lazy', 'only what is looked at'],
+  ];
+  return (
+    <div
+      className="relative shrink-0"
+      style={{ width: W, height: H }}
+      role="img"
+      aria-label="Kim's hub holds top secret data, locked, and one collaboration: a subspace with the tile, the stitched image and the labels she shared. Somebody else opens the link in their browser. Their browser connects directly to that one subspace of the hub, encrypted, and the image streams from there: pyramidal, as zarr chunks, and lazily, only what is looked at. The rest of the hub is not even visible to them."
+    >
+      <div className="sm-steps sm-animate absolute inset-0" style={{ '--sm-stagger': 1 } as CSSProperties}>
+        {[1, 2].map((n) => (
+          <Fragment key={n} as="span" index={n} className={`${u}-s${n} absolute`} />
+        ))}
+        <LoopStyles css={css} />
+
+        {/* Kim's hub: top secret, apart from the one subspace that is shared */}
+        <div className="absolute inset-x-0 top-0 rounded-[22px] bg-fd-primary p-3 text-fd-primary-foreground shadow-xl" style={{ height: hub.h }}>
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-[32px] items-center justify-center rounded-lg bg-white/95 shadow-sm">
+              <Logo className="size-[26px]" />
+            </span>
+            <span className="text-[19px] font-bold leading-none tracking-[-0.02em]">Arkitekt</span>
+            <span className="font-mono text-[12px] opacity-85">Kim’s lab</span>
+          </div>
+          <div className="mt-3 flex h-[36px] items-center justify-center gap-2 rounded-lg bg-black/30 text-[14px] font-extrabold tracking-[0.06em]">
+            <Lock className="size-[16px]" strokeWidth={2.8} /> TOP SECRET DATA
+          </div>
+        </div>
+        <div className={`${u}-sub absolute rounded-xl border-2 border-dashed border-white bg-fd-card px-2.5 py-2 text-fd-foreground`} style={{ left: sub.x, top: sub.y, width: sub.w, height: sub.h }}>
+          <span className="flex items-center gap-1.5 whitespace-nowrap text-[12.5px] font-semibold">
+            <Share2 className="size-[13px] text-fd-primary" strokeWidth={2.4} /> collaboration “Test”
+            <span className="ml-auto font-mono text-[10px] font-normal text-fd-muted-foreground">a subspace</span>
+          </span>
+          <span className="mt-1.5 flex justify-between">
+            {shared.map(([name, bg]) => (
+              <span key={name} className="flex flex-col items-center gap-0.5">
+                <span className="h-[36px] w-[88px] rounded-md ring-1 ring-fd-border" style={{ background: bg }} />
+                <span className="font-mono text-[10.5px] text-fd-muted-foreground">{name}</span>
+              </span>
+            ))}
+          </span>
+        </div>
+
+        {/* the direct connection: into the subspace, not the hub */}
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} className={`${u}-line pointer-events-none absolute inset-0`} aria-hidden>
+          <path className={`${u}-flow`} d={`M${lineX} ${sub.y + sub.h} L${lineX} ${win.y}`} fill="none" stroke={PRIMARY} strokeWidth={3} strokeDasharray="8 6" />
+          <circle cx={lineX} cy={sub.y + sub.h} r={5} fill="var(--color-fd-card)" stroke={PRIMARY} strokeWidth={2} />
+          <circle cx={lineX} cy={win.y} r={5} fill="var(--color-fd-card)" stroke={PRIMARY} strokeWidth={2} />
+        </svg>
+        {[0, 0.5, 1].map((d) => (
+          <span key={d} className={`${u}-dot absolute size-[12px] rounded-sm ring-1 ring-white/70`} style={{ left: lineX - 6, top: sub.y + sub.h, background: HE_BG(), '--d': `${0.5 + d}s` } as CSSProperties} />
+        ))}
+        {how.map(([Icon, name, what], i) => (
+          <span key={name} className={`${u}-how absolute flex items-center gap-2 whitespace-nowrap`} style={{ left: lineX + 22, top: sub.y + sub.h + 22 + i * 37, '--d': `${0.4 + i * 0.25}s` } as CSSProperties}>
+            <span className="flex h-[28px] items-center gap-1.5 rounded-full border-2 border-fd-primary/50 bg-fd-card px-2.5 text-[13px] font-semibold shadow-sm">
+              <Icon className="size-[13px] text-fd-primary" strokeWidth={2.6} /> {name}
+            </span>
+            <span className="text-[11.5px] text-fd-muted-foreground">{what}</span>
+          </span>
+        ))}
+
+        {/* somebody else, and their browser */}
+        <div className={`${u}-guest absolute inset-x-0 overflow-hidden rounded-2xl border-2 border-fd-primary/60 bg-fd-card shadow-xl`} style={{ top: win.y, height: win.h }}>
+          <div className="flex h-[30px] items-center gap-1.5 border-b border-fd-border bg-fd-muted px-3">
+            {['#f87171', '#fbbf24', '#34d399'].map((c) => (
+              <span key={c} className="size-[8px] rounded-full" style={{ background: c }} />
+            ))}
+            <span className="relative ml-1.5 flex h-[20px] flex-1 items-center gap-1.5 rounded-full bg-fd-background/70 px-2.5 font-mono text-[11px]">
+              <Lock className="size-[10px] text-fd-muted-foreground" strokeWidth={2.6} /> the link Kim copied
+              <span className={`${u}-click pointer-events-none absolute left-[56px] top-1/2 size-[24px] -translate-y-1/2 rounded-full border-2 border-fd-primary`} />
+            </span>
+          </div>
+          <div className="flex gap-3 p-2.5">
+            <span className="relative h-[118px] w-[150px] shrink-0 overflow-hidden rounded-lg border border-fd-border bg-fd-background/60">
+              <span className={`${u}-wait absolute inset-0 flex items-center justify-center px-2 text-center font-mono text-[11px] text-fd-muted-foreground`}>signing in as guest…</span>
+              <span className={`${u}-img absolute inset-0`} style={{ background: HE_BG() }} />
+            </span>
+            <span className="flex min-w-0 flex-col gap-1.5">
+              <span className="flex items-center gap-2">
+                <svg width={30} height={30} viewBox="0 0 30 30" role="img" aria-label="somebody else" className="shrink-0">
+                  <rect width={30} height={30} rx={15} fill="#1e3a5f" />
+                  <path d="M5 30 C 5 22, 10 19.5, 15 19.5 C 20 19.5, 25 22, 25 30 Z" fill="#38bdf8" />
+                  <circle cx={15} cy={12.5} r={6.6} fill="#e0ac86" />
+                  <path d="M8.2 12 C 7.6 6.5, 11 4.2, 15 4.2 C 19 4.2, 22.4 6.5, 21.8 12 C 20.4 9.4, 18.6 8.6, 15 8.6 C 11.4 8.6, 9.6 9.4, 8.2 12 Z" fill="#2b2118" />
+                  <circle cx={12.6} cy={12.8} r={0.9} fill="#1f2937" />
+                  <circle cx={17.4} cy={12.8} r={0.9} fill="#1f2937" />
+                  <path d="M12.6 15.6 Q15 17.4 17.4 15.6" fill="none" stroke="#7c2d12" strokeWidth={1} strokeLinecap="round" />
+                </svg>
+                <span className="text-[13px] font-semibold leading-tight">somebody else</span>
+              </span>
+              <span className="text-[12px] leading-snug text-fd-muted-foreground">A guest: sees this collaboration, and nothing else.</span>
+              <span className={`${u}-ok flex items-center gap-1 text-[12px] font-semibold leading-tight text-emerald-600`}>
+                <Check className="size-[13px] shrink-0" strokeWidth={3} /> streaming from Kim’s hub
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

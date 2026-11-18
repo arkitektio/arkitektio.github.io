@@ -51,7 +51,7 @@ const PINS: Pin[] = [
   { name: 'openUC2', city: 'jena', who: `${first(team.diederich.name)} · Ethan · Stefan`, group: true, photo: `${MEDIA}/people/openuc2.jpg`, at: [530, 170] },
   { name: 'The Linz team', city: 'linz', group: true, photo: `${MEDIA}/group.jpg`, at: [875, 440] },
   { name: team.wilhelmi.name, city: 'frankfurt', photo: team.wilhelmi.avatar, at: [555, 398] },
-  { name: team.golden.name, city: 'marburg', photo: team.golden.avatar, at: [448, 305] },
+  { name: team.golden.name, city: 'marburg', photo: `${MEDIA}/people/artemiy.jpg`, at: [448, 305] },
   { name: team.schmidt.name, city: 'berlin', photo: team.schmidt.avatar, at: [802, 232] },
   { name: team.niemeyer.name, city: 'helsinki', photo: team.niemeyer.avatar, at: [972, 98] },
 ];
@@ -180,13 +180,18 @@ function TeamPicture({ pin, width, height }: { pin: Pin; width: number; height: 
 
 /* --- the slide -------------------------------------------------------------- */
 
+/** The map is drawn at full size and shown a little smaller, to leave the
+    bottom of the slide to the logos. */
+const SHRINK = 0.88;
 const FACE = 60;
-const TEAM = { w: 204, h: 128 };
+const TEAM = { w: 224, h: 124 };
 
 /** The acknowledgements: everyone, on one map. */
 export function ThanksFigure() {
   return (
-    <div className="relative mx-auto" style={{ width: MAP_W, height: MAP_H }}>
+    <div className="mx-auto flex flex-col items-center gap-3.5">
+    <div className="relative" style={{ width: MAP_W * SHRINK, height: MAP_H * SHRINK }}>
+    <div className="absolute left-0 top-0 origin-top-left" style={{ width: MAP_W, height: MAP_H, transform: `scale(${SHRINK})` }}>
       <svg width={MAP_W} height={MAP_H} viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="absolute inset-0" aria-hidden>
         <defs>
           <clipPath id="thanks-map">
@@ -237,6 +242,27 @@ export function ThanksFigure() {
           </div>
         ),
       )}
+    </div>
+    </div>
+
+      {/* the institutions, and the money */}
+      <div className="flex items-center gap-4">
+        <span className="font-mono text-[11.5px] font-bold uppercase tracking-[0.16em] text-fd-muted-foreground">Supported by</span>
+        {/* on white, so the logos keep their own colours in light and dark mode */}
+        <span className="flex h-[46px] items-center rounded-xl bg-white px-4 shadow-sm">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`${MEDIA}/logos/u-bordeaux.png`} alt="Université de Bordeaux" className="h-[30px] w-auto" />
+        </span>
+        <span className="flex h-[46px] items-center rounded-xl bg-white px-4 shadow-sm">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`${MEDIA}/logos/jku.svg`} alt="Johannes Kepler University Linz" className="h-[32px] w-auto" />
+        </span>
+        {/* the Impetus call has no logo of its own: its name, set like one */}
+        <span className="flex h-[46px] flex-col justify-center rounded-xl bg-white px-4 leading-none text-black shadow-sm">
+          <span className="text-[17px] font-black tracking-[-0.01em]">MED Call Impetus</span>
+          <span className="mt-0.5 text-[10.5px] font-medium text-black/60">JKU Faculty of Medicine</span>
+        </span>
+      </div>
     </div>
   );
 }

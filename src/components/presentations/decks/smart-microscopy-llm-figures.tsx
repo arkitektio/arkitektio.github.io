@@ -85,6 +85,185 @@ const BASE_CSS = (u: string) => `
 
 /* --- Kim's pitch ---------------------------------------------------------------- */
 
+
+/* --- the two things an agent touches in a lab ---------------------------------- */
+
+/** Why an LLM in a lab is not like an LLM anywhere else, as two little
+    scenes drawn like the rest of the story. Left, fragile hardware: Kim asks
+    for a brighter image, Claude happily turns the laser to 500 %, from two
+    threads at once, and the slide under the objective burns. Right,
+    sensitive data: Kim asks Claude to analyse a table of patients, and the
+    rows leave the lab for somebody else's cloud. Nothing builds in; only the
+    flames flicker and the rows drift. */
+export function LlmRisksFigure() {
+  const u = useUid();
+  const css = `
+.${u}-flame { transform-box: fill-box; transform-origin: 50% 100%; animation: ${u}-flame 0.7s ease-in-out infinite alternate; }
+.${u}-flame:nth-child(2) { animation-duration: 0.55s; }
+.${u}-flame:nth-child(3) { animation-duration: 0.85s; }
+@keyframes ${u}-flame { from { transform: scale(1, 0.86) skewX(-4deg); } to { transform: scale(1.06, 1.12) skewX(5deg); } }
+.${u}-beam { animation: ${u}-beam 0.5s ease-in-out infinite alternate; }
+@keyframes ${u}-beam { from { opacity: 0.55; } to { opacity: 1; } }
+.${u}-row { animation: ${u}-row 2.4s linear infinite; }
+@keyframes ${u}-row { 0% { opacity: 0; transform: translate(0, 0); } 12% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(196px, -52px); } }
+@media (prefers-reduced-motion: reduce) { :is(.${u}-flame, .${u}-beam, .${u}-row) { animation: none; } }
+`;
+  const ink = 'var(--color-fd-foreground)';
+  const paper = 'var(--color-fd-card)';
+  const line = 'var(--color-fd-border)';
+  const mute = 'var(--color-fd-muted-foreground)';
+  const say = 'rounded-2xl px-5 py-2.5 text-[19px] leading-snug';
+  const flame = 'M0 0 C -11 -12, 5 -17, -1 -34 C 13 -23, 16 -9, 8 0 Z';
+  const scene = (title: string, ask: ReactNode, reply: ReactNode, art: ReactNode) => (
+    <div className="flex w-[560px] flex-col gap-3.5">
+      <h3 className="text-[32px] font-bold leading-none tracking-[-0.025em]">{title}</h3>
+      <div className="flex items-start justify-end gap-3">
+        <p className={cn(say, 'rounded-tr-sm bg-fd-primary/12')}>
+          <span className="sr-only">Kim: </span>
+          {ask}
+        </p>
+        <KimAvatar size={40} />
+      </div>
+      <div className="flex items-start gap-3">
+        <ClaudeAvatar size={40} />
+        <p className={cn(say, 'rounded-tl-sm border border-fd-border bg-fd-card font-semibold')}>
+          <span className="sr-only">Claude: </span>
+          {reply}
+        </p>
+      </div>
+      {art}
+    </div>
+  );
+  return (
+    <div
+      className="sm-animate relative mx-auto flex w-[1200px] justify-between"
+      role="img"
+      aria-label="Two things an agent touches in a lab. Fragile hardware: Kim asks for a brighter image, Claude answers that it is increasing the laser to 500 percent, from two threads at the same time, and the slide under the microscope's objective is on fire. Sensitive data: Kim asks Claude to analyse a table of patients and their diagnoses, and its rows leave the lab for somebody else's cloud."
+    >
+      <LoopStyles css={css} />
+      {scene(
+        'Fragile hardware',
+        <>Can you make the image a bit brighter?</>,
+        <>
+          Sure! Increasing the laser to <span className="text-[#dc2626]">500 %</span>, from two threads at the same time.
+        </>,
+        <svg width={560} height={190} viewBox="0 0 560 190" aria-hidden>
+          <path d="M40 176 H520" stroke={line} strokeWidth={4} strokeLinecap="round" />
+          {/* the microscope */}
+          <g stroke={ink} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" fill={paper}>
+            <rect x={196} y={160} width={140} height={14} rx={7} />
+            <path d="M318 160 V70 Q318 44 290 44 H276" fill="none" strokeWidth={12} />
+            <path d="M318 160 V70 Q318 44 290 44 H276" fill="none" stroke={paper} strokeWidth={6} />
+            <rect x={246} y={14} width={34} height={64} rx={6} />
+            <rect x={254} y={4} width={18} height={12} rx={3} />
+            <rect x={255} y={78} width={16} height={20} rx={3} />
+            <rect x={214} y={134} width={100} height={9} rx={3} />
+          </g>
+          <rect x={236} y={127} width={56} height={7} rx={2} fill="#bfdbfe" stroke={ink} strokeWidth={2} />
+          {/* the laser, far too bright */}
+          <g className={`${u}-beam`}>
+            <path d="M263 98 V128" stroke="#ef4444" strokeOpacity={0.3} strokeWidth={20} strokeLinecap="round" />
+            <path d="M263 98 V128" stroke="#ef4444" strokeWidth={6} strokeLinecap="round" />
+          </g>
+          {/* and what it does to the slide */}
+          <g transform="translate(246 128)">
+            <path className={`${u}-flame`} d={flame} fill="#f97316" transform="scale(1.1)" />
+            <path className={`${u}-flame`} d={flame} fill="#f97316" transform="translate(22 0) scale(1.4)" />
+            <path className={`${u}-flame`} d={flame} fill="#f97316" transform="translate(44 0) scale(0.95)" />
+            <path d={flame} fill="#fde047" transform="translate(24 0) scale(0.75)" />
+          </g>
+          <g fill={mute} fillOpacity={0.45}>
+            <circle cx={286} cy={62} r={7} />
+            <circle cx={298} cy={40} r={10} />
+            <circle cx={284} cy={16} r={13} />
+          </g>
+          {/* the dial, and the two threads turning it */}
+          <g transform="translate(446 96)">
+            <circle r={46} fill={paper} stroke={ink} strokeWidth={3} />
+            <path d="M-32 18 A 36 36 0 0 1 12 -34" fill="none" stroke={line} strokeWidth={7} strokeLinecap="round" />
+            <path d="M12 -34 A 36 36 0 0 1 32 18" fill="none" stroke="#ef4444" strokeWidth={7} strokeLinecap="round" />
+            <path d="M0 0 L27 12" stroke={ink} strokeWidth={4} strokeLinecap="round" />
+            <circle r={5} fill={ink} />
+            <text y={66} textAnchor="middle" fontFamily="var(--font-mono, monospace)" fontSize={15} fontWeight={700} fill="#ef4444">
+              laser · 500 %
+            </text>
+          </g>
+          {[
+            [34, 'thread-1'],
+            [78, 'thread-2'],
+          ].map(([y, name]) => (
+            <g key={name} transform={`translate(34 ${y})`}>
+              <rect width={92} height={28} rx={14} fill={paper} stroke={ink} strokeWidth={2} />
+              <text x={46} y={19} textAnchor="middle" fontFamily="var(--font-mono, monospace)" fontSize={13} fontWeight={700} fill={ink}>
+                {name}
+              </text>
+              <path d={`M96 14 H176`} stroke={ink} strokeWidth={2} strokeDasharray="5 5" fill="none" />
+              <path d="M170 8 L180 14 L170 20" stroke={ink} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </g>
+          ))}
+          <text x={126} y={132} textAnchor="middle" fontFamily="var(--font-mono, monospace)" fontSize={12.5} fill={mute}>
+            set_laser_power(500)
+          </text>
+        </svg>,
+      )}
+      {scene(
+        'Sensitive data',
+        <>
+          Can you analyze this, Claude?{' '}
+          <span className="ml-1 inline-block rounded-md bg-fd-background/70 px-2 py-0.5 align-middle font-mono text-[14px] font-semibold">patients.csv</span>
+        </>,
+        <>Of course! Uploading 4 812 patients and their diagnoses…</>,
+        <svg width={560} height={190} viewBox="0 0 560 190" aria-hidden>
+          {/* the lab, and the table that should stay in it */}
+          <rect x={20} y={14} width={236} height={164} rx={18} fill="none" stroke={ink} strokeWidth={2.5} strokeDasharray="9 7" />
+          <text x={36} y={38} fontFamily="var(--font-mono, monospace)" fontSize={13} fontWeight={700} fill={mute}>
+            the lab
+          </text>
+          <g transform="translate(48 52)">
+            <rect width={180} height={112} rx={8} fill={paper} stroke={ink} strokeWidth={3} />
+            <path d="M0 26 H180" stroke={ink} strokeWidth={2} />
+            <text x={12} y={18} fontFamily="var(--font-mono, monospace)" fontSize={12} fontWeight={700} fill={ink}>
+              name · diagnosis
+            </text>
+            {[0, 1, 2, 3].map((r) => (
+              <g key={r} transform={`translate(12 ${38 + r * 19})`}>
+                <circle cx={6} cy={5} r={5} fill={mute} fillOpacity={0.6} />
+                <rect x={18} y={1} width={56 - r * 6} height={8} rx={4} fill={mute} fillOpacity={0.45} />
+                <rect x={92} y={1} width={64 - (r % 2) * 18} height={8} rx={4} fill="#ef4444" fillOpacity={0.6} />
+              </g>
+            ))}
+          </g>
+          {/* out it goes */}
+          <path d="M236 108 C 300 96, 330 70, 392 60" fill="none" stroke={ink} strokeWidth={2.5} strokeDasharray="7 7" />
+          <path d="M382 52 L396 59 L384 69" fill="none" stroke={ink} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+          {[0, 0.8, 1.6].map((d) => (
+            <g key={d} className={`${u}-row`} style={{ animationDelay: `${d}s` }}>
+              <g transform="translate(214 100)">
+                <rect width={44} height={16} rx={4} fill={paper} stroke={ink} strokeWidth={2} />
+                <circle cx={9} cy={8} r={3.5} fill={mute} />
+                <rect x={17} y={5} width={20} height={6} rx={3} fill="#ef4444" fillOpacity={0.7} />
+              </g>
+            </g>
+          ))}
+          {/* somebody else's cloud */}
+          <g transform="translate(452 62)">
+            <path d="M-62 28 C -86 28, -90 -6, -62 -8 C -62 -40, -16 -48, -4 -24 C 14 -44, 52 -32, 46 -6 C 74 -6, 74 28, 48 28 Z" fill={paper} stroke={ink} strokeWidth={3} strokeLinejoin="round" />
+            <g transform="translate(-8 0)">
+              <rect x={-17} y={-17} width={34} height={34} rx={9} fill="#d97757" />
+              {Array.from({ length: 8 }, (_, k) => (
+                <rect key={k} x={-1.3} y={-11} width={2.6} height={8} rx={1.3} fill="#fff" transform={`rotate(${k * 45})`} />
+              ))}
+            </g>
+            <text y={54} x={-8} textAnchor="middle" fontFamily="var(--font-mono, monospace)" fontSize={14} fontWeight={700} fill={ink}>
+              somebody else’s cloud
+            </text>
+          </g>
+        </svg>,
+      )}
+    </div>
+  );
+}
+
 /** Kim, bored again, with a plan; one click, and Arkitekt answers with two
     problems. */
 export function PitchFigure() {

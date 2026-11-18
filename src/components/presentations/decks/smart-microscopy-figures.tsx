@@ -698,11 +698,10 @@ function CollapseHorrors({ u }: { u: string }) {
     turn up round her, each on its own computer; she tries to read them, eyes
     darting from one to the next, and no longer understands her own code;
     then the data, in a folder on
-    every one of them; then the question of how to package any of it; then
-    she says it out loud: she doesn't understand anything any more, it is not
-    her code, and she doesn't know its shortcomings. On the next press she
-    wobbles, keels over backwards, x-ed out eyes and stars circling, and from
-    the floor asks for the one thing that used to work. Then Claude, helpful
+    every one of them; then the question of how to package any of it. On the
+    next press she sways once, keels over backwards, x-ed out eyes and stars
+    circling, and from the floor says she no longer understands her own code
+    and asks for the one thing that used to work. Then Claude, helpful
     as ever, offers to write the paper too, and she shouts STOP. */
 export function CollapseFigure() {
   const u = useUid();
@@ -710,29 +709,23 @@ export function CollapseFigure() {
   const hair = '#5b3a29';
   const ink = '#1f2937';
   const coat = '#f4f4f5';
-  const lineAt = 8.8; // what she says, once everything is on the table
-  const startAt = 10; // the fall: after the scripts, the reading, the folders, the packaging and her line
+  const startAt = 8.8; // the fall: after the scripts, the reading, the folders and the packaging
   const crazy = { from: LEFTOVER_AT.crazy, darts: 12 };
-  const fallAt = startAt + 3.6;
+  const fallAt = startAt + 1.15; // she is down: one sway, then over
   const claudeAt = fallAt + 3; // Claude offers one more thing
   const stopAt = claudeAt + 1.3; // and she has had enough
   const css = `
 .${u}-fall { transform-box: view-box; transform-origin: 470px 372px; transform: translateY(-50px) rotate(-90deg); }
-section.present .${u}-fall { animation: ${u}-fall 4.4s ${startAt}s both; }
+section.present .${u}-fall { animation: ${u}-fall 1.4s ${startAt}s both; }
 @keyframes ${u}-fall {
   0% { transform: rotate(0); animation-timing-function: ease-in-out; }
-  12% { transform: rotate(-1.5deg); animation-timing-function: ease-in-out; }
-  22% { transform: rotate(1.5deg); animation-timing-function: ease-in-out; }
-  32% { transform: rotate(-3deg); animation-timing-function: ease-in-out; }
-  42% { transform: rotate(3deg); animation-timing-function: ease-in-out; }
-  51% { transform: rotate(-4.5deg); animation-timing-function: ease-in-out; }
-  59% { transform: rotate(4.5deg); animation-timing-function: ease-in-out; }
-  67% { transform: rotate(-6deg); animation-timing-function: ease-in-out; }
-  74% { transform: rotate(3deg); animation-timing-function: ease-in-out; }
-  78% { transform: rotate(0); animation-timing-function: cubic-bezier(.55,0,1,.45); }
-  92% { transform: translateY(-50px) rotate(-90deg); animation-timing-function: ease-out; }
-  96% { transform: translateY(-58px) rotate(-85deg); animation-timing-function: ease-in; }
+  18% { transform: rotate(-4deg); animation-timing-function: ease-in-out; }
+  38% { transform: rotate(4deg); animation-timing-function: ease-in-out; }
+  50% { transform: rotate(0); animation-timing-function: cubic-bezier(.55,0,1,.45); }
+  84% { transform: translateY(-50px) rotate(-90deg); animation-timing-function: ease-out; }
+  92% { transform: translateY(-58px) rotate(-85deg); animation-timing-function: ease-in; }
   100% { transform: translateY(-50px) rotate(-90deg); }
+}
 }
 .${u}-dart, .${u}-twitch { transform-box: fill-box; transform-origin: center; }
 section.present .${u}-dart { animation: ${u}-dart 0.24s ease-in-out ${crazy.from}s ${crazy.darts} alternate; }
@@ -759,10 +752,10 @@ section.present .${u}-race { animation: ${u}-race 0.6s cubic-bezier(.4,0,.6,1) v
 `;
   const star = (x: number, y: number) => `M${x} ${y - 9} L${x + 3} ${y - 3} L${x + 9} ${y - 2} L${x + 4} ${y + 2} L${x + 6} ${y + 9} L${x} ${y + 5} L${x - 6} ${y + 9} L${x - 4} ${y + 2} L${x - 9} ${y - 2} L${x - 3} ${y - 3} Z`;
   return (
-    <Steps live cues={[0.5, LEFTOVER_AT.scripts + 1.1, LEFTOVER_AT.crazy + 3.2, LEFTOVER_AT.folders + 1.1, LEFTOVER_AT.pack + 1, lineAt + 0.7, fallAt + 2.6, claudeAt + 0.9, stopAt + 0.9]} className="relative mx-auto h-[420px] w-[900px]">
+    <Steps live cues={[0.5, LEFTOVER_AT.scripts + 1.1, LEFTOVER_AT.crazy + 3.2, LEFTOVER_AT.folders + 1.1, LEFTOVER_AT.pack + 1, fallAt + 2.6, claudeAt + 0.9, stopAt + 0.9]} className="relative mx-auto h-[420px] w-[900px]">
       <LoopStyles css={css} />
       <CollapseHorrors u={u} />
-      <svg width={900} height={420} viewBox="110 66 700 327" role="img" aria-label="Kim stands among five scripts on five computers, her laptop, the acquisition PC, the arm controller, the OT-2 and the GPU server, each with its own folder of data, and the question of how to package any of it. She keels over backwards and lies on the floor, eyes crossed out, stars circling her head, and says: I want my Fiji script back." className="absolute inset-0">
+      <svg width={900} height={420} viewBox="110 66 700 327" role="img" aria-label="Kim stands among five scripts on five computers, her laptop, the acquisition PC, the arm controller, the OT-2 and the GPU server, each with its own folder of data, and the question of how to package any of it. She keels over backwards and lies on the floor, eyes crossed out, stars circling her head, and says: I don't understand my own code anymore. I want my Fiji script back." className="absolute inset-0">
         <path className="sm-fade" d="M60 374 H840" stroke={BORDER} strokeWidth={4} strokeLinecap="round" />
         <ellipse className="sm-fade" cx={340} cy={378} rx={210} ry={8} fill={MUTED} fillOpacity={0.15} />
         <g className={`${u}-fall`}>
@@ -829,24 +822,22 @@ section.present .${u}-race { animation: ${u}-race 0.6s cubic-bezier(.4,0,.6,1) v
       </svg>
       <div className="absolute left-[130px] top-[10px]">
         <div className="sm-pop relative rounded-2xl rounded-bl-sm border-2 border-fd-border bg-fd-card px-6 py-4 shadow-md" style={delay(fallAt + 1.75)}>
-          <p className="text-[30px] font-semibold italic leading-snug">
-            <span className="sr-only">Kim: </span>“I want my Fiji script back.”
+          <p className="whitespace-nowrap text-[30px] font-semibold italic leading-snug">
+            <span className="sr-only">Kim: </span>“I don’t understand my own code anymore.
+            <br />
+            I want my Fiji script back.”
           </p>
         </div>
         <span className="sm-pop absolute bottom-[-30px] left-[24px] size-[18px] rounded-full border-2 border-fd-border bg-fd-card" style={delay(fallAt + 1.6)} />
         <span className="sm-pop absolute bottom-[-58px] left-[10px] size-[12px] rounded-full border-2 border-fd-border bg-fd-card" style={delay(fallAt + 1.45)} />
       </div>
-      {/* what she says, standing, before she goes down */}
-      <div className={`${u}-until absolute left-[548px] top-[172px] w-[188px]`}>
-        <p className="sm-pop rounded-2xl rounded-bl-sm border-2 border-fd-border bg-fd-card px-4 py-3 text-[17px] font-semibold leading-snug shadow-md" style={delay(lineAt)}>
-          <span className="sr-only">Kim: </span>“I don’t understand anything anymore. This is not my code anymore. I don’t know its shortcomings.”
-        </p>
-      </div>
       {/* Claude, helpful as ever */}
       <div className="sm-pop absolute left-[470px] top-[150px] flex items-start gap-2.5" style={delay(claudeAt)}>
         <ClaudeMark size={38} />
         <p className="whitespace-nowrap rounded-[24px] rounded-tl-md border-2 border-fd-border bg-fd-card px-5 py-3 text-[24px] font-semibold leading-snug shadow-md">
-          <span className="sr-only">Claude: </span>I can also write that paper for you? ✨
+          <span className="sr-only">Claude: </span>No worries :)
+          <br />
+          I can also write that paper for you!
         </p>
       </div>
       {/* and she has had enough */}
@@ -1527,9 +1518,6 @@ export function CyclingIdeaFigure() {
       ))}
 
       {/* the images, one per round */}
-      <T x={30} y={466} anchor="start" size={12} mono weight={700} fill={MUTED}>
-        ONE SLIDE · ONE IMAGE PER ROUND
-      </T>
       {ROUNDS.map((key, r) => {
         const x = 30 + r * 140;
         return (
@@ -1625,9 +1613,6 @@ export function AllBrownFigure() {
         </T>
       </g>
       <g className="sm-in" style={delay(1.6)}>
-        <T x={xs[1]} y={cy + r + 26} size={14} fill={MUTED}>
-          gone? mostly.
-        </T>
       </g>
     </svg>
     </Steps>
@@ -1963,17 +1948,7 @@ export function ChromogenicRoundFigure() {
         <rect x={mid(2) - 58} y={196} width={116} height={10} rx={3} fill={SURFACE} stroke={FG} strokeWidth={1.6} />
         {/* ImageJ, open on it: its microscope, top right */}
         <g transform={`translate(${mid(2) + 40} 63)`}>
-          <title>ImageJ</title>
-          <rect width={28} height={28} rx={6} fill="#f8fafc" />
-          <g transform="scale(0.933)">
-            <g fill="#1d4f91">
-              <rect x={6} y={23.5} width={18} height={3} rx={1.5} />
-              <rect x={8} y={18.5} width={11} height={2} rx={1} />
-              <rect x={10} y={4} width={6.5} height={10} rx={1.5} />
-              <rect x={11.7} y={14} width={3} height={3.2} />
-            </g>
-            <path d="M20.5 24 V11.5 Q20.5 8 17 8 H16" fill="none" stroke="#1d4f91" strokeWidth={3} strokeLinecap="round" />
-          </g>
+          <ImageJGlyph />
         </g>
         {entries.map((e, r) => (
           <g key={r} className={`${u}-entry${r}`}>
@@ -2323,13 +2298,6 @@ export function OverworkedKimFigure() {
           <rect x={132} y={108} width={68} height={8} rx={3} />
         </g>
       </g>
-      <T className="sm-fade" style={delay(0.5)} x={82} y={428} size={15} fill={MUTED}>
-        staining bench
-      </T>
-      <T className="sm-fade" style={delay(0.5)} x={360} y={428} size={15} fill={MUTED}>
-        microscope
-      </T>
-
       {/* Kim, in transit */}
       <g transform="translate(60 242)">
         <g className={`${u}-run`}>
@@ -2689,15 +2657,10 @@ ${onClock(name)}
       </T>
     </g>
   );
-  const title = (x: number, y: number, text: string, sub: string, at: number, anchor: 'middle' | 'end' = 'middle') => (
-    <>
-      <T className="sm-in" style={delay(at)} x={x} y={y} anchor={anchor} size={19} weight={600}>
-        {text}
-      </T>
-      <T className="sm-in" style={delay(at + 0.05)} x={x} y={y + 20} anchor={anchor} size={14} fill={MUTED}>
-        {sub}
-      </T>
-    </>
+  const title = (x: number, y: number, text: string, at: number, anchor: 'middle' | 'end' = 'middle') => (
+    <T className="sm-in" style={delay(at)} x={x} y={y} anchor={anchor} size={19} weight={600}>
+      {text}
+    </T>
   );
   /** A thick, outlined arm segment. */
   const link = (d: string) => (
@@ -2811,8 +2774,8 @@ ${onClock(name)}
         </g>
       </g>
       <g className={dreamOnly}>
-        {title(96, 356, 'Slide rack', 'HE-07', 0.3)}
-        {title(ARM.x, 356, 'Robot arm', 'carries every slide', 0.4)}
+        {title(96, 356, 'Slide rack', 0.3)}
+        {title(ARM.x, 356, 'Robot arm', 0.4)}
       </g>
       {lab ? (
         <g {...labOnly(1.4)}>
@@ -2861,7 +2824,7 @@ ${onClock(name)}
             )),
           )}
         </g>
-        {title(490, 62, 'OT-2', 'stains · washes', 0.55)}
+        {title(490, 78, 'OT-2', 0.55)}
       </g>
 
       {/* the openUC2: cubes, an objective, a camera */}
@@ -2881,7 +2844,7 @@ ${onClock(name)}
           </g>
         </g>
       </g>
-      <g className={dreamOnly}>{title(490, 247, 'openUC2', 'tiles', 0.7)}</g>
+      <g className={dreamOnly}>{title(490, 263, 'openUC2', 0.7)}</g>
       {lab ? (
         <g {...labOnly(1.4)}>
           <T x={226} y={318} anchor="end" size={19} weight={600}>
@@ -2902,7 +2865,7 @@ ${onClock(name)}
               <polygon key={i} className="sm-pop" style={delay(1 + i * 0.1)} points={starPoly(x - 6, y - 6, r * 0.85, i)} fill={LABELS[i % LABELS.length]} fillOpacity={0.35} stroke={LABELS[i % LABELS.length]} strokeWidth={2} />
             ))}
           </g>
-          {title(900, 402, 'Cellpose', 'segment cells', 0.85)}
+          {title(900, 402, 'Cellpose', 0.85)}
         </g>
       </g>
 
@@ -2930,7 +2893,7 @@ ${onClock(name)}
               </g>
             ))}
           </g>
-          {title(700, 402, 'Measure', 'stain per cell', 1)}
+          {title(700, 402, 'Measure', 1)}
         </g>
       </g>
 
@@ -2946,7 +2909,7 @@ ${onClock(name)}
               gone?
             </T>
           </g>
-          {title(490, 402, 'Decide', 'wash again · next · done', 1.15)}
+          {title(490, 402, 'Decide', 1.15)}
         </g>
       </g>
 
@@ -3174,7 +3137,7 @@ export function KimLoopFigure({ variant }: { variant: LoopVariant }) {
     last year's environment (reproducibility), and a little graveyard of AI
     projects nobody uses any more. */
 export function YearsFigure() {
-  const head = 'font-mono text-[13px] font-bold uppercase tracking-[0.16em] text-fd-muted-foreground';
+  const head = 'text-[17px] font-semibold text-fd-muted-foreground';
   /* the shared drive: name, left, top, tilt, and whether it is the "real" one */
   const files: [string, number, number, number, ('hot' | 'dead')?][] = [
     ['final.tif', 8, 6, -4, 'dead'],
@@ -3213,7 +3176,7 @@ export function YearsFigure() {
     <div className="grid grid-cols-3 gap-5">
       {/* data management: the shared drive */}
       <div className="flex flex-col gap-3">
-        <span className={head}>data management · the shared drive</span>
+        <span className={head}>Data management: the shared drive</span>
         <div className="relative h-[300px]">
           {files.map(([name, left, top, tilt, kind]) => (
             <span
@@ -3234,7 +3197,7 @@ export function YearsFigure() {
 
       {/* reproducibility: last year's environment */}
       <div className="flex flex-col gap-3">
-        <span className={head}>reproducibility · one year later</span>
+        <span className={head}>Reproducibility: one year later</span>
         <div className="relative h-[300px]">
           <div className="flex h-[236px] flex-col gap-[3px] rounded-xl bg-[#111827] px-4 py-3 font-mono text-[13.5px] leading-[1.5]">
             {term.map(([line, color]) => (
@@ -3256,7 +3219,7 @@ export function YearsFigure() {
 
       {/* the graveyard of unused AI */}
       <div className="flex flex-col gap-3">
-        <span className={head}>the graveyard of unused AI</span>
+        <span className={head}>The graveyard of unused tailored UIs</span>
         <svg width={372} height={300} viewBox="0 0 372 300" role="img" aria-label="A graveyard at night. The headstones: the lab chatbot, 2023 to 2023; classifier v3, saw 12 cells; the AI pilot project, the PhD left; the vibe-coded GUI, ran once; the agentic pipeline, demo only. A small ghost with a sparkle floats above them." className="block rounded-xl">
           <rect width={372} height={300} rx={12} fill="#111827" />
           {/* the moon, and a few stars */}
@@ -3880,21 +3843,22 @@ ${horsemanAmbientCss(u)}`;
 
 /* --- Pandora's box ---------------------------------------------------------- */
 
-/** Where each of the four spirits goes once it is out of the box: a path from
-    the opening to where its head ends up. */
+/** Where each of the four spirits goes once it is out of the eyepiece: a path
+    from the top of the tube to where its head ends up. */
 const PANDORA_PLUMES: { night: HorsemanKey; d: string; head: [number, number]; tilt: number }[] = [
-  { night: 'communication', d: 'M214 404 C 190 330, 84 346, 78 256 C 74 204, 112 178, 92 128', head: [92, 128], tilt: -14 },
-  { night: 'threads', d: 'M224 404 C 214 326, 150 300, 172 226 C 190 168, 146 130, 180 66', head: [180, 66], tilt: -6 },
-  { night: 'data', d: 'M236 404 C 250 326, 312 304, 290 228 C 272 166, 322 134, 288 72', head: [288, 72], tilt: 6 },
-  { night: 'repro', d: 'M246 404 C 276 334, 380 350, 384 262 C 386 208, 346 184, 372 134', head: [372, 134], tilt: 14 },
+  { night: 'communication', d: 'M226 272 C 205 215, 110 236, 96 172 C 88 142, 108 128, 92 100', head: [92, 100], tilt: -14 },
+  { night: 'threads', d: 'M229 272 C 220 215, 165 206, 178 150 C 188 110, 160 90, 180 54', head: [180, 54], tilt: -6 },
+  { night: 'data', d: 'M232 272 C 240 215, 300 206, 288 150 C 278 110, 312 92, 290 58', head: [290, 58], tilt: 6 },
+  { night: 'repro', d: 'M235 272 C 256 220, 372 242, 380 176 C 384 144, 356 130, 374 104', head: [374, 104], tilt: 14 },
 ];
 
-/** Pandora's box, for the beat after Claude's cheerful answer. On arrival it
-    is shut, with a glow throbbing in the seam under the lid. One press of
-    "next": it rattles, the lid flies open in a burst of light, and four
-    spirits wind out of it one after the other, in the colours of the four
-    horses (white, red, black, pale), each with a pair of red eyes. They are
-    not the horsemen yet, just a promise of them; the nights introduce each. */
+/** Pandora's box, for the beat after Claude's cheerful answer, and here the
+    box is a microscope. On arrival it stands there with its dust cap on the
+    eyepiece and a glow throbbing under the cap. One press of "next": it
+    rattles, the cap flies off in a burst of light, and four spirits wind up
+    out of the eyepiece one after the other, in the colours of the four horses
+    (white, red, black, pale), each with a pair of red eyes. They are not the
+    horsemen yet, just a promise of them; the nights introduce each. */
 export function PandoraBoxFigure() {
   const u = useUid();
   const W = 460;
@@ -3905,17 +3869,21 @@ export function PandoraBoxFigure() {
   const gap = 0.3;
   const draw = 0.9;
   const end = first + (PANDORA_PLUMES.length - 1) * gap + draw + 0.6;
+  /* The microscope is drawn in its own 220 x 390 box and set down at the
+     bottom of the figure; its eyepiece ends up at (230, 261). */
+  const scope = { x: 153, y: 261, k: 0.7 };
   const css = `
-.${u}-box, .${u}-shut, .${u}-lid { transform-box: view-box; }
-.${u}-box { transform-origin: 230px 500px; }
-.${u}-shut, .${u}-lid { transform-origin: 230px 400px; }
-.${u}-shut { transform: scaleY(0); }
-.${u}-seam { opacity: 0; }
+.${u}-scope, .${u}-cap { transform-box: view-box; }
+.${u}-scope { transform-origin: 230px 534px; }
+.${u}-cap { transform-origin: 230px 258px; opacity: 0; }
+.${u}-glow, .${u}-ring { opacity: 0; }
+.${u}-ring { transform-box: fill-box; transform-origin: center; }
+section.present .${u}-ring { animation: ${u}-ring 1.1s ease-out var(--d) both; }
+@keyframes ${u}-ring { 0% { opacity: 0; transform: scale(0.4); } 8% { opacity: 0.9; } 100% { opacity: 0; transform: scale(2.4); } }
 .${u}-throb { animation: ${u}-throb 1.6s ease-in-out infinite; }
-section.present .${u}-box { animation: ${u}-shake 0.6s ease-in-out ${shake}s both; }
-section.present .${u}-shut { animation: ${u}-shut 0.16s ease-in ${open}s both; }
-section.present .${u}-lid { animation: ${u}-lift 0.34s cubic-bezier(.3,1.7,.5,1) ${open + 0.16}s both; }
-section.present .${u}-seam { animation: ${u}-seam 0.16s linear ${open}s both; }
+section.present .${u}-scope { animation: ${u}-shake 0.6s ease-in-out ${shake}s both; }
+section.present .${u}-cap { animation: ${u}-cap 0.7s cubic-bezier(.2,.7,.4,1) ${open}s both; }
+section.present .${u}-glow { animation: ${u}-glow 0.2s linear ${open}s both; }
 section.present .${u}-plume { animation: ${u}-rise ${draw}s cubic-bezier(.4,0,.2,1) var(--d) both; }
 @keyframes ${u}-shake {
   0%, 100% { transform: none; }
@@ -3925,17 +3893,21 @@ section.present .${u}-plume { animation: ${u}-rise ${draw}s cubic-bezier(.4,0,.2
   62% { transform: translateY(-6px) rotate(4deg); }
   80% { transform: rotate(-2deg); }
 }
-@keyframes ${u}-shut { from { transform: scaleY(1); } to { transform: scaleY(0); } }
-@keyframes ${u}-lift { from { transform: scaleY(0); } to { transform: none; } }
-@keyframes ${u}-seam { from { opacity: 1; } to { opacity: 0; } }
+@keyframes ${u}-cap {
+  0% { opacity: 1; transform: none; }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(120px, -150px) rotate(200deg); }
+}
+@keyframes ${u}-glow { from { opacity: 1; } to { opacity: 0; } }
 @keyframes ${u}-throb { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
 @keyframes ${u}-rise { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .${u}-throb, section.present :is(.${u}-box, .${u}-shut, .${u}-lid, .${u}-seam, .${u}-plume) { animation: none; }
+  .${u}-throb, section.present :is(.${u}-scope, .${u}-cap, .${u}-glow, .${u}-ring, .${u}-plume) { animation: none; }
 }
 `;
   const OUT = '#111';
-  const WOOD = '#8b5a2b';
+  const BODY = '#d9dde4';
+  const DARK = '#2b303b';
   const GOLD = '#e0a526';
   return (
     <Steps live cues={[0.3, end]} className="relative shrink-0">
@@ -3945,7 +3917,7 @@ section.present .${u}-plume { animation: ${u}-rise ${draw}s cubic-bezier(.4,0,.2
         viewBox={`0 0 ${W} ${H}`}
         className="overflow-visible"
         role="img"
-        aria-label="Pandora’s box bursts open, and four spirits in the colours of the four horses wind out of it."
+        aria-label="A microscope as Pandora’s box: the cap flies off its eyepiece, and four spirits in the colours of the four horses wind up out of it."
       >
         <LoopStyles css={css} />
         <defs>
@@ -3953,22 +3925,16 @@ section.present .${u}-plume { animation: ${u}-rise ${draw}s cubic-bezier(.4,0,.2
             <feGaussianBlur stdDeviation={9} />
           </filter>
           <linearGradient id={`${u}-cone`} x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0" stopColor="#fde68a" stopOpacity={0.75} />
+            <stop offset="0" stopColor="#fde68a" stopOpacity={0.8} />
             <stop offset="1" stopColor="#fde68a" stopOpacity={0} />
           </linearGradient>
         </defs>
 
         {/* the light that comes out with them */}
-        <polygon className="sm-fade" style={delay(open + 0.1)} points="146,404 314,404 430,120 30,120" fill={`url(#${u}-cone)`} />
+        <polygon className="sm-fade" style={delay(open + 0.1)} points="219,264 241,264 430,30 30,30" fill={`url(#${u}-cone)`} />
         {[0, 0.18].map((d) => (
-          <circle key={d} className="sm-ping" style={delay(open + 0.12 + d)} cx={230} cy={392} r={70} fill="none" stroke={GOLD} strokeWidth={5} />
+          <circle key={d} className={`${u}-ring`} style={delay(open + 0.12 + d)} cx={230} cy={258} r={52} fill="none" stroke={GOLD} strokeWidth={5} />
         ))}
-
-        {/* the lid, thrown back: its inside, seen from the front */}
-        <g className={`${u}-lid`}>
-          <path d="M132 402 L146 318 Q148 304 164 304 L296 304 Q312 304 314 318 L328 402 Z" fill="#3b230e" stroke={OUT} strokeWidth={3.5} strokeLinejoin="round" />
-          <path d="M152 396 L162 326 Q163 320 170 320 L290 320 Q297 320 298 326 L308 396 Z" fill="#24150a" />
-        </g>
 
         {/* the four of them, one after the other */}
         {PANDORA_PLUMES.map(({ night, d, head, tilt }, i) => {
@@ -3978,9 +3944,9 @@ section.present .${u}-plume { animation: ${u}-rise ${draw}s cubic-bezier(.4,0,.2
           return (
             <g key={night}>
               <g className="sm-fade" style={delay(at)}>
-                <path {...line} stroke={h.aura} strokeWidth={40} filter={`url(#${u}-blur)`} />
-                <path {...line} stroke={OUT} strokeWidth={23} />
-                <path {...line} stroke={h.horse} strokeWidth={17} />
+                <path {...line} stroke={h.aura} strokeWidth={38} filter={`url(#${u}-blur)`} />
+                <path {...line} stroke={OUT} strokeWidth={21} />
+                <path {...line} stroke={h.horse} strokeWidth={15} />
               </g>
               <g transform={`translate(${head[0]} ${head[1]}) rotate(${tilt})`}>
                 <g className="sm-pop" style={delay(at + draw - 0.2)}>
@@ -3997,36 +3963,266 @@ section.present .${u}-plume { animation: ${u}-rise ${draw}s cubic-bezier(.4,0,.2
           );
         })}
 
-        {/* the box */}
-        <g className={`${u}-box`}>
-          <rect x={130} y={400} width={200} height={104} rx={9} fill={WOOD} stroke={OUT} strokeWidth={3.5} />
-          {[434, 468].map((y) => (
-            <path key={y} d={`M133 ${y} H327`} stroke="#5b3716" strokeWidth={2.5} />
-          ))}
-          {[152, 294].map((x) => (
-            <rect key={x} x={x} y={400} width={14} height={104} fill={GOLD} stroke={OUT} strokeWidth={2.5} />
-          ))}
-          <rect x={212} y={400} width={36} height={34} rx={5} fill={GOLD} stroke={OUT} strokeWidth={2.5} />
-          <circle cx={230} cy={413} r={4.5} fill={OUT} />
-          <path d="M230 414 L226 427 H234 Z" fill={OUT} />
-
-          {/* shut, on arrival */}
-          <g className={`${u}-shut`}>
-            <path d="M124 402 L124 376 Q124 348 152 348 L308 348 Q336 348 336 376 L336 402 Z" fill="#9c6a35" stroke={OUT} strokeWidth={3.5} strokeLinejoin="round" />
-            {[152, 294].map((x) => (
-              <rect key={x} x={x} y={350} width={14} height={52} fill={GOLD} stroke={OUT} strokeWidth={2.5} />
-            ))}
-            <path d="M128 374 H332" stroke="#5b3716" strokeWidth={2.5} />
+        {/* the microscope */}
+        <g className={`${u}-scope`}>
+          <g transform={`translate(${scope.x} ${scope.y}) scale(${scope.k})`} strokeLinejoin="round">
+            {/* the arm, from the tube round to the foot */}
+            <path d="M128 84 C 214 84, 226 190, 196 262 L196 366" fill="none" stroke={OUT} strokeWidth={40} strokeLinecap="round" />
+            <path d="M128 84 C 214 84, 226 190, 196 262 L196 366" fill="none" stroke={BODY} strokeWidth={31} strokeLinecap="round" />
+            {/* the foot, and the lamp in it */}
+            <rect x={8} y={358} width={208} height={32} rx={13} fill={DARK} stroke={OUT} strokeWidth={5} />
+            <rect x={86} y={334} width={48} height={26} rx={5} fill={DARK} stroke={OUT} strokeWidth={5} />
+            <rect x={96} y={326} width={28} height={10} rx={3} fill="#fde68a" stroke={OUT} strokeWidth={4} />
+            {/* the stage, its condenser, and a slide on it */}
+            <rect x={96} y={256} width={28} height={30} rx={4} fill={DARK} stroke={OUT} strokeWidth={5} />
+            <rect x={18} y={240} width={176} height={16} rx={5} fill={DARK} stroke={OUT} strokeWidth={5} />
+            <rect x={66} y={232} width={88} height={9} rx={2} fill="#dbeafe" stroke={OUT} strokeWidth={3.5} />
+            <ellipse cx={110} cy={236.5} rx={15} ry={2.6} fill="#c084fc" />
+            {/* the focus knob */}
+            <circle cx={198} cy={296} r={21} fill={DARK} stroke={OUT} strokeWidth={5} />
+            <circle cx={198} cy={296} r={8} fill={GOLD} stroke={OUT} strokeWidth={3.5} />
+            {/* the nosepiece and the objective */}
+            <path d="M99 166 L121 166 L117 220 L103 220 Z" fill={BODY} stroke={OUT} strokeWidth={5} />
+            <rect x={101} y={196} width={18} height={7} fill={GOLD} stroke={OUT} strokeWidth={3} />
+            <rect x={78} y={140} width={64} height={28} rx={8} fill={DARK} stroke={OUT} strokeWidth={5} />
+            {/* the tube and the eyepiece */}
+            <rect x={90} y={30} width={40} height={112} rx={5} fill={BODY} stroke={OUT} strokeWidth={5} />
+            <rect x={90} y={52} width={40} height={11} fill={GOLD} stroke={OUT} strokeWidth={3.5} />
+            <rect x={96} y={2} width={28} height={30} rx={4} fill={DARK} stroke={OUT} strokeWidth={5} />
           </g>
-          {/* what is already leaking out under the lid */}
-          <g className={`${u}-seam`}>
+
+          {/* what is already leaking out under the cap */}
+          <g className={`${u}-glow`}>
             <g className={`${u}-throb`}>
-              <path d="M128 401 H332" stroke="#fde68a" strokeWidth={12} strokeLinecap="round" filter={`url(#${u}-blur)`} />
-              <path d="M130 401 H330" stroke="#fef3c7" strokeWidth={3} strokeLinecap="round" />
+              <path d="M214 262 H246" stroke="#fde68a" strokeWidth={14} strokeLinecap="round" filter={`url(#${u}-blur)`} />
+              <path d="M219 262 H241" stroke="#fef3c7" strokeWidth={3} strokeLinecap="round" />
             </g>
+          </g>
+          {/* the dust cap, on arrival */}
+          <g className={`${u}-cap`}>
+            <rect x={215} y={246} width={30} height={15} rx={5} fill={DARK} stroke={OUT} strokeWidth={3.5} />
+            <rect x={219} y={250} width={22} height={3} rx={1.5} fill="#4b5563" />
           </g>
         </g>
       </svg>
     </Steps>
+  );
+}
+
+/** ImageJ's microscope on its light tile, drawn in a 28px box. */
+function ImageJGlyph() {
+  return (
+    <>
+      <title>ImageJ</title>
+      <rect width={28} height={28} rx={6} fill="#f8fafc" />
+      <g transform="scale(0.933)">
+        <g fill="#1d4f91">
+          <rect x={6} y={23.5} width={18} height={3} rx={1.5} />
+          <rect x={8} y={18.5} width={11} height={2} rx={1} />
+          <rect x={10} y={4} width={6.5} height={10} rx={1.5} />
+          <rect x={11.7} y={14} width={3} height={3.2} />
+        </g>
+        <path d="M20.5 24 V11.5 Q20.5 8 17 8 H16" fill="none" stroke="#1d4f91" strokeWidth={3} strokeLinecap="round" />
+      </g>
+    </>
+  );
+}
+
+/** The ImageJ icon on its own, for use in running text. */
+export function ImageJIcon({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 28 28" role="img" aria-label="ImageJ" className="inline-block shrink-0 align-middle">
+      <ImageJGlyph />
+    </svg>
+  );
+}
+
+/* --- who I am right now ---------------------------------------------------------- */
+
+/** The presenter, as a puppet with his own photo for a head, one key press
+    per beat (reveal fragments, CSS transitions): he stands next to a crying
+    baby in its basket; he bends down to fetch it; his back gives out and he
+    is stuck half bent, baby in his arms; and like that he shuffles over to
+    the laptop and presents. */
+export function RightNowFigure({ photo }: { photo: string }) {
+  const u = useUid();
+  const hip = { x: 300, y: 270 };
+  const walk = 440; // how far it is to the desk
+  const on = (n: number, sel: string) => `.${u}-s${n}.visible ~ ${sel}, .${u}-s${n}.visible ~ * ${sel}`;
+  const css = `
+.${u}-torso, .${u}-arms, .${u}-me { transform-box: view-box; transition: transform 0.9s cubic-bezier(.4,0,.2,1); }
+.${u}-torso { transform-origin: ${hip.x}px ${hip.y}px; }
+.${u}-arms { transform-origin: ${hip.x}px 172px; }
+.${u}-me { transition-duration: 2.2s; }
+:is(.${u}-pain, .${u}-ouch, .${u}-talk, .${u}-lit) { opacity: 0; transition: opacity 0.3s ease-out; }
+/* on arrival: a happy dad, stars all around. They go when the back does. */
+.${u}-happy { transition: opacity 0.15s ease-out; }
+.${u}-star { transform-box: fill-box; transform-origin: center; animation: ${u}-twinkle 1.4s ease-in-out infinite alternate; }
+@keyframes ${u}-twinkle { from { transform: scale(0.6) rotate(-12deg); opacity: 0.5; } to { transform: scale(1.15) rotate(12deg); opacity: 1; } }
+${on(2, `.${u}-happy`)} { opacity: 0; }
+/* press 1: down he goes */
+${on(1, `.${u}-torso`)} { transform: rotate(80deg); }
+${on(1, `.${u}-arms`)} { transform: rotate(-80deg); }
+/* press 2: and there goes the back. A crack, a flash, the whole room shakes;
+   half way up is as far as he gets. The baby stays where it is. */
+${on(2, `.${u}-torso`)} { transform: rotate(34deg); transition: transform 0.18s cubic-bezier(.3,2.2,.5,1); }
+${on(2, `.${u}-arms`)} { transform: rotate(-34deg); transition-duration: 0.18s; }
+${on(2, `.${u}-pain`)} { opacity: 1; transition-duration: 0.05s; }
+${on(2, `.${u}-shake`)} { animation: ${u}-shake 0.7s linear both; }
+${on(2, `.${u}-flash`)} { animation: ${u}-flash 0.8s ease-out both; }
+${on(2, `.${u}-burst`)} { animation: ${u}-burst 0.45s cubic-bezier(.2,1.8,.4,1) both; }
+${on(2, `.${u}-ouch`)} { animation: ${u}-scream 0.5s cubic-bezier(.2,1.8,.4,1) 0.25s both; }
+@keyframes ${u}-shake {
+  0%, 100% { transform: none; }
+  10% { transform: translate(-14px, 6px) rotate(-1deg); } 20% { transform: translate(12px, -8px) rotate(1deg); }
+  30% { transform: translate(-10px, -4px); } 40% { transform: translate(10px, 6px); }
+  55% { transform: translate(-6px, 3px); } 70% { transform: translate(5px, -3px); } 85% { transform: translate(-2px, 1px); }
+}
+@keyframes ${u}-flash { 0% { opacity: 0; } 8% { opacity: 0.75; } 100% { opacity: 0; } }
+@keyframes ${u}-burst { from { opacity: 0; transform: scale(0.2) rotate(-20deg); } to { opacity: 1; transform: scale(1) rotate(-8deg); } }
+@keyframes ${u}-scream { from { opacity: 0; transform: scale(0.3) rotate(-5deg); } to { opacity: 1; transform: scale(1) rotate(-5deg); } }
+.${u}-burst { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.${u}-flash { opacity: 0; }
+/* press 3: like that, over to the laptop */
+${on(3, `.${u}-me`)} { transform: translateX(${walk}px); }
+${on(3, `.${u}-ouch`)} { animation: none; opacity: 0; }
+${on(3, `.${u}-burst`)} { animation: none; opacity: 0; }
+${on(3, `.${u}-shake`)} { animation: none; }
+${on(3, `.${u}-flash`)} { animation: none; }
+${on(3, `.${u}-talk`)} { opacity: 1; transition-delay: 2.2s; }
+${on(3, `.${u}-lit`)} { opacity: 1; transition-delay: 2s; }
+.${u}-bolt { transform-box: fill-box; transform-origin: center; animation: ${u}-bolt 0.5s ease-in-out infinite alternate; }
+@keyframes ${u}-bolt { from { transform: scale(0.85); opacity: 0.7; } to { transform: scale(1.15); opacity: 1; } }
+.${u}-wah { animation: ${u}-wah 0.6s ease-in-out infinite alternate; }
+@keyframes ${u}-wah { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-4px) rotate(3deg); } }
+@media (prefers-reduced-motion: reduce) { :is(.${u}-bolt, .${u}-wah, .${u}-star) { animation: none; } :is(.${u}-torso, .${u}-arms, .${u}-me) { transition: none; } }
+`;
+  const ink = '#1f2937';
+  const skin = '#e0ac86';
+  const bolt = 'M0 0 L10 -4 L6 6 L18 4 L4 22 L8 10 L-2 12 Z';
+  // a comic starburst, for the crack
+  const star = Array.from({ length: 24 }, (_, i) => {
+    const r = i % 2 ? 62 : 104;
+    const t = (i / 24) * Math.PI * 2;
+    return `${i ? 'L' : 'M'}${(Math.cos(t) * r * 1.25).toFixed(1)} ${(Math.sin(t) * r * 0.8).toFixed(1)}`;
+  }).join(' ') + ' Z';
+  const bubble = 'absolute whitespace-nowrap rounded-2xl border-2 border-fd-border bg-fd-card px-5 py-2.5 text-[26px] font-bold italic leading-none shadow-lg';
+  return (
+    <div className="sm-animate relative mx-auto h-[440px] w-[1180px]" role="img" aria-label="Who the presenter is right now, in four pictures: he stands next to a crying baby in its basket; he bends down to pick it up; his back gives out with a loud crack, and he is stuck half bent while the baby stays in its basket; and like that he shuffles over to a laptop and starts presenting.">
+      {[1, 2, 3].map((n) => (
+        <Fragment key={n} as="span" index={n} className={`${u}-s${n} absolute`} />
+      ))}
+      <LoopStyles css={css} />
+      <span className={`${u}-flash pointer-events-none absolute -inset-x-[40px] -inset-y-[120px] bg-[radial-gradient(ellipse_at_22%_55%,#ef4444,transparent_65%)]`} />
+      <svg width={1180} height={440} viewBox="0 0 1180 440" className={`${u}-shake absolute inset-0`} overflow="visible" aria-hidden>
+        <defs>
+          <clipPath id={`${u}-face`}>
+            <circle cx={hip.x} cy={104} r={48} />
+          </clipPath>
+        </defs>
+        <path d="M60 400 H1120" stroke={BORDER} strokeWidth={4} strokeLinecap="round" />
+
+        {/* the desk, and the laptop on it */}
+        <rect x={830} y={286} width={250} height={12} rx={4} fill={SURFACE} stroke={FG} strokeWidth={2.5} />
+        <path d="M850 298 V400 M1060 298 V400" stroke={FG} strokeWidth={5} strokeLinecap="round" />
+        <path d="M876 286 L900 190 H1030 L1020 286 Z" fill={ink} stroke={FG} strokeWidth={2.5} strokeLinejoin="round" />
+        <g className={`${u}-lit`}>
+          <path d="M888 276 L908 200 H1020 L1012 276 Z" fill={PRIMARY} fillOpacity={0.85} />
+          <text x={962} y={234} textAnchor="middle" fontSize={15} fontWeight={800} fill="var(--color-fd-primary-foreground)">
+            Smart
+          </text>
+          <text x={960} y={254} textAnchor="middle" fontSize={15} fontWeight={800} fill="var(--color-fd-primary-foreground)">
+            microscopy
+          </text>
+        </g>
+
+        {/* the basket the baby starts in */}
+        <path d="M374 356 H470 L458 398 H386 Z" fill="#d6b98c" stroke={FG} strokeWidth={2.5} strokeLinejoin="round" />
+        <path d="M374 356 Q422 300 470 356" fill="none" stroke={FG} strokeWidth={2.5} />
+
+        {/* the baby: it stays in its basket, whatever happens to him */}
+        <g>
+          <g className={`${u}-wah`}>
+            <ellipse cx={424} cy={352} rx={30} ry={17} fill="#fde68a" stroke={FG} strokeWidth={2.5} />
+            <circle cx={446} cy={336} r={15} fill={skin} stroke={FG} strokeWidth={2.5} />
+            <path d="M440 334 l5 2 M452 334 l-5 2" stroke={ink} strokeWidth={2} strokeLinecap="round" />
+            <ellipse cx={446} cy={343} rx={4} ry={3.5} fill="#7c2d12" />
+          </g>
+        </g>
+        {/* stars, all around the happy dad */}
+        <g className={`${u}-happy`}>
+          {(
+            [
+              [150, 96, 1.5],
+              [214, 40, 1],
+              [404, 44, 1.7],
+              [470, 130, 1.1],
+              [128, 214, 1.2],
+              [196, 316, 0.9],
+              [520, 216, 1.4],
+              [556, 330, 1],
+              [330, 8, 0.9],
+              [84, 330, 1.3],
+            ] as const
+          ).map(([x, y, k], i) => (
+            <g key={i} transform={`translate(${x} ${y}) scale(${k})`}>
+              <path className={`${u}-star`} d="M0 -14 L4 -4 L14 -3 L6 4 L9 14 L0 8 L-9 14 L-6 4 L-14 -3 L-4 -4 Z" fill="#facc15" stroke="#a16207" strokeWidth={1} style={{ animationDelay: `${(i % 5) * 0.25}s` }} />
+            </g>
+          ))}
+        </g>
+
+        {/* the crack, behind him */}
+        <g transform={`translate(${hip.x - 96} 214)`}>
+          <g className={`${u}-burst`}>
+            <path d={star} fill="#fde047" stroke="#dc2626" strokeWidth={5} strokeLinejoin="round" />
+            <text y={12} textAnchor="middle" fontSize={34} fontWeight={900} fill="#dc2626" letterSpacing={1}>
+              CRACK!
+            </text>
+          </g>
+        </g>
+
+        <g className={`${u}-me`}>
+          {/* legs */}
+          <path d={`M${hip.x - 10} ${hip.y} L${hip.x - 16} 394 M${hip.x + 10} ${hip.y} L${hip.x + 18} 394`} stroke="#334155" strokeWidth={18} strokeLinecap="round" />
+          <ellipse cx={hip.x - 10} cy={396} rx={20} ry={7} fill={ink} />
+          <ellipse cx={hip.x + 26} cy={396} rx={20} ry={7} fill={ink} />
+          {/* everything above the hip: it bends there */}
+          <g className={`${u}-torso`}>
+            <rect x={hip.x - 28} y={156} width={56} height={124} rx={22} fill="#93c5fd" stroke={FG} strokeWidth={2.5} />
+            <rect x={hip.x - 9} y={140} width={18} height={24} rx={7} fill={skin} />
+            {/* the head: the real one */}
+            <circle cx={hip.x} cy={104} r={51} fill={SURFACE} stroke={FG} strokeWidth={3} />
+            <image href={photo} x={hip.x - 52} y={46} width={104} height={128} preserveAspectRatio="xMidYMin slice" clipPath={`url(#${u}-face)`} />
+            {/* the arms: they hang, whatever the back does */}
+            <g className={`${u}-arms`}>
+              <path d={`M${hip.x} 176 V262`} stroke="#93c5fd" strokeWidth={17} strokeLinecap="round" />
+              <path d={`M${hip.x} 176 V262`} stroke={FG} strokeWidth={2.5} strokeLinecap="round" fill="none" strokeOpacity={0} />
+              <circle cx={hip.x} cy={268} r={10} fill={skin} stroke={FG} strokeWidth={2} />
+            </g>
+            {/* where it hurts */}
+            <g className={`${u}-pain`}>
+              {(
+                [
+                  [-66, 236, 2.2, 0],
+                  [-58, 186, 1.6, 0.2],
+                  [-84, 276, 1.8, 0.35],
+                  [-40, 150, 1.3, 0.1],
+                  [-100, 222, 1.4, 0.28],
+                ] as const
+              ).map(([dx, y, k, d]) => (
+                <g key={y} transform={`translate(${hip.x + dx} ${y}) scale(${k})`}>
+                  <path className={`${u}-bolt`} d={bolt} fill={d === 0.35 ? '#f97316' : '#ef4444'} stroke="#7f1d1d" strokeWidth={1.5} style={{ animationDelay: `${d}s` }} />
+                </g>
+              ))}
+            </g>
+          </g>
+        </g>
+      </svg>
+
+      <span className={`${bubble} left-[474px] top-[262px] text-[22px]`}>waaah!</span>
+      <span className={`${u}-happy absolute left-[362px] top-[70px] whitespace-nowrap rounded-2xl border-2 border-[#facc15] bg-fd-card px-5 py-2.5 text-[30px] font-bold leading-none shadow-lg`}>Happy dad :)</span>
+      <span className={`${u}-ouch absolute left-[330px] top-[-8px] whitespace-nowrap rounded-3xl border-[5px] border-red-600 bg-fd-card px-7 py-3 text-[58px] font-black uppercase leading-none tracking-[0.01em] text-red-600 shadow-2xl`}>Aaaah! My back!</span>
+      <span className={`${u}-talk ${bubble} left-[560px] top-[30px]`}>“…so. Smart microscopy!”</span>
+    </div>
   );
 }

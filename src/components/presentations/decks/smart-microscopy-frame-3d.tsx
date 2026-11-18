@@ -1,9 +1,9 @@
 'use client';
 
-/* The devices as still 3D models: the openUC2 FRAME behind "the microscope,
-   as an app", and the Fairino arm (arkirino) behind the slide about device
-   state. Same files as in Kim's dream, drawn once and left standing; nothing
-   here moves. */
+/* The devices as 3D models: the openUC2 FRAME next to "the microscope, as an
+   app", and the Fairino arm (arkirino). Same files as in Kim's dream. The
+   still ones are drawn once and left standing; the moving arm follows a list
+   of moves, once or on a loop. */
 
 import dynamic from 'next/dynamic';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
@@ -29,6 +29,8 @@ export const ARM_POSES = {
   home: [0, 0, 0, 0, 0, 0],
   to_ot2: ARM_POSE,
   to_scope: [1.6881, -0.3557, -0.4645, 1.0274, -1.688, -0.2074],
+  /* half way between the two, lifted clear */
+  between: [1.3785, -0.62, -0.227, 0.8735, -1.3783, -0.2078],
 };
 export type ArmMove = { at: number; to: keyof typeof ARM_POSES; takes?: number };
 const MODELS = {
@@ -108,7 +110,7 @@ const smooth = (u: number) => u * u * (3 - 2 * u);
 
 /** The arm, driven by a list of moves on a clock that starts when its slide
     comes up: at `at` seconds it starts towards the pose `to`. */
-function MovingArm({ moves, startRef }: { moves: ArmMove[]; startRef: React.RefObject<number> }) {
+function MovingArm({ moves, startRef, loop }: { moves: ArmMove[]; startRef: React.RefObject<number>; loop?: number }) {
   const { scene } = useGLTF(MODELS.arm.url, DRACO);
   const { model, offset, scale, joints } = useMemo(() => {
     const copy = scene.clone(true);
@@ -125,8 +127,10 @@ function MovingArm({ moves, startRef }: { moves: ArmMove[]; startRef: React.RefO
     };
   }, [scene]);
   useFrame(({ clock }) => {
-    const t = clock.elapsedTime - startRef.current;
-    let pose = ARM_POSES.home;
+    const since = clock.elapsedTime - startRef.current;
+    // on a loop the moves repeat every `loop` seconds, each round starting where the last one ended
+    const t = loop ? since % loop : since;
+    let pose = loop ? ARM_POSES[moves[moves.length - 1].to] : ARM_POSES.home;
     for (const move of moves) {
       if (t < move.at) break;
       const target = ARM_POSES[move.to];
@@ -153,7 +157,7 @@ function Restart({ startRef, token }: { startRef: React.RefObject<number>; token
   return null;
 }
 
-function MovingScene({ className, moves }: { className?: string; moves: ArmMove[] }) {
+function MovingScene({ className, moves, loop }: { className?: string; moves: ArmMove[]; loop?: number }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
   const [arrivals, setArrivals] = useState(0);
@@ -182,7 +186,7 @@ function MovingScene({ className, moves }: { className?: string; moves: ArmMove[
           <directionalLight position={[2, 3, 1.5]} intensity={1.8} />
           <Suspense fallback={null}>
             <Restart startRef={startRef} token={arrivals} />
-            <MovingArm moves={moves} startRef={startRef} />
+            <MovingArm moves={moves} startRef={startRef} loop={loop} />
           </Suspense>
         </Canvas>
       ) : null}
