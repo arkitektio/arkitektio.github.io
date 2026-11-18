@@ -6,7 +6,7 @@ import { FileText } from 'lucide-react';
  * the platform. Every showcase that was run with the Paper version links here.
  */
 export const WHATS_CHANGED_URL =
-  '/docs/concepts/whats-changed';
+  '/docs/about/whats-changed';
 
 /**
  * Marks a showcase that was run with the Paper version of Arkitekt. It is a

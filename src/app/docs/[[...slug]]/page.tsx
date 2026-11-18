@@ -12,7 +12,7 @@ import { getMDXComponents, StewardCard } from '@/components/site';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
-import { pageTypes, personaInfo } from '@/lib/persona';
+import { pageTypes } from '@/lib/page-type';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -22,31 +22,19 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
 
-  // what kind of page this is (its top folder) and who it is written for
-  const badges = [
-    pageTypes[page.slugs[0]],
-    ...page.data.personas.map((persona) => personaInfo[persona].badge),
-  ].filter(Boolean);
+  // what kind of page this is
+  const badge = page.data.type && pageTypes[page.data.type];
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
-      {badges.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {badges.map((badge, index) => (
-            <span
-              key={badge}
-              className={
-                index === 0
-                  ? 'rounded-full bg-fd-primary/10 px-2.5 py-0.5 text-xs font-medium text-fd-primary'
-                  : 'rounded-full border px-2.5 py-0.5 text-xs font-medium text-fd-muted-foreground'
-              }
-            >
-              {badge}
-            </span>
-          ))}
+      {badge && (
+        <div className="flex">
+          <span className="rounded-full bg-fd-primary/10 px-2.5 py-0.5 text-xs font-medium text-fd-primary">
+            {badge}
+          </span>
         </div>
       )}
-      {page.slugs[0] === 'tutorials' ? (
+      {page.data.type === 'tutorial' ? (
         // a tutorial names its steward to the right of the title
         <div className="flex items-center justify-between gap-6 max-sm:flex-col max-sm:items-start max-sm:gap-3">
           <DocsTitle>{page.data.title}</DocsTitle>

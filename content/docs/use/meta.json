@@ -1,0 +1,18 @@
+{
+  "title": "Use Arkitekt",
+  "description": "For scientists: connect and run workflows",
+  "icon": "Microscope",
+  "root": true,
+  "pages": [
+    "---Get connected---",
+    "joining",
+    "---First steps---",
+    "...first-steps",
+    "---Going further---",
+    "...advanced",
+    "---Apps and help---",
+    "apps",
+    "mobile-companion",
+    "troubleshooting"
+  ]
+}

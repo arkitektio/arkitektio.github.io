@@ -11,4 +11,4 @@ export { getMDXComponents, useMDXComponents } from './mdx';
 export { default as DefaultSearchDialog } from './search';
 export { Avatar, Steward, StewardCard } from './steward';
 export { ThemeSwitchWithConnector } from './sidebar-theme-switch';
-export { PersonaCard } from './persona';
+export { Guide, GuideScript, GuideStart } from './guide';

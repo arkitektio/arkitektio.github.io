@@ -2,14 +2,10 @@
   "title": "Arkitekt",
   "pages": [
     "index",
-    "---Tutorials---",
-    "...tutorials",
-    "---Guides---",
-    "...guides",
-    "---Reference---",
-    "...reference",
-    "---Concepts---",
-    "...concepts",
+    "use",
+    "run",
+    "build",
+    "about",
     "---Legal---",
     "privacy"
   ]

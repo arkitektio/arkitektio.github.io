@@ -1,0 +1,306 @@
+---
+title: Embedding in your own program
+description: "Walk through embedded_host.py: running an app beside a program that has its own main loop with run_detached, handing the program's own object to actions, state-driven dropdowns, actions registered only when the hardware is there, and showing the login, the connection and remote calls in the host's interface."
+type: tutorial
+---
+
+Every example so far was a script: `run(app)` takes over and blocks until you stop it. Many
+instruments are already controlled by a program, with a window, a server or threads of its own.
+That program can't hand over its main thread. This example shows how to add Arkitekt to such a
+program without restructuring it.
+
+<Prerequisites>
+
+- [A device with live state](/docs/build/python/examples/device-state)
+
+</Prerequisites>
+
+<Learn>
+
+- Start an app next to your own loop with `run_detached`, and stop it again
+- Give actions your program's own object through `app_context`
+- Offer a dropdown filled from the app's state with `withStateChoices`
+- Register an action only when the hardware supports it, with `app.register_action`
+- Show the login, the connection status and incoming calls in your own interface
+- Mark actions with `effects=` and `locks=`
+
+</Learn>
+
+The file is longer than the others, so this page goes through it in parts. The whole example is in
+the [arkitekt repository](https://github.com/arkitektio/arkitekt/blob/main/examples/embedded_host.py).
+
+## The program you already have
+
+```python title="embedded_host.py"
+class Instrument:
+    """The program you already have: a few pumps it drives, by name."""
+
+    def __init__(self, pumps: list[str], has_dispenser: bool) -> None:
+        self.flows = {name: 0.0 for name in pumps}
+        self.has_dispenser = has_dispenser
+        # The state the app publishes, once it runs: the host writes to it too.
+        self.published: "InstrumentState | None" = None
+
+    def set_flow(self, pump: str, ml_per_min: float) -> None:
+        if pump not in self.flows:
+            raise ValueError(f"No pump named {pump!r}: this instrument has {', '.join(self.flows)}.")
+        if not 0.0 <= ml_per_min <= 50.0:
+            raise ValueError("A pump runs between 0 and 50 ml/min.")
+        self.flows[pump] = ml_per_min  # here: the serial call to the real pump
+
+
+app = App("embedded-host", "0.1.0", app_context=Instrument)
+```
+
+`Instrument` stands in for your existing code: it knows its pumps and how to set their flow. In a
+real program `set_flow` would send a serial command.
+
+The app is declared with `app_context=Instrument`, as in
+[`typed_context.py`](/docs/build/python/examples/device-state#typed-context).
+Your program creates the `Instrument`, passes it to the run, and every action that asks for an
+`Instrument` gets that object. No global variables, no closures.
+
+## Publishing what the instrument does
+
+```python title="embedded_host.py"
+@app.state(name="instrument")
+class InstrumentState:
+    """What the instrument is doing. Watch this instead of asking for it."""
+
+    pumps: list[str] = field(default_factory=list)
+    flows: dict[str, float] = field(default_factory=dict)
+    dispensing: str = ""
+
+
+@app.startup
+def publish(instrument: Instrument) -> InstrumentState:
+    """Publish the instrument as it is when the app starts providing."""
+    instrument.published = InstrumentState(
+        pumps=list(instrument.flows), flows=dict(instrument.flows)
+    )
+    return instrument.published
+```
+
+The state follows the rule from the stage example: publish what the instrument is doing, and don't
+offer actions that read it back. `name="instrument"` is the key the state is published under. Other
+apps and widgets refer to it by that name.
+
+The startup hook also keeps a reference to the state in `instrument.published`. That lets the host
+program update the state from its own code later, when an operator changes something at the
+instrument.
+
+## Actions
+
+```python title="embedded_host.py"
+Pump = Annotated[str, withStateChoices("self.instrument.pumps"), Description("One of this instrument's pumps")]
+
+
+@app.action(effects=Effects.REPEATABLE, locks=["instrument"])
+def set_flow(
+    instrument: Instrument,
+    state: InstrumentState,
+    pump: Pump,
+    ml_per_min: Annotated[float, Description("0 stops the pump")],
+) -> None:
+    """Sets how fast one pump runs."""
+    instrument.set_flow(pump, ml_per_min)
+    state.flows[pump] = ml_per_min
+
+
+def dispense(
+    instrument: Instrument,
+    state: InstrumentState,
+    task: Task,
+    pump: Pump,
+    volume_ml: Annotated[float, Description("How much to dispense")],
+) -> None:
+    """Runs one pump until a volume went through, then stops it."""
+    rate = 10.0
+    instrument.set_flow(pump, rate)
+    state.flows[pump], state.dispensing = rate, pump
+    try:
+        steps = max(1, int(volume_ml / rate * 60 / 0.5))
+        for step in range(steps):
+            # Where a cancelled call stops: a sync action is only told when it asks.
+            task.check_cancelled()
+            koil.sleep(0.5)
+            task.progress(int(100 * (step + 1) / steps), f"{pump}: {volume_ml:.1f} ml")
+    finally:
+        instrument.set_flow(pump, 0.0)
+        state.flows[pump], state.dispensing = 0.0, ""
+```
+
+### A dropdown from the state
+
+```python
+Pump = Annotated[str, withStateChoices("self.instrument.pumps"), Description("One of this instrument's pumps")]
+```
+
+The pump names depend on the installation, so they can't be an `Enum` written in the code.
+`withStateChoices` points the input at the `pumps` field of this app's own `instrument` state.
+Orkestrator shows a dropdown with whatever pumps this instrument has. `Pump` is a type alias, so both
+actions reuse it.
+
+### Effects and locks
+
+```python
+@app.action(effects=Effects.REPEATABLE, locks=["instrument"])
+```
+
+- `effects=` tells callers what running the action **again** would do. Setting a flow twice
+  leaves the same result as once, so it is `REPEATABLE`. The final page explains why this matters
+  when an agent crashes.
+- `locks=["instrument"]` means only one task holding the `instrument` lock runs at a time. Two
+  callers can't drive the pumps at once.
+
+### Cancellation in a synchronous action
+
+```python
+task.check_cancelled()
+```
+
+A synchronous action only notices that it was cancelled when it checks. `dispense` checks in every
+loop iteration, and the `finally` block stops the pump whether the action finished, failed or was
+cancelled. Physical side effects need this kind of cleanup.
+
+### An action that isn't decorated
+
+`dispense` has no `@app.action`. Not every instrument has a dispenser, so the action is registered
+only if this one does:
+
+```python title="embedded_host.py"
+class Host:
+    """Stands in for the host program: its own loop, and a panel that is ``print``."""
+
+    def __init__(self, instrument: Instrument) -> None:
+        self.instrument = instrument
+        if instrument.has_dispenser:
+            # Offered only on an instrument that can do it.
+            app.register_action(dispense, effects=Effects.IRREVERSIBLE, locks=["instrument"])
+```
+
+`app.register_action(fn, ...)` does the same as the decorator, as a plain call. It takes the same
+options: here `effects=Effects.IRREVERSIBLE`, because dispensing twice puts liquid in the well twice.
+
+You can see the difference with `arkitekt inspect`: it imports the module but doesn't start the
+host, so it lists only `set_flow`. `dispense` is registered when the program runs.
+
+## Showing Arkitekt in the host's interface
+
+```python title="embedded_host.py"
+    def show(self, line: str) -> None:
+        print(f"[panel] {line}")
+
+    async def on_code(self, challenge: DeviceCodeChallenge) -> None:
+        self.show(f"approve at {challenge.verification_uri_complete} (code {challenge.user_code})")
+
+    async def on_state(self, state: ConnectionState) -> None:
+        self.show(f"arkitekt is {state.value}")
+
+    async def on_task(self, event: TaskEvent) -> None:
+        if event.kind is TaskEventKind.ASSIGNED:
+            self.show(f"called: {event.action} {event.arguments}")
+        elif event.kind in (TaskEventKind.DONE, TaskEventKind.FAILED, TaskEventKind.CANCELLED):
+            self.show(f"{event.action} {event.kind.value} {event.error or ''}".rstrip())
+
+    def operate(self) -> None:
+        """The host's own loop: someone at the instrument changes a pump now and then."""
+        while True:
+            time.sleep(5)
+            pump = random.choice(list(self.instrument.flows))
+            flow = float(random.choice([0, 5, 10]))
+            self.instrument.set_flow(pump, flow)
+            self.show(f"operator set {pump} to {flow} ml/min")
+            published = self.instrument.published
+            if published is not None:
+                # From the host's own thread, with no action involved: watchers see it at once.
+                published.flows[pump] = flow
+```
+
+The host has a "panel", which here is just `print`. Three callbacks feed it:
+
+| Callback | Called with | Use it to |
+|---|---|---|
+| `on_code` | a `DeviceCodeChallenge` | show the login link and code to the operator |
+| `on_state` | a `ConnectionState` | show whether Arkitekt is connecting, waiting for login, connected, … |
+| `on_task` | a `TaskEvent` | show that someone started an action, and how it ended |
+
+`operate` is the host's own loop. Every five seconds an imaginary operator changes a pump by hand.
+The host then writes the new flow to `published.flows`, **from its own thread, with no action
+involved**. Everyone watching the state sees the change. The state stays true no matter who changed
+the instrument.
+
+## Starting and stopping
+
+```python title="embedded_host.py"
+if __name__ == "__main__":
+    host = Host(Instrument(pumps=["buffer", "dye"], has_dispenser=True))
+    host.show("logged in before" if has_stored_login(app) else "needs a login")
+    running = run_detached(
+        app,
+        context=host.instrument,
+        headless=True,
+        device_code_hook=host.on_code,
+        connection_listener=host.on_state,
+        task_listener=host.on_task,
+    )
+    try:
+        host.operate()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        running.cancel()
+        if running.error is not None:
+            host.show(f"the run had failed: {running.error}")
+```
+
+- `has_stored_login(app)` checks, without connecting, whether a login is already stored, so the
+  host can tell the operator what to expect.
+- `run_detached(...)` **returns immediately** with a run object, and the app connects in the
+  background. `headless=True` means nothing is printed or opened by arkitekt itself: the login goes
+  only through `device_code_hook`.
+- The host goes on with its own loop.
+- On shutdown, `running.cancel()` stops the run (or a login that nobody approved). It can be called
+  from any thread. `running.error` holds what ended the run, if it failed.
+
+The callbacks are called on the run's own thread. In a GUI, hand what they receive to your toolkit
+the way it expects, for example with a Qt signal.
+
+<Callout type="warn" title="Don't put run() on a thread">
+
+Wrapping `run(app)` in a thread of your own looks simpler, but you would have to rebuild what
+`run_detached` already has: a way to stop it, to know its state and to cancel a pending login.
+
+</Callout>
+
+## Try it
+
+```bash
+uv run --script examples/embedded_host.py
+```
+
+The panel lines show the login prompt (or that a stored login was found), then the connection state
+as it changes. Approve the login, open the *embedded-host* app in Orkestrator, and:
+
+- watch `flows` in the state change every few seconds as the "operator" adjusts pumps,
+- run **Set Flow** and pick a pump from the dropdown,
+- run **Dispense**, cancel it halfway, and see the pump's flow return to 0.
+
+Each call you make shows up as a `[panel] called: …` line in the terminal.
+
+## Next
+
+- `run_detached` in full (run states, restarting, logging out): [docs/embedding.md](https://github.com/arkitektio/arkitekt/blob/main/docs/embedding.md) in the arkitekt repository
+- Next example: [When an agent dies](/docs/build/python/examples/recovery)
+
+<Quiz>
+  <Question q="Why does the host call run_detached instead of run?">
+    `run` blocks the calling thread until the app stops. `run_detached` returns at once with a run the host can watch and cancel, so the host keeps its own loop.
+  </Question>
+  <Question q="Why is dispense registered with app.register_action instead of @app.action?">
+    It should only be offered when the instrument has a dispenser, which is only known once the program runs.
+  </Question>
+  <Question q="An operator changes a pump at the instrument itself. How do watchers find out?">
+    The host writes the new value into the published state. Assigning to a state field publishes it, even from the host's own thread.
+  </Question>
+</Quiz>

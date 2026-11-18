@@ -1,0 +1,208 @@
+---
+title: Arrays between actions
+description: "Walk through in_memory_pipeline.py: declaring numpy arrays as an in-memory structure so read, segment and count actions can pass them to each other without storing anything."
+type: tutorial
+---
+
+So far every input and output has been a small value: a string, a number, a record. Real pipelines
+pass images from one step to the next. This example builds a three-step pipeline (read a TIFF,
+segment it, count the objects) where a numpy array goes from each action to the next.
+
+<Prerequisites>
+
+- [A device with live state](/docs/build/python/examples/device-state)
+
+</Prerequisites>
+
+<Learn>
+
+- Why a port can only use a type the app has registered
+- Register a type that stays on the agent with `app.memory_structure`
+- Know when in-memory data is the right choice, and when it isn't
+
+</Learn>
+
+## The example
+
+```python title="in_memory_pipeline.py"
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["arkitekt[rekuest]>=5", "tifffile>=2024.5.22", "scikit-image>=0.24", "numpy>=1.26"]
+# ///
+"""Offering: three actions that hand a numpy array to each other, on the agent.
+
+Run:  uv run --script examples/in_memory_pipeline.py
+
+A port may only name a class the app knows. ``app.memory_structure(np.ndarray)``
+declares one whose instances *stay here*: the array is kept by this agent and
+what travels is a reference to it, so `read_tiff -> segment -> count` can be
+wired into a workflow without a data layer in between.
+
+Use this for scratch data inside one pipeline. Anything worth keeping belongs in
+mikro — see `upload_cells3d.py` and `denoise_volume.py`.
+"""
+
+from pathlib import Path
+from typing import Annotated
+
+import numpy as np
+import tifffile
+from skimage import measure
+from skimage.filters import gaussian, threshold_otsu
+
+from arkitekt import App, Description, run
+
+app = App("in-memory-pipeline", "0.1.0")
+
+# Neither numpy nor this app owns a data layer: the instances live on the agent
+# and travel as a reference to it.
+app.memory_structure(np.ndarray, description="A numpy array held by this agent")
+
+DEMO_TIFF = Path.home() / ".arkitekt-examples" / "demo_cells.tif"
+
+
+@app.action
+def write_demo_tiff() -> str:
+    """Writes a small synthetic two-cell field to disk and returns its path, so the
+    other actions have something to read without a download.
+    """
+    DEMO_TIFF.parent.mkdir(parents=True, exist_ok=True)
+    y, x = np.mgrid[0:256, 0:256]
+    blobs = np.zeros((256, 256), dtype=np.float32)
+    for cy, cx, r in ((70, 70, 18), (180, 80, 22), (120, 190, 15)):
+        blobs += np.exp(-(((y - cy) ** 2 + (x - cx) ** 2) / (2 * r**2)))
+    noisy = blobs + np.random.default_rng(42).normal(0, 0.05, blobs.shape)
+    tifffile.imwrite(DEMO_TIFF, noisy.astype(np.float32))
+    return str(DEMO_TIFF)
+
+
+@app.action
+def read_tiff(path: Annotated[str, Description("A TIFF on this machine")]) -> np.ndarray:
+    """Reads a TIFF with tifffile. The array stays on this agent.
+    """
+    return np.asarray(tifffile.imread(path))
+
+
+@app.action
+def segment(
+    image: np.ndarray,
+    sigma: Annotated[float, Description("Smoothing before thresholding")] = 2.0,
+) -> np.ndarray:
+    """Otsu-thresholds a smoothed copy and labels the connected components.
+    """
+    smoothed = gaussian(image.astype(np.float32), sigma=sigma)
+    return measure.label(smoothed > threshold_otsu(smoothed))
+
+
+@app.action
+def count_objects(labels: np.ndarray) -> int:
+    """How many labels the mask carries, background excluded.
+    """
+    return int(labels.max())
+
+
+if __name__ == "__main__":
+    run(app)
+```
+
+<Callout type="warn" title="Fix the example in the repository first">
+
+The copy of `in_memory_pipeline.py` in the repository annotates its ports with `NDArray[Any]` from
+`numpy.typing`, and fails when it is imported:
+
+```
+StructureRegistryError: numpy._typing._array_like.NDArray[typing.Any] is not registered, ...
+```
+
+The registration is for `np.ndarray`, and a generic alias is a different annotation. The listing
+above is fixed: it annotates with `np.ndarray` and drops the `NDArray` import. Make the same change
+in your copy (or paste the listing over it) before you try the commands below.
+
+</Callout>
+
+### Every port needs a known type
+
+Arkitekt has to know how to send each input and output. For `str`, `int` and models it knows how.
+For a numpy array there are two possible answers, and arkitekt will not pick one for you:
+
+- **The array is worth keeping.** Then it belongs in a data service such as Mikro, and only a
+  reference to the stored dataset travels. The next pages do this.
+- **The array is scratch data**, an intermediate result inside one pipeline. Then nobody needs to
+  store it.
+
+If you annotate a port with a type arkitekt doesn't know, the import fails and tells you to choose.
+Older versions registered unknown types silently. A typo in an annotation then created a type that
+no other app could ever read.
+
+### Choosing "keep it here"
+
+```python
+app.memory_structure(np.ndarray, description="A numpy array held by this agent")
+```
+
+This line chooses the second answer for `np.ndarray`. When `read_tiff` returns an array, the array
+**stays in this process**. What the task returns is a reference to it. When a workflow passes that
+reference on to `segment`, the agent looks the array up and calls `segment` with the real array.
+`segment` itself is ordinary numpy and scikit-image code.
+
+The pipeline:
+
+| Action | Takes | Returns |
+|---|---|---|
+| `write_demo_tiff` | nothing | the path of a synthetic test image it wrote |
+| `read_tiff` | a path on this machine | an array, kept on the agent |
+| `segment` | an array | a label image, kept on the agent |
+| `count_objects` | a label image | an `int`, sent by value |
+
+Only the final count leaves the agent. The two arrays never cross the network.
+
+## Try it
+
+With the fix applied, `arkitekt inspect` shows which ports are in-memory references (the hash column is left out here):
+
+```bash
+uv run --with "arkitekt[rekuest]" --with tifffile --with scikit-image \
+  arkitekt inspect implementations examples/in_memory_pipeline.py
+```
+
+```
+action            takes                    returns
+write_demo_tiff   -                        return0: STRING
+read_tiff         path: STRING             return0: MEMORY_STRUCTURE
+segment           image: MEMORY_STRUCTURE, return0: MEMORY_STRUCTURE
+                  sigma: FLOAT?
+count_objects     labels: MEMORY_STRUCTURE return0: INT
+```
+
+Then run it against a server and build the pipeline in Orkestrator's workflow editor:
+**Write Demo Tiff → Read Tiff → Segment → Count Objects**. The synthetic image has three blobs, so
+the final count is 3. `write_demo_tiff` saves it to `~/.arkitekt-examples/demo_cells.tif`.
+
+## When not to use it
+
+An in-memory reference only means something to the process that holds it:
+
+- **Another app can't resolve it.** If `segment` lived in a different app, it couldn't get the
+  array. Data that crosses apps has to be stored somewhere both can reach.
+- **It disappears with the process.** If the app restarts, every reference it handed out is gone.
+- **It isn't provenance.** Nothing records where the array came from.
+
+Use in-memory structures for intermediate data inside one app's pipeline. Everything you want to
+look at, share or keep goes into a data service, which is what the next page does.
+
+## Next
+
+- All the ways data can travel: [Types & data](/docs/build/python/types)
+- Next example: [Uploading data from a script](/docs/build/python/examples/uploads)
+
+<Quiz>
+  <Question q="What happens if an action's parameter is annotated with a type arkitekt has not registered?">
+    Importing the app fails with a `StructureRegistryError` that tells you to register the type, either as a memory structure or as a structure with an expander and a shrinker.
+  </Question>
+  <Question q="What travels between read_tiff and segment?">
+    A reference to the array. The array itself stays in the agent's memory.
+  </Question>
+  <Question q="Why could an action in a different app not take read_tiff's output?">
+    The reference only resolves inside the process that holds the array. Data shared between apps has to be stored in a data service.
+  </Question>
+</Quiz>

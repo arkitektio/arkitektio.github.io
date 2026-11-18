@@ -47,7 +47,7 @@ export default function WhatsThisPage() {
             More detail in{' '}
             <Link
               className={linkClass}
-              href="/docs/guides/joining"
+              href="/docs/use/joining"
             >
               Joining somebody&apos;s server
             </Link>

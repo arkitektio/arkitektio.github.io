@@ -214,3 +214,35 @@ html[data-brand-hue-animate] {
 .bg-grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/* ----------------------------------------------------------------------------
+   The first-time guide in the corner of the docs (src/components/site/guide.tsx).
+   What it hides is written into a <style> of its own (guideCss in
+   src/lib/guide.ts); this is only how the mascot moves.
+   ------------------------------------------------------------------------- */
+.guide-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .guide-bob {
+    animation: guide-bob 3.6s ease-in-out infinite;
+  }
+  .guide-blink {
+    animation: guide-blink 5s infinite;
+  }
+  .guide-pop {
+    animation: guide-pop 0.2s ease-out;
+  }
+}
+@keyframes guide-bob {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  50% { translate: 0 -4px; rotate: -4deg; }
+}
+@keyframes guide-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+@keyframes guide-pop {
+  from { opacity: 0; translate: 0 6px; }
+}

@@ -1,0 +1,10 @@
+{
+  "title": "A bit more advanced",
+  "pages": [
+    "index",
+    "deep-learning",
+    "local-workflows",
+    "training",
+    "live"
+  ]
+}

@@ -2,7 +2,7 @@ import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { ImageZoom } from 'fumadocs-ui/components/image-zoom';
 import type { MDXComponents } from 'mdx/types';
 import type { ComponentProps } from 'react';
-import { PersonaCard } from './persona';
+import { GuideStart } from './guide';
 import { Steward } from './steward';
 import { Learn, Prerequisites } from '@/components/docs/tutorial';
 import { Question, Quiz } from '@/components/docs/quiz';
@@ -22,7 +22,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,
     img: DocImage,
-    PersonaCard,
+    GuideStart,
     Steward,
     // the parts every tutorial is built from
     Prerequisites,
