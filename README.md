@@ -61,9 +61,9 @@ personas: [run]
 ```
 
 A page can name several personas. Leave the key out for a page that is for everyone (philosophy,
-terminology, comparisons). The switch at the top of the sidebar lets a reader pick a persona (it starts on `use`); the
-sidebar, the search and the previous/next links then leave out pages tagged only for the others.
-Folders and sidebar headings follow their pages, so there is nothing to tag in a `meta.json`.
+terminology, comparisons). The tag shows as a badge above the page title ("For scientists", "For admins",
+"For developers"). It does not filter anything: the sidebar, the search and the previous/next links always
+cover all pages.
 
 ### Tutorials
 
