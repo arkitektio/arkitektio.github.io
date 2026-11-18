@@ -1,0 +1,17 @@
+{
+  "title": "About",
+  "description": "The ideas behind Arkitekt",
+  "icon": "BookOpen",
+  "root": true,
+  "pages": [
+    "index",
+    "basics",
+    "philosophy",
+    "terminology",
+    "provenance",
+    "performance",
+    "comparisons",
+    "whats-changed",
+    "ai"
+  ]
+}

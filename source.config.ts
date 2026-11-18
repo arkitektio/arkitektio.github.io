@@ -68,9 +68,9 @@ function rehypeBasePath() {
 export const docs = defineDocs({
   dir: 'content/docs',
   docs: {
-    // who a page is for; empty means everyone (see src/lib/persona.ts)
     schema: pageSchema.extend({
-      personas: z.array(z.enum(['use', 'run', 'build'])).default([]),
+      // what kind of page this is (Diataxis), shown as a badge (see src/lib/page-type.ts)
+      type: z.enum(['tutorial', 'guide', 'reference', 'concept']).optional(),
       // who guides a tutorial, a key of src/lib/team.ts (optional)
       steward: z.string().optional(),
     }),

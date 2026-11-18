@@ -1,14 +1,15 @@
 import { docs, showcases } from 'collections/server';
 import { loader } from 'fumadocs-core/source';
+import { lucideIconsPlugin } from 'fumadocs-core/source/plugins/lucide-icons';
 import { asset } from './base-path';
-import { personaPlugin } from './page-tree';
+import { guidePathPlugin } from './page-tree';
 import { docsContentRoute, docsImageRoute, docsRoute, showcaseRoute } from './shared';
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
   baseUrl: docsRoute,
   source: docs.toFumadocsSource(),
-  plugins: [personaPlugin()],
+  plugins: [lucideIconsPlugin(), guidePathPlugin()],
 });
 
 export const showcaseSource = loader({

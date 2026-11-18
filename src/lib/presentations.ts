@@ -21,6 +21,16 @@ export type Presentation = {
 
 export const presentations: Presentation[] = [
   {
+    slug: 'smart-microscopy',
+    title: 'Infrastructure for smart microscopy',
+    description:
+      'Kim’s AI-built sequential-staining loop works, and still leaves the same debt behind. Arkitekt pays it down, one horseman at a time, on open source hardware.',
+    topic: 'Arkitekt',
+    tags: ['Smart microscopy', 'Workflows', 'openUC2'],
+    slides: 61,
+    minutes: 45,
+  },
+  {
     slug: 'mikro-coordinate-system',
     title: 'The Mikro coordinate system',
     description:
@@ -29,7 +39,7 @@ export const presentations: Presentation[] = [
     tags: ['Coordinates', 'Metadata', 'Microscopy'],
     slides: 22,
     minutes: 18,
-    docsHref: '/docs/concepts/services/mikro/coordinate-systems',
+    docsHref: '/docs/build/services/mikro/coordinate-systems',
   },
   {
     slug: 'volume-viewer',

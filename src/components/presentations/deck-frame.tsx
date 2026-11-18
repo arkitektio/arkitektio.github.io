@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 import { Maximize, Minimize } from 'lucide-react';
 import type { RevealApi } from 'reveal.js';
 import { cn } from '@/lib/cn';
-import RevealDeck from './reveal-deck';
+import RevealDeck, { DECK_MARGIN } from './reveal-deck';
 
 /** `document.fullscreenEnabled` never changes, so there is nothing to subscribe to. */
 const noSubscribe = () => () => {};
@@ -39,6 +39,9 @@ export function DeckFrame({
   const fullscreen = useSyncExternalStore(
     useCallback((onStoreChange: () => void) => {
       const onChange = () => {
+        // Fullscreen uses the whole screen: no margin around the canvas (the
+        // theme insets the slides from the left and right edges instead).
+        deckRef.current?.configure({ margin: document.fullscreenElement ? 0 : DECK_MARGIN });
         // Reveal only re-measures on its own resize tick; entering fullscreen
         // resizes the frame a beat earlier than that.
         requestAnimationFrame(() => deckRef.current?.layout());

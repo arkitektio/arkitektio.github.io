@@ -5,8 +5,7 @@
 
    The arc mirrors the Mikro coordinate-system deck: the problem, the wish, the
    thing itself, then the background behind it. Several slides are drafts that
-   still need checking against the actual renderer; they are marked with speaker
-   notes saying so. */
+   still need checking against the actual renderer. */
 
 import { useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
@@ -307,7 +306,6 @@ export function VolumeViewerDeck() {
         eyebrow="The problem"
         title="You acquired more than you can look at"
         lead="Cleared tissue, light sheet, modern microscopy is multi-gigabytes the thing you view it on is measured in megapixels."
-        notes="Keep it concrete — name the instrument in the room."
       >
         <div className="flex flex-1 items-center">
           <Figure>
@@ -341,7 +339,6 @@ export function VolumeViewerDeck() {
         eyebrow="The problem"
         title="The money way"
         lead="Or you buy your way out of it. There is very good commercial software for exactly thism IMARIS and its neighbours will happily open your volume, and they are genuinely good at it. They are also priced accordingly."
-        notes="Be fair here — the software is good. The point is who gets to use it, not whether it works."
       >
         <div className="grid flex-1 grid-cols-3 content-center gap-4">
           <Panel title="a licence per seat">
@@ -374,7 +371,6 @@ export function VolumeViewerDeck() {
         eyebrow="The problem"
         title="And this is what the money buys"
         lead="A published figure, rendered in Imaris: native light-sheet channels, then the same volume as isosurfaces, turned in the hand. It is very good, and it is the bar."
-        notes="Third-party footage, CC BY 4.0 — the credit line has to stay on the slide."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
           <SourceVideo src="/presentations/volume-viewer/imaris-ovary-lightsheet.mp4" />
@@ -453,7 +449,6 @@ export function VolumeViewerDeck() {
         eyebrow="The landscape"
         title="So nobody is doing this?"
         lead="Plenty of people are, and the rendering is a solved problem in more than one place Nothing is perfect t"
-        notes="The honest answer to 'how are you different from Neuroglancer' is: we are not, at rendering. We differ at knows-the-data and act-on-it. Say that plainly. Do not sneer at these. Neuroglancer really does ray-march voxels (ON, MAX, MIN) — off by default per layer, which is why people remember it as the mesh viewer. webKnossos: verify its 3D viewport before claiming anything; I could not confirm true volume rendering as opposed to slice planes plus meshes."
       >
         <div className="flex flex-1 flex-col justify-center gap-2">
           <div className={`${CONTENDER_COLS} px-5 pb-1`}>
@@ -618,7 +613,6 @@ export function VolumeViewerDeck() {
         eyebrow="Live demo"
         title="Open some Gigabystes"
         lead="quickly, from home"
-        notes="Nothing was prepared for this recording — the dataset is the one the microscope wrote. Say that over the top of it rather than putting it on the slide."
       >
         <div className="flex flex-1 items-center justify-center">
           <DemoVideo
@@ -638,7 +632,6 @@ export function VolumeViewerDeck() {
         eyebrow="Background"
         title="The array was never one file"
         lead="A single compressed stack is indivisible — to see one plane you fetch all of it. Zarr stores the same array as a grid of independently addressable chunks."
-        notes="Be fair if challenged: a *tiled* TIFF can be range-read. The left-hand case is deliberately a gzipped stack — one deflate stream, where no byte range is decodable and nothing says where a plane starts. That is the common case in a lab, not a strawman about TIFF in general."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
           <div className="flex justify-end">
@@ -662,7 +655,6 @@ export function VolumeViewerDeck() {
         eyebrow="Background"
         title="And it was written at several resolutions"
         lead="An octree: one coarse block that subdivides, eight ways at a time, wherever detail is actually wanted — and only ever so many nodes at once, because the screen is the budget."
-        notes="Hover the block and let it refine while you talk — the cursor is standing in for the camera. Only the octant under it splits; everywhere else stays coarse, and refining somewhere new drops the oldest refinement. You cannot draw more than a screen's worth of detail, so it never tries: the coarsest level that still looks right is the one it asks for."
       >
         <div className="flex flex-1 items-center">
           <OctreeFigure />
@@ -673,7 +665,6 @@ export function VolumeViewerDeck() {
         eyebrow="Background"
         title="What happens between moving and seeing"
         lead="One pass of the loop, and it is deliberately cheap. The Python API is asked once when the layer loads — for the layout, never for pixels — and after that most passes end at the cache."
-        notes="Trace the fast path first, then the detour, then the dashed edge. The GraphQL API is Python and it is nowhere near the hot loop: it answers where the bricks are and how the spaces relate, once. Nothing here renders on a server and nothing decodes on the main thread. And the quiet part — the bottom row runs once per brick, ever."
       >
         <div className="flex min-h-0 flex-1 flex-col justify-center gap-3">
           <PipelineFlow />
@@ -690,7 +681,6 @@ export function VolumeViewerDeck() {
         eyebrow="Background"
         title="A scene is more than the voxels"
         lead="Four kinds of resident, drawn over one another: the image, the mask segmented from it, the meshes built from that, and whatever you marked yourself. Each lives in its own space, and the coordinate graph is what makes them line up."
-        notes="Fake data — this is the shape of a scene, not a screenshot. The point is that nothing here was baked into a combined file; they are separate residents composed at draw time."
       >
         <div className="flex flex-1 flex-col justify-center gap-3">
           <Figure>
@@ -727,7 +717,6 @@ export function VolumeViewerDeck() {
       <DeckSlide
         eyebrow="The payoff"
         title="Annotate by probing"
-        notes="Play it twice — once watching the readout follow the cursor, once watching the mark land. The probe costs nothing: the plan was fetched when the layer loaded, and the ray is marched on the GPU, inside Orkestrator."
       >
         <div className="flex flex-1 items-center justify-center">
           <DemoVideo
@@ -765,7 +754,6 @@ export function VolumeViewerDeck() {
           </>
         }
         lead="A wire format that gives a mesh collection the grid it never had. fabriks partitions surfaces into an octree of Parquet cells — level 0 full detail, each coarser level merging eight cells into one at a quarter of the faces — and the camera plans which cell to draw at which level."
-        notes="Point out the seam: a coarse cell touching a fine one keeps the fine vertices along that edge. That is what stops the cracks."
       >
         <div className="flex flex-1 items-center">
           <MeshLodFigure />
@@ -775,7 +763,6 @@ export function VolumeViewerDeck() {
       <DeckSlide
         eyebrow="The other half"
         title="Meshes, in the viewer"
-        notes="Watch the silhouettes tighten as cells drop to level 0 near the camera, and watch the boundaries: nothing pops at a cell edge, because the boundary vertices are shared."
       >
         <div className="flex flex-1 items-center justify-center">
           <DemoVideo
@@ -796,7 +783,6 @@ export function VolumeViewerDeck() {
         eyebrow="Example 01"
         title="FLIM Data"
         lead="You can choose the renderer on the fly"
-        notes="Nothing was prepared for this recording — the dataset is the one the microscope wrote. Say that over the top of it rather than putting it on the slide."
       >
         <div className="flex flex-1 items-center justify-center">
           <DemoVideo
@@ -827,7 +813,6 @@ export function VolumeViewerDeck() {
         eyebrow="Limitations"
         title="Where this does not reach — yet"
         lead="The honest version, so nobody discovers these on stage."
-        notes="DRAFT — the first two are documented in design/security/performance.mdx; the rest are my guesses. Correct before presenting."
       >
         <div className="grid flex-1 grid-cols-2 content-center gap-4">
           <Panel title="throughput is the ceiling">

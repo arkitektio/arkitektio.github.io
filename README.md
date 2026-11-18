@@ -34,36 +34,47 @@ components hot-reload as you edit.
 
 ## Writing content
 
-All documentation lives in [`content/docs`](content/docs) as MDX, in one tree organised by what
-kind of page it is ([Diataxis](https://diataxis.fr)):
+All documentation lives in [`content/docs`](content/docs) as MDX, organised by who reads it. Each
+section is its own tab in the sidebar:
 
-| Folder       | What belongs there                                             |
-| ------------ | -------------------------------------------------------------- |
-| `tutorials`  | A lesson that takes a newcomer through a first success.        |
-| `guides`     | Steps for a reader who already knows what they want to do.     |
-| `reference`  | Facts to look up: options, tables, protocols.                  |
-| `concepts`   | Background that explains how and why something works.          |
+| Folder   | Reader                                                               |
+| -------- | -------------------------------------------------------------------- |
+| `use`    | Scientists using Orkestrator and the connected apps.                 |
+| `run`    | Admins installing and operating an Arkitekt hub.                     |
+| `build`  | Developers writing apps, plugins and services.                       |
+| `about`  | Everyone: philosophy, basics, terminology, comparisons.              |
 
-Who a page is for is a tag, not a path. Set `personas` in the frontmatter:
-
-| Persona   | Reader                                                 |
-| --------- | ------------------------------------------------------ |
-| `use`     | Scientists using Orkestrator and the connected apps.   |
-| `run`     | Admins installing and operating an Arkitekt server.    |
-| `build`   | Developers writing apps, plugins and services.         |
+Inside a section, pages run from learning to looking up: tutorials first, then guides, then
+reference. A page states its kind ([Diataxis](https://diataxis.fr)) in the frontmatter, and it shows
+as a badge above the title:
 
 ```mdx
 ---
 title: Join the mesh
 description: ...
-personas: [run]
+type: guide
 ---
 ```
 
-A page can name several personas. Leave the key out for a page that is for everyone (philosophy,
-terminology, comparisons). The switch at the top of the sidebar lets a reader pick a persona (it starts on `use`); the
-sidebar, the search and the previous/next links then leave out pages tagged only for the others.
-Folders and sidebar headings follow their pages, so there is nothing to tag in a `meta.json`.
+| `type`       | What it is                                                     |
+| ------------ | -------------------------------------------------------------- |
+| `tutorial`   | A lesson that takes a newcomer through a first success.        |
+| `guide`      | Steps for a reader who already knows what they want to do.     |
+| `reference`  | Facts to look up: options, tables, protocols.                  |
+| `concept`    | Background that explains how and why something works.          |
+
+### The first-time guide
+
+Klippy, the mascot in the bottom right corner of the docs, asks a new reader a few questions and then hides
+the sidebar entries they do not need (other sections, other languages, ...) and the switch between
+sections. The questions live in
+[`src/lib/guide.ts`](src/lib/guide.ts): each answer lists the folders and pages it hides, as paths
+under `content/docs`. Pages are not tagged for it. The answers stay in the reader's browser; the
+search and the previous/next links are not filtered.
+
+When a page moves, add it to [`scripts/redirects/moves.json`](scripts/redirects/moves.json) and run
+`node scripts/migrate-docs.mjs links` to rewrite the links to it. The old URL keeps working through
+a redirect stub.
 
 ### Tutorials
 
@@ -74,14 +85,14 @@ and a self-check. The parts are components, so they look the same everywhere:
 ---
 title: Upload your first images
 description: ...
-personas: [use]
+type: tutorial
 ---
 
 One or two sentences on what this tutorial is about.
 
 <Prerequisites>
 
-- Orkestrator is connected to a hub ([Connect with Orkestrator](/docs/tutorials/connect-orkestrator)).
+- Orkestrator is connected to a hub ([Connect with Orkestrator](/docs/use/first-steps/connect-orkestrator)).
 
 </Prerequisites>
 
@@ -114,7 +125,7 @@ Each folder uses a `meta.json` to control sidebar ordering and labels. To add a 
 `.mdx` file in the relevant folder with a `title` and `description` in its frontmatter, and add
 it to that folder's `meta.json`.
 
-Link to other pages with absolute URLs (`/docs/guides/python/workflows`), not relative paths.
+Link to other pages with absolute URLs (`/docs/build/python/workflows`), not relative paths.
 
 MDX components (callouts, code blocks, custom React widgets) are available inside
 content. Frontmatter and MDX options are configured in

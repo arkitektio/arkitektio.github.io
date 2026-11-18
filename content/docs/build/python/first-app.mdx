@@ -1,0 +1,236 @@
+---
+title: Your first app
+description: "Scaffold an app with arkitekt create, understand the generated app.py, run it with hot reloading, call it from Orkestrator, and see what it registers with arkitekt inspect."
+type: tutorial
+---
+
+This guide takes you from an empty folder to an app whose actions you can call from Orkestrator. It
+assumes you have [installed arkitekt](/docs/build/python/installation) and have a server to
+connect to. Read [Core concepts](/docs/build/python#core-concepts) first if the words *action*,
+*agent* or *task* are unfamiliar.
+
+<Prerequisites>
+
+- [Installed arkitekt](/docs/build/python/installation)
+- A server to connect to
+- Know the words action, agent and task, see [Core concepts](/docs/build/python#core-concepts)
+
+</Prerequisites>
+
+<Learn>
+
+- Scaffold a project with `arkitekt create`
+- Read the generated `app.py` and its actions
+- Run the app in development mode with hot reloading
+- Call an action from Orkestrator
+- See what the app registers with `arkitekt inspect`
+
+</Learn>
+
+## 1. Scaffold the project
+
+Every command on this page is shown twice: with [uv](https://docs.astral.sh/uv/), which needs
+nothing installed beforehand, and with pip, where `arkitekt` is installed into your active
+environment. Pick one and stay with it.
+
+```bash tab="uv"
+uvx arkitekt create my-app
+```
+
+```bash tab="pip"
+pip install "arkitekt[all]"
+arkitekt create my-app --package-manager pip
+```
+
+The command asks for an identifier and an author, then sets up the folder `my-app`. By default that
+is a whole project, everything an app needs to be developed and released:
+
+- `app.py`, which declares the app with `App(...)`
+- `tests/`, a first test of its actions
+- `.arkitekt/flavours/vanilla/`, a flavour (a Dockerfile) to build the app into an image
+- with uv: a `pyproject.toml` with its own environment, and a GitHub workflow that releases the app
+  on every push
+
+The app it starts with makes a random image and blurs one, storing both in Mikro. This tutorial
+uses the `simple` starter instead, which needs no service. To get it, and to skip the questions:
+
+```bash tab="uv"
+uvx arkitekt create my-app --identifier com.example.myapp --starter simple --yes
+```
+
+```bash tab="pip"
+arkitekt create my-app --identifier com.example.myapp --starter simple --package-manager pip --yes
+```
+
+| Option | Meaning |
+|---|---|
+| `PATH` | The folder to create the app in. Without one, an empty current folder is set up in place |
+| `--identifier`, `-i` | A unique identifier, ideally in reverse-domain form (`com.example.myapp`) |
+| `--version` | Semantic version (default `0.0.1`) |
+| `--author` | Shown to users of the app (default: your OS user) |
+| `--template` | `project` (default), `blok` (a project around a blok agent), `qt` (a desktop app with its own window) or `bare` (only the app file, in this folder) |
+| `--starter` | The code the app file starts with: `image` (default for `project`), `simple` or `filter` |
+| `--entrypoint`, `-e` | The entrypoint file without `.py` (default `app`) |
+| `--package-manager` | `uv` or `pip` |
+| `--tests` / `--no-tests` | Write a first test of the actions |
+| `--flavour` / `--no-flavour` | Write a flavour, so the app can be built into an image |
+| `--ci` | `github`, `gitlab` or `none`: release the app from this forge on every push |
+| `--yes`, `-y` | Accept the defaults without asking |
+
+Then change into the project:
+
+```bash
+cd my-app
+```
+
+There is **no manifest file**. The identity you entered is written into `app.py` as the arguments
+of `App(...)`, and that code is the single source of truth. The version sits next to it as `__version__`.
+
+## 2. Read the generated app
+
+The `simple` starter produces something like this (docstrings shortened):
+
+```python
+import time
+from collections.abc import Generator
+
+from arkitekt import App, run
+
+__version__ = "0.0.1"
+
+app = App("com.example.myapp", __version__, author="jane")
+
+@app.action
+def generate_n_string(n: int = 10, timeout: int = 2) -> Generator[str, None, None]:
+    """Generate N Strings
+
+    Generates {{n}} strings with a {{timeout}} second pause between each.
+    """
+    for i in range(n):
+        time.sleep(timeout)
+        yield f"Hello {i}"
+
+@app.action
+def append_world(hello: str) -> str:
+    """Append World
+
+    Appends " World" to {{hello}}.
+    """
+    return hello + " World"
+
+@app.action
+def print_string(input: str) -> str:
+    """Print String
+
+    Prints {{input}} to the console.
+    """
+    print(input)
+    return input
+
+if __name__ == "__main__":
+    run(app)
+```
+
+- `app = App(...)` **declares** the app. Importing this module connects nothing, so the CLI, tests
+  and packaging can all import it safely.
+- Each `@app.action` becomes an action on the platform. `generate_n_string` is a generator, so its
+  action **streams**: each `yield` reaches the caller as it happens.
+- `run(app)` connects and serves until you stop it. The `if __name__ == "__main__"` guard means
+  `python app.py` works too, but the CLI is the better way to run it while developing.
+
+<Callout type="warn" title="Keep module import side-effect free">
+
+The CLI imports your module to find the app: when running, when inspecting and when building the
+container. Opening a device, loading a model or connecting to anything at module level would
+happen every time. Put such work in an [`@app.startup` hook](/docs/build/python/state-lifecycle)
+instead. `arkitekt inspect variables` warns about module-level variables that would leak across hot
+reloads.
+
+</Callout>
+
+## 3. Run it in development mode
+
+```bash tab="uv"
+uv run arkitekt run dev
+```
+
+```bash tab="pip"
+arkitekt run dev
+```
+
+On first run a browser opens and asks you to authorize the app on your server. After that you
+should see the agent connect and register three implementations. Edit `app.py` and save: the app
+**reloads** and re-registers, without you restarting anything.
+
+| Option | Meaning |
+|---|---|
+| `--url`, `-u` | The server (otherwise `$FAKTS_URL`, then the public deployment) |
+| `--headless` | Print the login link instead of opening a browser |
+| `--reauth` | Log in again and replace the saved session |
+| `--skip-cache` | Ignore the saved session for this run, and save none |
+| `--deep` | Also watch and reload packages installed for development (editable installs) |
+| `--log-level`, `-l` | e.g. `DEBUG` |
+| `--context module:attr`, `--context-file path` | The [app context](/docs/build/python/state-lifecycle#app-context), if the app declares one |
+
+`arkitekt run prod` runs the app the way it runs inside a container: no reloading. Use it to check
+the app before [packaging](/docs/build/python/packaging).
+
+<Callout type="info" title="Which app does the CLI run?">
+
+The CLI looks for the app like uvicorn does. The default target `app` imports the module `app` and
+uses its variable `app`, or its only `App`. Pass `arkitekt run dev pkg.main:api` or set
+`ARKITEKT_APP=pkg.main:api` to point it somewhere else.
+
+</Callout>
+
+## 4. Call it
+
+Open Orkestrator, find your app under **Apps**, and open `Append World`. The form was generated
+from the signature: one text field called `hello`. Run it, and a **task** appears. Its result,
+logs and progress stream in from your agent.
+
+Run `Generate N Strings` and you will see each yield arrive one by one. If the process is killed
+while a task runs (try `kill -9` on it), the task ends as **LOST** once the grace window has passed.
+The platform knows the agent died, and that it cannot know whether the work finished. [Durable execution](/docs/build/python/durable-execution)
+explains what you can do about that.
+
+From a terminal, `arkitekt call remote` calls an action of the app through the server, which is
+handy in scripts and CI.
+
+## 5. See what the app registers
+
+```bash tab="uv"
+uv run arkitekt inspect all              # everything: implementations, states, requirements, bloks
+uv run arkitekt inspect implementations  # one entry per action, with its ports
+uv run arkitekt inspect requirements     # the services the app needs
+uv run arkitekt inspect lifecycle        # startup, shutdown and background hooks
+```
+
+```bash tab="pip"
+arkitekt inspect all              # everything: implementations, states, requirements, bloks
+arkitekt inspect implementations  # one entry per action, with its ports
+arkitekt inspect requirements     # the services the app needs
+arkitekt inspect lifecycle        # startup, shutdown and background hooks
+```
+
+`inspect` never connects. It shows exactly what `run` would register and validates it the way the
+server would, so it is a good check in CI. Add `--json` for output a program can read. The packaging step runs it inside the built container too.
+
+## Next
+
+- Walk through the example apps that ship with arkitekt: [Python by example](/docs/build/python/examples).
+- Give your actions real inputs and outputs: [Types & data](/docs/build/python/types).
+- Keep a device or model around between tasks: [State & lifecycle](/docs/build/python/state-lifecycle).
+- Ship it: [Packaging](/docs/build/python/packaging).
+
+<Quiz>
+  <Question q="Where does the identity of the app live, given that there is no manifest file?">
+    It is written into `app.py` as the arguments of `App(...)`. That code is the single source of truth.
+  </Question>
+  <Question q="Why should work like opening a device or loading a model not happen at module level?">
+    The CLI imports the module when running, inspecting and building the container, so that work would happen every time. It belongs in an `@app.startup` hook.
+  </Question>
+  <Question q="What happens to a running task when the app process is killed?">
+    The task ends as LOST once the grace window has passed, because the platform cannot know whether the work finished.
+  </Question>
+</Quiz>

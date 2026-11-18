@@ -87,6 +87,13 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+/* Fullscreen has no margin around the canvas, so the slides keep their own
+   small inset from the left and right edges of the screen. */
+:fullscreen .reveal .slides section {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 /* --- deck chrome ---------------------------------------------------------- */
 
 .reveal .controls {

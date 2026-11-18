@@ -74,7 +74,7 @@ export default function TeamPage() {
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Join us</h2>
           <p className="max-w-xl text-fd-muted-foreground">
             {appName} is open source, and there is room on this page. Read how to{' '}
-            <Link className={linkClass} href="/docs/guides/contribute">
+            <Link className={linkClass} href="/docs/build/contribute">
               contribute
             </Link>
             , or say hello in the{' '}

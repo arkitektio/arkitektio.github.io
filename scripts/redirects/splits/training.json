@@ -1,7 +1,7 @@
 {
-  "source": "introduction/advanced/training.mdx",
-  "primary": "tutorials/advanced/training.mdx",
+  "source": "tutorials/advanced/training.mdx",
+  "primary": "use/advanced/training.mdx",
   "anchors": {
-    "the-developers-perspective": "guides/python/training-example.mdx#the-developers-perspective"
+    "the-developers-perspective": "build/python/training-example.mdx#the-developers-perspective"
   }
 }
