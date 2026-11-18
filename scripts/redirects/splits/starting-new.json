@@ -11,7 +11,7 @@
     "plugin-engine": "run/hub.mdx#add-a-plugin-engine",
     "updating": "run/hub.mdx#update-a-hub",
     "mesh": "run/hub.mdx#join-the-mesh",
-    "advertising": "run/hub.mdx#advertising",
+    "advertising": "about/legacy/removed-features.mdx#advertising",
     "other-installation-strategies": "run/other-installation-strategies.mdx",
     "custom-compose": "run/other-installation-strategies.mdx#custom-compose",
     "docker-compose": "run/other-installation-strategies.mdx#docker-compose",

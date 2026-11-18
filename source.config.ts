@@ -83,24 +83,6 @@ export const docs = defineDocs({
   },
 });
 
-// Showcases live outside the docs tree and render under /showcase. The extra
-// frontmatter drives the cards on the index page: `group` sorts them, `tags`
-// are the chips, and `version: paper` marks examples that were run with the
-// Paper version of the platform.
-export const showcases = defineDocs({
-  dir: 'content/showcases',
-  docs: {
-    schema: pageSchema.extend({
-      group: z.enum(['paper', 'advanced']).default('advanced'),
-      tags: z.array(z.string()).default([]),
-      version: z.enum(['paper', 'next']).optional(),
-    }),
-  },
-  meta: {
-    schema: metaSchema,
-  },
-});
-
 export default defineConfig({
   mdxOptions: {
     // Docusaurus `:::` admonitions were converted to <Callout> at migration

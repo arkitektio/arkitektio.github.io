@@ -1,0 +1,13 @@
+{
+  "title": "Legacy",
+  "description": "Older versions of Arkitekt. Not how it works today.",
+  "pages": [
+    "index",
+    "whats-changed",
+    "showcases",
+    "removed-features",
+    "migrating-from-arkitekt-next",
+    "agent-skill",
+    "training-example"
+  ]
+}

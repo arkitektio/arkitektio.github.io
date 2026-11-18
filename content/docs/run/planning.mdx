@@ -43,7 +43,7 @@ Please refer to the [Mikro documentation](/docs/build/services/mikro#storage) fo
 ### How much data will be streamed through Arkitekt?
 
 This is another thing you should consider when deploying Arkitekt. If you are planning to stream a lot of data to and from Arkitekt,
-you should consider having a fast network connection, and a lot of bandwidth, as well as a lot of fast storage. Our showcases all
+you should consider having a fast network connection, and a lot of bandwidth, as well as a lot of fast storage. The workflows in our publication all
 were possible with a 1Gbit/s connection, but this might not be enough for your use case. The truly mission critical part of the platform
 is again "minio", as it stores all the data that is streamed through Arkitekt. In rare cases you might be limited by the speed of the
 API layer, but this is not very likely for smaller team sizes.

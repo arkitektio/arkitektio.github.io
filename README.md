@@ -135,7 +135,7 @@ content. Frontmatter and MDX options are configured in
 
 ```
 content/docs/         MDX documentation content
-src/app/(home)/       Landing page, showcase, explorer and blog routes
+src/app/(home)/       Landing page, explorer and blog routes
 src/app/docs/         Documentation layout and dynamic pages
 src/app/api/          Search route handler
 src/components/       Marketing sections, bento grids, MDX widgets, UI primitives

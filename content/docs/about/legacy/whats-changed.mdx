@@ -1,6 +1,6 @@
 ---
 title: What's changed
-description: "What is different between the Paper version of Arkitekt, frozen for the publication, and the Next version these docs describe: installing, accounts, connecting apps, and what stayed the same."
+description: "Outdated. What is different between the Paper version of Arkitekt, frozen for the publication, and the Next version these docs describe: installing, accounts, connecting apps, and what stayed the same."
 type: concept
 ---
 
@@ -11,11 +11,9 @@ Arkitekt today. Most of what you know from Paper still applies: the hub, apps, w
 data model are the same ideas. What changed is mostly *how the pieces find and trust each other*,
 and *how you install and run them*. This section collects those changes in one place.
 
-<Callout type="info" title="About the Paper showcases">
-  The examples in the [Showcase](/showcase) that carry a **Paper** badge were run with the Paper
-  version of the platform. The workflows and apps they describe still apply, but the installer,
-  the login and the connection flow they show are the Paper ones described on these pages.
-</Callout>
+The workflows from the publication are kept among the [old showcases](/docs/about/legacy/showcases).
+The installer, the login and the connection flow they show are the Paper ones described on this
+page.
 
 ## At a glance
 
@@ -32,11 +30,11 @@ and *how you install and run them*. This section collects those changes in one p
 
 The sections below go through each of these:
 
-- [Installing and running](/docs/about/whats-changed#installing-and-running): Konstruktor, accounts,
+- [Installing and running](/docs/about/legacy/whats-changed#installing-and-running): Konstruktor, accounts,
   channels, advertising and the mesh.
-- [Connecting apps](/docs/about/whats-changed#connecting-apps): the Fakts protocol, step by step,
+- [Connecting apps](/docs/about/legacy/whats-changed#connecting-apps): the Fakts protocol, step by step,
   and how to tell a Paper deployment apart from a Next one.
-- [New in Next](/docs/about/whats-changed#new-in-next): the features that arrived with Next.
+- [New in Next](/docs/about/legacy/whats-changed#new-in-next): the features that arrived with Next.
 
 ## What stayed the same
 
@@ -51,7 +49,7 @@ The sections below go through each of these:
 
 Most of this page is about plumbing: how things are installed, found and trusted. What you can do
 differently on Next, such as direct task assignment, the knowledge graph, views and protocols, is under
-[New in Next](/docs/about/whats-changed#new-in-next).
+[New in Next](/docs/about/legacy/whats-changed#new-in-next).
 
 ## Installing and running
 
@@ -101,7 +99,7 @@ the Paper channel itself is frozen for reproducibility; see
 ### Finding the platform
 
 In Paper, a deployment could **advertise** itself on the local network with a UDP broadcast; that
-feature has been [removed](/docs/run/hub#advertising). In Next, a
+feature has been [removed](/docs/about/legacy/removed-features#advertising). In Next, a
 hub **advertises a list of addresses** you choose at install time, and across networks it can join
 the [mesh](/docs/run/hub#join-the-mesh), which did not exist in Paper. What
 the mesh is and why it is the secure default is explained in [The Mesh](/docs/run/security/mesh).
@@ -280,7 +278,7 @@ way to say which services and versions they needed before connecting, so an app 
 against a deployment that could not serve it. In Next the app [manifest](/docs/build/manifest)
 declares **requirements**, one per service the app needs, and the user sees and approves them per
 instance when the app connects. This was the biggest breaking change for Paper-era apps; see
-[Connecting apps](/docs/about/whats-changed#connecting-apps).
+[Connecting apps](/docs/about/legacy/whats-changed#connecting-apps).
 
 ### Under the hood
 

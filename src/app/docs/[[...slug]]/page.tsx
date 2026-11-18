@@ -8,6 +8,7 @@ import {
   ViewOptionsPopover,
 } from 'fumadocs-ui/layouts/docs/page';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { getMDXComponents, StewardCard } from '@/components/site';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
@@ -24,6 +25,9 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   // what kind of page this is
   const badge = page.data.type && pageTypes[page.data.type];
+
+  // every page of the legacy section carries the same warning
+  const isLegacy = page.slugs.includes('legacy');
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
@@ -52,6 +56,22 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         />
       </div>
       <DocsBody>
+        {isLegacy && (
+          <div
+            role="note"
+            className="not-prose mb-6 rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-sm"
+          >
+            <p className="font-semibold tracking-wide text-red-700 dark:text-red-300">OUTDATED</p>
+            <p className="mt-1 text-fd-foreground">
+              This is not how Arkitekt works today. This page describes an older version and is kept
+              for reference only. For the current platform, start at the{' '}
+              <Link href="/docs" className="underline underline-offset-4">
+                documentation home
+              </Link>
+              .
+            </p>
+          </div>
+        )}
         <MDX
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths

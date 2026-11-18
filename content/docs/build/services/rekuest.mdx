@@ -37,13 +37,6 @@ A gateway in front of the pair sends the agent routes to takt and everything els
 When a GraphQL mutation needs something done to a task or an agent, the server asks takt over a
 signed internal API; takt is the only writer of task state.
 
-<Callout type="info">
-
-Earlier versions of Rekuest queued tasks through a message broker (RabbitMQ). That is gone: tasks
-are rows in Postgres, and Redis carries the queues to connected agents and the events between
-replicas.
-
-</Callout>
 
 ### Why task assignment is written in Rust
 

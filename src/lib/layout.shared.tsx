@@ -3,7 +3,6 @@ import {
   Atom,
   BookOpen,
   MonitorPlay,
-  Sparkles,
   Users,
 } from 'lucide-react';
 import { Logo } from '@/components/site';
@@ -33,12 +32,6 @@ export function baseOptions(): BaseLayoutProps {
         url: '/presentations',
         active: 'nested-url',
         icon: <MonitorPlay />,
-      },
-      {
-        text: 'Showcase',
-        url: '/showcase',
-        active: 'nested-url',
-        icon: <Sparkles />,
       },
       {
         text: 'Shoulders of Giants',

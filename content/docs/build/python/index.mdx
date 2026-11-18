@@ -8,14 +8,7 @@ Python is the reference implementation of the Arkitekt client. Every feature of 
 available from Python first, and the other clients follow its model. This section documents the
 `arkitekt` package (version 5 and later, Python 3.11+).
 
-<Callout type="warn" title="Coming from arkitekt-next?">
-
-Earlier versions of these docs described the `arkitekt_next` package, with `easy(...)` as the app,
-`@register` as the decorator and an `arkitekt-next` command. That package has been replaced by
-`arkitekt`. The [installation page](/docs/build/python/installation#migrating-from-arkitekt-next)
-has a table mapping every old name to the new one.
-
-</Callout>
+Porting an app written for an older package? See [Legacy](/docs/about/legacy).
 
 ## Two directions
 
@@ -180,6 +173,9 @@ def greet(
   `{{name}}` placeholders in the description are filled with the call's arguments in the UI.
 - `Annotated[..., Description(...)]` documents a single port. `Default`, `Units`, `Requires` and
   `Provides` are further markers you can add the same way.
+- An action can be **sync or async**: write `def` or `async def`, both are registered the same way.
+  A sync action runs in a worker thread, and a sync task can be cancelled too, at its next
+  `koil.check_cancelled()` or `koil.sleep(...)`. See [Sync and async with koil](/docs/build/python/koil).
 - A default value makes the port optional, and `Optional[...]` makes it nullable.
 
 The **action** is the abstract "what", defined by its ports. It is what users search for and what
@@ -442,4 +438,5 @@ not a safety interlock, and hardware that must stop needs its own watchdog.
 Both are supported, for actions, hooks and workflows. Use `async def` when your code awaits I/O or
 calls async clients (`await mikro.acreate_folder(...)`), and plain `def` for CPU-bound or blocking
 library code. Sync functions run in a worker thread, so they don't block the agent. Every client and
-task method exists in both forms: `x(...)` and `await ax(...)`.
+task method exists in both forms: `x(...)` and `await ax(...)`. How sync code is run and cancelled is
+described in [Sync and async with koil](/docs/build/python/koil).

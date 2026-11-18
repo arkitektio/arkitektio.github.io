@@ -34,7 +34,7 @@ features. Two things update separately:
 
 <Callout type="info" title="About channels">
 
-  Konstruktor no longer has a channel picker. A hub's channel is simply the set of image tags in its
+  Konstruktor has no channel picker. A hub's channel is simply the set of image tags in its
   `hub_config.yaml`; a stock hub ships on the `next` tag (with Kraph on `dev`). To move a service to
   another channel, change its tag there and pull. How the channels relate is described in
   [How we version Arkitekt](/docs/run/versioning).
@@ -57,17 +57,6 @@ address on the dashboard's address list and **Authorize** again, so apps arrivin
 told where to find the hub. What the mesh does and why it is the secure default is explained in
 [The Mesh](/docs/run/security/mesh).
 
-### Local-network advertising (removed) [#advertising]
-
-<Callout type="warn" title="This feature was removed">
-
-  Earlier versions of Arkitekt could **advertise** the platform on your local network with a UDP
-  broadcast so that apps could discover it without knowing its IP address. Local networks turned out
-  to be too much of a mess (firewalls, changing addresses, blocked broadcasts, VPNs) for that to be
-  reliable, and it only ever worked within a single LAN. Apps now discover a hub by the addresses it
-  advertises, and across networks through the [mesh](/docs/run/topology#arkitekt-mesh).
-
-</Callout>
 
 ## Arkitekt and the GPU
 

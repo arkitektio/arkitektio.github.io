@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Callout } from "fumadocs-ui/components/callout";
 
 /**
- * Shared prerequisites block for the paper showcases: the "please read the
+ * Shared prerequisites block for the old showcases in the legacy docs: the "please read the
  * Getting Started guide" callout, the hardware paragraph and the pointer to
  * how this website connects to an Arkitekt instance.
  */

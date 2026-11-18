@@ -24,24 +24,24 @@ export function HomeBento() {
         {/* media. A random clip from the volume-viewer talk, captioned
             (pin with ?demo=<slug>), filling its cell edge to edge like any
             other card. The card is a flex row so the clip stretches to the
-            row's height, with the showcase CTA sitting beside it. */}
+            row's height, with the presentations CTA sitting beside it. */}
         <BentoCard className="flex">
           <RandomClip slot="demo" caption />
         </BentoCard>
 
-        {/* facilities statement + showcase CTA, to the right of the clip */}
+        {/* presentations CTA, to the right of the clip */}
         <BentoCard className="flex flex-col justify-between gap-6 p-6 sm:p-8">
           <div>
             <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
               Want to see Arkitekt in action?
             </h2>
             <p className="mt-3 max-w-md text-sm text-fd-muted-foreground">
-              Look at these examples. Maybe they can illustrate things better than words.
+              Watch the talks. Maybe they can illustrate things better than words.
             </p>
           </div>
           <Button asChild className="w-fit rounded-full">
-            <Link href="/showcase">
-              Showcase
+            <Link href="/presentations">
+              Presentations
               <ArrowRight className="size-4" />
             </Link>
           </Button>

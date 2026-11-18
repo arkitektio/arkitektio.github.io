@@ -1,0 +1,11 @@
+{
+  "title": "Old showcases",
+  "pages": [
+    "index",
+    "smart-microscopy-workflow",
+    "streaming-workflow",
+    "interactive-workflow",
+    "fiji-workflow",
+    "omero-sink"
+  ]
+}

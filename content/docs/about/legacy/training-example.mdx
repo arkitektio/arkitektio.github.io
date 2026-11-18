@@ -1,6 +1,6 @@
 ---
 title: "Example: a training plugin"
-description: All the code for the Train CARE and Predict CARE actions used in the deep learning training tutorial.
+description: Outdated. All the code for the Train CARE and Predict CARE actions used in the deep learning training tutorial.
 type: guide
 ---
 
@@ -11,15 +11,11 @@ This page shows the code behind the [Train a Deep Learning Model](/docs/use/adva
 If you are a developer and you want to know how to integrate your own deep learning app into Arkitekt, you can read our Developer Tutorial on how to do this [here](/docs/build/python).
 But also please just find here **ALL** the code for the `Train CARE` and `Predict CARE` actions, which are just a few lines of code, and should be easy to understand.
 
-<Callout type="warn" title="Paper-era API">
-
 This code was written for the Paper version of Arkitekt (`from arkitekt import register`,
 `mikro.api.schema` fragments). It shows the shape of a training action, but it will not run
 against the current `arkitekt` package. For the current way to declare actions, services and
 structures, see [Core concepts](/docs/build/python#core-concepts) and
 [Types & data](/docs/build/python/types).
-
-</Callout>
 
 ```python
 from arkitekt import register
