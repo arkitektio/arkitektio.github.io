@@ -57,15 +57,15 @@ is not rewritten yet, so readers know which world a page describes.
   resolves its contradiction with the old `python/more.mdx`, which put a model in `@state`. The
   Groovy snippet was converted to valid DSL2, and the overclaim "Nextflow simply cannot preload a
   model" was softened.
-- `introduction/advanced/training.mdx` L221+: Paper-era code (`from arkitekt import register`,
+- ✅ `introduction/advanced/training.mdx` L221+ (now `about/legacy/training-example.mdx`): ported to `App` / `@app.action`, `SingleChannelVolume` lenses and a mikro `File` for the model. Was: Paper-era code (`from arkitekt import register`,
   `mikro.api.schema` fragments, duplicate imports, docstring defaults that contradict the
   signature). ✅ Flagged with a callout. Still needs porting to the current mikro API.
 - `design/deployment/testing.mdx`: `from arkitekt import deployment` no longer exists in `arkitekt`.
   ✅ Flagged with a callout. The page should be rewritten around konstruktor or removed.
-- `first-steps/first-workflow.mdx`, `first-run.mdx`: `@mikro/representation` (Paper type).
-- `design/various/nextflow.mdx`: hypothetical `arkitekt call remote` CLI and invalid Groovy. It also
+- ✅ `first-steps/first-workflow.mdx`, `first-run.mdx`: `@mikro/representation` (Paper type), now `@mikro/arraylens`.
+- `design/various/nextflow.mdx`: hypothetical `arkitekt call remote` CLI and invalid Groovy. ✅ The CLI now exists; snippets use `arkitekt call remote <hash> -a key=value` / `call local … --online` in valid DSL2. It also
   duplicates `comparisons/nextflow.mdx`.
-- `public/skills/arkitekt-next/SKILL.md`: the published AI skill teaches the old API throughout.
+- ✅ `public/skills/arkitekt-next/SKILL.md`: the published AI skill taught the old API throughout. Rewritten for `arkitekt` 5 and moved to `public/skills/arkitekt/SKILL.md`; its page moved to `build/python/agent-skill.mdx`.
   ✅ `agent-skill.mdx` now warns about this. **The skill itself still needs a rewrite.**
 - ✅ Landing page code snippets (`src/components/bento/{declare,async-api,state}-card.tsx`) now use
   `@app.action`, `@app.workflow` (the declare card calls a protocol), `@app.declare`, `@app.state`
@@ -135,7 +135,7 @@ outdated, and **L** means polish.
 | `design/security/measures.mdx` | H | See 1.4 | open |
 | `design/philosophy/version.mdx` (+ channel callouts in `terminology/manifest.mdx`, `deployment/testing.mdx`) | H | Channel model contradicts whats-changed | open (`testing.mdx` flagged ✅) |
 | `developers/javascript/*` | H | Broken code, Paper APIs, unpublished client | ✅ Removed (redirects to `/docs/developers`) |
-| `introduction/advanced/training.mdx` | H | Paper code, doc/sig mismatch, unused import | flagged ✅, port open |
+| `introduction/advanced/training.mdx` | H | Paper code, doc/sig mismatch, unused import | ported ✅ |
 | `developers/contribute/projects.mdx` | H | "Next not ready", `port` described as a Fluss client, `reaktor` misfiled, poetry | URL fixed ✅, rest open |
 | `design/terminology/scheduler.mdx` | H | Stub ("reworking… available soon") | open |
 | `design/various/containers.mdx` | H | Stub. `first-tool.mdx` links to it as the explanation of plugin containers. | open |
@@ -188,8 +188,8 @@ outdated, and **L** means polish.
 2. `troubleshooting/startup.mdx`: rewrite for Next failure modes.
 3. `design/security/measures.mdx` and `mesh.mdx`: state mechanisms or drop the claims.
 4. `design/philosophy/version.mdx` + channel callouts: align with image tags.
-5. `public/skills/arkitekt-next/SKILL.md`: port to `arkitekt` 5.
-6. `introduction/advanced/training.mdx`: port the code.
+5. ✅ `public/skills/arkitekt-next/SKILL.md`: port to `arkitekt` 5.
+6. ✅ `introduction/advanced/training.mdx`: port the code.
 7. Stubs: scheduler, containers, mikro-manager, standalones index, segmentor.
 8. `design/services/index.mdx` + `lok.mdx`: stack and coordinator story.
 9. Terminology pass: node → action, one term for the server.

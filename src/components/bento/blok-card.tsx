@@ -46,7 +46,7 @@ export function BlokCard() {
           Compose a panel from the component <strong>catalog</strong> and wire
           it straight to your app: bind props to a dependency&apos;s state with{' '}
           <code>$state</code>, and call its actions with <code>@</code>.{' '}
-          <code>jsx(...)</code> parses it into a component tree.
+          <code>app.blok(...)</code> parses it into a component tree.
         </p>
 
         {/* component catalog */}
