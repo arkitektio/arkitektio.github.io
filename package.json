@@ -10,7 +10,8 @@
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
     "lint": "eslint",
-    "check:links": "node scripts/check-links.mjs"
+    "check:links": "node scripts/check-links.mjs",
+    "check:catalogs": "node scripts/check-catalogs.mjs --remote"
   },
   "dependencies": {
     "@apollo/client": "^3.14.1",

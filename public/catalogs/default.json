@@ -1,0 +1,203 @@
+{
+  "spec_version": 1,
+  "name": "Arkitekt",
+  "description": "The apps the Arkitekt team publishes. Listing an app here makes it easy to find; a release is still approved on your hub before it is deployed.",
+  "entries": [
+    {
+      "key": "basiks",
+      "kind": "oci",
+      "reference": "ghcr.io/jhnnsrs/basiks",
+      "name": "Basiks",
+      "description": "The standard library: small, general actions over mikro data that a workflow strings together between the specialised apps.",
+      "tags": [
+        "utilities",
+        "standard-library"
+      ],
+      "homepage": "https://github.com/jhnnsrs/basiks",
+      "maintainer": "jhnnsrs"
+    },
+    {
+      "key": "ome-converter",
+      "kind": "oci",
+      "reference": "ghcr.io/arkitektio/ome-converter",
+      "name": "OME Converter",
+      "description": "Converts any file Bio-Formats can read (czi, lif, nd2, ome-tiff, ...) into mikro datasets, one pyramided dataset per series.",
+      "tags": [
+        "io",
+        "converter",
+        "bio-formats"
+      ],
+      "homepage": "https://github.com/arkitektio/ome-converter",
+      "maintainer": "arkitektio"
+    },
+    {
+      "key": "ome-tiff-converter",
+      "kind": "oci",
+      "reference": "ghcr.io/arkitektio/ome-tiff-converter",
+      "name": "OME-TIFF Converter",
+      "description": "Converts OME-TIFF files (and plain TIFFs) into mikro datasets natively, with their OME metadata. No Bio-Formats, no JVM.",
+      "tags": [
+        "io",
+        "converter",
+        "tiff"
+      ],
+      "homepage": "https://github.com/arkitektio/ome-tiff-converter",
+      "maintainer": "arkitektio"
+    },
+    {
+      "key": "lif-converter",
+      "kind": "oci",
+      "reference": "ghcr.io/jhnnsrs/lif-converter",
+      "name": "LIF Converter",
+      "description": "Converts Leica LIF and LOF files into mikro datasets natively, one pyramided dataset per image (and per tile of a tile scan).",
+      "tags": [
+        "io",
+        "converter",
+        "leica"
+      ],
+      "homepage": "https://github.com/jhnnsrs/lif-converter",
+      "maintainer": "jhnnsrs"
+    },
+    {
+      "key": "nd2-converter",
+      "kind": "oci",
+      "reference": "ghcr.io/jhnnsrs/nd2-converter",
+      "name": "ND2 Converter",
+      "description": "Converts Nikon ND2 files into mikro datasets natively, with NIS-Elements' own metadata, one dataset per stage position.",
+      "tags": [
+        "io",
+        "converter",
+        "nikon"
+      ],
+      "homepage": "https://github.com/jhnnsrs/nd2-converter",
+      "maintainer": "jhnnsrs"
+    },
+    {
+      "key": "objreader",
+      "kind": "oci",
+      "reference": "ghcr.io/arkitektio/objreader",
+      "name": "OBF Reader",
+      "description": "Converts Imspector OBF/MSR files into mikro datasets, one per acquisition.",
+      "tags": [
+        "io",
+        "converter",
+        "imspector"
+      ],
+      "homepage": "https://github.com/arkitektio/objreader",
+      "maintainer": "arkitektio"
+    },
+    {
+      "key": "snt-traces-importer",
+      "kind": "oci",
+      "reference": "ghcr.io/arkitektio/snt-traces-importer",
+      "name": "SNT Traces Importer",
+      "description": "Imports SNT (Simple Neurite Tracer) .traces files as mikro annotation collections.",
+      "tags": [
+        "io",
+        "tracing",
+        "neurons"
+      ],
+      "homepage": "https://github.com/arkitektio/snt-traces-importer",
+      "maintainer": "arkitektio"
+    },
+    {
+      "key": "hoverfast-app",
+      "kind": "oci",
+      "reference": "ghcr.io/arkitektio/hoverfast-app",
+      "name": "HoverFast",
+      "description": "HoverFast nuclei segmentation of H&E images: a label mask of the nuclei on the image's own grid. CPU and CUDA flavours.",
+      "tags": [
+        "segmentation",
+        "histology",
+        "deep-learning"
+      ],
+      "homepage": "https://github.com/arkitektio/hoverfast-app",
+      "maintainer": "arkitektio"
+    },
+    {
+      "key": "path-sam",
+      "kind": "oci",
+      "reference": "ghcr.io/arkitektio/path-sam",
+      "name": "Segment Anything Along Path",
+      "description": "Segment Anything along a path drawn in the 3D scene: trace an axon, vessel or fibre and get back a label crop and, if asked, a surface.",
+      "tags": [
+        "segmentation",
+        "3d",
+        "path",
+        "deep-learning"
+      ],
+      "homepage": "https://github.com/arkitektio/path-sam",
+      "maintainer": "arkitektio"
+    },
+    {
+      "key": "path-nninteractive",
+      "kind": "oci",
+      "reference": "ghcr.io/jhnnsrs/path-nninteractive",
+      "name": "nnInteractive Along Path",
+      "description": "nnInteractive along a path drawn in the 3D scene: trace an axon, vessel or fibre and get back a label crop and, if asked, a surface. Needs a GPU.",
+      "tags": [
+        "segmentation",
+        "3d",
+        "path",
+        "deep-learning"
+      ],
+      "homepage": "https://github.com/jhnnsrs/path-nninteractive",
+      "maintainer": "jhnnsrs"
+    },
+    {
+      "key": "ais-organelles-app",
+      "kind": "oci",
+      "reference": "ghcr.io/jhnnsrs/ais-organelles-app",
+      "name": "AIS Organelles",
+      "description": "Segments the axon initial segment and the cisternal organelle inside it along a path drawn in the 3D scene.",
+      "tags": [
+        "segmentation",
+        "3d",
+        "path",
+        "neurons"
+      ],
+      "homepage": "https://github.com/jhnnsrs/ais-organelles-app",
+      "maintainer": "jhnnsrs"
+    },
+    {
+      "key": "kaller",
+      "kind": "oci",
+      "reference": "ghcr.io/jhnnsrs/kaller",
+      "name": "Kaller",
+      "description": "A room assistant that runs actions: asked to segment something, it finds an installed segmenter, fills in the image from the room and calls it.",
+      "tags": [
+        "assistant",
+        "llm"
+      ],
+      "homepage": "https://github.com/jhnnsrs/kaller",
+      "maintainer": "jhnnsrs"
+    },
+    {
+      "key": "fairino-controller",
+      "kind": "oci",
+      "reference": "ghcr.io/arkitektio/fairino-controller",
+      "name": "Fairino Controller",
+      "description": "A simulated Fairino FR5 robot arm with a live 3D view: click the floor and it solves the joint angles to go there.",
+      "tags": [
+        "robotics",
+        "simulation",
+        "demo"
+      ],
+      "homepage": "https://github.com/arkitektio/fairino-controller",
+      "maintainer": "arkitektio"
+    },
+    {
+      "key": "stringops",
+      "kind": "oci",
+      "reference": "ghcr.io/arkitektio/stringops",
+      "name": "String Operations",
+      "description": "Simple string operations, written in the App pattern: a minimal example of an Arkitekt app.",
+      "tags": [
+        "example",
+        "utilities"
+      ],
+      "homepage": "https://github.com/arkitektio/stringops",
+      "maintainer": "arkitektio"
+    }
+  ]
+}

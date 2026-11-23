@@ -32,6 +32,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # The repository lists kabinet reads from arkitekt.live/catalogs (kabinet docs/catalogs.md).
+      - run: pnpm check:catalogs
+
       - run: pnpm types:check
 
       - run: pnpm build
