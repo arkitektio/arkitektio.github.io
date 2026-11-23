@@ -171,33 +171,6 @@
       ],
       "homepage": "https://github.com/jhnnsrs/kaller",
       "maintainer": "jhnnsrs"
-    },
-    {
-      "key": "fairino-controller",
-      "kind": "oci",
-      "reference": "ghcr.io/arkitektio/fairino-controller",
-      "name": "Fairino Controller",
-      "description": "A simulated Fairino FR5 robot arm with a live 3D view: click the floor and it solves the joint angles to go there.",
-      "tags": [
-        "robotics",
-        "simulation",
-        "demo"
-      ],
-      "homepage": "https://github.com/arkitektio/fairino-controller",
-      "maintainer": "arkitektio"
-    },
-    {
-      "key": "stringops",
-      "kind": "oci",
-      "reference": "ghcr.io/arkitektio/stringops",
-      "name": "String Operations",
-      "description": "Simple string operations, written in the App pattern: a minimal example of an Arkitekt app.",
-      "tags": [
-        "example",
-        "utilities"
-      ],
-      "homepage": "https://github.com/arkitektio/stringops",
-      "maintainer": "arkitektio"
     }
   ]
 }
