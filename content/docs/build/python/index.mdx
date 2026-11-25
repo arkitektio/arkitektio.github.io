@@ -6,9 +6,10 @@ type: concept
 
 Python is the reference implementation of the Arkitekt client. Every feature of the platform is
 available from Python first, and the other clients follow its model. This section documents the
-`arkitekt` package (version 5 and later, Python 3.11+).
+`arkitekt` package (version 19 and later, Python 3.11+).
 
-Porting an app written for an older package? See [Legacy](/docs/about/legacy).
+Porting an app written for an older package? See [Legacy](/docs/about/legacy). Coming from
+`arkitekt` 18? See [What changed in 19](#what-changed-in-19) at the end of this page.
 
 ## Two directions
 
@@ -18,10 +19,13 @@ for each:
 | Direction | You write | Entry point | It runs… |
 |---|---|---|---|
 | **Offer** actions others can call | an `App` with `@app.action` functions | `run(app)` or `arkitekt run dev` | until you stop it, waiting for tasks |
-| **Call** the platform | a script or notebook | `easy("name", service, …)` | as long as your script does |
+| **Call** the platform | a script or notebook | `connect(Mikro, …)` | as long as your script does |
 
 Most of this section is about the first direction, because that is how your code becomes part of
 the platform. The second is covered in [Scripts & notebooks](/docs/build/python/scripts).
+Which shape an app or a script should take (a plugin, a device, an app inside your own program, a
+notebook, an unattended job) is described for all languages in
+[Build an app](/docs/build/apps) and [Connect to the platform](/docs/build/connect).
 
 ```python
 from arkitekt import App, run
@@ -56,8 +60,8 @@ in your organization can call it, and it can be wired into workflows.
 | `rekuest` | The **distributed runtime**: the websocket agent that talks to the [Rekuest](/docs/build/services/rekuest) service, and the client for calling actions. |
 
 `arkitekt` re-exports everything an app author needs, so `from arkitekt import …` is the only
-import you should need for the app itself. Service clients (`mikro`, `fluss`, `elektro`, …) are
-imported from their own packages.
+import you should need for the app itself. Clients (`Mikro`, `Fluss`, `Elektro`, …) are imported
+from their own packages.
 
 ## Reading order
 
@@ -130,9 +134,18 @@ app = App(
     "com.example.nuclei",   # identifier: defaults to the file name
     "0.2.0",                # version: semver
     description="Nucleus segmentation for widefield images",
-    services=[],            # service clients the actions use, see below
 )
 ```
+
+There is no list of services to keep in sync. The clients an app uses are read from the
+annotations of what it offers: an action that takes `mikro: Mikro`, or a `Volume` that Mikro
+fetches, is all the app needs to use Mikro (see [Clients](#clients)).
+
+**Declaring only records.** A decorator writes down what you declared and checks nothing. The app
+is **assembled** when it is run, inspected or checked (`arkitekt check`). Assembly reads every
+annotation, finds the clients and structures they name, and reports *every* problem at once as an
+`AppDeclarationError`, each with the file and line it was declared at. Declaration order does not
+matter.
 
 The identifier and version tell the platform which app an implementation belongs to. Together they
 make up the app's [manifest](/docs/build/manifest). There is no manifest *file*: the
@@ -172,7 +185,9 @@ def greet(
 - The **first line of the docstring** is the action's title, and the rest is its description.
   `{{name}}` placeholders in the description are filled with the call's arguments in the UI.
 - `Annotated[..., Description(...)]` documents a single port. `Default`, `Units`, `Requires` and
-  `Provides` are further markers you can add the same way.
+  `Provides` are further markers you can add the same way. `Requires` and `Provides` narrow a
+  structure by features of the instance, such as a lens's number of spatial axes: see
+  [Requires & provides](/docs/build/python/requires-provides).
 - An action can be **sync or async**: write `def` or `async def`, both are registered the same way.
   A sync action runs in a worker thread, and a sync task can be cancelled too, at its next
   `koil.check_cancelled()` or `koil.sleep(...)`. See [Sync and async with koil](/docs/build/python/koil).
@@ -262,14 +277,15 @@ A port may only name a type the app knows how to transport:
 | **Models** | a class decorated with `@app.model` | the value, field by field |
 | **Service structures** | `Volume`, `SingleChannelImage`, `LabelMask` from `mikro.arkitekt.specs` | a reference: the id of an object stored in the service |
 | **Registered structures** | your own class, via `app.register_structure(...)` | a reference that your expander resolves |
-| **Memory structures** | e.g. `np.ndarray`, via `app.memory_structure(...)` | a reference to an object kept on this agent |
+| **Memory structures** | e.g. `np.ndarray`, via `app.memory_structure(...)` | a reference to an object kept on this agent. Use sparingly: the object stays in the agent's memory, and the app becomes stateful |
 
 This is the *pass-by-reference* model. Large data never travels between apps inline. It lives in a
 data service like [Mikro](/docs/build/services/mikro) and only its id travels. The receiving app
 fetches it again ("expands" it). [Types & data](/docs/build/python/types) explains each kind
 in detail. The platform-wide concept is described under [structure](/docs/about/terminology#how-do-these-elements-relate).
 
-Using a type the app does not know is an error when the app is declared, not when it is called.
+Using a type the app does not know is an error when the app is assembled (on `run`, `inspect` or
+`arkitekt check`), not when it is called.
 
 ### Injection by annotation
 
@@ -279,7 +295,7 @@ them apart by their **type annotation**:
 | Annotated with | Injected value |
 |---|---|
 | `Task` | The running task |
-| A service client (`Mikro`, `Fluss`, …) | A connected client, if the service is listed in `App(services=[...])` |
+| A client (`Mikro`, `Fluss`, `Rekuest`, …) | The run's connected client. The annotation is enough: the app uses that client from then on |
 | An `@app.state` class | The app's live state instance |
 | An `@app.context` class | The shared context built by a startup hook |
 | The class passed as `App(app_context=...)` | The value passed to `run(app, context=...)` |
@@ -288,16 +304,17 @@ them apart by their **type annotation**:
 Everything else is a port. Injected parameters can go anywhere in the signature. Making them
 keyword-only (after `*`) is a readable convention.
 
-### Services
+### Clients [#clients]
 
-Actions that need a platform service name it in `services=` and take its client by annotation:
+Actions that talk to a platform service take its **client** by annotation. Arkitekt builds the
+client when the app connects and injects it, just like the running `Task`:
 
 ```python
 from arkitekt import App, Task
-from mikro import Mikro, mikro_service
+from mikro import Mikro
 from mikro.arkitekt.specs import Volume
 
-app = App("inspect-volume", "0.1.0", services=[mikro_service])
+app = App("inspect-volume", "0.1.0")
 
 
 @app.action
@@ -307,9 +324,27 @@ def describe(volume: Volume, mikro: Mikro, task: Task) -> str:
     return f"{volume.data.shape}"
 ```
 
-Listing a service does two things. It declares a **requirement**, which the user approves when the
-app first connects, and it makes the service's structures (here `Volume`) usable as ports. Pass the
-service object (`mikro_service`), not the client class. Passing a class raises `TypeError`.
+The annotation is the declaration. Here `Volume` alone would be enough: it is a Mikro structure, so
+using it as a port brings the Mikro client with it. Using a client does two things. It adds a
+**requirement** to the manifest, which the user approves when the app first connects. It also makes
+the client's structures (here `Volume`) usable as ports.
+
+A client that no annotation names, because only a blok's query or a startup hook uses it, goes in
+`clients=`:
+
+```python
+from fluss import Fluss
+
+app = App("my-app", "0.1.0", clients=[Fluss])
+```
+
+`clients=` takes `@client` classes (`Mikro`, not an instance). Anything else raises `TypeError`.
+`arkitekt inspect clients` lists the clients a run of the app would build.
+
+A package can also ship actions of its own as a `Bundle`. `App(..., include=[fluss_actions])` (or
+`app.include(...)`) offers them as part of your app (`fluss_actions` comes from
+`fluss.engine.actions`). What the parts share counts once, and
+clashing names are reported at assembly.
 
 ### State, context and lifecycle
 
@@ -440,3 +475,24 @@ calls async clients (`await mikro.acreate_folder(...)`), and plain `def` for CPU
 library code. Sync functions run in a worker thread, so they don't block the agent. Every client and
 task method exists in both forms: `x(...)` and `await ax(...)`. How sync code is run and cancelled is
 described in [Sync and async with koil](/docs/build/python/koil).
+
+## What changed in 19 [#what-changed-in-19]
+
+`arkitekt` 19 makes an app a bundle of declarations that is assembled when it is run or inspected.
+If you are porting an app from 18:
+
+| In 18 | In 19 |
+|---|---|
+| `App(..., services=[mikro_service])` | `App(...)`. The `Mikro` annotation (or a Mikro structure) is enough |
+| `app.service(elektro_service)` | Nothing, or `App(clients=[Elektro])` if no annotation names it |
+| `App(providers=...)`, `app.provider(...)` | `App(provider=...)` |
+| `App(registry=merge(a, b))`, `app.merge(...)` | `App(include=[...])`, `app.include(...)` |
+| `easy("name", mikro_service)`, `aeasy(...)` | `connect(Mikro)` (`with` or `async with`), `identifier="name"` to name it |
+| `interactive("name", mikro_service)` | `connect(Mikro).enter()` |
+| `rekuest_service` / `rekuest_caller_service` in a script | `connect(RekuestCaller)` (`from rekuest.client.client import RekuestCaller`) |
+| A bad declaration raises at the decorator | Every problem is raised together, as `AppDeclarationError`, at assembly |
+| `arkitekt inspect services`, `gen init --service` | `arkitekt inspect clients`, `gen init --client` |
+| `arkitekt.testing.service_images`, `RunSnapshot.services` | `client_images`, `RunSnapshot.clients` |
+
+`run`, `arun`, `serve`, `connect(app)` and `run_detached` also take `clients=[...]`: client
+*instances* to use instead of building them, for example a fake in a test.

@@ -345,13 +345,13 @@ stage moved while the app was down, `moved_while_down` says so.
 ## From a script
 
 A script that calls actions directly is the caller, so a lost task is its decision too.
-`call_directly.py` does the same as the workflow, but with `easy` and the top-level `retry`:
+`call_directly.py` does the same as the workflow, but with `connect` and the top-level `retry`:
 
 ```python title="recovery/call_directly.py"
-from mikro import mikro_service
-from rekuest.arkitekt import rekuest_caller_service
+from mikro import Mikro
+from rekuest.client.client import RekuestCaller
 
-from arkitekt import AgentLost, easy, retry
+from arkitekt import AgentLost, connect, retry
 
 COUNT = "segmentation/count_cells"
 DISPENSE = "liquid-handler/dispense"
@@ -361,7 +361,7 @@ IMAGE_DATASET = "1234"  # an image already in mikro
 
 def main() -> None:
     """Count the cells, then dose: retry the one, ask a person about the other."""
-    with easy("plate-runner", rekuest_caller_service, mikro_service) as (rekuest, mikro):
+    with connect(RekuestCaller, Mikro, identifier="plate-runner") as (rekuest, mikro):
         image = mikro.get_array_dataset(IMAGE_DATASET).lens()
 
         # Counting changes nothing: if its agent dies, try again, even after it started.
@@ -381,7 +381,7 @@ def main() -> None:
                 )
 ```
 
-`rekuest_caller_service` is the client that starts tasks. A script is not resumed if it dies, so
+`RekuestCaller` is the client that starts tasks. A script is not resumed if it dies, so
 orchestration that must survive a crash belongs in a workflow.
 
 ## Try it

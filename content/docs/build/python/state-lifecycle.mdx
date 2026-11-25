@@ -124,11 +124,14 @@ Every action and hook annotated with `StagePosition` receives **the same instanc
 | Option | Meaning |
 |---|---|
 | `name=` | The key the state is offered under (default: the class name). Another app's protocol refers to it by this name. |
-| `publish_interval=` | Seconds between published updates (default `0.1`). Changes in between are coalesced. |
-| `required_locks=` | Locks an action must hold to change the state, so two tasks cannot move the stage at once. |
+| `persist=` | Keep the state's last value on disk (`1.0`: at most once a second, `"synchronous"`: on every change), so a startup hook of the next run can take it as `old: StagePosition \| None`. |
+| `required_locks=` | Locks every action that takes the state holds while it runs, so two tasks cannot command the stage at once. It orders actions; it does not guard writes. |
 
-Keep state **small and descriptive**: positions, flags, a barcode, counters. It is published on
-every change and recorded in the agent's journal, so it is the wrong place for a model or an image.
+Keep state **small and descriptive**: positions, flags, a barcode, counters. **Every assignment is
+one update**, sent as its own frame and recorded in the agent's journal. Nothing is merged, so it is
+the wrong place for a model, an image or anything written at frame rate (see
+[Anti-patterns](/docs/build/anti-patterns#frequency)). To change several fields as one update, so
+that nobody sees half of the change, wrap them in `with task.updating(state): ...`.
 
 ## Private shared objects: `@app.context`
 
@@ -140,10 +143,9 @@ database connection.
 from dataclasses import dataclass
 
 from arkitekt import App
-from mikro import mikro_service
 from mikro.arkitekt.specs import Image, LabelMask
 
-app = App("segmenter", "0.1.0", services=[mikro_service])
+app = App("segmenter", "0.1.0")
 
 
 @app.context

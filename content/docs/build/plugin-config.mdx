@@ -54,6 +54,6 @@ arkitekt plugin selector add gpu --kind cuda --compute-capability 8.6 --vram 800
 | `label` | `key`, `value`: matches a qualifier the server's operator put on a backend (e.g. `microscope: lightsheet`) |
 
 A **service** your app needs (Mikro, Rekuest, …) is never a selector. It is a requirement of the
-app, derived from `App(services=[...])`. `platforms` says what the image is *built* for, and a `cpu`
+app, derived from the clients the app uses (`arkitekt inspect requirements` lists them). `platforms` says what the image is *built* for, and a `cpu`
 selector's `arch` says where it may *run*. Setting both so that they contradict is flagged by
 `arkitekt plugin validate`.

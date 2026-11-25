@@ -272,10 +272,10 @@ const OTSU_D = 'text-[#fbbf24]'; // decorator
 const OTSU_LINES: [string, string?][][] = [
   [['from', OTSU_K], [' skimage.filters '], ['import', OTSU_K], [' threshold_otsu']],
   [['from', OTSU_K], [' arkitekt '], ['import', OTSU_K], [' App, run']],
-  [['from', OTSU_K], [' mikro '], ['import', OTSU_K], [' Mikro, mikro_service']],
-  [['from', OTSU_K], [' mikro.arkitekt.specs '], ['import', OTSU_K], [' LabelMask, SingleChannelImage, ensure']],
+  [['from', OTSU_K], [' mikro '], ['import', OTSU_K], [' Mikro']],
+  [['from', OTSU_K], [' mikro.arkitekt.specs '], ['import', OTSU_K], [' LabelMask, SingleChannelImage']],
   [],
-  [['app = App('], ['"otsu"', OTSU_S], [', '], ['"0.1.0"', OTSU_S], [', services=[mikro_service])']],
+  [['app = App('], ['"otsu"', OTSU_S], [', '], ['"0.1.0"', OTSU_S], [')']],
   [],
   [['@app.action', OTSU_D]],
   [['def', OTSU_K], [' '], ['otsu_threshold', OTSU_F], ['(image: SingleChannelImage, *, mikro: Mikro) -> LabelMask:']],
@@ -286,7 +286,7 @@ const OTSU_LINES: [string, string?][][] = [
   [['        axes=image.carried_axes(mask.dims),']],
   [['        derived_from=[image.derive_identity(value_relation='], ['"TRANSFORMED"', OTSU_S], [')],']],
   [['    )']],
-  [['    '], ['return', OTSU_K], [' ensure(result.lens(), LabelMask)']],
+  [['    '], ['return', OTSU_K], [' result.lens()']],
   [],
   [['run(app)']],
 ];

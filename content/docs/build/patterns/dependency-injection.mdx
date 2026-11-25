@@ -1,0 +1,80 @@
+---
+title: Dependency injection
+description: "How Arkitekt hands an action its task, clients, state, context and protocol proxies by type annotation, why there are no global clients, and how that makes actions testable and portable."
+type: concept
+---
+
+An action never builds what it needs. It **asks** for it, by naming a type in its signature, and the
+runtime hands it in:
+
+```python
+@app.action
+def segment(
+    image: SingleChannelImage,      # a port: the caller gives it
+    threshold: float,               # a port
+    *,
+    mikro: Mikro,                   # injected: a connected client
+    model: Model,                   # injected: the app's @app.context
+    stage: Stage,                   # injected: the app's @app.state
+    task: Task,                     # injected: the running task
+) -> LabelMask:
+    """Segment"""
+    ...
+```
+
+Parameters the runtime recognises by their type are **injected**. They are not ports, callers
+never see them, and the form in Orkestrator does not show them. Everything else is a port.
+
+| Annotated with | Injected value |
+|---|---|
+| `Task` | The running task: progress, logs, child calls |
+| A client (`Mikro`, `Rekuest`, …) | The run's connected client |
+| An `@app.state` class | The app's live state |
+| An `@app.context` class | The app's private context, built at startup |
+| The `app_context` class | What the program running the app passed in |
+| An `@app.declare` protocol | A proxy that calls another app (workflows) |
+
+## The pattern
+
+This is **dependency injection** in its simplest form: constructor injection, applied to functions,
+with the type as the key. The function declares its dependencies, a container (the runtime) builds
+and owns them, and hands them in on every call. The inversion goes further than usual: in Arkitekt
+the declaration of a dependency *is* the request for it. Annotating a parameter `Mikro` is what
+makes the app use Mikro, ask for its scopes at login and list it as a requirement.
+
+Underneath, the clients themselves are configured the same way. A client never holds a URL or a
+token: at login, [service discovery](/docs/build/service-discovery) tells the app where each
+service lives and hands out the credentials, and the runtime builds the client from that.
+
+## What it buys
+
+- **No connection code in actions.** The same function body works in a plugin, a device app, a
+  test or a script, because none of them is in it.
+- **Testing with fakes.** Call the function with stand-ins: `Task.local()` for the task, and for a
+  client an instance of its class handed to the run (`clients=[...]` on `run`, `connect(app)` or
+  the test fixtures). Nothing has to be patched.
+- **Least privilege.** The app asks at login for exactly the scopes the clients it uses need, and
+  the platform knows which services it depends on.
+- **Checked before running.** Assembly sees every dependency, so a missing or unknown one is
+  reported by `arkitekt check`, not by the first task that needs it.
+
+## What it costs
+
+- **Annotations are load-bearing.** Injection is by type, so the annotation decides whether a
+  parameter is injected or a port. An unannotated parameter cannot be either, and a type nothing
+  knows is reported when the app is assembled.
+- **Lifetimes are the runtime's.** A client lives as long as the run, one per connection, shared by
+  every action. Something that should live for one task only is created in the action, not
+  injected.
+
+## In other languages
+
+Rust marks injected parameters with `#[inject]` and services with `.service(...)`; Kotlin uses
+`@Inject` and `context[service]`. The idea is the same: the function names what it needs, the
+runtime provides it.
+
+## Next
+
+- [Stateless actions, explicit state](/docs/build/patterns/stateless-execution): what may be
+  injected, and why nothing else should be shared.
+- Python: [Injection by annotation](/docs/build/python#injection-by-annotation).

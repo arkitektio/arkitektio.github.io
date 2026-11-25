@@ -1,0 +1,12 @@
+{
+  "title": "Build an app",
+  "pages": [
+    "index",
+    "plugin",
+    "device",
+    "host-program",
+    "workflow",
+    "http",
+    "microcontroller"
+  ]
+}

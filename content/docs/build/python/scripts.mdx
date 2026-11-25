@@ -1,25 +1,25 @@
 ---
 title: Scripts & notebooks
-description: "Calling the platform from a script or Jupyter without offering actions: easy, aeasy and interactive, service clients, calling actions by id, and embedding Arkitekt in Qt applications."
+description: "Calling the platform from a script or Jupyter without offering actions: connect(Mikro) in with, async with and notebook form, clients, calling actions by id, and embedding Arkitekt in Qt applications."
 type: guide
 ---
 
 Not every program offers actions. An analysis script that uploads a result, a notebook that pulls
 images from Mikro, or a CI job that starts a workflow only **calls** the platform. For these,
-`arkitekt` has `easy`: name the services you need and get their clients back.
+`arkitekt` has `connect`: name the clients you need and get them back, connected.
 
-## `easy`
+## `connect(Mikro)`
 
 ```python
 import numpy as np
 import xarray as xr
 
-from arkitekt import easy
-from mikro import dataset_arrays, mikro_service
+from arkitekt import connect
+from mikro import Mikro, dataset_arrays
 
 volume = xr.DataArray(np.random.rand(1, 20, 256, 256).astype("float32"), dims=("c", "z", "y", "x"))
 
-with easy("my-upload-script", mikro_service) as mikro:
+with connect(Mikro) as mikro:
     folder = mikro.create_folder(name="examples")
     level_zero, scales = dataset_arrays(volume, levels=3, method="mean")
     dataset = mikro.create_array_dataset(
@@ -32,61 +32,71 @@ with easy("my-upload-script", mikro_service) as mikro:
     print(dataset.id)
 ```
 
-- `easy(identifier, *services, ...)` declares an app for you. Its identifier (default: the script's
-  file name) is what you authorize, and what shows up as the app in the platform.
-- **Nothing connects until the `with` block is entered.** Entering authenticates (opening a browser
-  the first time) and connects the clients. Leaving disconnects them.
-- **One service gives you its client, several give a tuple** in the order you named them:
+- You name **client classes**, the same `Mikro` an action would take by annotation. Behind the
+  scenes `connect(Mikro)` declares `App(<the script's file name>, clients=[Mikro])` for you. That
+  identifier is what you authorize, and what shows up as the app in the platform. Pass
+  `identifier="my-upload-script"` to name it yourself.
+- **Nothing connects until the block is entered.** Entering authenticates (opening a browser
+  the first time) and connects the clients. Leaving disconnects them. The same `connect(...)` object
+  can be entered again.
+- **One client gives you that client, several give a tuple** in the order you named them. The
+  result is typed, so your editor knows `mikro` is a `Mikro`:
 
   ```python
-  from fluss import fluss_service
+  from fluss import Fluss
 
-  with easy("my-script", mikro_service, fluss_service) as (mikro, fluss):
+  with connect(Mikro, Fluss) as (mikro, fluss):
       ...
   ```
 
-It takes the same connection options as `run`: `url=`, `headless=`, `token=`, `redeem_token=`,
-`no_cache=`, `mesh=` (see [Installation](/docs/build/python/installation#connecting-to-a-server)).
+It takes the same connection options as `run`: `url=`, `headless=`, `token=`, `mandate_key=`,
+`skip_cache=`, `reauth=`, `mesh=` (see [Installation](/docs/build/python/installation#connecting-to-a-server)).
 
 ## Clients: sync and async
 
-Every service client exposes each operation twice: a blocking method and an `a`-prefixed coroutine.
+Every client exposes each operation twice: a blocking method and an `a`-prefixed coroutine. The
+same `connect(...)` works as an `async with`:
 
 ```python
-from arkitekt import aeasy
+from arkitekt import connect
+from mikro import Mikro
+
 
 async def main() -> None:
-    async with aeasy("my-script", mikro_service) as mikro:
+    async with connect(Mikro) as mikro:
         folder = await mikro.acreate_folder(name="examples")
 ```
 
 Objects returned by a client are snapshots of the server's state. Changing an attribute locally
 changes nothing on the server. Call the corresponding mutation to change the stored object.
 
-## Notebooks: `interactive`
+## Notebooks: `.enter()`
 
-In Jupyter a `with` block per cell is awkward. `interactive` connects once and stays connected for
-the lifetime of the kernel:
+In Jupyter a `with` block per cell is awkward. `.enter()` connects once and stays connected until
+the kernel exits:
 
 ```python
-from arkitekt import interactive
-from mikro import mikro_service
+from arkitekt import connect
+from mikro import Mikro
 
-mikro = interactive("notebook", mikro_service)
+mikro = connect(Mikro, identifier="notebook").enter()
 dataset = mikro.get_array_dataset("1234")   # any operation of the client
 ```
 
+Running the cell again leaves the previous connection of that app before it connects again, so a
+re-run cell does not pile up sessions. Blocking calls work inside the notebook's own event loop.
+
 ## Calling actions
 
-Add `rekuest_service` to get the [Rekuest](/docs/build/services/rekuest) client, and call any
-action you are allowed to call by its id (copied from Orkestrator):
+Connect `RekuestCaller`, the [Rekuest](/docs/build/services/rekuest) client that starts tasks, and
+call any action you are allowed to call by its id (copied from Orkestrator):
 
 ```python
-from rekuest.arkitekt import rekuest_service
+from rekuest.client.client import RekuestCaller
 
-from arkitekt import AgentLost, easy, retry
+from arkitekt import AgentLost, connect, retry
 
-with easy("plate-runner", rekuest_service) as rekuest:
+with connect(RekuestCaller, identifier="plate-runner") as rekuest:
     result = rekuest.call("<action-id>", x=21)
 ```
 
@@ -104,8 +114,9 @@ through this script.
 
 ## Using an `App` without offering it
 
-When a script needs the same declaration as an app (its services, its registered structures), use
-`connect(app)` instead of `run(app)`. It connects the app's clients but provides nothing:
+When a script needs the same declaration as an app (its clients, its registered structures), pass
+the app itself: `connect(app)` instead of `run(app)`. It connects the app's clients but provides
+nothing. What you get back is the run, and `require` hands out its clients:
 
 ```python
 from arkitekt import connect
@@ -117,6 +128,10 @@ with connect(app) as runtime:
     mikro = runtime.require(Mikro)
 ```
 
+`connect(app)` takes one app. Client classes it should build although no annotation names them go
+into the app, `App(..., clients=[Fluss])`. To hand it client *instances* (a fake in a test, a
+client you configured yourself), pass `connect(app, clients=[my_mikro])`.
+
 ## Qt applications
 
 A desktop program with its own window, such as a microscope control GUI or a napari plugin, is a
@@ -125,12 +140,24 @@ provides `QtApp`, a declaration whose actions can run in the Qt event loop, and 
 that runs the app and shows its connection status:
 
 ```python
+from qtpy import QtWidgets
+
 from arkitekt import connect
 from arkitekt.qt import MagicBar, QtApp
 
-app = QtApp("my-viewer", parent=window)
-bar = MagicBar(connect(app))
+
+class Window(QtWidgets.QWidget):
+    def __init__(self) -> None:
+        super().__init__()
+        self.runtime = connect(app, provide=True)        # provide: offer the app's actions
+        self.bar = MagicBar(self.runtime, context=self)  # logs in and starts it on a click
+
+
+app = QtApp("my-viewer", app_context=Window)            # an action asking for Window gets it
 ```
+
+`arkitekt create my-viewer --template qt` writes a complete one, with an action that runs in the
+Qt loop (`@app.register_in_qt_loop`) to touch the window.
 
 ## FastAPI
 

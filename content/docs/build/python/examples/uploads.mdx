@@ -1,6 +1,6 @@
 ---
 title: Uploading data from a script
-description: "Walk through upload_cells3d.py, upload_nifti.py and read_with_bioio.py: using easy() to get a Mikro client, creating datasets with pyramids and contrast anchors, and getting the axis order right for NIfTI and bioio."
+description: "Walk through upload_cells3d.py, upload_nifti.py and read_with_bioio.py: using connect(Mikro) to get a Mikro client, creating datasets with pyramids and contrast anchors, and getting the axis order right for NIfTI and bioio."
 type: tutorial
 ---
 
@@ -17,7 +17,7 @@ data is in Mikro, every app on the server can use it, and the next page writes a
 
 <Learn>
 
-- Get a service client with `easy(...)`
+- Get a client with `connect(Mikro)`
 - Create a Mikro dataset, with a resolution pyramid and per-channel contrast
 - Name axes so that Mikro and the viewers understand them
 - Avoid the two common axis-order mistakes: NIfTI's reversed order and bioio's padded dimensions
@@ -30,7 +30,7 @@ data is in Mikro, every app on the server can use it, and the next page writes a
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#   "arkitekt[mikro]>=3",
+#   "arkitekt[mikro]>=19",
 #   "scikit-image>=0.24",
 #   "pooch>=1.8",
 #   "xarray>=2024.3.0",
@@ -41,8 +41,8 @@ data is in Mikro, every app on the server can use it, and the next page writes a
 
 Run:  uv run --script examples/upload_cells3d.py
 
-`easy` is the other direction from `run`: you name the *services* you need and
-it hands you their clients. Nothing connects until the `with` block is entered.
+`connect(Mikro)` is the other direction from `run`: it hands you the clients you
+name. Nothing connects until the `with` block is entered.
 
 The image is scikit-image's `cells3d` — a two-channel (membrane, nuclei) z-stack
 of cells, 60 planes of 256x256, fetched through pooch on first use (~80 MB).
@@ -55,8 +55,8 @@ import numpy as np
 import xarray as xr
 from skimage import data
 
-from arkitekt import easy
-from mikro import dataset_arrays, mikro_service
+from arkitekt import connect
+from mikro import Mikro, dataset_arrays
 from mikro.api.schema import CoordinateAnchorInput
 
 
@@ -69,7 +69,7 @@ def main() -> None:
         np.moveaxis(raw, 1, 0).astype("uint16"), dims=("c", "z", "y", "x")
     )
 
-    with easy("cells3d-upload", mikro_service) as mikro:
+    with connect(Mikro, identifier="cells3d-upload") as mikro:
         folder = mikro.create_folder(name="examples")
 
         # `data` *is* level 0 and `scales` only what is coarser than it —
@@ -97,21 +97,21 @@ if __name__ == "__main__":
     main()
 ```
 
-### `easy`: the calling direction
+### `connect`: the calling direction
 
 ```python
-with easy("cells3d-upload", mikro_service) as mikro:
+with connect(Mikro, identifier="cells3d-upload") as mikro:
 ```
 
-`easy` is the counterpart of `run`. You give it an identifier for your script and the services you
-need, and it gives you their clients:
+`connect` is the counterpart of `run`. You name the client classes you need, and it gives you
+them, connected:
 
 - **Nothing connects before the `with` block.** Entering it logs in (with the browser the first
   time) and connects. Leaving it disconnects.
-- **One service gives one client. Several give a tuple**, in the order you named them:
-  `easy("x", mikro_service, elektro_service) as (mikro, elektro)`.
+- **One client gives one client. Several give a tuple**, in the order you named them:
+  `connect(Mikro, Elektro) as (mikro, elektro)`.
 - The identifier, `"cells3d-upload"`, is the app you authorize on the server. It is how the server
-  knows which script uploaded what.
+  knows which script uploaded what. Without `identifier=` it is the script's file name.
 
 There is no `@app.action` and no `run`. The script does its work and ends.
 
@@ -165,7 +165,7 @@ say so.
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#   "arkitekt[mikro]>=3",
+#   "arkitekt[mikro]>=19",
 #   "nibabel>=5.2",
 #   "xarray>=2024.3.0",
 #   "numpy>=1.26",
@@ -192,8 +192,8 @@ import nibabel as nib
 import numpy as np
 import xarray as xr
 
-from arkitekt import easy
-from mikro import mikro_service
+from arkitekt import connect
+from mikro import Mikro
 from mikro.api.schema import CoordinateAnchorInput
 
 
@@ -217,7 +217,7 @@ def main(path: Path) -> None:
     print(f"{path.name}: {image.shape} (i,j,k) -> {array.shape} (z,y,x)")
     volume = xr.DataArray(array, dims=("z", "y", "x"))
 
-    with easy("nifti-upload", mikro_service) as mikro:
+    with connect(Mikro, identifier="nifti-upload") as mikro:
         dataset = mikro.create_array_dataset(
             data=volume,
             scales=[],
@@ -259,7 +259,7 @@ noise) to a temporary directory. Pass the path of a `.nii` or `.nii.gz` file to 
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#   "arkitekt[mikro]>=3",
+#   "arkitekt[mikro]>=19",
 #   "bioio>=3.5",
 #   "bioio-ome-tiff>=1.4",
 #   "tifffile>=2024.5.22",
@@ -291,8 +291,8 @@ import tifffile
 import xarray as xr
 from bioio import BioImage
 
-from arkitekt import easy
-from mikro import mikro_service
+from arkitekt import connect
+from mikro import Mikro
 from mikro.api.schema import CoordinateAnchorInput
 
 
@@ -320,7 +320,7 @@ def main(path: Path) -> None:
     )
     print(f"{path.name}: {image.dims.order} {array.shape} -> {squeezed.dims}")
 
-    with easy("bioio-upload", mikro_service) as mikro:
+    with connect(Mikro, identifier="bioio-upload") as mikro:
         dataset = mikro.create_array_dataset(
             data=squeezed,
             scales=[],
@@ -373,12 +373,12 @@ is in the *examples* folder, with its two channels shown in their own contrast r
 
 ## Next
 
-- Everything about scripts, notebooks and `easy`: [Scripts & notebooks](/docs/build/python/scripts)
+- Everything about scripts, notebooks and `connect`: [Scripts & notebooks](/docs/build/python/scripts)
 - Next example: [Actions on stored data](/docs/build/python/examples/stored-data)
 
 <Quiz>
-  <Question q="When does easy() connect to the server?">
-    When the `with` block is entered. Creating the `easy(...)` object connects nothing.
+  <Question q="When does connect(Mikro) connect to the server?">
+    When the `with` block is entered. Creating the `connect(...)` object connects nothing.
   </Question>
   <Question q="Why does upload_nifti.py reverse the array with .T?">
     NIfTI indexes data as (i, j, k) with i fastest, while Mikro names axes outermost-first, so (i, j, k) has to become (z, y, x).

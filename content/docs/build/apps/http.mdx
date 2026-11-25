@@ -1,0 +1,85 @@
+---
+title: Served over HTTP
+description: "The same app, served from your own web server instead of an agent socket: FastAPI in Python, axum in Rust. Every action becomes an HTTP endpoint, state is readable and streamed over a websocket, and no Arkitekt server is needed for an app without services."
+type: guide
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+Usually an app connects out to an Arkitekt server and waits for tasks. Served over HTTP, the same
+declaration is mounted in **your own web server** instead: every action becomes an endpoint, the
+states can be read and watched, and a websocket streams what happens.
+
+The actions do not change. What changes is the transport: the app is reached directly over HTTP,
+not through the platform.
+
+## Use it when
+
+- You want a **local API** for an instrument or a tool, for a program that does not speak the
+  Arkitekt protocol, on a machine with no server.
+- You already run a **web service** and want to add the app's actions to it.
+- You want to **test** an app's behaviour over a real transport without a deployment.
+
+**Not for** reaching people through Orkestrator, workflows or provenance. Those come from the
+server. An app can be served over HTTP and run as a normal agent elsewhere.
+
+## The shape
+
+<Tabs items={["Python", "Rust"]}>
+<Tab value="Python">
+
+```python
+import uvicorn
+from fastapi import FastAPI
+
+from arkitekt import App, serve
+
+app = App("counter", "0.1.0")
+
+
+@app.action
+def add(a: int, b: int) -> int:
+    """Add"""
+    return a + b
+
+
+api = FastAPI()
+serve(app, api)          # adds the routes, and a lifespan that runs the app
+uvicorn.run(api)
+```
+
+Needs the `serve` extra (`arkitekt[serve]`).
+
+</Tab>
+<Tab value="Rust">
+
+```rust
+use arkitekt::{serve, ServeOptions};
+
+let router = axum::Router::new();
+serve(app, router, ServeOptions::default()).await?.listen("0.0.0.0:8099").await
+```
+
+Needs the `serve` feature.
+
+</Tab>
+</Tabs>
+
+Both serve the same contract (the Rust server is tested against the Python one). Every action is a
+`POST` to its name, tasks can be cancelled, paused and resumed, states are readable under
+`/states`, a websocket streams every yield, log and state change, and `/docs` serves interactive
+OpenAPI docs.
+
+## What to watch
+
+- **An app without clients needs no server at all.** Nothing logs in. An app that uses Mikro or
+  another service still logs in to reach it, as any run does.
+- **The endpoints are yours to protect.** Served over HTTP, the platform's login and permissions
+  stand in front of nothing. Put the server behind your own authentication, or keep it on
+  localhost.
+- **No workflows over this transport.** A workflow's calls are routed and journaled by the server.
+
+## Next
+
+- Rust: [Serving without a server](/docs/build/rust/guide#serving-without-a-server).
+- Python: `arkitekt.serve` in [Scripts & notebooks](/docs/build/python/scripts#fastapi).

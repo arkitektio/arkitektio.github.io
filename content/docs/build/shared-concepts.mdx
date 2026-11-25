@@ -34,8 +34,8 @@ through services, and a blok puts a face on them.
 
 <Callout type="info" title="Not every client has everything yet">
 
-Python is the reference client and has all five. Rust has apps, actions, services and state.
-Kotlin has apps, actions and services. The concepts below are the same wherever they exist, and the
+Python is the reference client and has all five, plus workflows. Rust and Kotlin have all five
+too: apps, actions, services, state with locks, and bloks. Neither has workflows yet. The concepts below are the same wherever they exist, and the
 [table at the end](#what-each-client-supports) says what is implemented where.
 
 </Callout>
@@ -208,8 +208,8 @@ own GraphQL API.
 Your code never holds a URL or a token for any of them. Using a service takes two steps, and they
 are the same in every language:
 
-1. **The app declares the service.** This is part of the declaration, next to the identifier and
-   version.
+1. **The app says it uses the service.** In Rust and Kotlin this is part of the declaration, next
+   to the identifier and version. In Python the annotation in step 2 already says it.
 2. **An action asks for the client as a parameter.** The runtime builds the client when the app
    connects and passes it in on every call. Like the task and the state, it is **injected**: it is
    not a port, and the caller never sees it.
@@ -219,19 +219,21 @@ are the same in every language:
 
 ```python
 from arkitekt import App
-from mikro import Mikro, mikro_service
+from mikro import Mikro
 from mikro.arkitekt.specs import Volume
 
-app = App("inspect-volume", "0.1.0", services=[mikro_service])   # 1. declare
+app = App("inspect-volume", "0.1.0")
 
 
 @app.action
-def describe(volume: Volume, mikro: Mikro) -> str:               # 2. take the client
+def describe(volume: Volume, mikro: Mikro) -> str:   # 1 and 2: the annotation is the declaration
     """Describe Volume"""
     return f"{volume.data.shape}"
 ```
 
-The annotation `Mikro` is what marks the parameter as injected.
+The annotation `Mikro` marks the parameter as injected, and it is also what makes the app use
+Mikro: when the app is assembled, arkitekt reads every annotation and collects the clients they
+name. A client only a startup hook or a blok uses goes in `App(..., clients=[Mikro])`.
 
 </Tab>
 <Tab value="Rust">
@@ -370,9 +372,22 @@ let app = App::new("camera", "0.1.0")
 </Tab>
 <Tab value="Kotlin">
 
-The Kotlin client does not publish state yet. A Kotlin app offers actions only. Values an action
-needs across calls can be shared inside the process with `App.provide(…)` and taken with
-`@Inject`, but nothing outside the process sees them.
+```kotlin
+@State(name = "CameraState", locks = ["camera"])
+data class Camera(val connected: Boolean = false, val frames: Int = 0)
+
+@Action
+suspend fun snap(camera: StateMut<Camera>): Int {
+    return camera.update { it.copy(frames = it.frames + 1) }.frames   // published as it changes
+}
+
+val app = App("camera", "0.1.0")
+    .state(CameraState, Camera(connected = true))
+    .action(SnapAction)
+```
+
+The KSP processor writes `CameraState` (the declaration of `Camera`) and `SnapAction` beside them. Kotlin has no
+startup hook yet, so the initial value is passed to `.state(…)`.
 
 </Tab>
 </Tabs>
@@ -389,39 +404,87 @@ What stays the same:
 - **Keep it small.** State is published on every change and recorded in the agent's journal.
   Positions, flags and counters belong in it. A model or an image does not: keep those in a private
   context that is shared between actions but never published.
+- **Keep it actionable.** Publish what a workflow could guard on or a person could act on, when it
+  changes meaningfully. State is not a real-time channel: a camera stream or a 1 kHz sensor
+  belongs in a stream. [Anti-patterns](/docs/build/anti-patterns#frequency) explains why.
 
 ## Bloks
 
 A plugin app has no window of its own. A **blok** is how it gets a UI: a declarative panel that
 the app contributes and Orkestrator renders.
 
-A blok contains no code. It is a tree of components from a catalog the platform ships (`Page`,
-`Stack`, `Text`, `Button`, …), and its props are wired to the two things above:
+A blok contains no code. It is written in BSX, which reads like JSX: a tree of components from a
+catalog the platform ships (`Card`, `Text`, `Button`, …), wrapped in one `<Blok>` that says what it
+is (`kind`) and what draws it (`context`). Inside `{...}`, a blok reads and calls the app it belongs
+to through `self`:
 
-| Prop value | Meaning |
+| In the source | Meaning |
 |---|---|
-| `text="Camera"` | A **static** value |
-| `value="$state.camera.frames"` | A **binding** to a state: the panel updates when the state does |
-| `onClick="@camera.snap()"` | A **callback** that calls an action |
+| `<Text>Camera</Text>` | A **static** value |
+| `{self.CameraState.frames}` | A **binding** to a state: the panel updates when the state does |
+| `onClick={self.snap() into snapping}` | A **callback** that calls an action. `into` names the call, so the panel can show `snapping.running` |
 
 ```xml
-<Page>
-  <Label text="Camera" />
-  <Text value="$state.camera.frames" />
-  <Button title="Snap" onClick="@camera.snap()" />
-</Page>
+<Blok kind="agent" context="panel">
+  <Card>
+    <CardHeader><CardTitle>Camera</CardTitle></CardHeader>
+    <CardContent>
+      <Text>{self.CameraState.frames} frames</Text>
+      <Button onClick={self.snap() into snapping} disabled={snapping.running}>Snap</Button>
+    </CardContent>
+  </Card>
+</Blok>
 ```
 
 This is where the model closes into a loop. The button calls an action, the action changes the
 state, and the text bound to that state updates.
 
+The source is the same in every language. Each client only hands it to the platform, next to the
+states and actions it reads:
+
+<Tabs items={["Python", "Rust", "Kotlin"]}>
+<Tab value="Python">
+
+```python
+app.blok("panel", CAMERA_PANEL, description="Camera dashboard")
+```
+
+</Tab>
+<Tab value="Rust">
+
+```rust
+let app = App::new("camera", "0.1.0")
+    .state(CameraState::default())
+    .action(snap)
+    .blok("panel", CAMERA_PANEL);
+```
+
+</Tab>
+<Tab value="Kotlin">
+
+```kotlin
+val app = App("camera", "0.1.0")
+    .state(CameraState, Camera())
+    .action(SnapAction)
+    .blok("panel", CAMERA_PANEL, description = "Camera dashboard")
+```
+
+</Tab>
+</Tabs>
+
 A blok refers to actions and states **by name**, not by language. It does not know or care what
 wrote them. A panel can show a state published by a Rust device driver and call an action
 implemented in a Kotlin plugin, because all of them look the same once registered. The platform
-derives a blok's dependencies from the paths it references, so it knows what each panel needs.
+works out a blok's dependencies from the source, so it knows what each panel needs, and refuses a
+blok that reads a state or calls an action the app does not declare. Python checks the source
+itself when the app is assembled. Rust and Kotlin leave that to the server, which needs to be
+rekuest-server 21.4 or newer.
 
-Declaring a blok on an app is implemented in Python today, with `app.blok(...)`. See
-[Bloks: UIs from JSX](/docs/build/python/bloks) for the component catalog and how to bind to
+Write the source as a literal (or `include_str!` in Rust), not as a string built at run time. A
+blok keeps view state of its own, such as a slider before Apply, in a `<local>`. It never keeps its
+own copy of the app's state: see [Anti-patterns](/docs/build/anti-patterns#ui-state).
+
+See [Bloks: UIs from JSX](/docs/build/python/bloks) for the component catalog and how to bind to
 another app.
 
 ## What each client supports [#what-each-client-supports]
@@ -431,16 +494,21 @@ another app.
 | **App**: declare, connect, serve | yes | yes | yes |
 | **Actions** from functions | `@app.action` | `#[action]` | `@Action` |
 | Structures by id | yes | yes | yes |
-| **Services** declared and injected | `services=[...]` and annotation | `.service(..)` and `#[inject]` | `.service(..)` and `@Inject` |
+| **Services** declared and injected | the annotation (`clients=[...]` for extras) | `.service(..)` and `#[inject]` | `.service(..)` and `@Inject` |
 | Ready-made Mikro client | yes | yes (array datasets) | not yet |
-| Progress and logs from a task | yes | yes | not yet |
-| **State**, published live | `@app.state` | `#[derive(State)]` | not yet |
+| Progress and logs from a task | yes | yes | yes |
+| **State**, published live | `@app.state` | `#[derive(State)]` | `@State` |
 | Startup, background, shutdown hooks | yes | yes | not yet |
-| Locks | yes | yes | not yet |
-| **Bloks** declared on the app | `app.blok(...)` | not yet | not yet |
+| Locks | yes | yes | yes |
+| **Bloks** declared on the app | `app.blok(...)` | `.blok(..)` | `.blok(..)` |
 | Workflows (actions calling actions) | yes | not yet | not yet |
 
 Where to go next:
+
+- **Any language**: [Anti-patterns](/docs/build/anti-patterns): what not to do with state, UIs and
+  data, and what to do instead.
+- **Why it is built this way**: [The patterns behind Arkitekt](/docs/build/patterns): dependency
+  injection, stateless actions, pass by reference, observable state, durable execution and more.
 
 - **Python**: [Core concepts](/docs/build/python#core-concepts), then
   [State & lifecycle](/docs/build/python/state-lifecycle) and [Bloks](/docs/build/python/bloks).

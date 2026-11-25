@@ -1,6 +1,6 @@
 ---
 title: Actions on stored data
-description: "Walk through denoise_volume.py, upload_trace.py and detect_spikes.py: actions that take datasets from Mikro and Elektro through specs like Volume and SingleChannelTrace, use an injected service client, and store results with derivation edges."
+description: "Walk through denoise_volume.py, upload_trace.py and detect_spikes.py: actions that take datasets from Mikro and Elektro through specs like Volume and SingleChannelTrace, use an injected client, and store results with derivation edges."
 type: tutorial
 ---
 
@@ -19,7 +19,7 @@ do the same for electrophysiology traces in Elektro.
 <Learn>
 
 - Use a spec like `Volume` as a port, and what it tells the platform
-- Have a service client injected into an action
+- Have a client injected into an action
 - Read a stored dataset lazily and store a result next to it
 - Record where a result came from with a derivation edge
 - Store a trace with its unit and sampling rate in Elektro
@@ -32,7 +32,7 @@ do the same for electrophysiology traces in Elektro.
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#   "arkitekt[rekuest,mikro]>=5",
+#   "arkitekt[rekuest,mikro]>=19",
 #   "scipy>=1.13",
 #   "xarray>=2024.3.0",
 #   "numpy>=1.26",
@@ -59,15 +59,15 @@ import xarray as xr
 from scipy import ndimage
 
 from arkitekt import App, Description, Task, run
-from mikro import Mikro, mikro_service
+from mikro import Mikro
 from mikro.arkitekt.specs import Volume
 
-app = App("denoise-volume", "0.1.0", services=[mikro_service])
+app = App("denoise-volume", "0.1.0")
 
 
 @app.action
 def denoise(
-    mikro: Mikro,  # The mikro service is needed to create the result dataset (arkitekt injects it automatically)
+    mikro: Mikro,  # The mikro client creates the result dataset (arkitekt injects it automatically)
     task: Task,  # The task is needed to report progress (arkitekt injects it automatically)
     volume: Annotated[Volume, Description("The stack to smooth")],  # The input volume to denoise
     sigma: Annotated[float, Description("Gaussian width, in pixels")] = 1.5,
@@ -101,14 +101,17 @@ if __name__ == "__main__":
     run(app)
 ```
 
-### The app needs a service
+### The app uses Mikro, because its annotations say so
 
 ```python
-app = App("denoise-volume", "0.1.0", services=[mikro_service])
+app = App("denoise-volume", "0.1.0")
 ```
 
-`services=[mikro_service]` says the app needs Mikro. That has two effects. When the app logs in, it
+Nothing in the `App(...)` line mentions Mikro. The app uses Mikro because `denoise` takes a
+`Volume` (a Mikro type) and a `mikro: Mikro` client. When the app is assembled, arkitekt reads those
+annotations and adds Mikro to what the app needs. That has two effects. When the app logs in, it
 asks the server for access to Mikro. It also makes Mikro's types, like `Volume`, valid as ports.
+`arkitekt inspect clients` shows what an app uses.
 
 ### `Volume`: a type that says what it needs
 
@@ -129,7 +132,9 @@ As an input, `Volume` makes Orkestrator and the workflow editor offer **only dat
 spatial axes**. Nobody can pass a 2D image to `denoise` by mistake. As the return type, the same
 condition is recorded as what the action *provides*, so the editor knows the output fits wherever a
 volume is expected. Mikro has more of these specs, among them `Image`, `SingleChannelImage`,
-`MultichannelVolume` and `LabelMask`.
+`MultichannelVolume` and `LabelMask`. They are all the same class, narrowed by features of each
+instance: [Requires & provides](/docs/build/python/requires-provides) explains how, and how to write
+your own.
 
 ### Injected: the client and the task
 
@@ -142,7 +147,7 @@ Here the two injected parameters come first and are not keyword-only. That works
 recognises `Mikro` and `Task` by their annotations, wherever they are in the signature. The form
 only shows `volume` and `sigma`.
 
-`mikro` is a connected client, the same kind of object `easy` returns in a script. The action needs
+`mikro` is a connected client, the same kind of object `connect(Mikro)` returns in a script. The action needs
 it to store its result.
 
 ### Reading the data
@@ -212,7 +217,7 @@ what was uploaded.
 ```python title="upload_trace.py"
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["arkitekt[elektro]>=3", "numpy>=1.26"]
+# dependencies = ["arkitekt[elektro]>=19", "numpy>=1.26"]
 # ///
 """Calling: an electrophysiology trace into elektro.
 
@@ -232,8 +237,8 @@ import numpy as np
 from numpy.typing import NDArray
 from kanne.scalars import Duration, Frequency, Unit
 
-from arkitekt import easy
-from elektro import elektro_service
+from arkitekt import connect
+from elektro import Elektro
 from elektro.api.schema import CoordinateAnchorInput, SamplingInput, ValueUnitInput
 
 RATE_HZ = 20_000.0
@@ -255,7 +260,7 @@ def main() -> None:
     """Upload the trace, then give it the clock it was recorded against."""
     trace = synthesise()
 
-    with easy("trace-upload", elektro_service) as elektro:
+    with connect(Elektro, identifier="trace-upload") as elektro:
         folder = elektro.create_folder(name="examples")
 
         dataset = elektro.create_array_dataset(
@@ -304,7 +309,7 @@ units, such as `"20000.0 Hz"` or `"0 ms"`.
 ```python title="detect_spikes.py"
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["arkitekt[rekuest,elektro]>=5", "scipy>=1.13", "xarray>=2024.3.0", "numpy>=1.26"]
+# dependencies = ["arkitekt[rekuest,elektro]>=19", "scipy>=1.13", "xarray>=2024.3.0", "numpy>=1.26"]
 # ///
 """Offering: spike detection over a trace that already lives in elektro.
 
@@ -327,11 +332,10 @@ import xarray as xr
 from scipy.signal import find_peaks
 
 from arkitekt import App, Description, Task, run
-from elektro import Elektro, elektro_service
+from elektro import Elektro
 from elektro.specs import SingleChannelTrace, carried_axes
 
 app = App("detect-spikes", "0.1.0")
-app.service(elektro_service)
 
 
 @app.action
@@ -377,15 +381,9 @@ This is `denoise` again, for signals:
   peaks. `carried_axes(trace, source.dims)` copies the time axis, so the spike trace lines up with
   the recording and the two can be drawn on one plot.
 
-Note the other way to declare a service:
-
-```python
-app = App("detect-spikes", "0.1.0")
-app.service(elektro_service)
-```
-
-`app.service(...)` after the declaration does the same as `services=[...]` in it. Use whichever
-reads better.
+As with `denoise`, there is nothing to declare: `SingleChannelTrace` and `elektro: Elektro` are
+Elektro's, so the app uses Elektro. Only a client that no annotation names (because a startup hook
+or a blok's query uses it) needs listing: `App("detect-spikes", "0.1.0", clients=[Elektro])`.
 
 ## Try it
 

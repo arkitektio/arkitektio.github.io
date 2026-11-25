@@ -1,6 +1,6 @@
 ---
 title: Arrays between actions
-description: "Walk through in_memory_pipeline.py: declaring numpy arrays as an in-memory structure so read, segment and count actions can pass them to each other without storing anything."
+description: "Walk through in_memory_pipeline.py: declaring numpy arrays as an in-memory structure so read, segment and count actions can pass them to each other without storing anything, and why to use that sparingly: it makes the app stateful, and the arrays stay in its memory."
 type: tutorial
 ---
 
@@ -18,7 +18,8 @@ segment it, count the objects) where a numpy array goes from each action to the 
 
 - Why a port can only use a type the app has registered
 - Register a type that stays on the agent with `app.memory_structure`
-- Know when in-memory data is the right choice, and when it isn't
+- Why memory structures make an app stateful, and why its memory grows with every run
+- Know when in-memory data is the right choice, and what to do instead when it isn't
 
 </Learn>
 
@@ -27,7 +28,7 @@ segment it, count the objects) where a numpy array goes from each action to the 
 ```python title="in_memory_pipeline.py"
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["arkitekt[rekuest]>=5", "tifffile>=2024.5.22", "scikit-image>=0.24", "numpy>=1.26"]
+# dependencies = ["arkitekt[rekuest]>=19", "tifffile>=2024.5.22", "scikit-image>=0.24", "numpy>=1.26"]
 # ///
 """Offering: three actions that hand a numpy array to each other, on the agent.
 
@@ -105,13 +106,25 @@ if __name__ == "__main__":
     run(app)
 ```
 
+<Callout type="warn" title="Use this sparingly">
+
+A memory structure makes your app **stateful without saying so**. Every array an action returns
+stays in the agent's memory, under a reference, after the task has ended. It is not dropped when
+the next action has used it. It is freed only when Rekuest tells the agent to collect it, or when
+the agent stops. Run this pipeline a hundred times on large images, and the agent holds two arrays
+per run until it restarts. Read [Use it sparingly](#use-it-sparingly) before you reach for it.
+
+</Callout>
+
 <Callout type="warn" title="Fix the example in the repository first">
 
 The copy of `in_memory_pipeline.py` in the repository annotates its ports with `NDArray[Any]` from
-`numpy.typing`, and fails when it is imported:
+`numpy.typing`, and the app is not valid when it is assembled (by `arkitekt check`, `inspect` or
+`run`):
 
 ```
-StructureRegistryError: numpy._typing._array_like.NDArray[typing.Any] is not registered, ...
+The app is not valid (… problems):
+  in_memory_pipeline.py:…: action 'segment': … NDArray[typing.Any] is not registered, …
 ```
 
 The registration is for `np.ndarray`, and a generic alias is a different annotation. The listing
@@ -130,8 +143,8 @@ For a numpy array there are two possible answers, and arkitekt will not pick one
 - **The array is scratch data**, an intermediate result inside one pipeline. Then nobody needs to
   store it.
 
-If you annotate a port with a type arkitekt doesn't know, the import fails and tells you to choose.
-Older versions registered unknown types silently. A typo in an annotation then created a type that
+If you annotate a port with a type arkitekt doesn't know, the app is not valid when it is
+assembled, and the error tells you to choose. Older versions registered unknown types silently. A typo in an annotation then created a type that
 no other app could ever read.
 
 ### Choosing "keep it here"
@@ -144,6 +157,11 @@ This line chooses the second answer for `np.ndarray`. When `read_tiff` returns a
 **stays in this process**. What the task returns is a reference to it. When a workflow passes that
 reference on to `segment`, the agent looks the array up and calls `segment` with the real array.
 `segment` itself is ordinary numpy and scikit-image code.
+
+The array **stays** after that, too. `segment` gets the array, but the agent keeps its copy under
+the same reference, because another task may still pass that reference on. Nothing tells the agent
+that nobody will. So after one run of the pipeline the agent holds the image *and* the label image,
+and after the next run, four arrays.
 
 The pipeline:
 
@@ -178,17 +196,42 @@ Then run it against a server and build the pipeline in Orkestrator's workflow ed
 **Write Demo Tiff → Read Tiff → Segment → Count Objects**. The synthetic image has three blobs, so
 the final count is 3. `write_demo_tiff` saves it to `~/.arkitekt-examples/demo_cells.tif`.
 
-## When not to use it
+## Use it sparingly [#use-it-sparingly]
 
-An in-memory reference only means something to the process that holds it:
+Memory structures are convenient, and that is the danger. They quietly break two things Arkitekt
+otherwise gives you for free.
 
+**The app becomes stateful.** Arkitekt's actions are
+[stateless by design](/docs/build/patterns/stateless-execution): a task carries everything it needs,
+so any agent of the app can run it, and a restarted agent has lost nothing. A memory reference
+undoes that. `segment` now only works on the one agent that ran `read_tiff`, and only until that
+agent restarts:
+
+- **Another agent can't resolve it.** Run the app on two machines, and a reference from one is
+  meaningless on the other. The app can no longer be scaled out or moved.
 - **Another app can't resolve it.** If `segment` lived in a different app, it couldn't get the
   array. Data that crosses apps has to be stored somewhere both can reach.
-- **It disappears with the process.** If the app restarts, every reference it handed out is gone.
+- **A restart breaks every reference.** Every reference the app handed out is gone, including those
+  sitting in a workflow that is still running. A resumed workflow that passes one on fails.
 - **It isn't provenance.** Nothing records where the array came from.
 
-Use in-memory structures for intermediate data inside one app's pipeline. Everything you want to
-look at, share or keep goes into a data service, which is what the next page does.
+**The memory grows.** Every array an action returns is kept until Rekuest tells the agent to
+collect it, or until the agent stops. A pipeline that runs on every new acquisition holds every
+intermediate array it ever made. With large images that is a slow, invisible memory leak, which
+ends when the process is killed.
+
+Before you reach for a memory structure, try these:
+
+| Instead | When |
+|---|---|
+| **One action** that reads, segments and counts | The steps always run together. Nothing is kept, nothing is referenced, and the array is freed when the task ends. This is the default. |
+| **A data service** (Mikro, Elektro) | The intermediate result is worth looking at, keeping, sharing, or passing to another app. It gets provenance too. |
+| **A small value** (`int`, `@app.model`) | What the next step needs is a summary, not the array. |
+
+A memory structure is the right tool for a narrow case: an interactive pipeline on one agent,
+where a person rewires the steps and the intermediate data is not worth storing, on an app that
+restarts often enough that its memory stays bounded. Everything you want to look at, share or keep
+goes into a data service, which is what the next page does.
 
 ## Next
 
@@ -197,12 +240,15 @@ look at, share or keep goes into a data service, which is what the next page doe
 
 <Quiz>
   <Question q="What happens if an action's parameter is annotated with a type arkitekt has not registered?">
-    Importing the app fails with a `StructureRegistryError` that tells you to register the type, either as a memory structure or as a structure with an expander and a shrinker.
+    The app is not valid when it is assembled (`arkitekt check`, `inspect` or `run`): an `AppDeclarationError` names the parameter and tells you to register the type, either as a memory structure or as a structure with an expander and a shrinker.
   </Question>
   <Question q="What travels between read_tiff and segment?">
     A reference to the array. The array itself stays in the agent's memory.
   </Question>
   <Question q="Why could an action in a different app not take read_tiff's output?">
     The reference only resolves inside the process that holds the array. Data shared between apps has to be stored in a data service.
+  </Question>
+  <Question q="When is the array that read_tiff returned freed?">
+    Not when segment has used it. The agent keeps it until Rekuest tells it to collect that reference, or until the agent stops. That is why memory structures make an app stateful, and why its memory grows with every run.
   </Question>
 </Quiz>

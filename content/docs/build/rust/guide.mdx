@@ -112,8 +112,8 @@ async fn main() -> anyhow::Result<()> {
 before your function runs. Adding `mikro::service` also declares the requirements (Mikro and its S3
 store) that the user approves when the app first connects.
 
-**Scripts** that only call the platform use `easy` and `connect`, the Rust twin of Python's
-[`easy`](/docs/build/python/scripts):
+**Scripts** that only call the platform use `easy` and `connect`, the Rust counterpart of
+Python's [`connect(Mikro)`](/docs/build/python/scripts):
 
 ```rust
 use mikro::{axes_for, Mikro};

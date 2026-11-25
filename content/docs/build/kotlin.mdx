@@ -135,12 +135,15 @@ dependencies {
 
 | Works | Not yet |
 |---|---|
-| Discovery, device-code login, token rotation, cached login | [State](/docs/build/shared-concepts#state), locks and lifecycle hooks |
-| `@Action` with typed ports, defaults, KDoc and structures | [Bloks](/docs/build/shared-concepts#bloks) |
-| `@Requires` / `@Provides` constraints on structures | Workflows and child calls |
-| Services and `@Inject` | Progress reports from inside an action |
-| The agent socket, with reconnect and resend | Several returns, enums, dictionaries and dates as ports |
-| | A journal that survives a restart |
+| Discovery, device-code login, token rotation, cached login | Workflows and child calls |
+| `@Action` with typed ports, defaults, KDoc and structures | Startup, background and shutdown hooks |
+| `@Requires` / `@Provides` constraints on structures | State kept across restarts, structures as state fields |
+| Services and `@Inject` | An action's own bloks (logo, asks) and blok assets |
+| [State](/docs/build/shared-concepts#state) with `@State`, `StateMut` / `StateRef`, published as it changes | Several returns, enums, dictionaries and dates as ports |
+| Locks: on a state, and `@Action(locks = [...])` | A journal that survives a restart |
+| A `Task` parameter for progress and logs | |
+| [Bloks](/docs/build/shared-concepts#bloks) as BSX source, `App.blok(key, source)` (rekuest-server 21.4+) | |
+| The agent socket, with reconnect and resend | |
 
 The [README](https://github.com/arkitektio/arkitekt-kotlin#readme) is the current reference and
 is updated with the code.

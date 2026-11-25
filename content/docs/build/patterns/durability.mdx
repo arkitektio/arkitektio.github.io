@@ -1,0 +1,55 @@
+---
+title: Durable execution
+description: "The patterns that keep long-running Arkitekt work correct when machines die: journaled workflows replayed deterministically, recorded effects, idempotent child calls, at-least-once delivery from the agent's journal, and explicit decisions about lost steps."
+type: concept
+---
+
+Lab work runs for hours across several machines, and any of them can crash, reboot or lose power.
+Arkitekt's answer is **durable execution**: work that has finished is never done again, work in an
+unknown state is never guessed about, and a workflow whose agent dies is picked up where it was.
+
+This page names the patterns involved. The full contract (what is persisted where, the resume
+lifecycle, the guarantees and the known limits) is on the design page,
+[Durable execution](/docs/build/durable-execution).
+
+## The patterns
+
+- **Event-sourced workflows, replayed deterministically.** A workflow's every call and every value
+  from the outside world is recorded. When its agent dies, the workflow's code runs again from the
+  top on a new agent, and gets the recorded answers back instead of calling again. This is the
+  model of engines such as Temporal. It requires the workflow code to be deterministic: time,
+  randomness and outside reads go through `task.now()`, `task.random()`, `task.sleep()` and
+  `task.record(...)`.
+- **Idempotent child calls.** Each call a workflow makes has a stable **call key**. Issuing the
+  same call again during a replay finds the existing child task instead of creating a new one.
+- **At-least-once delivery, deduplicated.** Every agent keeps a local journal of everything it
+  reports, numbered without gaps, and resends what the server has not acknowledged after a
+  reconnect or a restart. The server ignores what it already has. Together that is effectively
+  exactly-once.
+- **Only workflows may call.** A plain action that called others and died would leave no record of
+  which calls finished. So orchestration lives in workflows, and the rule is enforced when the app
+  is assembled.
+- **Explicit compensation.** The platform never retries a step that had started. It reports the
+  loss (`AgentLost`) with what is known, including the action's `effects=` claim, and the workflow
+  decides: `task.retry` what is safe to repeat, `task.hold` to ask a person, `task.guard` to check a
+  device first.
+
+## What it buys
+
+- A crash costs time, not correctness. Finished steps stay finished.
+- An irreversible step, a dispense or a cut, is never repeated by accident.
+- Every decision about a lost step is visible: in code, or made by a person in the UI.
+
+## What it costs
+
+- **Deterministic workflow code.** A `time.time()` or a file read in a workflow breaks replay.
+- **Workflows are pinned to their code.** A workflow resumed with changed source may take another
+  path, which is reported as `NonDeterministicWorkflow`.
+- **Plain tasks are not resumed.** A plain task whose agent dies ends lost, and its caller decides.
+  Long work that must survive a crash has to be a workflow.
+
+## Next
+
+- [Durable execution](/docs/build/durable-execution): the full design.
+- Python: [Durable execution](/docs/build/python/durable-execution) and
+  [When an agent dies](/docs/build/python/examples/recovery).

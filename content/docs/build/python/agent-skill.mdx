@@ -27,7 +27,9 @@ You can also [view the raw file](/skills/arkitekt/SKILL.md) directly.
 
 An earlier version of this skill, published under `/skills/arkitekt-next/`, taught the retired
 `arkitekt-next` package (`@register`, `easy` as the app, the `arkitekt-next` CLI). If you installed
-it, replace it with the file above and delete the old `building-arkitekt-next-apps` folder.
+it, replace it with the file above and delete the old `building-arkitekt-next-apps` folder. The
+skill was updated for `arkitekt` 19 (clients by annotation, `connect(Mikro)` for scripts): download
+it again if you fetched it before.
 
 </Callout>
 
@@ -62,15 +64,15 @@ code.
 - The mental model: an `App` is a declaration, `@app.action` functions become platform
   **actions** whose ports, form and docs are derived from type hints and docstrings, and
   `run(app)` serves them.
-- **Injection by annotation**: `Task` for logs and progress, service clients like `Mikro`, state,
-  context and protocol proxies.
+- **Injection by annotation**: `Task` for logs and progress, clients like `Mikro` (the annotation
+  is the whole declaration), state, context and protocol proxies.
 - Passing large data by reference with mikro specs (`Volume`, `SingleChannelImage`, …), plus
   `@app.model`, registered and memory structures.
 - `@app.state`, `@app.context` and the `@app.startup` / `@app.shutdown` / `@app.background` hooks,
   and why state replaces getter actions.
 - Calling other apps from an `@app.workflow` through an `@app.declare` protocol, and `effects=`.
-- Calling the platform from scripts and notebooks with `easy`, `aeasy`, `interactive` and
-  `connect`, and the Qt, FastAPI and blok integrations.
+- Calling the platform from scripts and notebooks with `connect(Mikro)` (`with`, `async with`,
+  `.enter()`) and `connect(app)`, and the Qt, FastAPI and blok integrations.
 - A **CLI cheat-sheet** (`create`, `run`, `inspect`, `call`, `gen`, `plugin`) and a pre-flight
   checklist.
 

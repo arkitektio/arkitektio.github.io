@@ -35,10 +35,9 @@ become its input and output [ports](/docs/about/terminology#port), and your docs
 
 ```python
 from arkitekt import App
-from mikro import mikro_service
 from mikro.arkitekt.specs import Image, LabelMask
 
-app = App("stardist", "0.1.0", services=[mikro_service])
+app = App("stardist", "0.1.0")
 
 
 @app.action
@@ -161,10 +160,10 @@ from dataclasses import dataclass
 import xarray as xr
 
 from arkitekt import App
-from mikro import Mikro, mikro_service
+from mikro import Mikro
 from mikro.arkitekt.specs import Image
 
-app = App("inference", "0.1.0", services=[mikro_service])
+app = App("inference", "0.1.0")
 
 
 @app.context

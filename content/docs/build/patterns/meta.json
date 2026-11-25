@@ -1,0 +1,14 @@
+{
+  "title": "Design patterns",
+  "pages": [
+    "index",
+    "declaration",
+    "dependency-injection",
+    "stateless-execution",
+    "pass-by-reference",
+    "observable-state",
+    "durability",
+    "contracts",
+    "agents-and-actors"
+  ]
+}

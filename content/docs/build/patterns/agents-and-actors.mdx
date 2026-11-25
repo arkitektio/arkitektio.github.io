@@ -1,0 +1,65 @@
+---
+title: Outbound agents, actors inside
+description: "How an Arkitekt app runs: an agent that dials out to the server and never opens a port, actors that run each action's tasks one at a time or in parallel, and agent-wide locks taken in a fixed order so devices are never commanded twice and never deadlock."
+type: concept
+---
+
+When you call `run(app)`, your process becomes an **agent**. It connects to the server, says what
+it offers, and runs the tasks it is handed. Two patterns shape how it does that: how it talks to
+the outside, and how it runs work inside.
+
+## Outbound only
+
+An agent **dials out**. It opens one WebSocket to the server and keeps it open. It never listens on
+a port, needs no public address and no firewall rule. Tasks reach it over the connection it opened.
+
+This is the **reverse connection** (or pull) pattern used by CI runners and remote agents: the
+worker connects to the coordinator, not the other way round. It is why the same app runs unchanged
+on a laptop, behind a lab firewall, in a container and on a microcontroller, and why a deployment
+never needs to know where its agents are.
+
+When the connection drops, the agent reconnects with backoff and resends from its journal whatever
+the server has not acknowledged. Running tasks follow their [disconnect
+policy](/docs/build/python#disconnect-policy): keep going, or stop after a grace period.
+
+## Actors inside
+
+Inside the agent, each action is run by an **actor**: the thing that receives that action's
+assignments and runs them. By default an actor is **serial**: tasks of the same action run one
+after the other, in order. With `concurrency="parallel"` they may overlap.
+
+This is the **actor model**, used loosely: each actor owns its own queue, and actors of one agent
+run independently of each other. A slow "acquire" does not hold up a quick "read temperature".
+
+## Locks across actors
+
+Some things are shared between actions: the stage that both `move_to` and `autofocus` drive.
+**Locks** say so. A state can name locks (`required_locks=`) that every action taking it holds, and
+an action can name more (`locks=`). A task waits until it holds all of its locks, and releases them
+when it ends.
+
+Locks are agent-wide and are always taken **in the same global order**, so two tasks that need
+overlapping locks cannot deadlock each other, whatever order their actions declared them in. A
+lock is only held while a task actually runs, never while it waits in its actor's queue.
+
+## What it buys
+
+- **Runs anywhere.** No inbound connectivity, so no network configuration per lab.
+- **Safe defaults for hardware.** Serial actors and locks mean one command at a time to a device,
+  without writing any synchronization yourself.
+- **Isolation between actions.** A long task blocks only its own action, and only if it is serial.
+
+## What it costs
+
+- **Serial is slower.** A computation that could run many times at once has to say
+  `concurrency="parallel"`.
+- **Locks are not re-entrant.** A task holding a lock that calls, directly or through a
+  dependency, another action on the same agent that needs the same lock will wait for itself.
+- **One connection to rule them all.** If the link to the server is down, the agent can do nothing
+  new. Work in flight continues according to its disconnect policy and is reported later.
+
+## Next
+
+- On the wire: [Bare protocols](/docs/build/protocols) and the
+  [agent protocol](/docs/build/agent-protocol).
+- Python: the options of `@app.action` in [Core concepts](/docs/build/python#action-and-implementation).

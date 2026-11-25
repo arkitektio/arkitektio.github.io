@@ -11,9 +11,10 @@ value is transported. This page goes through the kinds of types in increasing or
 <Callout type="info" title="The rule">
 
 A port may only name a type the app knows. The built-in scalars and containers are always known.
-Everything else must come from a service the app declares, `@app.model`, `app.register_structure`
-or `app.memory_structure`. An unknown type is rejected when the action is **declared**, so you find
-out when the module is imported rather than when someone calls the action.
+Everything else must come from a client the app uses (a Mikro `Volume`, say), `@app.model`,
+`app.register_structure` or `app.memory_structure`. An unknown type is reported when the app is
+**assembled** (`arkitekt check`, `inspect` or `run`), so you find out before anyone calls the
+action.
 
 </Callout>
 
@@ -87,7 +88,8 @@ Images, volumes, traces and tables are too big to send through a task. They live
 store), and **only a reference travels**. The receiving agent resolves the reference with its own
 client. This is what Arkitekt calls a [structure](/docs/about/terminology#how-do-these-elements-relate).
 
-A service brings its structures with it. Declare the service, and its types become valid ports:
+A client brings its structures with it. Use one of its types as a port, and the app uses that
+client:
 
 ```python
 from typing import Annotated
@@ -97,10 +99,10 @@ import xarray as xr
 from scipy import ndimage
 
 from arkitekt import App, Description, Task
-from mikro import Mikro, mikro_service
-from mikro.arkitekt.specs import Volume, ensure
+from mikro import Mikro
+from mikro.arkitekt.specs import Volume
 
-app = App("denoise-volume", "0.1.0", services=[mikro_service])
+app = App("denoise-volume", "0.1.0")
 
 
 @app.action
@@ -130,23 +132,24 @@ def denoise(
         axes=volume.carried_axes(smoothed.dims),
         derived_from=[volume.derive_identity(value_relation="TRANSFORMED")],
     )
-    return ensure(result.lens(), Volume)
+    return result.lens()
 ```
 
-The example shows four things:
+The example shows three things:
 
 - **`Volume` is a spec, not a new class.** Mikro stores array datasets. A *lens* is a view on one of
   them. `Volume` (from `mikro.arkitekt.specs`) is a lens annotated with a requirement: exactly three
   spatial axes. As an argument, it lets Orkestrator and the workflow editor offer only datasets that
   fit. As a return type, it tells the platform what the action produces. Related specs include
-  `Image`, `SingleChannelImage`, `MultichannelVolume`, `TimelapseVolume` and `LabelMask`.
+  `Image`, `SingleChannelImage`, `MultichannelVolume`, `TimelapseVolume` and `LabelMask`. Using a
+  spec as a port is also what makes the app use the Mikro client: nothing else needs declaring.
+  All of them are the same class, `ArrayLens`, narrowed by features of the instance; see
+  [Requires & provides](/docs/build/python/requires-provides).
 - **`volume.data` is lazy.** It is an `xarray.DataArray` backed by zarr in the object store. Slicing
   it downloads only the chunks you touch. `np.asarray(...)` loads what is left.
 - **Results are written with the client, not returned as arrays.** `mikro.create_array_dataset(...)`
   uploads the array and creates a dataset. `derived_from=[...]` records a derivation edge, so the
   provenance graph knows the output came from the input and, here, that both share a grid.
-- **`ensure(lens, Volume)` checks the promise.** It raises if the result is not actually a volume,
-  instead of returning something that silently breaks a downstream action.
 
 <Callout type="warn" title="Local objects are not live">
 
@@ -164,11 +167,11 @@ the same way an action does:
 
 ```python
 from arkitekt import App
-from mikro import Mikro, mikro_service
+from mikro import Mikro
 
 from mylib import Thing   # a class both apps import
 
-app = App("things", "0.1.0", services=[mikro_service])
+app = App("things", "0.1.0")
 
 
 async def expand_thing(id: str, mikro: Mikro) -> Thing:
@@ -218,6 +221,16 @@ In-memory references are only meaningful on the agent that holds them. They are 
 process ends, and they cannot be resolved by another app. Anything worth keeping belongs in a data
 service.
 
+<Callout type="warn" title="Use memory structures sparingly">
+
+They make the app **implicitly stateful**. Every returned object stays in the agent's memory after
+its task has ended, and is freed only when Rekuest tells the agent to collect it, or when the agent
+stops. So the app's memory grows with every run, and a reference only works on the one agent that
+made it, until it restarts. Prefer one action that does all the steps, or store intermediate
+results in a data service. See [Arrays between actions](/docs/build/python/examples/in-memory#use-it-sparingly).
+
+</Callout>
+
 ## Choosing
 
 | You have… | Use |
@@ -226,4 +239,4 @@ service.
 | a few named values that belong together | `@app.model` |
 | images, volumes, traces, tables | the service's structures (`mikro`, `elektro`, …) |
 | a shared library type stored somewhere both apps reach | `app.register_structure` |
-| intermediate data between actions of one agent | `app.memory_structure` |
+| intermediate data between actions of one agent, when fusing them into one action is not an option | `app.memory_structure`, sparingly |

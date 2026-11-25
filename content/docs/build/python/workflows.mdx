@@ -28,10 +28,9 @@ A workflow never imports another app's code. It declares what it needs from that
 from typing import AsyncGenerator, Protocol
 
 from arkitekt import App
-from mikro import mikro_service
 from mikro.arkitekt.specs import LabelMask, SingleChannelImage
 
-app = App("plate-workflow", "0.1.0", services=[mikro_service])
+app = App("plate-workflow", "0.1.0")
 
 
 @app.declare(app="segmentation", auto_resolvable=True, min=1)
@@ -58,7 +57,8 @@ class Segmentation(Protocol):
   use state demands to [guard](/docs/build/python/durable-execution#guard) against a changed
   world.
 - The ports are built against **this** app's known types. A demand that mentions `SingleChannelImage`
-  requires this app to declare `mikro_service` too, otherwise the declaration raises `DefinitionError`.
+  makes this app use the Mikro client, just as an action port would. A type nothing knows is
+  reported when the app is assembled, as an `AppDeclarationError` pointing at the demand.
 
 | `@app.declare(...)` option | Meaning |
 |---|---|
@@ -136,16 +136,15 @@ and provenance records every change they make under the workflow's task
 
 ## Calling by id
 
-The proxy is the preferred way to call because the demand is checked when the app is declared.
+The proxy is the preferred way to call because the demand is checked when the app is assembled, before it connects.
 When you only know an action at run time, resolve it with the Rekuest client and call it through
 the task:
 
 ```python
 from arkitekt import App, Task
-from rekuest.arkitekt import rekuest_service
 from rekuest.client.client import Rekuest
 
-app = App("dynamic", "0.1.0", services=[rekuest_service])
+app = App("dynamic", "0.1.0")
 
 
 @app.workflow
@@ -203,7 +202,7 @@ A protocol with **only state demands** is allowed on a plain action.
 
 | Error | When |
 |---|---|
-| `DefinitionError` | A plain action depends on an action demand, or a demand names a type this app does not know |
+| `AppDeclarationError` | When the app is assembled (`run`, `inspect`, `arkitekt check`): a plain action depends on an action demand, or a demand names a type nothing knows. Every problem is listed, each at its line |
 | `NotAWorkflowError` | A plain action tried to call another action at run time |
 | `NoCallerError` | A call was made from a `Task.local()` (tests), where nothing routes calls |
 | `AgentLost` | The agent running a child died. See [handling a lost step](/docs/build/python/durable-execution#handling-a-lost-step) |

@@ -35,7 +35,7 @@ needs:
 ```python
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["arkitekt[rekuest]>=5"]
+# dependencies = ["arkitekt[rekuest]>=19"]
 # ///
 ```
 
@@ -72,8 +72,8 @@ An app does one of two things with the platform:
 
 - It **offers** actions. `run(app)` connects, registers the app's actions and waits for tasks until
   you stop it. Other apps, workflows and people in Orkestrator call it.
-- It **calls** services. `easy(...)` connects, hands you clients for the services you named (Mikro
-  for images, Elektro for traces, …), and disconnects when your script is done.
+- It **calls** services. `connect(Mikro)` connects, hands you the clients you named (Mikro for
+  images, Elektro for traces, …), and disconnects when your script is done.
 
 Most examples show one direction or the other, and the pages are grouped that way.
 
@@ -84,7 +84,7 @@ Most examples show one direction or the other, and the pages are grouped that wa
 | [Actions from functions](/docs/build/python/examples/actions) | `hello.py`, `measure_nuclei.py` | `@app.action`, how a signature becomes a form, progress, `@app.model` results |
 | [A device with live state](/docs/build/python/examples/device-state) | `microscope_stage.py`, `typed_context.py` | `@app.state`, `@app.startup`, `@app.background`, per-installation config with `app_context` |
 | [Arrays between actions](/docs/build/python/examples/in-memory) | `in_memory_pipeline.py` | `app.memory_structure`: passing numpy arrays between actions without storing them |
-| [Uploading data from a script](/docs/build/python/examples/uploads) | `upload_cells3d.py`, `upload_nifti.py`, `read_with_bioio.py` | `easy`, Mikro datasets, pyramids, contrast anchors, getting axis order right |
+| [Uploading data from a script](/docs/build/python/examples/uploads) | `upload_cells3d.py`, `upload_nifti.py`, `read_with_bioio.py` | `connect(Mikro)`, Mikro datasets, pyramids, contrast anchors, getting axis order right |
 | [Actions on stored data](/docs/build/python/examples/stored-data) | `denoise_volume.py`, `upload_trace.py`, `detect_spikes.py` | Specs like `Volume`, injected clients, derivation edges, Elektro sessions |
 | [Embedding in your own program](/docs/build/python/examples/embedding) | `embedded_host.py` | `run_detached`, listeners, state dropdowns, actions registered at runtime |
 | [When an agent dies](/docs/build/python/examples/recovery) | `recovery/` | `effects=`, `@app.workflow`, `AgentLost`, `task.retry`, `task.hold`, `task.guard` |

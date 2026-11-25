@@ -6,6 +6,7 @@
     "examples",
     "---Building apps---",
     "types",
+    "requires-provides",
     "state-lifecycle",
     "---Orchestration---",
     "workflows",

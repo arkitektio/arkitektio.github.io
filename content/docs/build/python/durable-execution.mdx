@@ -225,12 +225,11 @@ an explicit answer:
 ```python
 from typing import Protocol
 
-from mikro import mikro_service
 from mikro.arkitekt.specs import LabelMask, SingleChannelImage
 
 from arkitekt import AgentLost, App, StateChanged, Task, run
 
-app = App("plate-workflow", "0.1.0", services=[mikro_service])
+app = App("plate-workflow", "0.1.0")
 
 
 class PlateState(Protocol):
@@ -332,12 +331,12 @@ A script that calls actions directly is the caller, so it decides about a lost t
 The top-level `retry` works like `task.retry`:
 
 ```python
-from mikro import mikro_service
-from rekuest.arkitekt import rekuest_service
+from mikro import Mikro
+from rekuest.client.client import RekuestCaller
 
-from arkitekt import AgentLost, easy, retry
+from arkitekt import AgentLost, connect, retry
 
-with easy("plate-runner", rekuest_service, mikro_service) as (rekuest, mikro):
+with connect(RekuestCaller, Mikro, identifier="plate-runner") as (rekuest, mikro):
     image = mikro.get_array_dataset("1234").lens()
     cells = retry(rekuest.call, COUNT_CELLS_ID, image=image, attempts=3, if_started=True)
     try:
