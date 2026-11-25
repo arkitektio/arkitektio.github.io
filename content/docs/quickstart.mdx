@@ -1,0 +1,161 @@
+---
+title: Quickstart
+description: "Fifteen minutes, one path, no choices: start a hub with one command, sign in with Orkestrator, install your first app from the App Store and run it on an image. Then pick where to go next: use, build, deploy or learn."
+type: tutorial
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import { OrkestratorGrid } from "@/components/docs";
+
+By the end of this page you will have started a hub on your own computer, connected to it,
+installed an app and run it on an image. It takes about fifteen minutes, most of which is waiting
+for downloads. There are no choices to make: everything here uses the defaults.
+
+<Prerequisites>
+
+- A computer running macOS, Linux or Windows, with **Docker** installed and running
+  ([Docker Desktop](https://www.docker.com/products/docker-desktop/) on macOS and Windows)
+- A reasonably recent machine: 16 GB of RAM is recommended (see [Requirements](/docs/run/requirements))
+- An email address, for a free account on go.arkitekt.live (you create it on the way)
+
+</Prerequisites>
+
+<Steps>
+<Step>
+
+## Start a hub
+
+The **hub** is the server in the middle: it stores your images and passes work between your tools.
+Start one with a single command:
+
+```bash tab="macOS / Linux"
+curl -fsSL https://raw.githubusercontent.com/arkitektio/konstruktor/main/install.sh | sh
+```
+
+```powershell tab="Windows"
+irm https://raw.githubusercontent.com/arkitektio/konstruktor/main/install.ps1 | iex
+```
+
+This installs **Konstruktor**, the tool that sets up and runs hubs, and asks a few questions.
+Accept the defaults with <kbd>Enter</kbd>: yes, put it on your `PATH`, and yes, create a hub now.
+When it asks for a name, give the hub a short one, for example `my-hub`. The hub comes with
+everything this quickstart needs, including a **plugin engine** that runs the apps you install.
+
+Konstruktor then shows a **link and a code**. Open the link, sign in to go.arkitekt.live (or create
+an account), and accept the hub. A hub keeps no accounts of its own: your account and your
+organization live on go.arkitekt.live, and this step connects the new hub to them.
+
+Once accepted, the hub starts. The first start downloads the images and takes a few minutes.
+
+</Step>
+<Step>
+
+## Open Orkestrator and sign in
+
+**Orkestrator** is the desktop app you use Arkitekt with. Download it and open it:
+
+<OrkestratorGrid />
+
+1. Click **Sign in with go.arkitekt.live**. Your browser opens.
+2. Sign in with the account from step 1.
+3. On the approval page, the hub you just started is already selected under **Assign to hub**.
+   Click **Allow access**.
+
+Back in Orkestrator, you are connected to your hub. It is empty, for now.
+
+</Step>
+<Step>
+
+## Install your first app
+
+Apps do the actual work. They come from the **App Store**, and run on your hub's plugin engine. Install **Basiks**, the standard library: small, general
+actions on images.
+
+Click this badge. It opens Orkestrator on the install page for Basiks:
+
+<a href="https://arkitekt.live/deeplink?orkestrator=%2Fdo%2Fv1%2Frepo.install%3Fsource%3Doci%253Aghcr.io%252Fjhnnsrs%252Fbasiks" style={{ display: "inline-block" }}>
+  <img src="/img/badge/open-in-arkitekt.svg" alt="Open in Arkitekt: install Basiks" style={{ height: "28px", width: "auto", margin: 0 }} />
+</a>
+
+1. Press **Import**. You land on the app's page, with the actions it brings.
+2. Press **Install** in the header (it names the version), look over what it asks for and confirm
+   with **Authorize**.
+3. The dialog asks where to deploy it. Pick your hub's engine and press **Deploy**.
+
+The first start downloads the app, which takes a minute or two. When the **Running** count in the
+app's header shows 1, it is ready.
+
+</Step>
+<Step>
+
+## Run it on an image
+
+First you need an image. Basiks can make one:
+
+1. Open **Actions** in the sidebar and search for **Generate Test Image**.
+2. Press its play button, choose `human_mitosis` (a microscopy image of nuclei) and press **Do**.
+3. The new image pops up in the bottom right corner when it is ready. Click it to open it in the
+   viewer.
+
+Now apply an action to it:
+
+4. Right-click the image and choose **Otsu Thresholding** from the actions offered for it.
+5. Leave the options as they are and press **Do**.
+6. The result, a mask of the nuclei, pops up when it is done. Click it to view it.
+
+That's the whole loop: an app announced what it can do, you picked an action, the hub sent the
+work to the app, and the result was stored next to the image it came from. Arkitekt also recorded
+that the mask was derived from that image, by a task you started. That record of where every
+result came from is [provenance](/docs/about/provenance).
+
+</Step>
+</Steps>
+
+## Where to go next
+
+You have a hub, an app and a first result. From here, pick what you want to do next:
+
+<Cards>
+  <Card title="Use: do more with it" href="/docs/use/first-steps">
+    Upload your own data, install more apps from the App Store, use napari and Fiji, and chain
+    actions into workflows.
+  </Card>
+  <Card title="Build: write your own app" href="/docs/build/python/first-app">
+    Turn your own Python function into an action like the ones you just ran, in a few lines.
+  </Card>
+  <Card title="Deploy: set it up for your lab" href="/docs/run/what-you-are-setting-up">
+    Ready to convince your colleagues? Plan a hub for a lab or a facility, with storage, more
+    machines, and the GPU.
+  </Card>
+  <Card title="Learn: how Arkitekt works" href="/docs/about">
+    The ideas behind it: hubs and apps, actions and tasks, provenance, and the design patterns
+    underneath.
+  </Card>
+</Cards>
+
+Going deeper on one of them? Builders can pick from the
+[kinds of apps you can build](/docs/build/apps), and the curious can read
+[the patterns behind Arkitekt](/docs/build/patterns).
+
+<Callout type="info" title="Running a hub for a lab or a facility?">
+
+This quickstart puts a hub on your own computer, reachable from your network. A hub that a whole
+lab relies on needs a bit more thought: where the data lives, how people reach it, and who
+administers it. Start with [What you are setting up](/docs/run/what-you-are-setting-up) and
+[Planning](/docs/run/planning).
+
+</Callout>
+
+<Callout type="info" title="Something did not work?">
+
+- **The command says Docker is missing or not running.** Start Docker Desktop (or the Docker
+  service on Linux) and run the command again.
+- **The hub is not in the Assign to hub list.** The hub was not accepted in step 1, or is still
+  starting. `konstruktor list` shows the hubs on this machine, and `konstruktor status my-hub` what
+  is running.
+- **Generate Test Image is not in the Actions list.** The app is not running yet. Open the App
+  Store, find Basiks and check that it shows as running.
+
+More in [Troubleshooting](/docs/use/troubleshooting).
+
+</Callout>

@@ -89,25 +89,29 @@ sources using the cache, so publish from the same tree you built.
 
 ### Add an "Open in Arkitekt" badge
 
-Put a badge at the top of the repository's README, so that anyone reading it can
-hand the repository to their own Arkitekt in one click:
+A badge at the top of the README lets anyone reading it install your app on
+their own hub in one click. You do not have to write it: the CLI puts it into the
+README (between `<!-- arkitekt:badge -->` markers) as soon as it knows the
+repository, at `arkitekt create` when `origin` is already set, otherwise on the
+first run of the generated release workflow. `arkitekt plugin badge` prints it.
+It looks like this:
 
 ```markdown
-[![Open in Arkitekt](https://arkitekt.live/img/badge/open-in-arkitekt.svg)](https://arkitekt.live/deeplink?orkestrator=%2Fkabinet%2Frepos%2Finstall%3Frepo%3DYOUR-USER%252FYOUR-REPO)
+[![Open in Arkitekt](https://arkitekt.live/img/badge/open-in-arkitekt.svg)](https://arkitekt.live/deeplink?orkestrator=%2Fdo%2Fv1%2Frepo.install%3Fsource%3Doci%253Aghcr.io%252FYOUR-USER%252FYOUR-APP)
 ```
 
-Replace `YOUR-USER` and `YOUR-REPO`; the `%252F` between them is an encoded
-slash and has to stay encoded. The badge image is the same for every
-repository — what it opens is carried by the link, not by the picture.
+The link names the **package** your release workflow publishes
+(`ghcr.io/YOUR-USER/YOUR-APP`), not the GitHub repository: that is what Kabinet
+runs. Clicking it opens the reader's own Orkestrator on the install page for your
+app, where they press **Import** and then install it. Readers without Orkestrator
+land on arkitekt.live instead, which tells them how to get it. The
+[Quickstart](/docs/quickstart) installs Basiks this way.
 
-Clicking it opens the reader's own Orkestrator on the install prompt for your
-repository, where they can add it to their Kabinet. Readers without Orkestrator
-land on arkitekt.live instead, which tells them how to get it.
+<Callout type="info" title="The older form still works">
 
-<Callout type="info" title="Let Orkestrator write it for you">
-
-Orkestrator can produce the snippet: open the repository under **Kabinet →
-Repos** and use **Copy README badge**.
+Badges written before 19 link to `/kabinet/repos/install?repo=user/repo`, a
+GitHub repository for Kabinet to scan. Orkestrator still opens them, but nothing
+writes them any more. Regenerate yours with `arkitekt plugin badge`.
 
 </Callout>
 

@@ -2,6 +2,7 @@
   "title": "Arkitekt",
   "pages": [
     "index",
+    "quickstart",
     "use",
     "run",
     "build",
