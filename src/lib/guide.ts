@@ -144,8 +144,6 @@ export function guideCss(answers: GuideAnswers | undefined) {
       `:is(#nd-sidebar,#nd-sidebar-mobile) :is(a,p):has(> ${label}):not(div[data-state] > a,[data-active="true"])`,
       `:is(#nd-sidebar,#nd-sidebar-mobile) div[data-state]:has(> :is(a,button) > ${label}):not(:has([data-active="true"]))`,
       `[data-radix-popper-content-wrapper] a:has(${label})`,
-      // a whole tab in the bar across the top (DocsTabs), unless it is the one being read
-      `nav a:has(> ${label}):not([aria-current])`,
     ].join(',');
   });
   return rules.length > 0 ? `${rules.join(',')}{display:none}` : '';
