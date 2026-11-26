@@ -1,8 +1,6 @@
 {
   "title": "Reference",
-  "description": "Look things up: tools, formats, protocols",
   "icon": "BookMarked",
-  "root": true,
   "pages": [
     "---Downloads & tools---",
     "downloads",

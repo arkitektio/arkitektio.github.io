@@ -1,8 +1,6 @@
 {
   "title": "Guides",
-  "description": "How-tos: get a specific thing done",
   "icon": "Compass",
-  "root": true,
   "pages": [
     "---Using Arkitekt---",
     "...using",

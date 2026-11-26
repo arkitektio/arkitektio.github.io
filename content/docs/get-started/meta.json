@@ -1,8 +1,6 @@
 {
   "title": "Get Started",
-  "description": "Tutorials: your first hour with Arkitekt",
   "icon": "Rocket",
-  "root": true,
   "pages": [
     "index",
     "basics",

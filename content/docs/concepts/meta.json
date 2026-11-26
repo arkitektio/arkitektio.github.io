@@ -1,8 +1,6 @@
 {
   "title": "Concepts",
-  "description": "Explanation: how and why Arkitekt works",
   "icon": "Lightbulb",
-  "root": true,
   "pages": [
     "---Arkitekt---",
     "index",
