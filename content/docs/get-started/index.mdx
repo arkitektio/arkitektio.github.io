@@ -1,24 +1,26 @@
 ---
-title: Get Started
-description: "Join somebody else's hub or bring your own, super quick or with a coffee: four ways to your first result with Arkitekt."
+title: Installation & get started
+description: "Start here: either you already have a hub to connect to, or you install one. Both paths come super quick or with a coffee."
 ---
 
-import { GetStartedPaths } from "@/components/docs";
+import { Server, Users } from "lucide-react";
 
-Two questions: whose hub, and how much time? Super quick gets you there on one page. Both speeds end
-at the same point, but with a coffee you tend to understand a bit more about what is going on. Dont
-you like coffee?
+Everything in Arkitekt runs through a **hub**. So the first question is whether you already have one.
 
-## Join somebody else's hub
+<Cards>
+  <Card icon={<Users />} title="I already have a hub" href="/docs/get-started/join">
+    Your lab, your imaging facility or a collaborator runs one. You only need the desktop app and an
+    invite. No server, no Docker.
+  </Card>
+  <Card icon={<Server />} title="I want to install a hub" href="/docs/get-started/own-hub">
+    Install a hub on your own computer with Docker, in about fifteen minutes. Your data stays with
+    you.
+  </Card>
+</Cards>
 
-Your lab, your imaging facility or a collaborator already runs a hub. You only need the desktop app
-and an invite. No server, no Docker.
+Both paths come in two speeds: **super quick** on one page, or **with a coffee**, where each step
+explains what you are doing. They end at the same point. Dont you like coffee?
 
-<GetStartedPaths hub="join" />
-
-## Bring your own hub
-
-Nobody runs one for you yet, or you want your own. Start a hub on your computer with Docker, and
-the data stays with you.
-
-<GetStartedPaths hub="own" />
+Setting up a hub for a whole lab or facility? That is under
+[Advanced deployment](/docs/get-started/deployment/what-you-are-setting-up), and the apps are on
+[Downloads](/docs/get-started/downloads).

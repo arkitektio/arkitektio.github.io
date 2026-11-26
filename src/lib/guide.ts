@@ -25,7 +25,7 @@ export type GuideQuestion = {
   options: GuideOption[];
 };
 
-// The docs have four tabs (What is Arkitekt?, Get started, Guides & tutorials,
+// The docs have four sections (What is Arkitekt?, Installation & get started, Guides & tutorials,
 // Developer); Klippy only puts away what makes no sense for this reader.
 const LANGUAGES: Record<string, string[]> = {
   python: ['develop/python/', 'develop/first-python-app/'],

@@ -1,6 +1,6 @@
 {
-  "title": "Get started",
-  "description": "Join a hub or bring your own, and deploy it for a lab",
+  "title": "Installation & get started",
+  "description": "Already have a hub, or install one; deploying for a lab",
   "icon": "Rocket",
   "root": true,
   "pages": [

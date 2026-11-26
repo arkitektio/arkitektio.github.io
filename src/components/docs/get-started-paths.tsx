@@ -356,14 +356,14 @@ export function GetStartedPaths({ hub }: { hub: 'join' | 'own' }) {
             Docker.
           </Card>
           <Card
-            href="/docs/concepts/basics"
+            href="/docs/get-started/join/invite"
             says={COFFEE_BREAK}
             title="With a coffee"
-            meta="The basics, then three short pages"
+            meta="Three short pages"
             art={<JoinCoffee />}
           >
-            What a hub, an app and the coordinator are, then organizations and invites, the mesh, and
-            what happens to your data on someone else&apos;s hub.
+            The same steps, one page each, with the idea behind them: organizations and invites, the
+            mesh, and what happens to your data on someone else&apos;s hub.
           </Card>
         </>
       ) : (
@@ -378,14 +378,14 @@ export function GetStartedPaths({ hub }: { hub: 'join' | 'own' }) {
             One command for the hub, one app, one result. No explanations on the way.
           </Card>
           <Card
-            href="/docs/concepts/basics"
+            href="/docs/get-started/own-hub/account"
             says={COFFEE_BREAK}
             title="With a coffee"
-            meta="The basics, then five short pages"
+            meta="Five short pages"
             art={<OwnCoffee />}
           >
-            What a hub, an app and the coordinator are, then each step of setting up your own with the
-            idea behind it.
+            The same steps, one page each, with the idea behind them: the coordinator, the hub, apps,
+            tasks and provenance.
           </Card>
         </>
       )}

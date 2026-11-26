@@ -7,7 +7,7 @@ import { baseOptions } from '@/lib/layout.shared';
 import { Guide, GuideScript, ThemeSwitchWithConnector } from '@/components/site';
 
 // The docs are four sections, each a root folder in content/docs: What is Arkitekt?
-// (concepts/), Get started (get-started/), Guides & tutorials (guides/) and
+// (concepts/), Installation & get started (get-started/), Guides & tutorials (guides/) and
 // Developer (develop/). The switch at the top of the sidebar moves between them,
 // with Home (the start page) first. The guide in the corner asks a first-time
 // reader a few questions and hides what they do not need (see src/lib/guide.ts).
