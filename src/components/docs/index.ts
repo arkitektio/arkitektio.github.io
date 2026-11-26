@@ -15,3 +15,4 @@ export { HubSharing } from './hub-sharing';
 export { OrkestratorConnect } from './orkestrator-connect';
 export { Prerequisites, Learn } from './tutorial';
 export { Quiz, Question } from './quiz';
+export { GetStartedPaths } from './get-started-paths';

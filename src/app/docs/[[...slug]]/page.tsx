@@ -14,6 +14,7 @@ import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
 import { pageTypes } from '@/lib/page-type';
+import { GlossaryAwareLink } from '@/components/docs/glossary';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -74,8 +75,9 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         )}
         <MDX
           components={getMDXComponents({
-            // this allows you to link to other pages with relative file paths
-            a: createRelativeLink(source, page),
+            // this allows you to link to other pages with relative file paths; links to a
+            // glossary term open its definition in a popover (src/lib/glossary.ts)
+            a: createRelativeLink(source, page, GlossaryAwareLink),
           })}
         />
       </DocsBody>

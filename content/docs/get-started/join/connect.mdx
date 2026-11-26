@@ -1,0 +1,69 @@
+---
+title: "2. Connect with Orkestrator"
+description: "The second step of joining somebody else's hub, with a coffee: sign in with Orkestrator and connect to their hub, and learn how an app finds a hub, even on another network."
+type: tutorial
+---
+
+import { OrkestratorGrid } from "@/components/docs";
+
+You are in their organization. Now you connect **Orkestrator**, the desktop app you use Arkitekt
+with, to their hub.
+
+## Do it
+
+Download Orkestrator and open it. It needs no admin rights:
+
+<OrkestratorGrid />
+
+1. Click **Sign in with go.arkitekt.live**. Your browser opens.
+2. Sign in with your account.
+3. On the approval page, pick their hub under **Assign to hub**. If you are in one organization
+   with one hub, it is already selected.
+4. Leave **Join the organization's mesh** switched on and click **Allow access**.
+
+Back in Orkestrator, you are connected, and you see what is already on the hub.
+
+## What just happened
+
+Orkestrator is an **app**, and signing in went through the same three parties every app goes
+through:
+
+1. **Orkestrator asked the coordinator.** It opened go.arkitekt.live in your browser, so you could
+   sign in there. Orkestrator never sees your password.
+2. **You decided what it may do.** The approval page showed which hub it wants to use, and on
+   whose behalf. **Allow access** gave Orkestrator permission to act for you, on that hub.
+3. **The coordinator introduced them.** Orkestrator learned where the hub is, and received a token
+   the hub checks on every request.
+
+You never typed an address. Your account knows the hubs of your organization.
+
+## Reaching a hub on another network: the mesh
+
+When you run your own hub, it usually sits on the same network as you. Somebody else's hub often
+doesn't: it is in the lab and you are at home, or it is at the facility and you are in your office
+across campus, behind a different firewall. That is what the switch you left on is for.
+
+The **mesh** is a private, encrypted network between the machines of your organization:
+
+- The coordinator hands Orkestrator a **key** for your organization's mesh. The hub has one too.
+- With those keys, the two open an encrypted **WireGuard** tunnel directly to each other. No ports
+  to open, no VPN to set up.
+- Your images and results travel through that tunnel, **between your machine and the hub**. The
+  coordinator knows *that* the two talk, not *what* they say.
+
+If the hub isn't on a mesh, the switch simply does nothing, and you reach the hub on the network you
+share with it. More in [The Mesh](/docs/run/security/mesh).
+
+<Quiz>
+  <Question q="Does Orkestrator ever see your password?">
+    No. You sign in on go.arkitekt.live in your browser, and Orkestrator only receives a token.
+  </Question>
+  <Question q="How does Orkestrator know where the hub is?">
+    The coordinator tells it: your account knows the hubs of your organization.
+  </Question>
+  <Question q="When you reach the hub over the mesh, does your data pass through go.arkitekt.live?">
+    No. It travels through an encrypted tunnel directly between your machine and the hub.
+  </Question>
+</Quiz>
+
+**Next:** [3. Run your first task](/docs/get-started/join/run)

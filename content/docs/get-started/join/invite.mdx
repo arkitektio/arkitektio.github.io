@@ -1,0 +1,84 @@
+---
+title: "1. Accept an invite"
+description: "The first step of joining somebody else's hub, with a coffee: accept an invite into their organization, and learn what an organization is and what the invite actually changes."
+type: tutorial
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+You want to use a hub that somebody else runs. Before Orkestrator can show you anything on it, you
+have to be let into the **organization** that owns it. That is what the invite is for.
+
+## Do it
+
+<Tabs items={["Somebody sent me an invite", "I have no invite yet"]}>
+<Tab value="Somebody sent me an invite">
+
+1. **Open the link.** It looks like `https://go.arkitekt.live/invite/…`.
+2. **Sign up or log in.** No account yet? Press **Sign Up** on the invite page, with your email
+   address, Google, ORCID or your institution's login. You come back to the invite afterwards.
+3. **Accept.**
+
+Signed in with a different account than the one invited? The invite page tells you so: sign out
+and sign back in with the right one.
+
+</Tab>
+<Tab value="I have no invite yet">
+
+Ask whoever set up Arkitekt where you work: your lab's admin, your imaging facility, or a
+collaborator who wants to share data with you. On [go.arkitekt.live](https://go.arkitekt.live) they
+open their organization, go to **Invites**, create a link and send it to you.
+
+Nobody to ask? Then [bring your own hub](/docs/get-started/own-hub/super-quick) instead.
+
+</Tab>
+</Tabs>
+
+## What an organization is
+
+Everything in Arkitekt happens inside an **organization**: the group your data belongs to, such as
+a lab, a facility or a project. Hubs belong to organizations, and so does everything stored on them.
+
+Two rules make it work:
+
+- **It is a hard boundary.** Data never crosses from one organization to another. A facility can
+  run one hub for ten groups, and each group stays in its own world.
+- **Inside, it is open by default.** Members can see and build on each other's data, because
+  science is collaborative. Admins can restrict that where they need to.
+
+More in [Organization](/docs/about/terminology#organization).
+
+## What the invite changed
+
+Accepting did not create anything on the hub. It changed one record on the **coordinator**
+(go.arkitekt.live, see [the basics](/docs/get-started/basics)): you are now a member of that
+organization. Every hub of the organization trusts the coordinator, so every one of them now
+accepts you. You never get a separate account on the hub itself.
+
+Not every invite makes you a full member. If someone only wanted to share part of their work with
+you, you join as a **guest**: you see what they shared, not the whole organization.
+
+<Callout type="info" title="What the coordinator knows about you">
+
+Your email address, your name if you gave one, and which organizations you are in. Not your data:
+that lives on their hub and never passes through go.arkitekt.live. Details in the
+[privacy policy](/docs/privacy#tier-2-an-account-on-goarkitektlive). If your invite link pointed
+somewhere other than go.arkitekt.live, that is the coordinator their hub trusts instead; everything
+else is the same.
+
+</Callout>
+
+<Quiz>
+  <Question q="What does accepting an invite give you?">
+    Membership in an organization, and with it access to every hub that organization owns.
+  </Question>
+  <Question q="Does accepting create an account on the hub?">
+    No. Your membership is recorded on the coordinator, and the hub trusts the coordinator.
+  </Question>
+  <Question q="What is the difference between a member and a guest?">
+    A member sees the organization's data (open by default). A guest only sees what was shared with
+    them.
+  </Question>
+</Quiz>
+
+**Next:** [2. Connect with Orkestrator](/docs/get-started/join/connect)

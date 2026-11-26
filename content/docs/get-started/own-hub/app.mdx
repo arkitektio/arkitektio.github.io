@@ -1,0 +1,73 @@
+---
+title: "4. Install an app"
+description: "The fourth step of bringing your own hub, with a coffee: install Basiks from the App Store and run it on your hub's plugin engine, and learn what apps and actions are."
+type: tutorial
+---
+
+Your hub stores and brokers, but cannot do any analysis on its own. That is what apps are for. On
+this page you install your first one.
+
+## Do it
+
+You install **Basiks**, the standard library: small, general actions on images. Click this badge.
+It opens Orkestrator on the install page for Basiks:
+
+<a href="https://arkitekt.live/deeplink?orkestrator=%2Fdo%2Fv1%2Frepo.install%3Fsource%3Doci%253Aghcr.io%252Fjhnnsrs%252Fbasiks" style={{ display: "inline-block" }}>
+  <img src="/img/badge/open-in-arkitekt.svg" alt="Open in Arkitekt: install Basiks" style={{ height: "28px", width: "auto", margin: 0 }} />
+</a>
+
+1. Press **Import**. You land on the app's page, with the actions it brings.
+2. Press **Install** in the header (it names the version), look over what it asks for and confirm
+   with **Authorize**.
+3. The dialog asks where to deploy it. Pick your hub's engine and press **Deploy**.
+
+The first start downloads the app, which takes a minute or two. When the **Running** count in the
+app's header shows 1, it is ready.
+
+## Apps and actions
+
+An **app** is any program that connects to the hub. Orkestrator is one, Basiks is another, and so
+are napari, Fiji or a Python script you write yourself. While the hub only connects and
+remembers, apps are what actually *do* something.
+
+When an app connects, it tells the hub what it can do. Each of those things is an **action**,
+described by its inputs and outputs: "Otsu Thresholding: Image → Mask", "Generate Test Image:
+name → Image". The Basiks page listed the actions the app brings. Once it runs, it announces them
+to the hub, and they show up in Orkestrator's **Actions** list, next to the actions of every other
+connected app.
+
+Apps never talk to each other directly. They only talk to the hub, and the hub passes work between
+them. So a viewer can ask for a segmentation without knowing which app does it, or on which
+machine.
+
+## Where it runs
+
+Basiks is a **plugin app**: it is packaged as a container, so the hub can run it for you. When you
+pressed **Deploy**, the App Store (Kabinet) told your hub's **plugin engine** to download that
+container and start it on this machine. Other apps run where you start them yourself: a desktop
+app on your laptop, a script on a GPU server. To the hub they all look the same.
+
+## What you authorized
+
+An app acts on your behalf, so before it runs it asks for permission, just like Orkestrator did on
+the previous page. The list you confirmed with **Authorize** is what Basiks may do in your
+organization. Basiks is also known as itself, not as you: every change it makes is recorded as made
+*by Basiks, on your behalf*, which matters on the next page.
+
+More on the vocabulary in [What is an App?](/docs/about/terminology#what-is-an-app) and
+[What is an Action?](/docs/about/terminology#what-is-an-action).
+
+<Quiz>
+  <Question q="What is an action?">
+    Something an app can do, described by its inputs and outputs, such as "Otsu Thresholding:
+    Image → Mask". Apps announce their actions to the hub when they connect.
+  </Question>
+  <Question q="Do apps talk to each other directly?">
+    No. They only talk to the hub, which passes work between them.
+  </Question>
+  <Question q="Where does Basiks run?">
+    On your hub's plugin engine, as a container on this machine, started by the App Store.
+  </Question>
+</Quiz>
+
+**Next:** [5. Run your first task](/docs/get-started/own-hub/task)

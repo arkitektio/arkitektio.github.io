@@ -1,0 +1,142 @@
+---
+title: Super quick
+description: "Somebody else runs the hub and you just want to use it: get into their organization with an invite, install Orkestrator, connect and run your first action. No server, no Docker."
+type: tutorial
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { OrkestratorGrid } from "@/components/docs";
+
+Most people who use Arkitekt never run a <Term id="hub">hub</Term>. Their lab, their imaging facility or a collaborator
+runs one, and they connect to it. This page is that path, on one page: no server, no Docker, just
+the desktop app. It takes about ten minutes once you have an invite. Want to know what you are
+doing as you go? Take the [version with a coffee](/docs/get-started/basics).
+
+## Get into their organization
+
+A hub only lets in members of the [organization](/docs/about/terminology#organization) it belongs
+to: a lab, a facility, a group. The way in is an **invite** from someone who is already a member.
+Your account says who you are; the invite opens the door.
+
+<Tabs items={["Somebody sent me an invite", "I have no invite yet"]}>
+<Tab value="Somebody sent me an invite">
+
+1. **Open the link.** It looks like `https://go.arkitekt.live/invite/…`.
+2. **Sign up or log in.** No account yet? Press **Sign Up** on the invite page, with your email
+   address, Google, ORCID or your institution's login. You come back to the invite afterwards.
+3. **Accept.** You are now a member of their organization, and every hub of it accepts you.
+
+Some invites share only part of someone's work: then you join as a **guest** and see only what they
+shared with you, not the whole organization.
+
+Signed in with a different account than the one invited? The invite page tells you so: sign out
+and sign back in with the right one.
+
+Your account stores only what a login needs (see the
+[privacy policy](/docs/privacy#tier-2-an-account-on-goarkitektlive)). go.arkitekt.live never sees
+your data. If the link points somewhere other than go.arkitekt.live, that is the <Term id="coordinator">coordinator</Term> their
+hub trusts, and everything else on this page stays the same.
+
+</Tab>
+<Tab value="I have no invite yet">
+
+**Who to ask.** Whoever set up Arkitekt where you work. Usually that is your lab's admin (or the
+colleague who keeps mentioning Arkitekt), your imaging facility if it runs a hub for the groups using
+its microscopes, or a collaborator who wants to share data with you.
+
+**What to ask for.** An invite link to their organization. If they haven't made one before, this is
+all they need to know: on [go.arkitekt.live](https://go.arkitekt.live), open the organization, go to
+**Invites** and create one. They can copy the link or email it to you from there. Something like:
+
+> Could you invite me to your organization on go.arkitekt.live? Under **Invites** you can create a
+> link and send it to me.
+
+While you wait, you can [create your account](https://go.arkitekt.live/account/signup) and install
+Orkestrator (step 1 below). When the link arrives, switch to the other tab.
+
+**Nobody to ask?** Then run a hub yourself, in about fifteen minutes with Docker:
+[super quick](/docs/get-started/own-hub/super-quick), or
+[with explanations](/docs/get-started/basics).
+
+</Tab>
+</Tabs>
+
+## Connect and run something
+
+<Steps>
+<Step>
+
+### Install Orkestrator and connect
+
+**Orkestrator** is the desktop app you use Arkitekt with. Download it and open it:
+
+<OrkestratorGrid />
+
+1. Click **Sign in with go.arkitekt.live** and sign in, in the browser that opens.
+2. On the approval page, pick their hub under **Assign to hub**. If you are only in one
+   organization with one hub, it is already selected.
+3. Leave **Join the organization's mesh** switched on and click **Allow access**.
+
+You never typed an address. Your account knows the hubs of your organization, and told Orkestrator
+where to find the one you picked. If the hub is on another network, say you are at home and it is in
+the lab, the [mesh](/docs/run/security/mesh) connects the two, which is what that switch is for.
+
+</Step>
+<Step>
+
+### Run something
+
+What you can run depends on which <Term id="app">apps</Term> that hub has installed. Open **Actions** in
+the sidebar to see them: each <Term id="action">action</Term> is something one of those apps can do.
+
+If the hub runs **Basiks**, the standard library, you can do the same first run as everyone else:
+
+1. Find **Generate Test Image**, press its play button, choose `human_mitosis` and press **Do**.
+2. Click the image that pops up in the bottom right corner to open it.
+3. Right-click the image, choose **Otsu Thresholding** and press **Do**.
+4. Click the mask that pops up to view it.
+
+No Basiks? Ask whoever runs the hub to install it, or go straight to your own images with
+[Upload data](/docs/use/first-steps/upload-data).
+
+</Step>
+</Steps>
+
+## Where your data goes on this path
+
+This is the one thing to be clear about when you use someone else's hub:
+
+- **Your data lives on their hub**, on their hardware. Whoever administers it is responsible for it,
+  and can reach it. Ask them about backups before you put your only copy of anything there.
+- **Your organization can see it.** Inside an organization, data is
+  [open by default](/docs/about/terminology#open-by-default-within-your-organization): colleagues in
+  the same organization can see and build on what you make, unless the admins have restricted it.
+- **We still don't see it.** go.arkitekt.live only knows your account and which organizations you
+  are in. Your images go directly between Orkestrator and the hub.
+
+## Where to go next
+
+<Cards>
+  <Card title="Use: do more with it" href="/docs/use/first-steps">
+    Upload your own data, use napari and Fiji, and chain actions into workflows.
+  </Card>
+  <Card title="Understand what you just did" href="/docs/get-started/basics">
+    What a hub, an app and the coordinator are, and why there is a coordinator at all.
+  </Card>
+  <Card title="Run your own hub after all" href="/docs/get-started/own-hub/super-quick">
+    Fifteen minutes and Docker, and the hub is on your own computer.
+  </Card>
+</Cards>
+
+<Callout type="info" title="Something did not work?">
+
+- **"This invite link isn't valid".** The link is incomplete, or the invite expired or was
+  cancelled. Ask for a new one.
+- **The Assign to hub list is empty.** You haven't accepted an invite yet, or the organization has
+  no hub. Check with whoever invited you.
+- **The Actions list is empty.** No apps are running on that hub right now. Ask whoever runs it.
+
+More in [Troubleshooting](/docs/use/troubleshooting).
+
+</Callout>

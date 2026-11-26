@@ -1,0 +1,82 @@
+---
+title: "3. Run your first task"
+description: "The last step of joining somebody else's hub, with a coffee: run an action on their hub, and learn what apps, actions and tasks are, what provenance records and where your data now lives."
+type: tutorial
+---
+
+You are connected. Now you run something, and see what Arkitekt records along the way.
+
+## Do it
+
+Open **Actions** in the sidebar. What you see there depends on which apps their hub runs. If it runs
+**Basiks**, the standard library:
+
+1. Find **Generate Test Image**, press its play button, choose `human_mitosis` (a microscopy image
+   of nuclei) and press **Do**.
+2. The new image pops up in the bottom right corner. Click it to open it.
+3. Right-click the image and choose **Otsu Thresholding** from the actions offered for it.
+4. Press **Do**, and click the mask that pops up to view it.
+
+No Basiks? Ask whoever runs the hub to install it, or go straight to your own images with
+[Upload data](/docs/use/first-steps/upload-data).
+
+## Apps and actions
+
+The hub does no analysis itself. **Apps** do: programs that connect to the hub, such as Basiks,
+napari, Fiji, a Python script or a segmentation model on a GPU server. When an app connects, it tells
+the hub what it can do. Each of those things is an **action**, described by its inputs and outputs:
+"Otsu Thresholding: Image → Mask".
+
+The **Actions** list is every action of every app connected to the hub right now. On somebody
+else's hub, those apps run wherever its admins started them. You never need to know where.
+
+## What a task is
+
+Each time you pressed **Do**, you started a **task**: one run of an action, with your inputs.
+
+1. **You assigned it to the action, not to a machine.** The hub checked that you may run it and
+   that the inputs fit.
+2. **The hub routed it** to a running app that can do it.
+3. **The app did the work**, fetching the image from the hub and storing the mask back on it.
+4. **The result came back** to you.
+
+## Provenance
+
+Arkitekt recorded that the mask was **derived from that image**, by a task running **Otsu
+Thresholding**, done by **Basiks**, **started by you**, in **your organization**. On a shared hub
+this matters even more: months from now, any colleague can open the mask and see exactly how it was
+made, and by whom. That record is [provenance](/docs/about/provenance).
+
+## Where your data lives now
+
+- **On their hub**, on their hardware. Whoever administers it is responsible for it, and can reach
+  it. Ask them about backups before you put your only copy of anything there.
+- **Visible to your organization.** Inside an organization, data is open by default.
+- **Not with us.** go.arkitekt.live only knows your account and your organizations.
+
+<Quiz>
+  <Question q="What is the difference between an action and a task?">
+    An action is what an app can do; a task is one run of it, with your inputs.
+  </Question>
+  <Question q="Who can see the mask you just made?">
+    The members of your organization, by default, and whoever administers the hub.
+  </Question>
+  <Question q="What does provenance record about the mask?">
+    That it was derived from the test image, by a task running Otsu Thresholding, done by Basiks,
+    started by you, in your organization.
+  </Question>
+</Quiz>
+
+## Where to go next
+
+<Cards>
+  <Card title="Use: do more with it" href="/docs/use/first-steps">
+    Upload your own data, use napari and Fiji, and chain actions into workflows.
+  </Card>
+  <Card title="Build: write your own app" href="/docs/build/python/first-app">
+    Turn your own Python function into an action like the ones you just ran.
+  </Card>
+  <Card title="Bring your own hub" href="/docs/get-started/own-hub/super-quick">
+    Fifteen minutes and Docker, and a hub of your own on your computer.
+  </Card>
+</Cards>

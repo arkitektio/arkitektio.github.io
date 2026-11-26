@@ -1,0 +1,113 @@
+---
+title: Understanding the basics
+description: "Where both paths with a coffee start: the three pieces of Arkitekt (the hub, apps and the coordinator), what each one does, and why there is a coordinator at all."
+type: tutorial
+---
+
+import { HubSharing } from "@/components/docs";
+
+Before you install anything, five minutes on the three pieces you are about to set up. Every later
+page builds on them.
+
+<HubSharing coordinator />
+
+You put an image into the hub through an app, and a colleague opens the same image from somewhere
+else, in the app they like. Above it all, the coordinator knows who each of you is, and never holds
+the data. The rest of this page takes the three pieces one at a time.
+
+## The hub: where your data lives
+
+The **hub** is a server, on a machine in your lab or on your own computer. Everything else in
+Arkitekt connects to it. It has two jobs:
+
+- **It stores your data.** Images, masks, tables, and the record of how each one was made, in one
+  place instead of in folders spread over several computers.
+- **It passes work between your tools.** When you ask for an image to be segmented, the hub finds a
+  tool that can do it and hands the work over.
+
+The hub does no analysis of its own. It brokers and it remembers.
+
+## Apps: the tools that do the work
+
+An **app** is any program that connects to a hub: Orkestrator, the desktop app you click around
+in; napari or Fiji; a Python script; a segmentation model in a container. When an app connects,
+it tells the hub what it can do. Each of those things is an **action**, like "Otsu Thresholding:
+Image → Mask".
+
+Apps only ever talk to the hub, never to each other. So a viewer can ask for a segmentation without
+knowing which app does it or on which machine it runs, and you can swap one app for another without
+the rest noticing.
+
+## The coordinator: who is who, and where
+
+The **coordinator** is the third piece, and the least visible one. It doesn't store your data
+and it doesn't run your analyses. It answers two questions for everyone else:
+
+- **Who are you?** It holds the accounts: people, the organizations they belong to, and the apps
+  acting for them.
+- **Where is the hub?** It knows which hubs belong to your organization, and introduces your apps
+  to them.
+
+Once it has introduced an app to a hub, it steps aside: data goes directly between the two.
+[go.arkitekt.live](https://go.arkitekt.live) is a coordinator we run for everyone, and both paths
+start with an account on it.
+
+## Why a coordinator at all?
+
+It is fair to ask why apps can't just connect to the hub directly. Three reasons:
+
+1. **Hubs are hard to find.** A hub in a lab usually sits behind a firewall, on a network that
+   changes addresses and drops incoming connections. You can rarely "just point an app at a
+   server". The coordinator knows where your hubs are, and can connect machines across networks
+   through the [mesh](/docs/run/security/mesh) when they are not on the same one.
+2. **One account, many hubs.** Without a coordinator every hub would keep its own users and
+   passwords, and you would have one login per hub: one for the facility, one for your lab, one on
+   your laptop. With it, you sign in once, and every hub of your organization knows who you are.
+3. **Apps act for you, and should say so.** When Basiks thresholds an image, it does that on your
+   behalf. The coordinator gives each app its own identity and only the permissions you approved.
+   That way the hub can record that the mask was made *by Basiks, on your behalf*, and not just
+   "by you".
+
+Keeping the coordinator separate from the hub is deliberate, too. The hub holds your data and knows
+nothing about passwords. The coordinator holds logins and never sees your data. Neither can leak what
+it doesn't have.
+
+<Callout type="info" title="Does it have to be ours?">
+
+No. go.arkitekt.live is the easiest coordinator to start with, but you can use your institute's own
+or [run your own](/docs/run/topology#three-ways-to-meet), and work fully offline.
+
+</Callout>
+
+| Piece | What it does | Where it runs |
+|---|---|---|
+| **Hub** | Stores your data, passes work between apps | Your lab, or your computer |
+| **Apps** | Do the actual work, and announce what they can do as actions | Anywhere: your laptop, a GPU server, the hub's machine |
+| **Coordinator** | Knows who is who, and introduces apps to hubs | go.arkitekt.live, or your own |
+
+<Quiz>
+  <Question q="Which piece stores your images?">
+    The hub. Apps work on them, and the coordinator never sees them.
+  </Question>
+  <Question q="Do two apps ever talk to each other directly?">
+    No. They only talk to the hub, which passes work between them.
+  </Question>
+  <Question q="Name one reason Arkitekt needs a coordinator.">
+    Any of: apps need help finding a hub behind firewalls and changing networks; one account should
+    work on every hub of your organization; apps act for you and need their own identity and the
+    permissions you gave them.
+  </Question>
+</Quiz>
+
+## Next: pick your path
+
+<Cards>
+  <Card title="Join somebody else's hub" href="/docs/get-started/join/invite">
+    Your lab or facility already runs a hub. Accept an invite, connect and run something. Three short
+    pages.
+  </Card>
+  <Card title="Bring your own hub" href="/docs/get-started/own-hub/account">
+    Start a hub on your own computer, connect to it, install an app and run it. Five short pages,
+    starting with an account.
+  </Card>
+</Cards>

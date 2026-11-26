@@ -121,6 +121,16 @@ the team members marked `steward` in [`src/lib/team.ts`](src/lib/team.ts), which
 frontmatter and gets the default one otherwise. Inside a
 tutorial, `<Steward>…</Steward>` puts a note from the steward next to a step.
 
+### Glossary terms
+
+Core terms (hub, coordinator, app, action, task, organization, mesh, provenance and a few more) have a
+one-line definition in [`src/lib/glossary.ts`](src/lib/glossary.ts). Any docs link to one of those
+targets, such as `[task](/docs/about/terminology#task)`, opens a small popover with the definition
+and a "Read more" link instead of navigating away; nothing to do in the content. For a plain word
+that is not a link, write `<Term id="hub">hubs</Term>`. Use it on first mentions in pages that skip
+the explanations (the super quick pages), not on every occurrence. To add a term, add an entry with
+its `href` (and any `aliases`) to the glossary.
+
 Each folder uses a `meta.json` to control sidebar ordering and labels. To add a page, drop a new
 `.mdx` file in the relevant folder with a `title` and `description` in its frontmatter, and add
 it to that folder's `meta.json`.

@@ -64,6 +64,7 @@
   "/docs/introduction/first_steps/first_workflow": "/docs/tutorials/design-a-workflow",
   "/docs/introduction/first_steps/interface": "/docs/tutorials/connect-orkestrator",
   "/docs/introduction/first_steps/upload": "/docs/tutorials/upload-data",
+  "/docs/quickstart": "/docs/get-started",
   "/docs/roadmap/thoughts": "/docs",
   "/docs/roadmap/thoughts/app": "/docs",
   "/docs/services/lok": "/docs/concepts/services/lok",

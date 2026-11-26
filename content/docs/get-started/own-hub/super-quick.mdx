@@ -1,0 +1,132 @@
+---
+title: Super quick
+description: "Fifteen minutes, one page, no explanations: create an account, start a hub with one command, sign in with Orkestrator, install your first app and run it on an image."
+type: tutorial
+---
+
+import { Step, Steps } from "fumadocs-ui/components/steps";
+import { OrkestratorGrid } from "@/components/docs";
+
+Five steps to a first result, with the defaults everywhere and no explanations. It takes about
+fifteen minutes, most of which is waiting for downloads. Want to know what you are doing as you go?
+The [version with a coffee](/docs/get-started/basics) starts with the basics and then does the same
+steps over five short pages.
+
+All you need is **Docker**, installed and running
+([Docker Desktop](https://www.docker.com/products/docker-desktop/) on macOS and Windows), on a
+reasonably recent machine: 16 GB of RAM is recommended (see [Requirements](/docs/run/requirements)).
+
+<Steps>
+<Step>
+
+## Create an account
+
+Sign up on [go.arkitekt.live](https://go.arkitekt.live/account/signup), with your email address, Google,
+ORCID or your institution's login.
+
+<Callout type="info" title="You don't need us">
+
+Arkitekt also runs without go.arkitekt.live, with your own coordination server and fully offline
+([how](/docs/run/topology#three-ways-to-meet)). For a first try, use go.arkitekt.live: it only
+stores what a login needs ([privacy](/docs/privacy#tier-2-an-account-on-goarkitektlive)) and never
+sees your data ([the mesh](/docs/run/security/mesh)).
+
+</Callout>
+
+</Step>
+<Step>
+
+## Start a hub
+
+Run this in a terminal:
+
+```bash tab="macOS / Linux"
+curl -fsSL https://raw.githubusercontent.com/arkitektio/konstruktor/main/install.sh | sh
+```
+
+```powershell tab="Windows"
+irm https://raw.githubusercontent.com/arkitektio/konstruktor/main/install.ps1 | iex
+```
+
+Accept every question with <kbd>Enter</kbd>. When it asks for a name, type `my-hub`.
+
+It then shows a **link and a code**. Open the link, sign in with your account and accept the hub.
+The hub starts; the first start takes a few minutes.
+
+</Step>
+<Step>
+
+## Open Orkestrator and sign in
+
+Download Orkestrator and open it:
+
+<OrkestratorGrid />
+
+1. Click **Sign in with go.arkitekt.live** and sign in in the browser that opens.
+2. Your hub is already selected under **Assign to hub**. Click **Allow access**.
+
+</Step>
+<Step>
+
+## Install Basiks
+
+Click this badge. It opens Orkestrator on the install page for **Basiks**:
+
+<a href="https://arkitekt.live/deeplink?orkestrator=%2Fdo%2Fv1%2Frepo.install%3Fsource%3Doci%253Aghcr.io%252Fjhnnsrs%252Fbasiks" style={{ display: "inline-block" }}>
+  <img src="/img/badge/open-in-arkitekt.svg" alt="Open in Arkitekt: install Basiks" style={{ height: "28px", width: "auto", margin: 0 }} />
+</a>
+
+1. Press **Import**.
+2. Press **Install** in the header and confirm with **Authorize**.
+3. Pick your hub's engine and press **Deploy**.
+
+Wait until the **Running** count in the app's header shows 1.
+
+</Step>
+<Step>
+
+## Run it on an image
+
+1. Open **Actions** in the sidebar, find **Generate Test Image**, press its play button, choose
+   `human_mitosis` and press **Do**.
+2. Click the image that pops up in the bottom right corner to open it.
+3. Right-click the image, choose **Otsu Thresholding** and press **Do**.
+4. Click the mask that pops up to view it.
+
+Done: you have a hub, an app and a first result. Arkitekt also recorded that the mask came from
+that image, by a <Term id="task">task</Term> you started. That record is [provenance](/docs/about/provenance).
+
+</Step>
+</Steps>
+
+## Where to go next
+
+<Cards>
+  <Card title="Understand what you just did" href="/docs/get-started/basics">
+    The basics first, then the same five steps again, one page each, with the idea behind every step.
+  </Card>
+  <Card title="Use: do more with it" href="/docs/use/first-steps">
+    Upload your own data, install more apps from the App Store, use napari and Fiji, and chain
+    actions into workflows.
+  </Card>
+  <Card title="Build: write your own app" href="/docs/build/python/first-app">
+    Turn your own Python function into an action like the ones you just ran, in a few lines.
+  </Card>
+  <Card title="Deploy: set it up for your lab" href="/docs/run/what-you-are-setting-up">
+    Plan a hub for a lab or a facility, with storage, more machines, and the GPU.
+  </Card>
+</Cards>
+
+<Callout type="info" title="Something did not work?">
+
+- **The command says Docker is missing or not running.** Start Docker Desktop (or the Docker
+  service on Linux) and run the command again.
+- **The hub is not in the Assign to hub list.** The hub was not accepted in step 2, or is still
+  starting. `konstruktor list` shows the hubs on this machine, and `konstruktor status my-hub` what
+  is running.
+- **Generate Test Image is not in the Actions list.** The app is not running yet. Open the App
+  Store, find Basiks and check that it shows as running.
+
+More in [Troubleshooting](/docs/use/troubleshooting).
+
+</Callout>

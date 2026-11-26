@@ -6,6 +6,7 @@ import { GuideStart } from './guide';
 import { Steward } from './steward';
 import { Learn, Prerequisites } from '@/components/docs/tutorial';
 import { Question, Quiz } from '@/components/docs/quiz';
+import { Term } from '@/components/docs/glossary';
 
 /**
  * Markdown images (`![alt](/docs/...)`) are bundled by fumadocs-mdx's
@@ -29,6 +30,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Learn,
     Quiz,
     Question,
+    // a word with a glossary popover: <Term id="hub">hubs</Term>
+    Term,
     ...components,
   } as MDXComponents;
 }

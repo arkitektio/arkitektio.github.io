@@ -1,0 +1,64 @@
+---
+title: "3. Connect with Orkestrator"
+description: "The third step of bringing your own hub, with a coffee: sign in with Orkestrator and connect it to your hub, and learn how an app reaches a hub and what an organization is."
+type: tutorial
+---
+
+import { OrkestratorGrid } from "@/components/docs";
+
+Your hub is running, but nothing is connected to it yet. On this page you connect **Orkestrator**,
+the desktop app you use Arkitekt with.
+
+## Do it
+
+Download Orkestrator and open it:
+
+<OrkestratorGrid />
+
+1. Click **Sign in with go.arkitekt.live**. Your browser opens.
+2. Sign in with your account.
+3. On the approval page, the hub you just started is already selected under **Assign to hub**.
+   Click **Allow access**.
+
+Back in Orkestrator, you are connected to your hub. It is empty, for now.
+
+## What just happened
+
+Orkestrator is an **app**, like every other tool that connects to Arkitekt. Signing in went
+through the same three parties every app goes through:
+
+1. **Orkestrator asked the coordinator.** It opened go.arkitekt.live in your browser, so you
+   could sign in there. Orkestrator never sees your password.
+2. **You decided what it may do.** The approval page showed which hub it wants to use, and on
+   whose behalf. **Allow access** gave Orkestrator permission to act for you, on that hub.
+3. **The coordinator introduced them.** Orkestrator received a token and the hub's address. From
+   then on it talks to the hub directly, and the hub checks the token on every request.
+
+The coordinator is now out of the loop: what you see in Orkestrator comes straight from your hub.
+How this works in detail (OAuth2, tokens, scopes) is in
+[Identity & Access](/docs/run/security/identity).
+
+## Organizations
+
+Everything you do happens inside an **organization**: the group your data belongs to, such as a lab,
+a facility or just you. The hub was accepted for your organization, and Orkestrator now acts for you
+in it.
+
+The organization is the one boundary in Arkitekt that **always holds**: data never crosses from one
+organization to another. Inside it, things are open by default: colleagues you add to it can see and
+build on what you make. More in [Organization](/docs/about/terminology#organization).
+
+<Quiz>
+  <Question q="Does Orkestrator ever see your password?">
+    No. You sign in on go.arkitekt.live in your browser, and Orkestrator only receives a token.
+  </Question>
+  <Question q="After signing in, does Orkestrator talk to the hub through the coordinator?">
+    No. The coordinator introduced them; from then on Orkestrator talks to the hub directly, and the
+    hub checks its token on every request.
+  </Question>
+  <Question q="What is the one boundary that always holds in Arkitekt?">
+    The organization. Data never crosses from one organization to another.
+  </Question>
+</Quiz>
+
+**Next:** [4. Install an app](/docs/get-started/own-hub/app)

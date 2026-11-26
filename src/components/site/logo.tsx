@@ -1,3 +1,4 @@
+import type React from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -6,9 +7,13 @@ import { cn } from '@/lib/utils';
  * from the page's custom properties, so the logo couldn't re-tint with the theme.
  * The outer hexagon + connectors use `currentColor` and follow the surrounding text.
  */
-export function Logo({ className }: { className?: string }) {
+export function Logo({
+  className,
+  ...props
+}: { className?: string } & Omit<React.SVGProps<SVGSVGElement>, 'className'>) {
   return (
     <svg
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 200 200"
       fill="none"

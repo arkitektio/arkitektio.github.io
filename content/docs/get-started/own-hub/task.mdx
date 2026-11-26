@@ -1,0 +1,121 @@
+---
+title: "5. Run your first task"
+description: "The last step of bringing your own hub, with a coffee: make a test image and threshold it, and learn what a task is, how the hub routes it to an app, and what provenance records about the result."
+type: tutorial
+---
+
+Everything is in place: a hub, Orkestrator and an app. On this page you put them to work, and see
+what Arkitekt records along the way.
+
+## Do it
+
+First you need an image. Basiks can make one:
+
+1. Open **Actions** in the sidebar and search for **Generate Test Image**.
+2. Press its play button, choose `human_mitosis` (a microscopy image of nuclei) and press **Do**.
+3. The new image pops up in the bottom right corner when it is ready. Click it to open it in the
+   viewer.
+
+Now apply an action to it:
+
+4. Right-click the image and choose **Otsu Thresholding** from the actions offered for it.
+5. Leave the options as they are and press **Do**.
+6. The result, a mask of the nuclei, pops up when it is done. Click it to view it.
+
+## What a task is
+
+Each time you pressed **Do**, you started a **task**: one run of an action, with your inputs. Here is
+the path it took:
+
+1. **You assigned it to the action, not to a machine.** Orkestrator sent "Otsu Thresholding, on
+   this image" to the hub. The hub checked that you may run it and that the inputs fit.
+2. **The hub routed it.** It looked for a running app that can do Otsu Thresholding, found Basiks,
+   and passed the task on.
+3. **The app did the work.** Basiks fetched the image from the hub, computed the mask and stored it
+   back on the hub, reporting progress as it went.
+4. **The result came back to you.** The hub told Orkestrator the task was done, and the mask popped
+   up.
+
+Orkestrator never needed to know where Basiks runs, and Basiks never needed to know who asked. That
+is the hub doing its job as a middleman. It is also why the image was offered the right actions
+when you right-clicked it: the hub knows which actions take an image as input.
+
+More on tasks, their states and cancelling them in [Task](/docs/about/terminology#task).
+
+## Provenance: where every result came from
+
+The mask is not just a file. Arkitekt recorded that it was **derived from that image**, by a task
+running **Otsu Thresholding**, done by **Basiks**, **started by you**, in **your organization**.
+Every create, update and delete on your data is recorded this way, as it happens.
+
+So months from now, anyone in your organization can open the mask and see exactly how it was made,
+without a lab notebook. That record is [provenance](/docs/about/provenance).
+
+## You made it
+
+That's the whole loop of Arkitekt, and you have now seen each piece:
+
+| Piece | What it did here |
+|---|---|
+| **Coordinator** (go.arkitekt.live) | Knew who you are, and introduced Orkestrator and Basiks to your hub |
+| **Hub** | Stored the image and the mask, and passed the work to Basiks |
+| **Organization** | The boundary everything happened in |
+| **Apps** | Orkestrator, to ask; Basiks, to do the work |
+| **Actions and tasks** | What Basiks can do, and each run of it you started |
+| **Provenance** | The record of how the mask came to be |
+
+<Quiz>
+  <Question q="What is the difference between an action and a task?">
+    An action is what an app can do; a task is one run of it, with your inputs.
+  </Question>
+  <Question q="When you run an action, do you choose which machine it runs on?">
+    No. You assign the task to the action, and the hub routes it to a running app that can do it.
+  </Question>
+  <Question q="What does provenance record about the mask?">
+    That it was derived from the test image, by a task running Otsu Thresholding, done by Basiks,
+    started by you, in your organization.
+  </Question>
+</Quiz>
+
+## Where to go next
+
+<Cards>
+  <Card title="Use: do more with it" href="/docs/use/first-steps">
+    Upload your own data, install more apps from the App Store, use napari and Fiji, and chain
+    actions into workflows.
+  </Card>
+  <Card title="Build: write your own app" href="/docs/build/python/first-app">
+    Turn your own Python function into an action like the ones you just ran, in a few lines.
+  </Card>
+  <Card title="Deploy: set it up for your lab" href="/docs/run/what-you-are-setting-up">
+    Plan a hub for a lab or a facility, with storage, more machines, and the GPU.
+  </Card>
+  <Card title="Learn: how Arkitekt works" href="/docs/about">
+    The ideas behind it, in more depth: the design, the patterns underneath and the philosophy.
+  </Card>
+</Cards>
+
+Going deeper on one of them? Builders can pick from the
+[kinds of apps you can build](/docs/build/apps), and the curious can read
+[the patterns behind Arkitekt](/docs/build/patterns).
+
+<Callout type="info" title="Running a hub for a lab or a facility?">
+
+This quickstart puts a hub on your own computer, reachable from your network. A hub that a whole
+lab relies on needs a bit more thought: where the data lives, how people reach it, and who
+administers it. Start with [What you are setting up](/docs/run/what-you-are-setting-up) and
+[Planning](/docs/run/planning).
+
+</Callout>
+
+<Callout type="info" title="Something did not work?">
+
+- **The hub is not in the Assign to hub list.** The hub was not accepted on page 2, or is still
+  starting. `konstruktor list` shows the hubs on this machine, and `konstruktor status my-hub` what
+  is running.
+- **Generate Test Image is not in the Actions list.** The app is not running yet. Open the App
+  Store, find Basiks and check that it shows as running.
+
+More in [Troubleshooting](/docs/use/troubleshooting).
+
+</Callout>

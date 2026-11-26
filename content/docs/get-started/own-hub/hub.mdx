@@ -1,0 +1,79 @@
+---
+title: "2. Start a hub"
+description: "The second step of bringing your own hub, with a coffee: start a hub on your own computer with Konstruktor, and learn what a hub is, what runs inside it and why it keeps no accounts of its own."
+type: tutorial
+---
+
+The hub is the center of Arkitekt: everything else connects to it. On this page you start one on
+your own computer with a single command.
+
+## Do it
+
+You need **Docker** installed and running
+([Docker Desktop](https://www.docker.com/products/docker-desktop/) on macOS and Windows), and
+ideally 16 GB of RAM (see [Requirements](/docs/run/requirements)). Then run this in a terminal:
+
+```bash tab="macOS / Linux"
+curl -fsSL https://raw.githubusercontent.com/arkitektio/konstruktor/main/install.sh | sh
+```
+
+```powershell tab="Windows"
+irm https://raw.githubusercontent.com/arkitektio/konstruktor/main/install.ps1 | iex
+```
+
+This installs **Konstruktor**, the tool that sets up and runs hubs, and asks a few questions.
+Accept the defaults with <kbd>Enter</kbd>: yes, put it on your `PATH`, and yes, create a hub now.
+When it asks for a name, give the hub a short one, for example `my-hub`.
+
+Konstruktor then shows a **link and a code**. Open the link, sign in with the account you just
+created, and accept the hub. The hub then starts. The first start downloads the images and takes a
+few minutes.
+
+## What a hub is
+
+As [the basics](/docs/get-started/basics) put it: the hub stores your data and passes work between
+your tools, and does no analysis of its own. The actual work is done by **apps**, which you install
+on page 4. Here is what that looks like on your machine.
+
+## What runs inside it
+
+A hub is not one program but a small set of **services**, each with one job, behind a single
+gateway. The ones you will meet in this quickstart:
+
+| Service | Its job |
+|---|---|
+| **Mikro** | Stores images and their metadata |
+| **Rekuest** | Knows which actions your apps offer, and passes tasks to them |
+| **Kabinet** | The App Store: installs apps and runs them |
+
+The default hub also starts a **plugin engine**: the part that runs the apps you install from the
+App Store, as containers on this machine.
+
+Underneath, all of this is a plain Docker Compose project in a folder. Konstruktor is a convenience
+for creating, updating and backing it up, not a black box. See
+[What you are setting up](/docs/run/what-you-are-setting-up).
+
+## Why you had to accept it
+
+A hub keeps **no accounts of its own**. Your account and your organization live on the coordinator
+(page 1), and your data lives on the hub. Accepting the hub tells the coordinator: *this hub belongs
+to my organization, and the people and apps in it may use it*. From then on, when you sign in
+somewhere, the coordinator can vouch for you to the hub, and the hub trusts it.
+
+That is also why you never create a user account on the hub itself: people and apps always sign in
+through the coordinator.
+
+<Quiz>
+  <Question q="What are the two roles of a hub?">
+    A middleman that passes work between your tools, and a datahub that stores what they produce.
+  </Question>
+  <Question q="Which part of Arkitekt actually runs the analysis?">
+    The apps. The hub only brokers and remembers.
+  </Question>
+  <Question q="Where do the accounts live, and where does the data live?">
+    Accounts on the coordinator (go.arkitekt.live), data on your hub. That is why the hub has to be
+    accepted with your account.
+  </Question>
+</Quiz>
+
+**Next:** [3. Connect with Orkestrator](/docs/get-started/own-hub/orkestrator)

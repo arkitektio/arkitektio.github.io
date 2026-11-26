@@ -246,3 +246,107 @@ html[data-brand-hue-animate] {
 @keyframes guide-pop {
   from { opacity: 0; translate: 0 6px; }
 }
+
+/* Klippy on the Get Started page (src/components/docs/get-started-paths.tsx) */
+@media (prefers-reduced-motion: no-preference) {
+  .qs-rush {
+    animation: qs-rush 0.4s ease-in-out infinite alternate;
+  }
+  .qs-calm {
+    animation: qs-calm 4s ease-in-out infinite;
+  }
+  .qs-steam {
+    animation: qs-steam 2.6s ease-in-out infinite;
+  }
+  .qs-steam-late {
+    animation-delay: 1.3s;
+  }
+  .qs-led {
+    animation: qs-led 1.6s steps(1) infinite;
+  }
+  .qs-led-fast {
+    animation-duration: 0.5s;
+  }
+  .qs-led-boot {
+    animation-name: qs-led-boot;
+    animation-duration: 4s;
+  }
+  .qs-twist {
+    transform-box: fill-box;
+    transform-origin: 100% 50%;
+    animation: qs-twist 0.8s ease-in-out infinite alternate;
+  }
+  .qs-twist-fast {
+    transform-origin: 0% 50%;
+    animation-duration: 0.18s;
+  }
+}
+@keyframes qs-led {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+@keyframes qs-led-boot {
+  0%, 20% { opacity: 0.15; }
+  30%, 100% { opacity: 1; }
+}
+@keyframes qs-twist {
+  from { rotate: -10deg; }
+  to { rotate: 10deg; }
+}
+@keyframes qs-rush {
+  from { translate: 0 0; }
+  to { translate: 0 -6px; }
+}
+@keyframes qs-calm {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -3px; }
+}
+@keyframes qs-steam {
+  0% { opacity: 0; translate: 0 6px; }
+  40% { opacity: 1; }
+  100% { opacity: 0; translate: 0 -10px; }
+}
+
+/* The hub diagram (src/components/docs/hub-sharing.tsx) */
+.hs-fly {
+  opacity: 0;
+}
+.hs-pulse {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hs-march {
+    animation: hs-march 1.2s linear infinite;
+  }
+  .hs-fly-in {
+    animation: hs-fly-in 7s ease-in-out infinite;
+  }
+  .hs-fly-out {
+    animation: hs-fly-out 7s ease-in-out infinite;
+  }
+  .hs-pulse {
+    animation: hs-pulse 7s ease-out infinite;
+  }
+}
+@keyframes hs-march {
+  to { stroke-dashoffset: -16; }
+}
+@keyframes hs-fly-in {
+  0%, 12% { opacity: 0; translate: 0 0; }
+  16% { opacity: 1; translate: 0 0; }
+  40% { opacity: 1; translate: 260px -18px; }
+  44%, 100% { opacity: 0; translate: 260px -18px; }
+}
+@keyframes hs-pulse {
+  0%, 40% { opacity: 0; scale: 1; }
+  43% { opacity: 0.7; scale: 1; }
+  60%, 100% { opacity: 0; scale: 1.12; }
+}
+@keyframes hs-fly-out {
+  0%, 50% { opacity: 0; translate: 0 0; }
+  54% { opacity: 1; translate: 0 0; }
+  78% { opacity: 1; translate: 230px 18px; }
+  82%, 100% { opacity: 0; translate: 230px 18px; }
+}

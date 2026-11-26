@@ -7,6 +7,13 @@ import type { ReactNode } from 'react';
  * it, and a colleague opens the same file from somewhere else. Above them the
  * account service, which only says who is who and never holds the data.
  * Drawn with the theme's colors, so it follows light and dark mode.
+ *
+ * Animated (global.css, hs-*): the sign-in lines march, a file flies from you into the
+ * hub, the hub pulses as it lands, and the file flies on to your colleague. With
+ * prefers-reduced-motion the flying files stay hidden and the picture is static.
+ *
+ * `coordinator` names the account service by its role, for pages that already
+ * introduced the coordinator.
  */
 
 const PRIMARY = 'var(--color-fd-primary)';
@@ -77,7 +84,7 @@ function Arrow({ x1, x2, label }: { x1: number; x2: number; label: string }) {
   );
 }
 
-export function HubSharing() {
+export function HubSharing({ coordinator = false }: { coordinator?: boolean }) {
   return (
     <figure className="not-prose my-6 rounded-2xl border bg-fd-card/40 p-3 sm:p-5">
       <svg viewBox="0 0 760 336" role="img" aria-labelledby="hub-sharing-title" className="h-auto w-full">
@@ -95,14 +102,14 @@ export function HubSharing() {
         {/* who is who: the account service, off to the top */}
         <rect x="250" y="12" width="260" height="58" rx="29" fill={CARD} stroke={BORDER} strokeWidth="1.5" strokeDasharray="5 4" />
         <Label x={380} y={37} size={13} weight={700} fill={TEXT}>
-          Your account
+          {coordinator ? 'The coordinator' : 'Your account'}
         </Label>
         <Label x={380} y={55} size={11.5}>
           knows who you are · holds no data
         </Label>
-        <path d="M262 58 L 138 150" fill="none" stroke={MUTED} strokeWidth="1.25" strokeDasharray="4 4" />
-        <path d="M498 58 L 622 150" fill="none" stroke={MUTED} strokeWidth="1.25" strokeDasharray="4 4" />
-        <path d="M380 70 L 380 150" fill="none" stroke={MUTED} strokeWidth="1.25" strokeDasharray="4 4" />
+        <path className="hs-march" d="M138 150 L 262 58" fill="none" stroke={MUTED} strokeWidth="1.25" strokeDasharray="4 4" />
+        <path className="hs-march" d="M622 150 L 498 58" fill="none" stroke={MUTED} strokeWidth="1.25" strokeDasharray="4 4" />
+        <path className="hs-march" d="M380 150 L 380 70" fill="none" stroke={MUTED} strokeWidth="1.25" strokeDasharray="4 4" />
         <Label x={172} y={98} size={11}>
           sign in
         </Label>
@@ -116,7 +123,8 @@ export function HubSharing() {
         <Person x={20} title="You" app="in Orkestrator" action="at the microscope" />
         <Person x={540} title="A colleague" app="in Orkestrator, napari or Fiji" action="in another building" />
 
-        {/* the hub, where the data lives */}
+        {/* the hub, where the data lives; the ring pulses when a file lands */}
+        <rect className="hs-pulse" x="290" y="160" width="180" height="160" rx="20" fill="none" stroke={PRIMARY} strokeWidth="2.5" />
         <rect x="290" y="160" width="180" height="160" rx="20" fill={CARD} stroke={PRIMARY} strokeWidth="2.5" />
         <Label x={380} y={196} size={16} weight={700} fill={TEXT}>
           The hub
@@ -131,6 +139,14 @@ export function HubSharing() {
 
         <Arrow x1={222} x2={290} label="upload" />
         <Arrow x1={470} x2={540} label="open" />
+
+        {/* the same file, on its way: from you into the hub, then out to your colleague */}
+        <g className="hs-fly hs-fly-in">
+          <FileIcon x={110} y={258} />
+        </g>
+        <g className="hs-fly hs-fly-out">
+          <FileIcon x={400} y={240} />
+        </g>
       </svg>
     </figure>
   );

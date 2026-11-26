@@ -1,0 +1,64 @@
+---
+title: "1. Create an account"
+description: "The first step of bringing your own hub, with a coffee: create an account on go.arkitekt.live, and learn what the coordinator is, what it stores and what it never sees."
+type: tutorial
+---
+
+Arkitekt starts with an account, before you install anything. This page is about what that account
+is (and is not) used for.
+
+## Do it
+
+Open the [sign-up page on go.arkitekt.live](https://go.arkitekt.live/account/signup) and sign up,
+with your email address, Google, ORCID or your institution's login. That's all for this step.
+
+<Callout type="info" title="You can go completely without us">
+
+Arkitekt does not need go.arkitekt.live. You can point it at your institute's own coordination
+server, or [self-host everything](/docs/run/topology#three-ways-to-meet), coordinator included,
+and run fully offline. For your first experience, use go.arkitekt.live anyway: there is nothing to
+set up, and you can move away from it later. Before you sign up, you may want to read what we
+store ([privacy policy](/docs/privacy#tier-2-an-account-on-goarkitektlive)) and how the
+[mesh](/docs/run/security/mesh) connects machines without us seeing what they send.
+
+</Callout>
+
+## What go.arkitekt.live is
+
+go.arkitekt.live is the **coordinator** from [the basics](/docs/get-started/basics) that we run for
+everyone: it holds your account and your organization, and introduces your apps to your hub. Then
+it gets out of the way. Your images, results and tasks go **directly** between your apps and your
+hub, never through it.
+
+## What it stores, and what it never sees
+
+| go.arkitekt.live knows | go.arkitekt.live never sees |
+|---|---|
+| Your email address, and your name if you give one | Your images, tables and results |
+| Your organization and who is in it | The tasks you run and their inputs |
+| Which hubs and apps belong to it | What your apps and hub say to each other |
+
+This split is deliberate. Your data lives on hardware you control, and the coordinator only does
+the "meeting". If you later connect machines across networks (a laptop at home, a GPU in another
+building), the coordinator also hands out keys for the [mesh](/docs/run/security/mesh): an
+encrypted network between *your* machines, where it still only knows *that* two machines talk, not
+*what* they say. This quickstart keeps everything on one network and does not use the mesh.
+
+More on the split between hub and coordinator in [Design](/docs/about#the-coordinator) and
+[Identity & Access](/docs/run/security/identity).
+
+<Quiz>
+  <Question q="What does go.arkitekt.live store about you?">
+    Your email address, your name if you give one, your organization and which hubs and apps belong
+    to it. Nothing of your data.
+  </Question>
+  <Question q="Where do your images go when an app works on them?">
+    Directly between the app and your hub. They never pass through go.arkitekt.live.
+  </Question>
+  <Question q="Do you have to use go.arkitekt.live?">
+    No. You can use your institute's own coordination server, or run your own and work fully
+    offline. go.arkitekt.live is simply the easiest place to start.
+  </Question>
+</Quiz>
+
+**Next:** [2. Start a hub](/docs/get-started/own-hub/hub)
