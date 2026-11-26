@@ -3,7 +3,6 @@
   "pages": [
     "index",
     "not-arkitekt",
-    "nextflow",
-    "nextflow-integration"
+    "nextflow"
   ]
 }

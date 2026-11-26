@@ -79,7 +79,7 @@ things it connects fail. Its contract for that is specific:
 - **Workflows survive their agent.** A workflow task is resumed from its journal, and the calls it
   already made return their recorded results instead of running again.
 
-[Durable execution](/docs/concepts/building/durable-execution) describes this in full.
+[Durable execution](/docs/concepts/patterns/durability) describes this in full.
 
 Every deadline behind that contract is a column in the database, and takt's replicas sweep them. One
 replica sweeps per tick and every transition has exactly one winner, so a replica can stop at any
@@ -90,6 +90,6 @@ moment without a deadline being missed.
 ![Distributed](/docs/design/services/distributed.png)
 
 <div className="text-gray-400 mb-2 mt-4">
-<small> Elements of recovery facilitated by Rekuest and its corresponding SDKs, described in [Durable execution](/docs/concepts/building/durable-execution). </small>
+<small> Elements of recovery facilitated by Rekuest and its corresponding SDKs, described in [Durable execution](/docs/concepts/patterns/durability). </small>
 </div>
 </div>

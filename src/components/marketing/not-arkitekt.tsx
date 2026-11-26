@@ -18,7 +18,7 @@ const tools = [
     isNot: 'Arkitekt is not a pure parallelization library.',
     weAre:
       'We are a concurrency platform: long-lived, stateful actor apps that broker data and compute. They are not ephemeral task graphs you submit and forget.',
-    link: '/docs/concepts/services/kluster',
+    link: '/docs/concepts/services#kluster',
     linkLabel: 'How we run Dask',
     hue: 195,
   },

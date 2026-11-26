@@ -119,7 +119,7 @@ export function DeeplinkGuide() {
             An open-source platform for bioimage analysis. It sits between a
             lab&apos;s data, its analysis tools and its people, so they can
             share images, workflows and results with each other.{' '}
-            <Link className={linkClass} href="/docs/concepts/basics">
+            <Link className={linkClass} href="/docs/concepts">
               Read the basics
             </Link>
             .

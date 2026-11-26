@@ -1,90 +1,101 @@
 ---
-title: Design
-description: The core design of Arkitekt as a hub, a central middleman that your apps connect to and through, and the parts that make it up.
+title: How Arkitekt works
+description: "One level below the basics: the services a hub is made of, how an app's actions become tasks that run on agents, and how the coordinator lets apps and hubs find and trust each other."
 type: concept
 ---
 
-At its heart, Arkitekt is a **hub**. Picture a hub-and-spoke: a single center with
-everything else radiating out from it. Arkitekt is that center. Your **apps**, the
-tools that do the actual work, are the spokes. They do not talk to each other
-directly; they connect *to* the hub, and everything, data, compute, results,
-flows *through* it. That is what makes a loose scattering of tools behave like one
-coherent platform.
+[Understanding the basics](/docs/get-started/basics) introduces the three pieces: the hub, apps and
+the coordinator. This page goes one level deeper: what each piece is made of, and what passes
+between them when you run something.
 
-The hub plays two roles at once:
+<div className="mt-2 p-6">
 
-- It is a **middleman**, brokering requests between apps so they can rely on one
-  another without knowing anything about each other.
-- It is a **datahub**, a central place where your lab's data lives and can be
-  explored, in real time, throughout its lifecycle.
+![Apps connect to a central hub, never to each other](/docs/introduction/stateless.png)
 
-What the hub does *not* do is decide who is allowed in, or introduce apps to it in
-the first place. That is a separate job, and it belongs to the **coordinator**
-(described below). Keeping the two apart matters: the hub holds your data and does
-the brokering, while the coordinator handles identity and discovery.
+</div>
 
-The rest of these docs unpack the pieces of this picture. The three you meet first
-are:
+## The Hub [#the-hub]
 
-- The **Hub** itself (and the services it is built from)
-- **Apps** (the spokes that connect to it)
-- The **Coordinator** (a separate piece: authentication and discovery)
-
-## The Hub
-
-The hub is the center of everything: the part you install and run, and the point
-every app connects to. It is a **middleman** and a **datahub** in one, it brokers
-communication between apps, and it stores the data they produce so the whole lab
-can build on it. On its own the hub does very little "analysis"; its job is to
-broker and to remember. The heavy lifting is left to the apps, and identity is left
-to the coordinator. Why we built Arkitekt around a middleman in the first place, and
-how that answers the fragmented landscape of bioimage tools, is the subject of
+The hub is the part you install and the point every app connects to. It brokers work between apps
+and stores what they produce, and it runs no analysis of its own. Why Arkitekt is built around a
+middleman at all is the subject of
 [Arkitekt the Middleman](/docs/concepts/philosophy#arkitekt-the-middleman).
 
-The hub is modular. It is built from a set of [**Services**](/docs/concepts/services)
-(like Mikro for data, or Rekuest for tasks), and when you deploy Arkitekt you choose
-[which services](/docs/concepts/deployment/planning) your hub needs.
+A hub is not one program. It is a set of [services](/docs/concepts/services), each with its own
+database and API, behind one gateway:
 
-<Callout type="info" title="Hub vs. Server">
+| Service | Job |
+|---|---|
+| [Rekuest](/docs/concepts/services/rekuest) | Knows the connected apps and their actions, and routes tasks to them |
+| [Mikro](/docs/concepts/services/mikro) | Stores images and their metadata |
+| [Fluss](/docs/concepts/services#fluss) | Stores and runs workflows |
+| [Kabinet](/docs/concepts/services/kabinet) | The app store, from which apps are installed as containers |
+| [Kraph](/docs/concepts/services/kraph) | The knowledge graph |
 
-You will also see us call the hub a **Server** (or a **Deployment**). That is the
-*technical* name for what the hub runs on. A `Server` is a logical entity, not
-necessarily one physical machine: it can be a single computer under your desk, a
-cluster, or an adapting set of virtual machines in the cloud. Whichever it is, the
-*concept* it realizes is the hub, the central thing your apps connect to.
+You choose which services a hub runs when you [plan a deployment](/docs/concepts/deployment/planning).
+What that looks like on a machine is described in
+[What you are setting up](/docs/concepts/deployment/what-you-are-setting-up).
+
+<Callout type="info" title="Hub, server, deployment">
+
+You will also see the hub called a **server** or a **deployment**. A server is a logical thing, not
+necessarily one machine: a computer under your desk, a cluster, or a set of virtual machines in the
+cloud.
 
 </Callout>
 
-## Apps
+## Apps [#apps]
 
-Apps are the **spokes**. While the hub only connects and remembers, apps are the
-entities that actually *do* something with your data, from a desktop app that
-visualizes results to a machine-learning model running in a container.
+Apps do the work. An app is any program that connects to a hub: Orkestrator, Fiji with its plugin,
+napari, a Python script, a model in a container. Apps talk only to the hub, never to each other.
 
-Crucially, apps connect only to the hub, never directly to one another. An app
-exposes part of its functionality to the hub, and the hub makes that functionality
-available to *other* apps, to you, and to workflows. What an app is, and how it
-differs from the services the hub is built from, is explained in
-[Apps vs Services](/docs/concepts/terminology#apps-vs-services).
+Orkestrator, the graphical interface, is not special. It is an app like any other, so you can use
+Arkitekt entirely through its API, or build your own interface.
 
-## The Coordinator
+When an app connects, it declares its **actions**: what it can do, described by typed inputs and
+outputs. For each action it offers an **implementation**, its own way of doing it, and several apps
+can implement the same action. Each running copy of an app is an **agent**, and one app can run as
+many agents on different machines. When you run an action, the hub creates a **task** and routes it to
+an agent that has an implementation. You assign work to an action, never to a machine.
 
-The coordinator is a piece of its own, separate from the hub. It sits between you,
-your apps, and the hub, and its job is to make sure everyone is who they say they
-are and can find one another. On the surface it is the most boring part of the
-platform, and under the hood probably the single most important. It is the
-**control plane**: the part that manages who can access which services and apps, and
-how the pieces of a deployment find and trust each other. In Arkitekt this role is
-filled by [**Lok**](/docs/concepts/services/lok), and it covers two jobs that belong
-together:
+How these terms fit together, and how apps differ from services, is explained in [Terminology](/docs/concepts/terminology#how-do-these-elements-relate)
+and [Apps vs Services](/docs/concepts/terminology#apps-vs-services).
 
-- **Authentication and authorization** of users and apps, so every request is made
-  by someone who is logged in and allowed to make it.
-- **Discovery**, so apps and servers can locate one another, both on a local network
-  via the [Fakts protocol](/docs/concepts/services/service-discovery), and across
-  networks via the [mesh](/docs/concepts/security/mesh), where the same coordinator
-  role runs as a *coordination server*.
+## The Coordinator [#the-coordinator]
 
-Without the coordinator, you and your apps could never safely reach the hub:
-nothing would know who anyone is, and the apps and the hub would never meet. For the
-full picture, see [Identity & Access](/docs/concepts/security/identity).
+The coordinator is separate from the hub. It is the **control plane**: it knows who everyone is, and
+it lets the pieces of a deployment find and trust each other. In Arkitekt this role is filled by
+[Lok](/docs/concepts/services#lok). It has two jobs:
+
+- **Authentication and authorization.** Users and apps sign in through OAuth2. Each app gets an
+  identity of its own and only the permissions you approved, so the hub can record that a result was
+  made by an app on your behalf. See [Identity & Access](/docs/concepts/security/identity).
+- **Discovery.** An app finds a hub through the
+  [Fakts protocol](/docs/concepts/services/service-discovery), a standard OAuth2 device flow whose
+  token response also carries the configuration of each service the app asked for. Across networks,
+  the coordinator hands out keys for the [mesh](/docs/concepts/security/mesh), so that app and hub can
+  reach each other without opening ports.
+
+The coordinator holds the accounts and never sees your data. The hub holds the data and keeps no
+accounts of its own. Data moves between apps and the hub, the **data plane**, and the coordinator
+only makes the introductions. Who runs the coordinator (us at go.arkitekt.live, your institute, or
+you) is covered in
+[Where Arkitekt runs](/docs/concepts/deployment/topology#three-ways-to-meet).
+
+## One task, end to end
+
+Here is what happens when you segment an image from Orkestrator:
+
+1. **Log in.** Orkestrator gets a token and the hub's address from the coordinator. This happens
+   once, not per task.
+2. **Assign.** You pick the action and fill in its inputs. Orkestrator sends the request to Rekuest,
+   which checks that you may call it and that the inputs match, and records the task.
+3. **Route.** Rekuest chooses an implementation, and with it an agent, and sends the task there.
+4. **Run.** The agent fetches the image from Mikro. Only a reference to it travelled with the task.
+   The agent runs the segmentation and stores the mask in Mikro.
+5. **Report.** Progress, logs and the reference to the mask stream back to Orkestrator. The task's
+   history records who started it, which app ran it and in which organization, so the mask's
+   [provenance](/docs/concepts/provenance) is known.
+
+Nothing in this chain depends on where the agent runs, so you can move it to a GPU server, or swap
+in another app that implements the same action, without changing how you call it.

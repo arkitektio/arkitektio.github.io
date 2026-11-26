@@ -1,79 +1,114 @@
 ---
 title: Services
-description: An overview of the modular, containerized (micro)-service architecture that forms the backbone of the Arkitekt platform.
+description: The independent, containerized services that make up an Arkitekt server, what each one does, and the design principles they share.
 type: concept
 ---
 
-## Services in Arkitekt
+import { GithubRepo } from "@/components/docs";
 
-The following are the core services that are installed in a default Arkitekt platform:
+An Arkitekt server is a set of independent services. Each owns one concern, has its own database and
+GraphQL API, and can be left out if you do not need it. Computation does not happen here: it runs in
+apps, and the services store, route and describe their work.
 
-- [Lok](/docs/concepts/services/lok): Authorization and Authentication service
-- [Rekuest](/docs/concepts/services/rekuest): Node Repository and Task-Assignment
-- [Kabinet](/docs/concepts/services/kabinet): App Store and Plugin Management
-- [Mikro](/docs/concepts/services/mikro): Microscopy Data Management
-- [Kraph](/docs/concepts/services/kraph): Knowledge graph and provenance
-- [Fluss](/docs/concepts/services/fluss): Workflow management
+| Service | Concern |
+|---|---|
+| [Lok](#lok) | Users, apps, login and configuration |
+| [Rekuest](/docs/concepts/services/rekuest) | The catalogue of actions and the assignment of tasks to agents |
+| [Fluss](#fluss) | Workflow designs and the logs of their runs |
+| [Mikro](/docs/concepts/services/mikro) | Microscopy data: images, metadata and their lineage |
+| [Kraph](/docs/concepts/services/kraph) | The knowledge graph and provenance |
+| [Kabinet](/docs/concepts/services/kabinet) | The app store: installing and running plugin apps |
 
-Other services can be added to the platform as needed. These **Next Generation** services are
-a set of emerging services that are currently in development and might replace existing services
-in the future. While you can definitely use them, be aware that they are not yet fully supported
-and might change in the future.
+These services are newer or optional. You can use them, but they are less tested and may change:
 
-- [OmeroArk](/docs/concepts/services/omeroark): OMERO integration
-- [Kluster](/docs/concepts/services/kluster): Dask-Cluster management
+| Service | Concern |
+|---|---|
+| [OmeroArk](#omeroark) | Access to an OMERO server |
+| [Kluster](#kluster) | Dask clusters on demand |
+| [Port](#port) | The earlier app store, superseded by Kabinet |
 
+## Design principles [#design-principles]
 
-## Technical Design of the Services
+- **Containerized.** Each service is a web server in its own container, deployable with Docker or
+  Kubernetes.
+- **GraphQL.** Each service has a GraphQL API with subscriptions for live updates (see
+  [GraphQL](/docs/concepts/services/graphql)).
+- **Independent.** Services do not call each other. They can evolve on their own, be combined freely
+  and scale separately.
+- **Tokens checked locally.** Each service verifies the JWT a request carries on its own, without
+  asking Lok (see [Identity & Access](/docs/concepts/security/identity)).
+- **Postgres** is the default database.
+- **Configured from files and environment variables**, generated when you set up a server.
+- **Logs go to standard output.**
 
-#### Design Principles
+Most services are Python with Django and Strawberry GraphQL, built on the shared
+[backend libraries](/docs/concepts/services/backend-libraries). Rekuest's task assignment runs in
+a separate Rust program, takt, because agent traffic must not wait behind API work. A service with
+other needs can use another stack, as long as it follows the principles above.
 
-While the Services in Arkitekt can be designed in a variety of ways, the following are some of the key design principles that are followed in the design of the services:
+## Lok [#lok]
 
-- **Containerized**: Each service is designed to be a containerized web-server that can be deployed in a containerized environment (e.g. Docker, Kubernetes).
+<GithubRepo url="https://github.com/arkitektio/lok-server" title="Lok"/>
 
-- **GraphQL API**: Each service provides a GraphQL API that can be used to interact with the service. This allows for a flexible and powerful way to interact with the service.
+Lok manages users and apps. It registers and authorizes apps through OAuth2 and OpenID Connect, hands
+them their configuration through [Fakts](/docs/concepts/services/service-discovery), and issues
+signed JWTs. Every other service verifies those tokens with Lok's public key, without asking Lok. It
+also holds user profiles and comments.
 
-- **No inter-service communication**: While Arkitekt adopts a clear seperation of concerns and modularity in its design, the services are designed to act completely independently and do not
-communicate with each other (as opposed to some micro-service architectures where services communicate with each other). This is to ensure that the services
-can develop and evolve independently and can be used in a variety of combinations.
+![Lok configures an app through fakts and issues it a signed JWT through OAuth2](/docs/design/services/lok.png)
 
-- ** JWT Authentication and Authorization**: Each service can be configured to use a variety of authentication and authorization mechanisms. However, In order to ensure a consistent and distibributed authentication 
-each service accepts JWT tokens that are used to authenticate.
+## Fluss [#fluss]
 
-- **Database**: Each service can be configured to use a variety of databases. However, the default database used in the Arkitekt platform is a PostgreSQL database.
+<GithubRepo url="https://github.com/arkitektio/fluss-server" title="Fluss"/>
 
-- **Configuration**: Each service should be configurable using a configuration file and environment variables. This configuration is generated when installaling the platform
-through the Arkitekt CLI or Konstruktor.
+Fluss stores workflows and the records of their runs. It does not execute them: a scheduler app runs
+a workflow by calling the actions its nodes name (see
+[Workflow](/docs/concepts/terminology#workflow) and
+[Durable execution](/docs/concepts/patterns/durability)).
 
-- **Logging and Monitoring**: Each service logs its activity to standard output. 
+A workflow designed in Orkestrator is stored as JSON that lists its nodes and their connections. You
+can edit the JSON, but it is not meant to be read by people; use Orkestrator. Web components render
+a stored workflow, as on these pages.
 
-#### Current Tech Stack
+When an app runs a workflow, it creates a run in Fluss and logs every event of the execution there.
+The log holds references to the data, not the data itself, and the processing steps applied to it.
+You can filter a log by time, node and status, and view it in Orkestrator.
 
-The following are the current base technologies that are used in the design of the services:
+![Fluss and its relationship with an app that executes a workflow](/docs/design/services/fluss.png)
 
-- **Language**: Python
-- **Web Framework**: Django
-- **GraphQL**: Graphene
-- **Database**: PostgreSQL
+## OmeroArk [#omeroark]
 
-While the above technologies are used as the base, the services can be designed using a variety of technologies and frameworks as needed.
+<GithubRepo url="https://github.com/arkitektio/omero-ark-server" title="OmeroArk"/>
 
-<Callout type="info">
+OmeroArk is a stateless gateway that puts a GraphQL API in front of an OMERO server's Blitz API. It
+keeps no copy of the data: what you see is what OMERO holds. It uses Arkitekt's login once you have
+linked your OMERO account to your Arkitekt account. Like the OMERO web client, it cannot upload data
+to OMERO.
 
+![OmeroArk wraps the Blitz-based OMERO server in a GraphQL API](/docs/design/services/omeroark-design.png)
 
-In an effort to standardize and make the backend services more testable and type-safe, we are currently in the process of migrating the services
-to use `Strawberry` a wildely used Python GraphQL library that is designed to be more type-safe and testable.
+## Kluster [#kluster]
 
+<GithubRepo url="https://github.com/arkitektio/kluster-server" title="Kluster"/>
 
-</Callout>
+Kluster is a stateless gateway to [Dask-Gateway](https://gateway.dask.org/en/latest/), which starts
+Dask clusters on demand on backends such as SLURM, PBS, Kubernetes and Hadoop. Kluster wraps its API
+in GraphQL. Because it keeps no state, it scales horizontally.
+[Kluster-Gateway](https://github.com/arkitektio/kluster-gateway-server), a modified Dask-Gateway with
+a JWT plugin, lets Arkitekt logins reach Dask-Gateway without Kluster.
 
-<Callout type="info">
+Kluster is early in development. It works with local clusters and with SLURM (which needs extra
+configuration), and has not been tested with the other backends. If you use Dask-Gateway and want to
+try it, get in touch.
 
+![Kluster wraps the Dask-Gateway API in a GraphQL API](/docs/design/services/kluster-design.png)
 
-While Django might not be the most performant web-framework, it is chosen as the base web-framework for the services due to its flexibility,
-modularity and the wide variety of libraries and tools that are available for it. If you are designing a service that requires high-performance
-or has specific requirements, you can choose to use a different web-framework.
+## Port [#port]
 
+<GithubRepo url="https://github.com/arkitektio/port-server" title="Port"/>
 
-</Callout>
+Port was the first app store: it installed containerized plugin apps and ran them on the server.
+[Kabinet](/docs/concepts/services/kabinet) has replaced it in the standard deployment. Port still works
+and can run alongside Kabinet, but Kabinet is the recommended choice.
+
+![An overview of the Port service](/docs/design/services/port.png)

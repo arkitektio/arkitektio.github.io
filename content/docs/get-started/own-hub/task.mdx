@@ -4,8 +4,8 @@ description: "The last step of bringing your own hub, with a coffee: make a test
 type: tutorial
 ---
 
-Everything is in place: a hub, Orkestrator and an app. On this page you put them to work, and see
-what Arkitekt records along the way.
+You have a hub, Orkestrator and an app. Now you put them to work and see what Arkitekt records
+along the way.
 
 ## Do it
 
@@ -24,8 +24,8 @@ Now apply an action to it:
 
 ## What a task is
 
-Each time you pressed **Do**, you started a **task**: one run of an action, with your inputs. Here is
-the path it took:
+Each time you pressed **Do**, you started a **task**: one run of an action, with your inputs. This
+is the path it took:
 
 1. **You assigned it to the action, not to a machine.** Orkestrator sent "Otsu Thresholding, on
    this image" to the hub. The hub checked that you may run it and that the inputs fit.
@@ -36,24 +36,22 @@ the path it took:
 4. **The result came back to you.** The hub told Orkestrator the task was done, and the mask popped
    up.
 
-Orkestrator never needed to know where Basiks runs, and Basiks never needed to know who asked. That
-is the hub doing its job as a middleman. It is also why the image was offered the right actions
-when you right-clicked it: the hub knows which actions take an image as input.
+Orkestrator never needed to know where Basiks runs, and Basiks never needed to know who asked. The
+hub sits between them. That is also how the right-click menu offered the right actions: the hub
+knows which actions take an image as input.
 
 More on tasks, their states and cancelling them in [Task](/docs/concepts/terminology#task).
 
 ## Provenance: where every result came from
 
-The mask is not just a file. Arkitekt recorded that it was **derived from that image**, by a task
-running **Otsu Thresholding**, done by **Basiks**, **started by you**, in **your organization**.
-Every create, update and delete on your data is recorded this way, as it happens.
+Arkitekt recorded that the mask was **derived from that image**, by a task running **Otsu
+Thresholding**, done by **Basiks**, **started by you**, in **your organization**. Every create,
+update and delete on your data is recorded this way, as it happens.
 
-So months from now, anyone in your organization can open the mask and see exactly how it was made,
-without a lab notebook. That record is [provenance](/docs/concepts/provenance).
+Months from now, anyone in your organization can open the mask and see how it was made, without a
+lab notebook. That record is [provenance](/docs/concepts/provenance).
 
-## You made it
-
-That's the whole loop of Arkitekt, and you have now seen each piece:
+## The whole loop
 
 | Piece | What it did here |
 |---|---|
@@ -85,25 +83,24 @@ That's the whole loop of Arkitekt, and you have now seen each piece:
     actions into workflows.
   </Card>
   <Card title="Build: write your own app" href="/docs/get-started/next-steps/first-python-app">
-    Turn your own Python function into an action like the ones you just ran, in a few lines.
+    Turn your own Python function into an action like the ones you just ran.
   </Card>
   <Card title="Deploy: set it up for your lab" href="/docs/concepts/deployment/what-you-are-setting-up">
     Plan a hub for a lab or a facility, with storage, more machines, and the GPU.
   </Card>
   <Card title="Learn: how Arkitekt works" href="/docs/concepts">
-    The ideas behind it, in more depth: the design, the patterns underneath and the philosophy.
+    The ideas behind it: the design, the patterns underneath and the philosophy.
   </Card>
 </Cards>
 
-Going deeper on one of them? Builders can pick from the
-[kinds of apps you can build](/docs/guides/app-kinds), and the curious can read
-[the patterns behind Arkitekt](/docs/concepts/patterns).
+Builders can pick from the [kinds of apps you can build](/docs/guides/app-kinds), and the curious
+can read [the patterns behind Arkitekt](/docs/concepts/patterns).
 
 <Callout type="info" title="Running a hub for a lab or a facility?">
 
-This quickstart puts a hub on your own computer, reachable from your network. A hub that a whole
-lab relies on needs a bit more thought: where the data lives, how people reach it, and who
-administers it. Start with [What you are setting up](/docs/concepts/deployment/what-you-are-setting-up) and
+This quickstart puts a hub on your own computer, reachable from your network. A hub a whole lab
+relies on needs more planning: where the data lives, how people reach it, and who administers it.
+Start with [What you are setting up](/docs/concepts/deployment/what-you-are-setting-up) and
 [Planning](/docs/concepts/deployment/planning).
 
 </Callout>

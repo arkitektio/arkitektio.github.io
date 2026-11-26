@@ -1,26 +1,14 @@
 ---
 title: Anti-patterns
-description: "What not to do when building an Arkitekt app, in any language: getter actions, UI state that mirrors the app, large arrays and high-frequency updates in state, device handles in state, work at import time, orchestration in plain actions and large data inline. Each with an example and what to do instead."
+description: "Common mistakes when building an Arkitekt app, in any language, and what to do instead."
 type: concept
 ---
 
-> **With great power comes great responsibility.**
-
-Arkitekt makes a lot of things one line away. Mark a class as state, and every UI and every other
-app sees it change live. Take a client by annotation, and your function can reach the whole
-platform. Declare an action, and anyone in your organization can call it from a form, a script or a
-workflow.
-
-That reach is the point, and it is also how apps go wrong. A value published to the platform is
-sent, journaled and pushed to every watcher on each change. A UI panel that keeps its own idea of
-the device can be wrong for everyone looking at it. None of the patterns below raises an error.
-They work in a demo and break once a second user, a workflow or a restart turns up.
-
-Each one breaks one of [the patterns behind Arkitekt](/docs/concepts/patterns), which explain why
-the rule exists. The examples are Python, the reference client. The patterns apply unchanged to Rust and Kotlin,
-because they are about the [shared model](/docs/concepts/building/shared-concepts), not the syntax. `Hardware`
-in the examples stands for the app's device and model, kept in a context as
-[shown below](#handles).
+None of these mistakes raises an error. They work in a demo and break once a second user, a
+workflow or a restart turns up. Each breaks one of [the patterns behind Arkitekt](/docs/concepts/patterns).
+The examples are Python, but the rules hold for every client, because they are about the
+[shared model](/docs/concepts/building/shared-concepts). `Hardware` in the examples is the app's
+device and model, kept in a context as [shown below](#handles).
 
 | Anti-pattern | Do this instead |
 |---|---|
@@ -36,21 +24,12 @@ in the examples stands for the app's device and model, kept in a context as
 
 ## Getter actions for state [#getters]
 
-**Don't.** Offer an action whose only job is to report what the app already knows:
-
-```python
-@app.action
-def get_position() -> tuple[float, float]:
-    """Get Position"""
-    return stage.x_um, stage.y_um
-```
-
-Every UI that wants to show the position now has to call it over and over. Each call is a task:
-scheduled, routed to your agent, run, recorded. Ten open panels polling twice a second are twenty
-tasks a second that do nothing. Between two polls the value is unknown, and a workflow cannot
+An action like `get_position()` that only reports what the app already knows turns every UI into a
+poller. Each call is a task that is scheduled, routed, run and recorded. Ten panels polling twice a
+second are twenty useless tasks a second, the value is unknown between polls, and a workflow cannot
 [guard](/docs/guides/python/durable-execution#guard) on an action.
 
-**Do.** Publish it as state. Assigning a field sends the change once, to everyone watching:
+Publish the value as state instead. Assigning a field sends the change once, to everyone watching:
 
 ```python
 @app.state
@@ -74,31 +53,16 @@ def move_to(stage: Stage, hardware: Hardware, x_um: float, y_um: float) -> None:
     stage.moving = False
 ```
 
-Actions are for things that **do** something or **compute** something. If the answer is already
-sitting in the app, it is state.
+Actions are for things that do or compute something. If the answer is already in the app, it is
+state.
 
 ## UI that keeps its own copy of the app's state [#ui-state]
 
-**Don't.** Let the panel decide what the device is doing because a button was clicked:
+A panel (or a Qt widget) that sets `acquiring = true` when its Start button is clicked has its own
+opinion of the device. It is wrong when the call failed, when a workflow or a colleague stopped the
+camera, after a restart, and in every other open panel.
 
-```xml
-<Blok kind="agent" context="panel">
-  <local name="acquiring" default={false} />
-  <Card>
-    <Switch bind={acquiring} />
-    <Button onClick={self.start()}>Start</Button>
-    <Text>{acquiring ? "Acquiring" : "Idle"}</Text>
-  </Card>
-</Blok>
-```
-
-The `acquiring` local is the panel's own opinion. It says "Acquiring" when the call failed, when a
-workflow or a colleague stopped the camera, when the agent restarted, and in every other panel
-that was not the one clicked. The same mistake exists outside bloks: a Qt widget that flips
-`self.running = True` in its click handler, or a web frontend that sets a flag before the request
-returns.
-
-**Do.** The app owns the truth and publishes it. The UI only shows it and calls actions:
+Let the app own the truth. The UI shows the published state and calls actions:
 
 ```xml
 <Blok kind="agent" context="panel">
@@ -111,102 +75,49 @@ returns.
 </Blok>
 ```
 
-`self.Camera.acquiring` is the state the app publishes. `into starting` gives the panel the record
-of its own call, so it can show that a request is in flight (`starting.running`) without claiming
-anything about the device.
+`into starting` gives the panel the record of its own call, so it can show a request in flight
+without claiming anything about the device.
 
-The rule cuts both ways. **View state** belongs to the viewer and stays out of `@app.state`: which
-tab is open, a slider value before Apply, which row is expanded. That is what a blok's `<local>` is
-for. A good test: if two people look at the app at the same time, should they see the same value?
-Then it is app state. Could they disagree? Then it is view state.
+**View state** is different: which tab is open, a slider value before Apply. It belongs to the viewer
+and goes in a blok's `<local>`, not in `@app.state`. If two people looking at the app at once
+should see the same value, it is app state.
 
 ## Large arrays in state [#large-arrays]
 
-**Don't.** Put the data itself into state because it is convenient to show:
+State is sent as a patch on every change, recorded in the agent's journal and held by the server. A
+`numpy` array is refused when the app is assembled, so this mistake usually shows up as `.tolist()`:
+a 2048 × 2048 frame as JSON is tens of megabytes, on every update, to every watcher.
+
+Store large data in a data service and publish a **reference**, or a **summary** someone can act on:
 
 ```python
-@app.state
-class Acquisition:
-    frames: int = 0
-    histogram: list[float] | None = None          # 65 536 bins
-    last_frame: list[list[int]] | None = None     # 2048 x 2048 pixels, as lists
-```
-
-A `numpy` array is refused when the app is assembled, so this usually shows up as `.tolist()`.
-State is sent as a patch on every change, recorded in the agent's journal, and held by the server
-for anyone who asks. A 2048 × 2048 frame as JSON is tens of megabytes, on every update, to every
-watcher.
-
-**Do.** Store large data where large data lives, and publish a **reference**, or a **summary** that
-fits in a sentence:
-
-```python
-from mikro import Mikro
-from mikro.arkitekt.specs import Image
-
-
 @app.state
 class Acquisition:
     frames: int = 0
     saturated_pixels: int = 0                     # a summary someone can act on
     last_image: Image | None = None               # a reference: Mikro holds the pixels
-
-
-@app.action
-def snap(acquisition: Acquisition, hardware: Hardware, mikro: Mikro) -> Image:
-    """Snap"""
-    frame = hardware.camera.snap()
-    image = mikro.create_array_dataset(data=frame, ...).lens()
-    acquisition.frames += 1
-    acquisition.saturated_pixels = int((frame == frame.max()).sum())
-    acquisition.last_image = image                # only the id travels
-    return image
 ```
 
 Keep state to what you would write on a whiteboard next to the instrument: positions, flags,
-counters, a barcode, a reference. Anything you would need a viewer for goes into a data service.
+counters, a barcode, a reference.
 
 ## State as a real-time channel [#frequency]
 
-This is the one that hurts most, because it looks like it works.
+A background loop that writes a frame counter or a 1 kHz encoder value into state sends one update
+per assignment. Each is sent to the server, journaled and fanned out to every watcher, with nothing
+merged or dropped, in the same queue as the progress, logs and results of the app's tasks. A chatty
+state slows down everything else, and because every update travels through the server, a live view
+built on it stutters and a control loop reacts too late.
 
-**Don't.** Push to state at the rate things happen:
+Two questions decide whether a value belongs in state, and how often to write it:
 
-```python
-@app.background
-def acquire(camera: Camera, hardware: Hardware) -> None:
-    while True:
-        frame = hardware.camera.snap()            # 50 frames a second
-        camera.frame_number += 1                  # 50 updates a second
-        camera.mean_intensity = float(frame.mean())
-        camera.stage_z_um = hardware.stage.read_z()   # a 1 kHz encoder, read in the loop
-```
+1. **Would a workflow guard on it, or a person decide on it?** `acquiring` or `exposure_ms`: yes. A
+   per-frame counter: no.
+2. **Is it actionable at the rate you push it?** Write a value when it changes meaningfully, not every
+   time you read it.
 
-State is not a stream. **Every assignment is one update**: its own numbered frame, sent to the
-server, recorded in the agent's journal and fanned out to every watcher. Nothing is merged or
-dropped, so the loop above sends 150 frames a second, each one stored, and every 60th update also
-carries a full snapshot of all the app's states. Those frames share one ordered queue with the
-progress, logs and results of the app's tasks, so a chatty state slows down everything else the
-agent reports.
-
-And there is **always latency**: every update makes the trip from the agent through the server to
-each viewer. A live view built on state lags and stutters, and a control loop built on it reacts
-too late. Neither is what state is for.
-
-**Push only state you might want to track during a workflow, and only at a rate someone can act
-on.** Two questions decide whether a value belongs in state, and how often to write it:
-
-1. **Would a workflow guard on it, or a person decide on it?** `acquiring`, `exposure_ms`,
-   `saturated`, the current plate barcode: yes. A per-frame counter, a running mean, the raw encoder
-   value: no.
-2. **Is it actionable at the frequency you push it?** A temperature that a workflow waits on is
-   actionable once a second. A focus value that changes 50 times a second is not actionable 50
-   times a second by anyone watching through a server. Write it when it *changes meaningfully*
-   (settled, out of range, crossed a threshold), not every time you read it.
-
-**Do.** Publish the few actionable facts, at their own pace, and send the live data through a
-channel built for it. For video and fast signals that is Lovekit (the `lovekit` extra), which
-streams over WebRTC. State only carries *which* streams exist:
+Send live data through a channel built for it. For video and fast signals that is Lovekit (the
+`lovekit` extra), which streams over WebRTC. State only says which streams exist:
 
 ```python
 from lovekit import Lovekit, VideoStream, to_rgba
@@ -233,35 +144,14 @@ async def live_view(camera: Camera, hardware: Hardware, lovekit: Lovekit) -> Non
                 camera.saturated = saturated
 ```
 
-The same split holds for data that is not video: a `DataStream` for a spectrum or a trace you want
-to watch live, and a `@app.state` field for the one number a workflow decides on.
-
-When several fields change together, make them **one** update, so nobody sees the stage at the new
-x and the old y, and the platform gets one frame instead of three:
-
-```python
-with task.updating(stage):
-    stage.x_um, stage.y_um = x_um, y_um
-    stage.moving = False
-```
+For a spectrum or trace, use a `DataStream`. When several fields change together, group them into one
+update with `with task.updating(stage):`, so nobody sees the new x with the old y.
 
 ## Device handles and models in state [#handles]
 
-**Don't.** Make the open device or the loaded network a state field so that every action can reach
-it:
-
-```python
-@app.state
-class Microscope:
-    driver: object                               # a serial port, a DLL handle
-    model: object                                # 2 GB of weights
-```
-
-State is published, so its fields have to be serialized and sent. A handle cannot be, and a model
-should not be.
-
-**Do.** Put private, process-bound objects in a **context**: shared by the app's actions, built by a
-startup hook, never published.
+State is published, so its fields must be serialized. A serial port or DLL handle cannot be, and 2 GB
+of model weights should not be. Put private, process-bound objects in a **context**: shared by the
+app's actions, built by a startup hook, never published.
 
 ```python
 from dataclasses import dataclass
@@ -284,55 +174,26 @@ def close_hardware(hardware: Hardware) -> None:
     hardware.driver.close()
 ```
 
-Publish what the device *is doing* as state. Keep what the device *is* as context.
+Publish what the device is doing as state. Keep what the device is as context.
 
 ## Work at import time, module-level globals [#import-time]
 
-**Don't.** Open the device or load the model when the module is imported, and keep it in a global:
-
-```python
-driver = Driver("/dev/ttyUSB0")                  # runs on import
-model = load("model.pt")
-
-@app.action
-def segment(image: Image) -> LabelMask:
-    """Segment"""
-    return model.predict(image)
-```
-
-The CLI imports your module to inspect, check and package it, and `arkitekt run dev` imports it
-again on every reload. Each import opens the port and loads the weights, on the build machine and
-in CI. A global is also invisible to the platform: nobody can see it, lock it or test with a
-stand-in.
-
-**Do.** Do the work in a startup hook and take the result by annotation, as in the context example
-above. Tests can then call the action with a fake context, and `arkitekt inspect variables` stays
-quiet.
+Opening the device or loading the model at module level runs that work on every import. The CLI
+imports your module to inspect, check and package it, and `arkitekt run dev` imports it on every
+reload, on the build machine and in CI. A global is also invisible to the platform and hard to
+replace in a test. Do the work in a startup hook and take the result by annotation, as in the
+context example above.
 
 ## A plain action that orchestrates [#orchestration]
 
-**Don't.** Call other actions from inside an `@app.action`, or drive a multi-step experiment from a
-loop in a script:
+A plain action that calls other actions, or a script that drives a multi-step experiment in a loop,
+leaves no record of which calls it made if it dies. Nobody can tell whether the dispense happened,
+so nothing can be resumed. Arkitekt refuses this: a client call from inside a task raises
+`RootOnlyCallError`, and a plain action that depends on an action demand is reported when the app is
+assembled.
 
-```python
-from rekuest.client.client import RekuestCaller
-
-
-@app.action
-def stain_and_measure(well: str, rekuest: RekuestCaller) -> float:
-    """Stain And Measure"""
-    cells = rekuest.call(COUNT_CELLS, well=well)    # refused: RootOnlyCallError
-    rekuest.call(DISPENSE, well=well, volume_ul=0.5 * cells)
-    return rekuest.call(READ, well=well)
-```
-
-A plain action whose agent dies leaves no trace of which calls it made. Did the dispense happen?
-Nobody can say, so nothing can be resumed. Arkitekt refuses this: a client call from inside a task
-raises `RootOnlyCallError`, and a plain action that depends on an action demand is reported when
-the app is assembled.
-
-**Do.** Declare what you need as a protocol and orchestrate in an `@app.workflow`. Its calls are
-recorded, so a crashed workflow is resumed where it was:
+Declare what you need as a protocol and orchestrate in an `@app.workflow`. Its calls are recorded,
+so a crashed workflow resumes where it was:
 
 ```python
 @app.declare(app="liquid-handler", auto_resolvable=True, min=1)
@@ -348,70 +209,26 @@ def stain_and_measure(well: str, handler: LiquidHandler, *, task: Task) -> None:
     handler.dispense(well=well, volume_ul=0.5)
 ```
 
-See [Workflows](/docs/guides/python/workflows) and [Durable execution](/docs/concepts/building/durable-execution).
+See [Workflows](/docs/guides/python/workflows) and [Durable execution](/docs/concepts/patterns/durability).
 
 ## Large data inline in ports [#inline-data]
 
-**Don't.** Pass pixels, traces or tables as plain values between actions:
-
-```python
-@app.action
-def denoise(pixels: list[list[float]]) -> list[list[float]]:
-    """Denoise"""
-    ...
-```
-
-The arguments are serialized into the task, stored with its history and sent through the server on
-every call. The form in Orkestrator cannot offer "an image" to pick, the workflow editor cannot
-check that the output fits the next step, and provenance has no dataset to point at.
-
-**Do.** Take and return a **structure**. The data stays in its service and only a reference travels:
-
-```python
-from mikro.arkitekt.specs import Volume
-
-
-@app.action
-def denoise(volume: Volume, mikro: Mikro) -> Volume:
-    """Denoise"""
-    ...
-```
-
-For arrays that only move between actions of one app, a
-[memory structure](/docs/guides/python/types#in-memory-structures) keeps them on the agent without
-storing them anywhere. Use that sparingly, for the reasons in the next section.
+Pixels, traces or tables passed as plain values (`list[list[float]]`) are serialized into the task,
+stored with its history and sent through the server on every call. Orkestrator cannot offer "an
+image" to pick, the workflow editor cannot check that the output fits the next step, and provenance
+has no dataset to point at. Take and return a **structure** such as Mikro's `Volume`: the data stays
+in its service and only a reference travels.
 
 ## Memory structures as the default [#memory-structures]
 
-**Don't.** Register `np.ndarray` as a memory structure and split every pipeline into small actions
-that hand arrays to each other:
+Registering `np.ndarray` as a [memory structure](/docs/guides/python/types#in-memory-structures) and
+splitting a pipeline into small actions that hand arrays to each other looks clean, but it makes the
+app stateful. Every returned array stays in the agent's memory until Rekuest tells it to collect that
+reference or the agent stops. Run the pipeline on every acquisition and memory grows until the
+process is killed. The references also work only on that one agent, and a restart breaks every
+reference a running workflow still holds.
 
-```python
-app.memory_structure(np.ndarray)
-
-
-@app.action
-def read(path: str) -> np.ndarray: ...
-
-@app.action
-def smooth(image: np.ndarray) -> np.ndarray: ...
-
-@app.action
-def segment(image: np.ndarray) -> np.ndarray: ...
-
-@app.action
-def count(labels: np.ndarray) -> int: ...
-```
-
-It looks clean, and it quietly makes the app **stateful**. Every array an action returns stays in
-the agent's memory after its task has ended. It is not dropped when the next action has used it:
-the agent keeps it until Rekuest tells it to collect that reference, or until the agent stops. Run
-this pipeline on every new acquisition, and the agent holds three arrays per run, growing until
-the process is killed. Meanwhile every reference works only on that one agent: a second agent of the
-same app cannot resolve it, and a restart breaks every reference a running workflow still holds.
-
-**Do.** Keep steps that always run together in **one** action. Nothing is kept, nothing is
-referenced, and the arrays are freed when the task ends:
+Keep steps that always run together in **one** action, calling plain functions:
 
 ```python
 @app.action
@@ -422,22 +239,7 @@ def count_cells(path: str, sigma: float = 2.0) -> int:
     return int(labels.max())
 ```
 
-When an intermediate result is worth looking at, keeping or passing to another app, store it in a
-data service and pass the reference. A memory structure is for the narrow case of an interactive
-pipeline on one agent, where a person rewires the steps, on an app that restarts often enough that
-its memory stays bounded. See
+Store an intermediate result worth keeping in a data service. Memory structures fit an interactive
+pipeline on one agent that a person rewires. See
 [Arrays between actions](/docs/guides/python/examples/in-memory#use-it-sparingly).
 
-## A checklist
-
-- [ ] Nothing is a getter: values the app knows are `@app.state`.
-- [ ] UIs bind to the app's state, and keep only view state (`<local>`) of their own.
-- [ ] State holds no arrays: references and summaries only.
-- [ ] Every state field is something a workflow could guard on or a person could act on, and it is
-      written when it changes meaningfully, not on every reading.
-- [ ] Live video and fast signals go through Lovekit streams, not state.
-- [ ] Handles and models are `@app.context`, built in `@app.startup`.
-- [ ] Importing the module does nothing but declare.
-- [ ] Anything that calls other actions is an `@app.workflow`.
-- [ ] Images, traces and tables cross action boundaries as structures.
-- [ ] Memory structures are the exception: steps that belong together are one action.

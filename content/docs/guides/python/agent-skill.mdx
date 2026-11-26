@@ -10,8 +10,7 @@ the Claude Agent SDK, and other tools that understand the open
 `arkitekt` package: declaring an `App`, offering actions, publishing state,
 passing data by reference, writing workflows, and using the CLI.
 
-Drop it into your assistant and it will scaffold and edit apps following the
-conventions in these docs instead of guessing.
+With it, your assistant scaffolds and edits apps following the conventions in these docs.
 
 ## Get the skill
 
@@ -25,11 +24,9 @@ You can also [view the raw file](/skills/arkitekt/SKILL.md) directly.
 
 <Callout type="info" title="Replaces the arkitekt-next skill">
 
-An earlier version of this skill, published under `/skills/arkitekt-next/`, taught the retired
-`arkitekt-next` package (`@register`, `easy` as the app, the `arkitekt-next` CLI). If you installed
-it, replace it with the file above and delete the old `building-arkitekt-next-apps` folder. The
-skill was updated for `arkitekt` 19 (clients by annotation, `connect(Mikro)` for scripts): download
-it again if you fetched it before.
+An older skill under `/skills/arkitekt-next/` taught the retired `arkitekt-next` package. If you
+installed it, delete its `building-arkitekt-next-apps` folder and use the file above. The skill
+covers `arkitekt` 19; download it again if you fetched it before.
 
 </Callout>
 
@@ -49,9 +46,9 @@ curl -o .claude/skills/building-arkitekt-apps/SKILL.md \
 For a skill available in **every** project, use the user directory
 `~/.claude/skills/building-arkitekt-apps/SKILL.md` instead.
 
-Claude Code loads the skill's short description at startup and pulls in the full
-instructions automatically the moment you start working on an `arkitekt`
-app, with no manual invocation required.
+Claude Code loads the skill's description at startup and reads the full
+instructions when you start working on an `arkitekt` app. You do not need to
+invoke it.
 
 ### Other agents
 
@@ -75,9 +72,3 @@ code.
   `.enter()`) and `connect(app)`, and the Qt, FastAPI and blok integrations.
 - A **CLI cheat-sheet** (`create`, `run`, `inspect`, `call`, `gen`, `plugin`) and a pre-flight
   checklist.
-
-<Callout type="info" title="Keep it in sync">
-The skill mirrors the guidance in the [Python guide](/docs/guides/python).
-If the API changes, update both `public/skills/arkitekt/SKILL.md` and the
-relevant docs pages together.
-</Callout>

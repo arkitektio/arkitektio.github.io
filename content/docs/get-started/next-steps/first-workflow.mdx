@@ -1,0 +1,151 @@
+---
+title: Your first workflow
+description: "Build a small analysis workflow in Orkestrator's Workflow Designer, run it on an image, follow the run live and trace the results back through provenance."
+type: tutorial
+---
+
+You chain three actions into one workflow: take an image, make a maximum projection, threshold it,
+and measure the fraction of the image below the threshold, which estimates how much of it is not
+covered by cells. Then you run it and look at what it recorded.
+
+<Prerequisites>
+
+- An image on your hub, for example from [Run your first task](/docs/get-started/own-hub/task)
+- You know how to install an app ([Install an app](/docs/get-started/own-hub/app))
+
+</Prerequisites>
+
+<Learn>
+
+- What a workflow is
+- Build a workflow in the drag-and-drop Workflow Designer
+- Set node parameters and save the workflow
+- Run it on an image and follow the run on the **Run** page
+- Tell the data graph apart from the provenance graph
+
+</Learn>
+
+## The workflow you will build
+
+A [workflow](/docs/concepts/terminology#workflow) is a graph of nodes wired together, so that data
+streams from one node to the next. Each node runs an action of some app. This one has five nodes:
+
+1. **Input**: the image you run it on.
+2. **Maximum projection**: image in, image out.
+3. **Otsu Threshold**: image in, mask out.
+4. **Measure Fraction**: mask in, a metric out (a number attached to an image, here the fraction).
+5. **Output**: the metric, which becomes the result of the workflow.
+
+Every workflow has exactly one `Input` and one `Output` node. Whatever is connected to them becomes
+the workflow's parameters and results, so a finished workflow behaves like any other action
+([Workflows are just nodes](/docs/concepts/terminology#workflows-are-just-nodes)).
+
+The edges carry types. Between the first nodes you will see `@mikro/arraylens` (an image), and at
+the end `@mikro/metric`; the `@mikro` prefix marks a [Mikro](/docs/concepts/services/mikro) type.
+Data moves as a stream: each node processes an item as soon as it arrives and passes it on
+([Data flows as a stream](/docs/concepts/terminology#data-flows-as-a-stream)).
+
+## 1. Install the apps for the nodes
+
+A node can only run if a running app provides its action. In the designer, a node whose action no
+app provides shows up **yellow**. You can still design and save the workflow, but it cannot run
+until an app implements that node. Design is separate from execution, which is why you can share a
+workflow with someone whose hub runs different apps.
+
+Install the apps that provide the nodes above, the same way you installed Basiks in
+[Install an app](/docs/get-started/own-hub/app). Then search for `Otsu Threshold` in Orkestrator to
+check that the action is there.
+
+## 2. Build it in the Workflow Designer
+
+<video autoPlay muted loop controls className="rounded-md" width={"100%"}>
+  <source src="/docs/introduction/first_steps/create_workflow.webm" />
+</video>
+
+1. Open **Workflows** in the sidebar.
+2. Click **Create Workspace** in the bottom right, name it `Analysis Run` and click **Create**. A
+   workspace holds the versions of one workflow: every change you save creates a new version, so
+   any run can be traced to the exact design it used.
+3. The **Workflow Designer** opens. Search for each node in the node sidebar and drag it onto the
+   canvas.
+4. Connect them in order, by dragging from the output of one node to the input of the next. Connect
+   `Input` at the start and `Output` at the end; every workflow needs both.
+5. Click a node to set its parameters in the sidebar:
+   - **Otsu Threshold** can blur the image before thresholding. Leave the default.
+   - **Measure Fraction**: set the value to measure to `0`, to count the pixels below the threshold,
+     and rename the metric key to `Background Fraction`.
+6. Click **Save** in the bottom right.
+
+<Callout type="info" title="Ready to run">
+
+A saved workflow can be run on your data right away. There is no separate deploy step.
+
+</Callout>
+
+## 3. Run it [#run-it]
+
+<video autoPlay muted loop controls className="rounded-md my-3" width={"100%"}>
+  <source src="/docs/introduction/first_steps/run_analysis.webm" />
+</video>
+
+1. Open your image in Orkestrator. If you made it on an earlier day, open **Home** in the sidebar
+   and step back to that day.
+2. Right-click the image, or drag it. Among the actions offered you now find **Analysis Run**, your
+   workflow.
+3. Choose it. The **Assign** dialog asks you to confirm, as for any action.
+4. Orkestrator takes you to the **Run** page, where you follow the progress and see the result.
+
+A run is created every time you run a workflow. It records the progress and the result, links all
+the data the workflow produced, and is the place to start when something goes wrong. Your latest
+runs are listed under **Workflows**.
+
+## 4. Replay the run
+
+<video autoPlay muted loop controls className="rounded-md my-3" width={"100%"}>
+  <source src="/docs/introduction/first_steps/replay.webm" />
+</video>
+
+A small workflow finishes quickly. Click the **live** button in the bottom left to switch to replay
+and scrub through the history of the run. Double-click a node in live or replay mode to see the data
+that passed through it. If scrubbing does not work, reload the page (right-click → **Refresh**).
+
+## 5. Trace the results
+
+<video autoPlay muted loop controls className="rounded-md" width={"100%"}>
+  <source src="/docs/introduction/first_steps/provenance.webm" />
+</video>
+
+Open your original image again. The images the workflow created are now linked to it as derived
+images. Click through them to inspect each step.
+
+Two graphs connect your data:
+
+| | Built from | Answers |
+|---|---|---|
+| **Data graph** | Links the apps declare themselves, for example "this mask is derived from this image" | How is this data related to other data? |
+| **Provenance graph** | Which task created each item, and which workflow run started that task | Which action, run by whom, made this? |
+
+Click the **Provenance** icon on an image to see the task that created it, and from there the
+workflow run. How this is recorded is described in [Provenance](/docs/concepts/provenance).
+
+## Next
+
+- Run an action on your own images: [Upload your images](/docs/guides/using/upload-data).
+- Use a deep learning model in a workflow: [Bridging deep learning](/docs/guides/using/deep-learning).
+- Write a workflow in Python instead, with decisions and retries:
+  [Workflow apps](/docs/guides/app-kinds/workflow).
+
+<Quiz>
+  <Question q="What is a workflow in Arkitekt?">
+    A graph of nodes wired together so that data streams from one node to the next. Each node runs an action of some app.
+  </Question>
+  <Question q="Why can you design and share a workflow before the apps that provide its nodes are installed?">
+    Because design is separate from execution. Nodes without an app show up yellow, and the workflow runs once some app implements them.
+  </Question>
+  <Question q="What happens when you change and save a workflow, and why does that matter?">
+    A new version is created, so every run can be traced to the exact design it used.
+  </Question>
+  <Question q="What does the provenance graph record that the data graph does not?">
+    Which task created an item, and which workflow run started that task. The data graph holds the links between data that the apps declare.
+  </Question>
+</Quiz>

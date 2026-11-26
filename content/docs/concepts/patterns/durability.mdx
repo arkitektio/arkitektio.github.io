@@ -1,55 +1,120 @@
 ---
 title: Durable execution
-description: "The patterns that keep long-running Arkitekt work correct when machines die: journaled workflows replayed deterministically, recorded effects, idempotent child calls, at-least-once delivery from the agent's journal, and explicit decisions about lost steps."
+description: "How Arkitekt keeps long-running work correct when agents die: plain tasks end LOST, workflows are replayed from a journal, recorded effects and call keys make replay deterministic, and every decision about a lost step stays explicit."
 type: concept
 ---
 
 Lab work runs for hours across several machines, and any of them can crash, reboot or lose power.
-Arkitekt's answer is **durable execution**: work that has finished is never done again, work in an
-unknown state is never guessed about, and a workflow whose agent dies is picked up where it was.
+Arkitekt's answer is **durable execution**, built on three principles:
 
-This page names the patterns involved. The full contract (what is persisted where, the resume
-lifecycle, the guarantees and the known limits) is on the design page,
-[Durable execution](/docs/concepts/building/durable-execution).
+1. **Finished work is never redone.**
+2. **Unknown outcomes are not guessed.** If an agent dies mid-task, nobody knows whether the work
+   happened, and the platform says so. The server re-runs nothing on its own, except work no agent
+   ever picked up.
+3. **Whoever has the context decides**: the workflow's code, the calling script or a person.
+
+For the Python API and examples, see [Durable execution](/docs/guides/python/durable-execution).
 
 ## The patterns
 
-- **Event-sourced workflows, replayed deterministically.** A workflow's every call and every value
-  from the outside world is recorded. When its agent dies, the workflow's code runs again from the
-  top on a new agent, and gets the recorded answers back instead of calling again. This is the
-  model of engines such as Temporal. It requires the workflow code to be deterministic: time,
-  randomness and outside reads go through `task.now()`, `task.random()`, `task.sleep()` and
-  `task.record(...)`.
-- **Idempotent child calls.** Each call a workflow makes has a stable **call key**. Issuing the
-  same call again during a replay finds the existing child task instead of creating a new one.
-- **At-least-once delivery, deduplicated.** Every agent keeps a local journal of everything it
-  reports, numbered without gaps, and resends what the server has not acknowledged after a
-  reconnect or a restart. The server ignores what it already has. Together that is effectively
-  exactly-once.
+- **Event-sourced workflows, replayed deterministically**, as in engines such as Temporal. Every call
+  and every outside value is recorded, and a resumed workflow gets the recorded answers back.
+- **Idempotent child calls.** A replayed call finds its existing child task by its call key.
+- **At-least-once delivery, deduplicated.** Agents resend what the server has not acknowledged, and
+  the server ignores duplicates.
 - **Only workflows may call.** A plain action that called others and died would leave no record of
-  which calls finished. So orchestration lives in workflows, and the rule is enforced when the app
-  is assembled.
-- **Explicit compensation.** The platform never retries a step that had started. It reports the
-  loss (`AgentLost`) with what is known, including the action's `effects=` claim, and the workflow
-  decides: `task.retry` what is safe to repeat, `task.hold` to ask a person, `task.guard` to check a
-  device first.
+  which calls finished. Each implementation is either `PLAIN` or `WORKFLOW`.
+- **Explicit compensation.** The platform never retries a started step. The workflow or a person
+  decides.
+
+## When an agent dies
+
+| What died | Who handles it | Outcome |
+|---|---|---|
+| the agent of a plain task | the caller | the task ends **LOST**, and the caller gets `AgentLost` |
+| the agent of a workflow | the server | the workflow is **resumed** from its journal |
+| the agent of a step inside a workflow | the workflow's code | the step's call raises `AgentLost` there |
+| a caller (UI, script) | nobody | nothing: a caller disconnecting is not a failure |
+
+An agent counts as dead when it stays disconnected past the server's grace window, or at once when a
+new process takes it over.
+
+**LOST** is a final [task state](/docs/concepts/terminology#states) meaning the outcome is unknown.
+It carries whether the task ever started (if not, sending it again is safe), its last progress and its
+effects claim. A result that arrives later is kept but never replaces it.
+
+## Effects [#effects]
+
+Each implementation claims what running it again would do to the world:
+
+| `Effects` | Running it again… | Example |
+|---|---|---|
+| `NONE` | changes nothing | count cells |
+| `REPEATABLE` | leaves the same state as running it once | rename a dataset |
+| `UNKNOWN` (default) | nobody has said | store a new label dataset |
+| `IRREVERSIBLE` | happens again, in the real world | dispense liquid |
+
+The claim is information for whoever decides about a lost task. Neither the server nor the SDK's
+retry helper acts on it.
+
+## What is persisted where [#what-is-persisted-where]
+
+**On the agent**, a journal of everything it reports, from task events and logs to recorded effects
+and state patches, numbered without gaps. It is a SQLite file, by default
+`.arkitekt/rekuest_journal.db` in the app's working directory or `$REKUEST_JOURNAL_PATH`. Entries
+stay until the server acknowledges them, so a resumed workflow also gets what the dead process
+recorded but never sent.
+
+**On the server**, Rekuest's task history: each task's events, with every recorded effect unique per
+key; its child tasks, unique per call key; a hash of the implementation's source; and a resume
+counter.
+
+## How a workflow is replayed [#replay]
+
+Every value that came from outside the code must come back identical on replay, so two kinds are
+recorded under keys. **Effects** are time (`task.now()`), randomness (`task.random()`), a sleep's
+deadline, anything wrapped in `task.record(fn)` and the outcome of a hold. **Calls** are keyed by
+target, argument hash and occurrence; graph workflows from Orkestrator key them by node.
+
+When the agent dies, Rekuest requeues the task. If the source hash changed, or the task was already
+resumed three times, it ends LOST. Otherwise a new process runs it from the top: effect helpers return
+their recorded values, a finished call returns its result without running, and a running call
+continues live. A key that now names a different action or kind of value raises
+`NonDeterministicWorkflow`.
+
+## Deciding about a lost step
+
+Inside a workflow, a lost step raises `AgentLost`, and the SDK offers three answers:
+
+- **Retry**: automatic if the step never started, opt-in after that. It reacts to lost agents only.
+- **Hold**: pause with a message so a person can check the real world and resume or cancel.
+- **Guard** a dependency's published state: on resume, raise `StateChanged` if something else changed
+  it while the workflow was down, or if that agent restarted.
 
 ## What it buys
 
-- A crash costs time, not correctness. Finished steps stay finished.
-- An irreversible step, a dispense or a cut, is never repeated by accident.
-- Every decision about a lost step is visible: in code, or made by a person in the UI.
+| Guaranteed | Not guaranteed |
+|---|---|
+| A finished child call is never run again in the same workflow run | That a started but lost step did or did not take effect |
+| A resumed workflow sees the same recorded time, randomness and values | That code outside `task` helpers and calls replays identically |
+| Reports reach the server in order, despite reconnects and restarts | That a workflow survives a change to its own source |
+| LOST is final | Automatic retries of started work |
+| A plain task's loss reaches its caller with what is known | Idempotency of your actions: `effects` is a claim |
 
 ## What it costs
 
 - **Deterministic workflow code.** A `time.time()` or a file read in a workflow breaks replay.
-- **Workflows are pinned to their code.** A workflow resumed with changed source may take another
-  path, which is reported as `NonDeterministicWorkflow`.
-- **Plain tasks are not resumed.** A plain task whose agent dies ends lost, and its caller decides.
-  Long work that must survive a crash has to be a workflow.
+- **Workflows are pinned to their code**, though only the workflow function itself is hashed: a change
+  to a helper it calls goes unnoticed.
+- **Plain tasks are not resumed.** Long work that must survive a crash has to be a workflow.
+- **At most three resumes**, and a resumed run reports its progress, logs and yields again.
+- **Guards** see only published state, need a dependency resolved to one agent, and do not watch while
+  the workflow runs.
+- **The journal lives on the agent's disk.** If the disk is lost, unsent values are taken anew. Give
+  long-running workflow agents persistent storage for their `.arkitekt` folder.
 
 ## Next
 
-- [Durable execution](/docs/concepts/building/durable-execution): the full design.
 - Python: [Durable execution](/docs/guides/python/durable-execution) and
   [When an agent dies](/docs/guides/python/examples/recovery).
+- [Rekuest](/docs/concepts/services/rekuest), the service that keeps the task history.

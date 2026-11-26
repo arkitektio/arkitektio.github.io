@@ -30,7 +30,7 @@ know from logging a TV or a CLI tool into an online account. The only
 Arkitekt-specific part is that a successful token response carries an extra
 **envelope** next to the access token: the rendered configuration of every
 service the app asked for. The tokens are ordinary OAuth2 tokens issued by
-[Lok](/docs/concepts/services/lok), and are refreshed through the ordinary OAuth2
+[Lok](/docs/concepts/services#lok), and are refreshed through the ordinary OAuth2
 token endpoint.
 
 If you have implemented an OAuth2 device flow before, you already know almost all
@@ -53,7 +53,7 @@ of Fakts. If you have not, [Fakts protocol](/docs/reference/protocols/fakts) wal
 
 ## Where the pieces live
 
-- The **server side** of Fakts is part of [Lok](/docs/concepts/services/lok), the
+- The **server side** of Fakts is part of [Lok](/docs/concepts/services#lok), the
   coordinator. It serves the well-known document, registers clients, runs the
   configure page, and issues and refreshes tokens.
 - The **client side** is small enough to live inside each app. The Orkestrator

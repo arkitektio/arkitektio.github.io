@@ -3,7 +3,6 @@
   "pages": [
     "why-build",
     "shared-concepts",
-    "anti-patterns",
-    "durable-execution"
+    "anti-patterns"
   ]
 }

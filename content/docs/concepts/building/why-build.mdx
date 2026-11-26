@@ -4,72 +4,44 @@ description: What Arkitekt gives a developer of bioimage analysis software, what
 type: concept
 ---
 
-Arkitekt is a framework, that aims to provide you (the bioimage analyst developer) with a set of tools to let you build
-your own bioimage analysis software, that others are happy to use and orchestrate in
-real-time workflows, without having to worry too much about all the underlying infrastructure.
+Arkitekt lets you turn your analysis code into a tool that others can use and combine in live
+workflows, without building the infrastructure around it yourself. It is modular, so you use only
+the parts you need. What you get:
 
-As such we are trying to provide you with a set of tools that will help you to build your own
-applications. We also would like you to have an easy time sharing your analysis programs with others,
-so that they can use them as well.
-
-As Arkitekt follows a highly modular approach so that you don't have to use and enable all of the framework
-if you don't want to. But some features you can rely on include:
-
-- **Easy to build and easy to use GUI and API**
-
-  Arkitekt can build powerful and highly customizable widgets, that users can use when interfacing
-  remotely with your analysis program. Have a CLI interface? No problem, Arkitekt can build a GUI for you.
-  Have a GUI interface? No problem, Arkitekt can build remote API for it to.
-
-- **Build safe tools**
-
-  Arkitekt apps are always protected by a user and app authentication system. This means that
-  you highly customize your application for specific users, restrict access to resources, and most importantly that
-  your development app does not delete all of your data.
-
-- **Rely on the ecosystem**
-
-  With Arkitekt you can easily integrate all the ecosystem of other apps in your program. This is
-  especially useful if you want to build a small new analysis script (your new special algorithm),
-  but don't want to reinvent the wheel for all the other analysis steps that are already available in other apps.
-
-- **Use your work in Workflows**
-
-  Want to integrate your analysis program in a workflow? No problem, Arkitekt can help you with that. All functionality
-  that you build in your app can be **automatically** used in a workflow.
-
-- **Access data from anywhere**
-
-  With arkitekt you can access your data from anywhere. This means that you can use your analysis program on your local machine,
-  on a remote server, or even in the cloud. Arkitekt will take care of all the data transfer and storage for you.
+- **A UI and an API for free.** Declare a function as an action and Orkestrator shows it as a form.
+  If you have a CLI tool, it gets a GUI. If you have a GUI, it gets a remote API.
+- **Safe by default.** Every app is authenticated and acts for a user, so you can restrict who uses
+  it and what it can reach. A development app cannot delete your data.
+- **The rest of the ecosystem.** Your app can call actions of other apps, so a new algorithm does not
+  need its own loader, viewer or segmentation step.
+- **Workflows.** Every action you write can be used in a workflow without extra work.
+- **Data from anywhere.** The same app runs on your laptop, a server or the cloud, and reads and
+  stores data through the platform's services.
 
 ## What Arkitekt is not
 
-- Arkitekt is **not** a framework for replacing your existing analysis software and highly specialised GUIs. You should still use
-  (and develop) your existing software and GUIs for your analysis. Look at Arkitekt as a bridge between your analysis software and
-  the outside world of other bioimage apps.
-
-- Arkitekt is also **not** a tool for building highly parallelizable and highly available distributed systems. There are other frameworks
-  out there that are better suited for this task (e.g. [Dask](https://dask.org/), [Spark](https://spark.apache.org/)). Where these tools
-  shine in their ability to highly scale **specific** analysis tasks, Arkitekt shines in **universally bridging** and **orchestrating**
-  these tasks in a real-time workflow.
+- **Not a replacement for your analysis software.** Keep using and developing your specialised tools
+  and GUIs. Arkitekt connects them to other apps and people.
+- **Not a framework for massively parallel computing.** [Dask](https://dask.org/) and
+  [Spark](https://spark.apache.org/) scale one analysis across many machines. Arkitekt connects and
+  orchestrates many different tools in real time, and can call those frameworks from an app.
 
 ## Where to start
 
-First decide which direction you are going:
+Decide which direction you are going:
 
-- **[Build an app](/docs/guides/app-kinds)**: your code offers something others can call or watch. A
-  packaged tool, a device, an app inside your own program, a workflow.
-- **[Connect to the platform](/docs/guides/connect)**: your code only uses the platform. A script,
-  a notebook, a CI job.
+- **[Build an app](/docs/guides/app-kinds)**: your code offers something others can call or watch,
+  such as a packaged tool, a device, an app inside your own program or a workflow.
+- **[Connect to the platform](/docs/guides/connect)**: your code only uses the platform, as a script,
+  a notebook or a CI job.
 
-Then pick a language:
+Then pick a language. [Shared concepts](/docs/concepts/building/shared-concepts) explains the model
+all of them follow.
 
-- **Python**: the reference client. Start with [Core concepts](/docs/guides/python#core-concepts),
-  then [Your first app](/docs/get-started/next-steps/first-python-app).
-- **Rust**: the same model as a native library, for fast agents and small binaries. See
-  [Rust](/docs/get-started/next-steps/first-rust-app).
-- **Kotlin / Java**: an experimental client for JVM hosts, currently used only for the ImageJ
-  plugin. See [Kotlin / Java](/docs/guides/kotlin).
-- **Embedded**: microcontrollers that offer actions themselves. See [Embedded](/docs/get-started/next-steps/first-device).
-- **Backend**: for writing services of your own, see [Backend](/docs/concepts/services/backend-libraries).
+- **Python**, the reference client: [Your first app](/docs/get-started/next-steps/first-python-app),
+  then the [Python guides](/docs/guides/python).
+- **Rust**, for fast agents and small binaries: [Your first Rust app](/docs/get-started/next-steps/first-rust-app).
+- **Kotlin / Java**, an experimental client currently used only for the ImageJ plugin:
+  [Kotlin / Java](/docs/guides/kotlin).
+- **Embedded**, microcontrollers that offer actions themselves: [Your first device](/docs/get-started/next-steps/first-device).
+- **Backend**, to write services of your own: [Backend libraries](/docs/concepts/services/backend-libraries).

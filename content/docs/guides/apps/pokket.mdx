@@ -1,37 +1,48 @@
 ---
-title: Pokket - your mobile gateway to Arkitekt
-description: A mobile companion app for managing your Arkitekt services, tasks, and connected devices directly from your phone.
+title: Pokket
+description: "The mobile companion app: check your tasks, reach your hub over the mesh and set up ESP32 devices from your phone. Install it on Android or iOS."
 type: guide
 ---
 
 ![Pokket App](/docs/apps/standalones/pokket.png)
 
-**Pokket** is your mobile gateway to the [Arkitekt](https://arkitekt.live) ecosystem. It serves as a companion app for managing your Arkitekt services, tasks, and connected devices directly from your phone.
-For where it fits next to Orkestrator and when you would reach for it, see [Mobile Companion](/docs/guides/apps/mobile-companion).
+**Pokket** is the mobile companion to [Orkestrator](/docs/guides/apps/orkestrator), for the times you
+are at the microscope, at the bench or away from your desk. It talks to the same hub with the same
+account. It has no workflow editor and no image viewer; those stay in Orkestrator.
 
-## Features
+Pokket signs in through `lok` like every other Arkitekt app, so on your phone you can see and do
+exactly what your account may see and do on the hub.
 
-### 🔗 Arkitekt Connection
-Seamlessly connect to your Arkitekt instance. Pokket handles authentication via `lok` and provides a secure connection to your services.
+## What you can do with it
 
-### 📋 Task Management
-Stay on top of your workflows. View and manage your latest tasks through the `rekuest` service integration, ensuring you never miss an important action.
+| Feature | What it does |
+|---|---|
+| **Tasks** | Lists your latest tasks from the `rekuest` service, so you can check whether a long-running analysis finished or failed. |
+| **Device provisioning** | Sets up ESP32 devices over Bluetooth Low Energy with the **Improv Wi-Fi** protocol: it sends the Wi-Fi credentials (eduroam included) and an Arkitekt connection token. The device then connects, registers its actions and shows up as an app in Orkestrator. |
+| **Wi-Fi profiles** | Saves standard and eduroam profiles, so you can provision a shelf of devices without retyping credentials. |
+| **Mesh** | Joins your organization's [mesh](/docs/concepts/security/mesh) once you approve it, so services that only live on the mesh are reachable from your phone. |
 
-### 📡 Device Provisioning
-Easily provision ESP32-based devices for your lab or home. Pokket uses the **Improv Wi-Fi** protocol over BLE to configure devices with:
-- Wi-Fi Credentials (Standard & Eduroam support)
-- Arkitekt Connection Tokens
+For the firmware side of a device, see
+[Your first embedded device](/docs/get-started/next-steps/first-device).
 
-See [Embedded](/docs/get-started/next-steps/first-device) for the firmware side.
+<Callout type="info" title="Provisioning needs Bluetooth">
 
-### 📶 Wi-Fi Profile Management
-Manage your Wi-Fi configurations in one place. Save standard and Eduroam profiles to quickly provision multiple devices without re-entering credentials.
+Your phone needs Bluetooth Low Energy, and Pokket needs permission to use it.
 
-### 🕸️ Organisation Mesh
-If your deployment runs an organisation [mesh](/docs/concepts/security/mesh), Pokket can join it once you approve it.
-It runs its own in-app node (no VPN permission, no separate Tailscale app) and reaches the services that only
-live on the mesh through it. The **Mesh** screen shows the node, the machines it sees, which services it carries,
-and lets you switch it off.
+</Callout>
+
+### The mesh on your phone
+
+Pokket runs its own mesh node inside the app. It needs no VPN permission and no separate Tailscale
+app. The **Mesh** screen shows the node, the machines it sees and which services it carries, and
+lets you switch it off.
+
+<Callout type="warn" title="No live video over the mesh">
+
+Over the mesh, regular requests and live updates work, but WebRTC media (LiveKit) does not. Live
+video streams will not play on the phone over the mesh.
+
+</Callout>
 
 ## Install
 
@@ -40,35 +51,19 @@ and lets you switch it off.
 | **Android** | [`pokket.apk`](https://github.com/arkitektio/pokket/releases/latest/download/pokket.apk) | Open the link on the phone and install it (allow installs from your browser when asked). The [latest release](https://github.com/arkitektio/pokket/releases/latest) page has it too. |
 | **iPhone / iPad** | [TestFlight](https://testflight.apple.com/) | Ask a maintainer to add you as a tester; you get an e-mail invite. Install TestFlight from the App Store and accept it. |
 
-**Updates install themselves.** Most releases change only the app's JavaScript and arrive over the air:
-Pokket downloads them on launch and offers a restart. You only need a new APK or TestFlight build when a
-release changes the native app; the release notes say so.
+**Updates install themselves.** Most releases change only the app's JavaScript and arrive over the
+air: Pokket downloads them on launch and offers a restart. You only need a new APK or TestFlight
+build when a release changes the native app; the release notes say so.
 
-## Development Setup
+## Development
 
-1. **Install dependencies**
+```bash
+pnpm install
+pnpm expo start
+```
 
-   ```bash
-   pnpm install
-   ```
+The [repository README](https://github.com/arkitektio/pokket) covers development clients, building
+the mesh sidecar and how releases are made.
 
-2. **Start the app**
-
-   ```bash
-   pnpm expo start
-   ```
-
-The [repository README](https://github.com/arkitektio/pokket) covers development clients, building the mesh
-sidecar and how releases are made.
-
-## Tech Stack
-
-- **Framework**: React Native (Expo)
-- **Styling**: NativeWind (Tailwind CSS)
-- **Navigation**: Expo Router
-- **Data**: Apollo Client (GraphQL)
-- **BLE**: `react-native-ble-plx`
-
-## License
-
-MIT
+Pokket is built with React Native (Expo), NativeWind, Expo Router, Apollo Client (GraphQL) and
+`react-native-ble-plx`. It is MIT licensed.

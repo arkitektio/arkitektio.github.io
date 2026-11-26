@@ -1,37 +1,48 @@
 ---
 title: UC2
-description: Thoughts on integrating UC2 open-source hardware microscopes with the Arkitekt platform.
-type: concept
+description: "Connect a UC2 microscope to Arkitekt through ImSwitch's Arkitekt panel: bind it to a server, then call its stage, light and camera actions and store its images in Mikro."
+type: guide
 ---
 
-## What is UC2?
+[UC2](https://www.youtube.com/watch?v=Jp5TOqvf7Nc) is an open-source, modular microscope system,
+usually controlled by [ImSwitch](https://github.com/openUC2/ImSwitch). ImSwitch ships an Arkitekt panel
+that registers the microscope as an app: notebooks, other apps and workflows can then call it, and
+its images land in [Mikro](/docs/concepts/services/mikro).
 
-Because a video is worth a thousand words, here is a video that explains what UC2 is:
+<Callout type="warn" title="ImSwitch pins its own client">
 
-https://www.youtube.com/watch?v=Jp5TOqvf7Nc
+ImSwitch uses the `arkitekt` client 16 (`pip install "arkitekt[rekuest,mikro]==16.0.1"`), not the
+version 19 these docs describe. Check
+[ImSwitch's Arkitekt notes](https://github.com/openUC2/ImSwitch/blob/master/docs/ARKITEKT.md) for
+the server versions it needs.
 
+</Callout>
 
-## How can we integrate UC2 with Arkitekt?
+## Bind the microscope
 
-Integrating embedded devices like microscopes but also robotic devices into bioimage workflows is one of the primary use cases 
-for a distributed platform like Arkitekt. So how can we integrate UC2 with Arkitekt? Here are a few ideas:
+1. Install the client in ImSwitch's environment. Without it, ImSwitch starts normally and the panel
+   says what to install.
+2. List the `"Arkitekt"` widget in your setup's `availableWidgets`, switch it on in ImSwitch's App
+   Manager and open the panel (System category).
+3. Enter the server's address and click **Bind microscope**.
+4. Open the approval link on any computer, sign in, pick the hub and approve the app.
 
-### Using UC2 just as a device controlled by an Microscope App
+The login is stored on the microscope, so later starts reconnect without approval. **Unbind**
+removes it.
 
-This is the simplest way of integrating UC2 with Arkitekt. We would just create an Arkitekt App that would control the Imswitch
-instance that in turn controls the UC2 device. This would allow us to control the device from the Arkitekt platform, but currently we would not be able
-to stream live data from the device to the Arkitekt platform. This would be a good first step to get the device integrated with Arkitekt.
+## What you can call
 
-### Streaming Live Data from UC2 to Arkitekt
+| Action | What it does |
+|---|---|
+| Get Stage Position, Move Stage, Go To XY, Home Axis | Move the stage, in µm |
+| Move To Sample Loading Position | Park the stage for loading |
+| Set Illumination, Set Camera | Light on/off and intensity, exposure and gain |
+| Acquire Frame | Take one frame and store it in Mikro, placed in stage space |
+| Run Tile Scan | Scan a grid into one image and upload it to Mikro |
 
-This would be the next step in integrating UC2 with Arkitekt. We would need to create a way to stream live data from the UC2 device to the Arkitekt platform.
-utilzing the new Livekit/WebRTC features of Arkitekt. This would allow us to stream live data from the device to the Arkitekt platform, and then display
-it alongside other data in the Arkitekt platform. This would be a great way to integrate UC2 with Arkitekt, while still using the Imswitch instance to control the device.
-the microscope.
+Actions that move or acquire share one `microscope` lock, so they run one at a time, and they are
+refused while ImSwitch runs an experiment, a recording or a workflow. The stage position, light and exposure are
+published as live state.
 
-### Establish Arkitekt as the UC2 Control Center
-
-Another option is to establish Arkitekt as a full blown remote control center of the UC2 microscope without the need for a seperate GUI application like
-Imswitch (but building on top of its backend functionality) This would mean that the Arkitekt platform could be used as the complete GUI for microscopy contorl and remotley send requests to the (potentially completed
-in the microscopy enclosed) UC2 contorl device. While this would be a more complex integration, it would allow for a more seamless integration of UC2 with Arkitekt.
-, however it also could really consitute a mission creep for the Arkitekt platform.
+The panel settings, unattended login with a mandate key, and running a hub on the microscope's own
+computer are described in [ImSwitch's Arkitekt notes](https://github.com/openUC2/ImSwitch/blob/master/docs/ARKITEKT.md).

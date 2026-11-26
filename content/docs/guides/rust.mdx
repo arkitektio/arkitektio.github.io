@@ -121,10 +121,8 @@ use ndarray::ArrayD;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let rt = arkitekt::easy("rusty-script", "0.1.0")
-        .service(mikro::service)
-        .connect()
-        .await?;
+    let rt =
+        arkitekt::connect(arkitekt::easy("rusty-script", "0.1.0").service(mikro::service)).await?;
     let mikro = rt.require::<Mikro>()?;
 
     let data: ArrayD<f32> = ArrayD::from_shape_fn(vec![64, 64], |ix| (ix[0] * ix[1]) as f32);

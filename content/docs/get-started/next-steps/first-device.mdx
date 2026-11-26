@@ -1,6 +1,6 @@
 ---
 title: Your first embedded device
-description: "Microcontrollers as Arkitekt agents, in Rust: the same #[action] and App as on a desktop, running without an operating system on an ESP32. A walk through the esp32-embassy-demo firmware."
+description: "Run an ESP32 as an Arkitekt agent with the Rust client: walk through the esp32-embassy-demo firmware, its actions and states, then build, flash and provision it."
 type: tutorial
 ---
 
@@ -8,24 +8,21 @@ import { GithubRepo } from "@/components/docs";
 
 <GithubRepo url="https://github.com/arkitektio/esp32-embassy-demo" title="esp32-embassy-demo" />
 
-Not every device in a lab can run Python. A stage controller, a shutter, a temperature probe or a
-pump often sits behind a microcontroller. Such a board can be an Arkitekt
-[agent](/docs/concepts/terminology#agent) of its own: it registers actions that anyone in your
-organization can call from Orkestrator, a script or a workflow, and it publishes live state, with
-no computer in between.
+A stage controller, a shutter or a pump often sits behind a microcontroller that cannot run Python.
+Such a board can be an Arkitekt [agent](/docs/concepts/terminology#agent) of its own: it registers
+actions that anyone in your organization can call from Orkestrator, a script or a workflow, and it
+publishes live state, with no computer in between.
 
-**We use Rust for this as well.** There is no separate embedded SDK and no C++ firmware library.
-A microcontroller runs the same crates as a [desktop Rust app](/docs/get-started/next-steps/first-rust-app): the
-same `App`, the same `#[action]`, the same `#[derive(State)]`. What changes is the platform
-underneath. On a board there is no operating system, so the crates are built without the standard
-library and run on [embassy](https://embassy.dev), an async runtime for bare metal.
+There is no separate embedded SDK. A microcontroller runs the same crates as a
+[desktop Rust app](/docs/get-started/next-steps/first-rust-app), with the same `App`, `#[action]`
+and `#[derive(State)]`. The crates are built without the standard library and run on
+[embassy](https://embassy.dev), an async runtime for bare metal.
 
 <Callout type="warn" title="Experimental">
 
-The embedded stack is young and changes quickly. The demo below is the reference, and it is a
-demo: it shows that the whole path works on a board, and it is the starting point for your own
-firmware. [What is not there yet](/docs/reference/embedded#what-is-not-there-yet) lists the
-gaps. Do not use it for safety-relevant hardware.
+The embedded stack is young and changes quickly. The demo below is the reference and the starting
+point for your own firmware. [What is not there yet](/docs/reference/embedded#what-is-not-there-yet)
+lists the gaps. Do not use it for safety-relevant hardware.
 
 </Callout>
 
@@ -52,10 +49,8 @@ gaps. Do not use it for safety-relevant hardware.
 ## The demo
 
 [`esp32-embassy-demo`](https://github.com/arkitektio/esp32-embassy-demo) is a complete firmware
-that turns an ESP32 into an agent. Everything on the board is Rust: there is no ESP-IDF and no
-C SDK underneath.
-
-It offers a handful of actions and two states, chosen to exercise every part of the path:
+that turns an ESP32 into an agent. Everything on the board is Rust, with no ESP-IDF or C SDK
+underneath. Its actions and states exercise every part of the path:
 
 | | What it does |
 |---|---|
@@ -66,35 +61,34 @@ It offers a handful of actions and two states, chosen to exercise every part of 
 | `Sensors` state | The chip temperature, the Wi-Fi signal, the free heap and how often the BOOT button was pressed |
 | `Led` state | Whether the LED is on, and its colour |
 
-Once it is running you can call `set_led_color` from Orkestrator and watch the `Led` state follow,
-or press the BOOT button on the board and see `presses` count up in the UI. That is the whole
-model from [shared concepts](/docs/concepts/building/shared-concepts) on a chip the size of a stamp.
+Once it runs, call `set_led_color` from Orkestrator and watch the `Led` state follow, or press the
+BOOT button and see `presses` count up. That is the model from
+[shared concepts](/docs/concepts/building/shared-concepts), on a chip the size of a stamp.
 
 ## From power-on to the first task
 
 1. **Identity.** The device derives its id from its MAC address, so it keeps the same identity
    across reflashes.
-2. **Provisioning over Bluetooth.** From boot it advertises itself as `ARKITEKT-xxxx`. In
-   Orkestrator, under **Lok → Provision a device**, you pick it. Orkestrator issues a key for it
-   and sends the Wi-Fi credentials, the address of your deployment and the key in one document.
-   The device stores it in flash.
+2. **Provisioning over Bluetooth.** It advertises itself as `ARKITEKT-xxxx`. In Orkestrator, under
+   **Lok → Provision a device**, you pick it. Orkestrator issues a key for it and sends the Wi-Fi
+   credentials, the address of your deployment and the key in one document, which the device
+   stores in flash.
 3. **Wi-Fi.** It joins the network, including enterprise networks such as eduroam.
-4. **Clock.** It sets its clock over SNTP. A certificate cannot be checked without knowing the
-   date.
-5. **Login.** It logs in with the key it was given. There is no browser on a microcontroller, so
-   the key from provisioning stands in for the approval a person gives a desktop app.
+4. **Clock.** It sets its clock over SNTP, because a certificate cannot be checked without the date.
+5. **Login.** It logs in with the key it was given. The key stands in for the approval a person
+   gives a desktop app in the browser.
 6. **Agent.** It opens the [agent socket](/docs/reference/protocols/agent), registers its actions and
    states, and waits for tasks.
 7. **Bluetooth off.** Five seconds after registering, Bluetooth is switched off and its memory is
    given back to the app.
 
-Holding the BOOT button for 5 seconds while the device starts erases its configuration and login,
-and it returns to step 2.
+Hold the BOOT button for 5 seconds while the device starts to erase its configuration and login and
+return to step 2.
 
 ## How the actions are written
 
-This is the part that should look familiar. The demo's actions are ordinary `#[action]` functions,
-identical in form to the ones in [Your first Rust app](/docs/get-started/next-steps/first-rust-app):
+The actions are ordinary `#[action]` functions, as in
+[Your first Rust app](/docs/get-started/next-steps/first-rust-app):
 
 ```rust
 /// Free heap
@@ -139,11 +133,11 @@ async fn set_led(on: bool, state: StateMut<LedState>) -> anyhow::Result<bool> {
 }
 ```
 
-The `Sensors` state is kept current by a **background hook**, which reads the chip once a second.
-It publishes a value only when it moved by a meaningful step (half a degree, 3 dB), so sensor
-noise does not turn into a stream of patches.
+A **background hook** reads the chip once a second and keeps the `Sensors` state current. It
+publishes only when a value moved by a meaningful step (half a degree, 3 dB), so sensor noise does
+not turn into a stream of patches.
 
-The app is declared exactly as on a desktop:
+The app is declared as on a desktop:
 
 ```rust
 let app = App::new("live.arkitekt.esp32-embassy", "1")
@@ -156,9 +150,9 @@ let app = App::new("live.arkitekt.esp32-embassy", "1")
     .action(set_led_color);
 ```
 
-What differs is how it is run. A desktop app calls `run(app)`. A board has no operating system to
-provide a network, a clock or randomness, so the firmware hands those over as a `Board` and
-connects on it:
+What differs is how it runs. A desktop app calls `run(app)`. A board has no operating system to
+provide a network, a clock or randomness, so the firmware hands those over as a `Board` and connects
+on it:
 
 ```rust
 let board = Board { host: &HOST, tcp, dns, verify: verify() };
@@ -178,12 +172,12 @@ cargo esp32s3     # an ESP32-S3
 cargo esp32       # a classic ESP32
 ```
 
-The image is about 2.4 MB. Then provision the device from Orkestrator under
+The image is about 2.4 MB. Provision the device from Orkestrator under
 **Lok → Provision a device**. It appears under **Apps** with its actions and its two states.
 
 <Callout type="info" title="Until the crates are published">
 
-The demo currently depends on sibling checkouts: the provisioning crate from
+The demo depends on sibling checkouts: the provisioning crate from
 [`arkitekt-esp32-rs`](https://github.com/arkitektio/arkitekt-esp32-rs), and unreleased versions of
 the arkirust crates. Its
 [README](https://github.com/arkitektio/esp32-embassy-demo#build-and-flash) says which repositories
@@ -191,8 +185,8 @@ to place side by side.
 
 </Callout>
 
-Next: the [Embedded reference](/docs/reference/embedded) covers the crates, TLS, memory and
-what is not there yet.
+Next: the [Embedded reference](/docs/reference/embedded) covers the crates, TLS, memory and what is
+not there yet.
 
 <Quiz>
   <Question q="Which client does an embedded device use?">

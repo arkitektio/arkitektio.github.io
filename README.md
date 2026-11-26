@@ -92,7 +92,7 @@ One or two sentences on what this tutorial is about.
 
 <Prerequisites>
 
-- Orkestrator is connected to a hub ([Connect with Orkestrator](/docs/guides/apps/connect-orkestrator)).
+- Orkestrator is connected to a hub ([Connect with Orkestrator](/docs/guides/apps/orkestrator)).
 
 </Prerequisites>
 

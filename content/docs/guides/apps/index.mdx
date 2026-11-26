@@ -1,63 +1,42 @@
 ---
 title: Apps
-description: "A collection of Standalone Apps and Plugin Apps that hook into the Arkitekt platform and provide its actual functionality."
+description: "The apps you use Arkitekt with: desktop apps you install anywhere, and plugin apps that run as containers on your hub."
 type: guide
 ---
 
-import { InstallRepoButton } from "@/components/arkitekt";
+Apps come in two kinds:
 
-#### Standalones
+- **Standalone apps** are installed on any computer that can reach your hub, and bring their own
+  interface. Orkestrator, napari and Fiji are standalone apps.
+- **Plugin apps** are containers that your hub's plugin engine runs for you. You install them from
+  the App Store in Orkestrator, as in [Install an app](/docs/get-started/own-hub/app).
 
-Standalones are Apps that are installable anywhere in your lab on any computer, and are designed to be user-friendly entrypoints
-to the Arkitekt platform. We provide a few different standalones, that are community supported but feel free to create your own. 
+To write your own, start with [Your first app](/docs/get-started/next-steps/first-python-app).
 
+## Standalone apps
 
-#### Plugins
+| App | What it does |
+|---|---|
+| [Orkestrator](/docs/guides/apps/orkestrator) | The desktop app you use Arkitekt with: data, actions, workflows and runs. |
+| [Mikro-Napari](/docs/guides/apps/mikro-napari) | Connects napari, to show images and ROIs from your hub. |
+| [ImageJ plugin](/docs/guides/apps/imagej-plugin) | Connects Fiji, to upload and show images and run macros as actions. |
+| [Gucker](/docs/guides/apps/gucker) | Watches a folder and streams new files into a workflow. |
+| [Pokket](/docs/guides/apps/pokket) | The mobile companion: tasks, the mesh and device setup on your phone. |
 
-Plugins are also Apps but are built using software containers, so come with their own set of requirements and limitations.
-They are most often more hooked into the Arkitekt Platform, which can provide a graphical user interface and a more seamless integration with the platform.
+## Plugin apps
 
-<Callout type="info">
+The App Store's default catalog holds the plugin apps the Arkitekt team publishes: Basiks, the file
+converters, HoverFast and others. Kare and Segmentor below come from the earlier platform and are
+not in the default catalog; their repositories are under
+[arkitektio-apps](https://github.com/arkitektio-apps).
 
-Currently we provide a few different plugins, that are community supported but feel free to create your own. We put a lot of effort in making this
-as easy as possible, so if you have any questions or need help, feel free to reach out to us. To Create your own plugin, you can follow the [Plugin Creation Guide](/docs/get-started/next-steps/first-python-app).
+### Kare
 
-</Callout>
+CARE (content-aware restoration of fluorescence microscopy images) as a plugin app. It trains a
+CARE model on your data and restores images with it. See
+[Train a deep learning model](/docs/legacy/training).
 
+### Segmentor
 
-## Differences between Standalones and Plugins
-
-| Feature            | Standalones                                                                                      | Plugins                                                                                               | Services                                                                 |
-|--------------------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| **Description**    | Apps that are installable anywhere in your lab on any computer.                                  | Software containers that are more integrated into the Arkitekt Platform.                            | Designed to extend the functionality of the Arkitekt platform by providing new ways of storing data and connecting to other systems. |
-| **Installation**   | Designed to be easy to install and use by people not necessarily familiar with the Arkitekt platform. | Come with their own set of requirements and limitations due to being built using software containers. | Installed to extend the functionality of the Arkitekt platform.         |
-| **Primary Purpose**| Serve as user-friendly entrypoints to the Arkitekt platform.                                     | Interact with the Arkitekt Server, though they can be run in other environments like NextFlow pipelines. | Provide new ways of storing data and connecting to other systems.       |
-| **Integration**    | Designed to be installed on any resource that can connect to the Arkitekt platform. Provide their own GUI              | Provide a more seamless integration with the Arkitekt Platform, using it for a graphical user interface. | -                                                                        |
-
-## Kare
-
-
-Kare is just CARE (content-aware restoration of fluorescence microscopy images) with a K and enabled as an Arkitekt Plugin.
-When installing Kare, you can rely on two major features:
-
-- **Training**: Train a CARE model using your own data.
-
-- **Prediction**: Use a trained CARE model to restore images.
-
-### Installation
-
-To install Kare, you can use the Arkitekt Plugin Service "Port" to install it.
-
-<InstallRepoButton repo="kare" user="arkitektio-apps" branch="master" />
-
-### Usage
-
-If you want to use Kare in your project, you can check out one of the following tutorials or showcases:
-
-- [Training a CARE model](/docs/guides/using/training)
-- [Interactive Analysis with Napari](/docs/legacy/showcases/interactive-workflow) (run with an older version of Arkitekt)
-
-## Segmentor
-
-
-Segmentor is Stardist enabled as an Arkitekt Plugin.
+StarDist as a plugin app, with a pretrained model for nuclei. See
+[Bridging deep learning](/docs/guides/using/deep-learning).

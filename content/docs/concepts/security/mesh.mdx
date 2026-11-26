@@ -8,8 +8,8 @@ import { MeshTunnel, MeshHandshake } from "@/components/docs";
 
 On one local network, apps reach a hub directly. Across networks (a laptop on the train, a
 collaborator's institute, a GPU node behind another NAT) you would usually have to open ports or
-route everything through a central server. The **mesh** avoids both. It is a private,
-Tailscale-style network per organization, not a federation of public servers.
+route everything through a central server. The **mesh** avoids both: it is a private,
+Tailscale-style network per organization.
 
 ## Control plane and data plane
 
@@ -21,12 +21,8 @@ Tailscale-style network per organization, not a federation of public servers.
 
 <MeshTunnel />
 
-<Callout type="info" title="The coordinator never sees your data">
-
 The coordinator knows *that* two endpoints talk, not *what* they say. Whoever runs it cannot see
-your images, results or any other data moving between your machines.
-
-</Callout>
+your data.
 
 ## How an app and a hub meet
 
@@ -68,7 +64,7 @@ The mesh is optional. Arkitekt is a set of network services, so any way of conne
 works:
 
 - **Your own Tailscale** (or other WireGuard network), if your group already runs one.
-- **Your institution's VPN.** See [Using a VPN](/docs/concepts/security/mesh#arkitekt-through-a-vpn).
+- **Your institution's VPN.** See [below](#arkitekt-through-a-vpn).
 - **Nothing at all** on a single trusted LAN.
 
 The security boundary is Arkitekt's [authentication and
@@ -79,32 +75,16 @@ however the bytes get there.
 
 The mesh is new and changing quickly. Since [local-network advertising was
 removed](/docs/legacy/removed-features#advertising), it is the only built-in way to
-find a hub across networks. To join a hub, see the [Mesh step](/docs/guides/hub/running#join-the-mesh)
-of the installation guide.
+find a hub across networks. To put a hub on the mesh, see
+[Join the mesh](/docs/guides/hub/running#join-the-mesh).
 
 </Callout>
 
-## Arkitekt through a VPN
+## Arkitekt through a VPN [#arkitekt-through-a-vpn]
 
-### Introduction
-
-Arkitekt is not an entirely secure system, just yet. So if you want to use some of the arguably more interesting features of
-Arkitekt like online monitoring and remote control, you should consider using a VPN, to secure your connection.
-
-### I don't have a VPN
-
-No, this is not a NordVPN ad. And we are not going to recommend any specific VPN solution. There are plenty of them out there,
-and you can find a lot of reviews and comparisons online. We would however try to steer you away from the online VPN services,
-that advertised all over the place. They are usually not very secure, and you are the product, not the customer. If your university
-VPN is shit, we can however recommend a pretty straightforward solution, that is easy to set up and use and can easily
-coexist with other VPNs you might be using: [Tailscale](https://tailscale.com/)( It's what we have been using to enable remote
-monitoring)
-
-<Callout type="warn" title="This is not open source software">
-
-
-While big parts of the Tailscale software are open source, some of the core components are not. Tailscale is a commercial product,
-that is free for personal use.
-
-
-</Callout>
+If your institution already runs a VPN, you can reach a hub through it instead of the mesh. Remote
+features such as online monitoring and remote control are best kept behind one of the two for now,
+since Arkitekt is still young. If you have no usable VPN, use the built-in mesh or a Tailscale network
+of your own (Tailscale is a commercial product, free for personal use and not fully open source).
+Avoid consumer VPN services: they route your traffic through a third party and do not connect your
+own machines.

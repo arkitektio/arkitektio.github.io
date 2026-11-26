@@ -63,7 +63,7 @@ const services: Node[] = [
   { label: 'Mikro', sub: 'images', icon: Layers, href: '/docs/concepts/services/mikro' },
   { label: 'Kraph', sub: 'graph', icon: Share2, href: '/docs/concepts/services' },
   { label: 'Kabinet', sub: 'registry', icon: Box, href: '/docs/concepts/services/kabinet' },
-  { label: 'Yours?', sub: 'add a service', icon: Plus, placeholder: true, href: '/docs/reference/contribute' },
+  { label: 'Yours?', sub: 'add a service', icon: Plus, placeholder: true, href: '/docs/reference/projects#contributing' },
 ];
 
 // The AI Agent is one of the apps (just another caller of actions).
