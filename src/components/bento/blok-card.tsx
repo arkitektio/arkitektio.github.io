@@ -30,7 +30,7 @@ export function BlokCard() {
 
   return (
     <BentoCard
-      href="/docs/guides/python/bloks"
+      href="/docs/develop/python/bloks"
       hrefLabel="Learn about bloks"
       className="grid grid-cols-1 gap-6 p-6 sm:col-span-2 sm:p-8 lg:grid-cols-2 lg:items-center"
     >

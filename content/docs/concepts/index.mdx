@@ -4,7 +4,7 @@ description: "One level below the basics: the services a hub is made of, how an 
 type: concept
 ---
 
-[Understanding the basics](/docs/get-started/basics) introduces the three pieces: the hub, apps and
+[Understanding the basics](/docs/concepts/basics) introduces the three pieces: the hub, apps and
 the coordinator. This page goes one level deeper: what each piece is made of, and what passes
 between them when you run something.
 
@@ -21,20 +21,20 @@ and stores what they produce, and it runs no analysis of its own. Why Arkitekt i
 middleman at all is the subject of
 [Arkitekt the Middleman](/docs/concepts/philosophy#arkitekt-the-middleman).
 
-A hub is not one program. It is a set of [services](/docs/concepts/services), each with its own
+A hub is not one program. It is a set of [services](/docs/develop/internals), each with its own
 database and API, behind one gateway:
 
 | Service | Job |
 |---|---|
-| [Rekuest](/docs/concepts/services/rekuest) | Knows the connected apps and their actions, and routes tasks to them |
-| [Mikro](/docs/concepts/services/mikro) | Stores images and their metadata |
-| [Fluss](/docs/concepts/services#fluss) | Stores and runs workflows |
-| [Kabinet](/docs/concepts/services/kabinet) | The app store, from which apps are installed as containers |
-| [Kraph](/docs/concepts/services/kraph) | The knowledge graph |
+| [Rekuest](/docs/develop/internals/rekuest) | Knows the connected apps and their actions, and routes tasks to them |
+| [Mikro](/docs/develop/internals/mikro) | Stores images and their metadata |
+| [Fluss](/docs/develop/internals#fluss) | Stores and runs workflows |
+| [Kabinet](/docs/develop/internals/kabinet) | The app store, from which apps are installed as containers |
+| [Kraph](/docs/develop/internals/kraph) | The knowledge graph |
 
-You choose which services a hub runs when you [plan a deployment](/docs/concepts/deployment/planning).
+You choose which services a hub runs when you [plan a deployment](/docs/get-started/deployment/planning).
 What that looks like on a machine is described in
-[What you are setting up](/docs/concepts/deployment/what-you-are-setting-up).
+[What you are setting up](/docs/get-started/deployment/what-you-are-setting-up).
 
 <Callout type="info" title="Hub, server, deployment">
 
@@ -65,13 +65,13 @@ and [Apps vs Services](/docs/concepts/terminology#apps-vs-services).
 
 The coordinator is separate from the hub. It is the **control plane**: it knows who everyone is, and
 it lets the pieces of a deployment find and trust each other. In Arkitekt this role is filled by
-[Lok](/docs/concepts/services#lok). It has two jobs:
+[Lok](/docs/develop/internals#lok). It has two jobs:
 
 - **Authentication and authorization.** Users and apps sign in through OAuth2. Each app gets an
   identity of its own and only the permissions you approved, so the hub can record that a result was
   made by an app on your behalf. See [Identity & Access](/docs/concepts/security/identity).
 - **Discovery.** An app finds a hub through the
-  [Fakts protocol](/docs/concepts/services/service-discovery), a standard OAuth2 device flow whose
+  [Fakts protocol](/docs/develop/internals/service-discovery), a standard OAuth2 device flow whose
   token response also carries the configuration of each service the app asked for. Across networks,
   the coordinator hands out keys for the [mesh](/docs/concepts/security/mesh), so that app and hub can
   reach each other without opening ports.
@@ -80,7 +80,7 @@ The coordinator holds the accounts and never sees your data. The hub holds the d
 accounts of its own. Data moves between apps and the hub, the **data plane**, and the coordinator
 only makes the introductions. Who runs the coordinator (us at go.arkitekt.live, your institute, or
 you) is covered in
-[Where Arkitekt runs](/docs/concepts/deployment/topology#three-ways-to-meet).
+[Where Arkitekt runs](/docs/get-started/deployment/topology#three-ways-to-meet).
 
 ## One task, end to end
 

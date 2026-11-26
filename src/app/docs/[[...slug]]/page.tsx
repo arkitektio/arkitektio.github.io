@@ -10,6 +10,7 @@ import {
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getMDXComponents, StewardCard } from '@/components/site';
+import { DocsTabs } from '@/components/site/docs-tabs';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
@@ -32,6 +33,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
+      <DocsTabs />
       {badge && (
         <div className="flex">
           <span className="rounded-full bg-fd-primary/10 px-2.5 py-0.5 text-xs font-medium text-fd-primary">

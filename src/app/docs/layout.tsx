@@ -4,15 +4,18 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions } from '@/lib/layout.shared';
 import { Guide, GuideScript, ThemeSwitchWithConnector } from '@/components/site';
 
-// The docs have one section per reader (use, run, build) and one for everyone
-// (about). Each is a root folder in content/docs, so the sidebar shows one
-// section at a time and a switch at its top moves between them. The guide in
-// the corner asks a first-time reader a few questions and hides what they do
-// not need (see src/lib/guide.ts).
+// Four tabs across the top, one per question a reader brings: What is Arkitekt?
+// (concepts/), Get started (get-started/), Guides & tutorials (guides/) and
+// Developer (develop/). Each is a root folder in content/docs; the sidebar shows
+// the tab you are in, and the bar itself is drawn on each page (DocsTabs). The
+// guide in the corner asks a first-time reader a few questions and hides what
+// they do not need (see src/lib/guide.ts).
 export default function Layout({ children }: LayoutProps<'/docs'>) {
   return (
     <DocsLayout
       tree={withLinkedSeparators(source.getPageTree())}
+      // the tab bar is src/components/site/docs-tabs.tsx, at the top of each page
+      tabs={false}
       {...baseOptions()}
       links={[]}
       slots={{ themeSwitch: ThemeSwitchWithConnector }}

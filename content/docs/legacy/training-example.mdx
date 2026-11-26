@@ -8,7 +8,7 @@ This page shows the code behind the [Train a Deep Learning Model](/docs/legacy/t
 
 ## The developers perspective
 
-If you are a developer and you want to know how to integrate your own deep learning app into Arkitekt, you can read our Developer Tutorial on how to do this [here](/docs/guides/python).
+If you are a developer and you want to know how to integrate your own deep learning app into Arkitekt, you can read our Developer Tutorial on how to do this [here](/docs/develop/python).
 But also please just find here **ALL** the code for the `Train CARE` and `Predict CARE` actions, which are just a few lines of code, and should be easy to understand.
 
 The tutorial was recorded with the Paper version of Arkitekt, where these actions used
@@ -26,8 +26,8 @@ here:
 | `from_xarray(..., origins=[...])` | `mikro.create_array_dataset(...)` with a `derived_from` edge |
 | `from arkitekt.tqdm import tqdm` | `task.progress(...)` on an injected `Task` |
 
-For what each of these does, see [Core concepts](/docs/guides/python#core-concepts) and
-[Types & data](/docs/guides/python/types).
+For what each of these does, see [Core concepts](/docs/develop/python#core-concepts) and
+[Types & data](/docs/develop/python/types).
 
 ```python
 """CARE denoising: train a model on noisy/clean pairs, then apply it."""

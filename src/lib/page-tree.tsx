@@ -47,7 +47,7 @@ export function withLinkedSeparators(tree: Root): Root {
 
 const paths = new WeakMap<Node, string>();
 
-// `/docs/guides/rust` -> `build/rust/guide/`
+// `/docs/develop/rust` -> `build/rust/guide/`
 const docPath = (url: string) => {
   const path = url.replace(/^\/docs\/?/, '').replace(/\/$/, '');
   return path ? `${path}/` : '';

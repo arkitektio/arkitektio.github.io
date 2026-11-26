@@ -60,7 +60,7 @@ In Paper, Konstruktor was a desktop installer that asked you to pick a **channel
 the platform up. Updating meant a "Danger" button in its dashboard.
 
 In Next, Konstruktor comes as a desktop app *and* a `konstruktor` CLI, both writing a plain Docker
-Compose project (see [What Konstruktor is](/docs/reference/konstruktor#konstruktor)).
+Compose project (see [What Konstruktor is](/docs/get-started/deployment/konstruktor#konstruktor)).
 The old `arkitekt server init` command line tool from the `arkitekt[cli]` package is retired; the
 `konstruktor` CLI replaces it. The wizard asks about the folder, the coordination server, services,
 ports, storage, addresses and the mesh, and nothing else.
@@ -83,7 +83,7 @@ were made on that deployment. Signing in to an app meant signing in to that one 
 In Next, **a hub keeps no accounts of its own**. Users, organizations and permissions live on a
 **coordination server**, by default our hosted one at [go.arkitekt.live](https://go.arkitekt.live),
 or your institute's own, and a hub is [authorized against that
-server](/docs/guides/hub/first-hub#authorize-the-hub) before it exists on disk.
+server](/docs/get-started/deployment/first-hub#authorize-the-hub) before it exists on disk.
 Service-level superusers are still created per service from the dashboard when you need them. What
 the coordinator is and why it is a separate piece is explained in
 [The Coordinator](/docs/concepts#the-coordinator) and [Identity & Access](/docs/concepts/security/identity).
@@ -93,15 +93,15 @@ the coordinator is and why it is a separate piece is explained in
 In Paper, a channel was something you chose in the installer, and the whole deployment ran on it.
 In Next, **the channel is the set of image tags** in a hub's `hub_config.yaml`, per service, and
 the Paper channel itself is frozen for reproducibility; see
-[About channels](/docs/guides/hub/running#update-a-hub) and
-[How we version Arkitekt](/docs/concepts/deployment/versioning).
+[About channels](/docs/get-started/deployment/running#update-a-hub) and
+[How we version Arkitekt](/docs/get-started/deployment/versioning).
 
 ### Finding the platform
 
 In Paper, a deployment could **advertise** itself on the local network with a UDP broadcast; that
 feature has been [removed](/docs/legacy/removed-features#advertising). In Next, a
 hub **advertises a list of addresses** you choose at install time, and across networks it can join
-the [mesh](/docs/guides/hub/running#join-the-mesh), which did not exist in Paper. What
+the [mesh](/docs/get-started/deployment/running#join-the-mesh), which did not exist in Paper. What
 the mesh is and why it is the secure default is explained in [The Mesh](/docs/concepts/security/mesh).
 
 ### No web application
@@ -112,11 +112,11 @@ coordination server. See [Orkestrator](/docs/guides/apps/orkestrator).
 
 ## Connecting apps
 
-The [Fakts protocol](/docs/concepts/services/service-discovery) is how an app finds a deployment,
+The [Fakts protocol](/docs/develop/internals/service-discovery) is how an app finds a deployment,
 proves who it is, and learns where the services are. In the **Next** version it is a standard
 OAuth2 device-authorization flow. In the **Paper** version it was a custom sequence that was
 *inspired by* OAuth2 but not OAuth2. This page only covers what moved; the current protocol itself
-is described in [Service Discovery](/docs/concepts/services/service-discovery).
+is described in [Service Discovery](/docs/develop/internals/service-discovery).
 
 ### One protocol instead of two packages
 
@@ -140,12 +140,12 @@ carry the `fakts` name, but they now do what Fakts and Herre did together.
 ### Step by step
 
 Each row maps one Paper step to its Next counterpart. The Next column is the flow described in
-Service Discovery, from [discovery](/docs/reference/protocols/fakts#step-0-discover-the-deployment)
-through [registration](/docs/reference/protocols/fakts#step-1-register-and-request-device-authorization),
-[approval](/docs/reference/protocols/fakts#step-2-the-user-approves-the-app),
-[polling](/docs/reference/protocols/fakts#step-3-poll-the-token-endpoint) and
-[refresh](/docs/reference/protocols/fakts#step-4-refresh-and-pick-up-configuration-changes),
-plus [the envelope](/docs/reference/protocols/fakts#the-envelope).
+Service Discovery, from [discovery](/docs/develop/protocols/fakts#step-0-discover-the-deployment)
+through [registration](/docs/develop/protocols/fakts#step-1-register-and-request-device-authorization),
+[approval](/docs/develop/protocols/fakts#step-2-the-user-approves-the-app),
+[polling](/docs/develop/protocols/fakts#step-3-poll-the-token-endpoint) and
+[refresh](/docs/develop/protocols/fakts#step-4-refresh-and-pick-up-configuration-changes),
+plus [the envelope](/docs/develop/protocols/fakts#the-envelope).
 
 | Paper                                                                    | Next                                                                                                              |
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
@@ -220,7 +220,7 @@ be iterated on.
 A vision of Arkitekt was to capture the reality of biological systems in a database that lets you
 create arbitrary measurements and link them to each other. Paper could not capture those
 relationships intuitively. Next introduces the **knowledge graph**, backed by a graph database
-(Apache AGE) in the [Kraph](/docs/concepts/services/kraph) service, which lets you assign meaning to
+(Apache AGE) in the [Kraph](/docs/develop/internals/kraph) service, which lets you assign meaning to
 analyzed data in your own vocabulary ("this ROI delineates an axon") and link it to other data
 ("this axon is connected to this dendrite"). Programmers and database-savvy users can query it with
 standard graph query languages; everyone else gets an interactive interface for exploring the
@@ -275,7 +275,7 @@ handles the cascading failure of tasks on the server.
 
 Arkitekt is modular by design: do not care about Mikro? Do not install it. But Paper apps had no
 way to say which services and versions they needed before connecting, so an app could be installed
-against a deployment that could not serve it. In Next the app [manifest](/docs/reference/manifest)
+against a deployment that could not serve it. In Next the app [manifest](/docs/develop/reference/manifest)
 declares **requirements**, one per service the app needs, and the user sees and approves them per
 instance when the app connects. This was the biggest breaking change for Paper-era apps; see
 [Connecting apps](/docs/legacy/whats-changed#connecting-apps).
@@ -286,7 +286,7 @@ instance when the app connects. This was the biggest breaking change for Paper-e
   and Postgres and replaces Graphene with Strawberry, a more type-safe GraphQL library. Everything
   you see on Next already runs on it.
 - **API design.** The Next APIs follow GraphQL best practices more consistently than the Paper ones
-  did. See [GraphQL](/docs/concepts/services/graphql).
+  did. See [GraphQL](/docs/develop/internals/graphql).
 - **Security.** Paper was secure by design but enforced little. Next enforces more by default; scope
   enforcement is still being rolled out, see [Scopes](/docs/concepts/security/identity#scopes).
 - **Performance.** Task assignment in Rekuest is being tuned. Ephemeral tasks, which would skip the
@@ -296,5 +296,5 @@ instance when the app connects. This was the biggest breaking change for Paper-e
 
 Some things we have thought about but not built are written up as
 [Nextflow integration ideas](/docs/concepts/comparisons/nextflow#integration-ideas).
-[UC2 open-source microscopes](/docs/guides/uc2) started out on that list and now work through
+[UC2 open-source microscopes](/docs/develop/uc2) started out on that list and now work through
 ImSwitch.

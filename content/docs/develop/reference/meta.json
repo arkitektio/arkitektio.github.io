@@ -1,0 +1,9 @@
+{
+  "title": "Reference",
+  "pages": [
+    "manifest",
+    "plugin-config",
+    "rust",
+    "embedded"
+  ]
+}

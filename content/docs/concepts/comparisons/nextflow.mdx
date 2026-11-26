@@ -32,10 +32,10 @@ def run_stardist(image: Image) -> LabelMask:
     ...
 ```
 
-You orchestrate actions in an [`@app.workflow`](/docs/guides/python/workflows) with ordinary Python:
+You orchestrate actions in an [`@app.workflow`](/docs/develop/python/workflows) with ordinary Python:
 loops, conditionals, `async`/`await`, exceptions and your own helpers. A branch on a measured value
 or a loop until convergence is plain code. Such a workflow is also
-[durable](/docs/concepts/patterns/durability): if its process dies, it resumes without redoing the
+[durable](/docs/develop/patterns/durability): if its process dies, it resumes without redoing the
 steps that finished.
 
 For people who do not want to write code, Orkestrator has a graphical workflow designer. The same
@@ -140,7 +140,7 @@ def run_inference(image: Image, model: Model, mikro: Mikro) -> Image:
 
 A context holds private, long-lived resources. `@app.state` is for values you publish to the
 platform, and a model does not belong there (see
-[State & lifecycle](/docs/guides/python/state-lifecycle)).
+[State & lifecycle](/docs/develop/python/state-lifecycle)).
 
 This is why the two tools suit different work. Nextflow is built for large batches where startup
 time does not matter. Arkitekt is built for items that arrive one at a time and need a fast answer,

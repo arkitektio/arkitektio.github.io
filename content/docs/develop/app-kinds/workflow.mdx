@@ -1,0 +1,94 @@
+---
+title: Workflow
+description: "An app that orchestrates other apps: it declares what it needs as a protocol, calls it from an @app.workflow, and is resumed where it was if its agent dies. When to write one, and what makes it safe."
+type: guide
+---
+
+A **workflow app** does its work by calling other apps: count the cells, then dose the dye, then
+read the well. It owns the sequence and the decisions in between, and leaves the doing to the apps
+that can.
+
+What makes it a pattern of its own is failure. Each call is a task on another agent, and any agent
+can die halfway. A workflow is **journaled**: every call it made and every answer it got is
+recorded, and if its own agent dies, the platform resumes it from the journal on a new agent. Calls
+that already finished are not made again.
+
+## Use it when
+
+- Your code **calls other apps' actions**, more than once or with decisions in between.
+- A crash halfway would be **expensive or dangerous**: an experiment that took hours, a robot that
+  already dispensed.
+
+A plain action may not call other actions at all: Arkitekt refuses it, because nothing could find
+those calls again after a crash. A script that loops over calls works, but it is not resumed if it
+dies (see [Drive actions from code](/docs/develop/connect/drive-actions)).
+
+## The shape
+
+Say what you need from the other app as a protocol, and orchestrate in an `@app.workflow`:
+
+```python
+from typing import Protocol
+
+from arkitekt import AgentLost, App, Task
+from mikro.arkitekt.specs import SingleChannelImage
+
+app = App("plate-workflow", "0.1.0")
+
+
+@app.declare(app="segmentation", auto_resolvable=True, min=1)
+class Segmentation(Protocol):
+    def count_cells(self, image: SingleChannelImage) -> int:
+        """Count Cells"""
+        ...
+
+
+@app.declare(app="liquid-handler", auto_resolvable=True, min=1)
+class LiquidHandler(Protocol):
+    def dispense(self, well: str, volume_ul: float) -> None:
+        """Dispense"""
+        ...
+
+
+@app.workflow
+def stain(
+    image: SingleChannelImage,
+    well: str,
+    segmentation: Segmentation,
+    handler: LiquidHandler,
+    *,
+    task: Task,
+) -> int:
+    """Stain"""
+    cells = task.retry(segmentation.count_cells, image, attempts=3, if_started=True)  # safe to repeat
+    try:
+        handler.dispense(well=well, volume_ul=0.5 * cells)
+    except AgentLost:
+        task.hold(f"The dispense into {well} was lost. Check the well before going on.")
+    return cells
+```
+
+The workflow never imports the other apps' code. The protocol is checked when the app is
+assembled, and the platform finds running agents that match it.
+
+## What makes it safe
+
+- **Determinism.** On resume, the workflow's code runs again from the top and gets the recorded
+  answers back. So it must take the same path: no `time.time()`, `random` or file reads outside
+  `task.now()`, `task.random()`, `task.sleep()` and `task.record(...)`.
+- **Decide about every loss.** `task.retry` for steps that are safe to repeat, `task.hold` to ask a
+  person, `task.guard` to check a device's state before acting on it.
+- **Honest effects on the other side.** The apps a workflow calls say what repeating them does
+  (`effects=`). That is what tells `retry` and the person deciding what is safe.
+
+## In other languages
+
+Workflows exist in Python only. A workflow can call actions of any app, whatever language that
+app is written in, so a Python workflow orchestrating Rust and Kotlin devices is the usual setup.
+
+## Next
+
+- Python: [Workflows](/docs/develop/python/workflows), then
+  [Durable execution](/docs/develop/python/durable-execution).
+- The model behind it: [Durable execution](/docs/develop/patterns/durability).
+- A complete example with three apps: [When an agent dies](/docs/develop/python/examples/recovery).

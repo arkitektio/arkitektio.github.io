@@ -1,21 +1,21 @@
 {
   "source": "tutorials/first-hub.mdx",
-  "primary": "guides/hub/first-hub.mdx",
+  "primary": "get-started/deployment/first-hub.mdx",
   "anchors": {
-    "konstruktor": "reference/konstruktor.mdx#konstruktor",
-    "system-requirements": "reference/requirements.mdx",
-    "cli": "guides/hub/install-cli.mdx",
-    "install-the-cli": "guides/hub/install-cli.mdx#install-the-cli",
-    "create-a-hub-1": "guides/hub/install-cli.mdx#create-a-hub",
-    "run-it": "guides/hub/install-cli.mdx#run-it",
-    "plugin-engine": "guides/hub/running.mdx#add-a-plugin-engine",
-    "updating": "guides/hub/running.mdx#update-a-hub",
-    "mesh": "guides/hub/running.mdx#join-the-mesh",
+    "konstruktor": "get-started/deployment/konstruktor.mdx#konstruktor",
+    "system-requirements": "get-started/deployment/requirements.mdx",
+    "cli": "get-started/deployment/install-cli.mdx",
+    "install-the-cli": "get-started/deployment/install-cli.mdx#install-the-cli",
+    "create-a-hub-1": "get-started/deployment/install-cli.mdx#create-a-hub",
+    "run-it": "get-started/deployment/install-cli.mdx#run-it",
+    "plugin-engine": "get-started/deployment/running.mdx#add-a-plugin-engine",
+    "updating": "get-started/deployment/running.mdx#update-a-hub",
+    "mesh": "get-started/deployment/running.mdx#join-the-mesh",
     "advertising": "legacy/removed-features.mdx#advertising",
-    "other-installation-strategies": "guides/hub/other-installation-strategies.mdx",
-    "custom-compose": "guides/hub/other-installation-strategies.mdx#custom-compose",
-    "docker-compose": "guides/hub/other-installation-strategies.mdx#docker-compose",
-    "helm-charts": "guides/hub/other-installation-strategies.mdx#helm-charts",
-    "custom-installation": "guides/hub/other-installation-strategies.mdx#custom-installation"
+    "other-installation-strategies": "get-started/deployment/other-installation-strategies.mdx",
+    "custom-compose": "get-started/deployment/other-installation-strategies.mdx#custom-compose",
+    "docker-compose": "get-started/deployment/other-installation-strategies.mdx#docker-compose",
+    "helm-charts": "get-started/deployment/other-installation-strategies.mdx#helm-charts",
+    "custom-installation": "get-started/deployment/other-installation-strategies.mdx#custom-installation"
   }
 }

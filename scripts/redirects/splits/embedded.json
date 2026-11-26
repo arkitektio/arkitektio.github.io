@@ -1,10 +1,10 @@
 {
   "source": "tutorials/embedded-first-device.mdx",
-  "primary": "get-started/next-steps/first-device.mdx",
+  "primary": "develop/first-device.mdx",
   "anchors": {
-    "declaring-actions": "get-started/next-steps/first-device.mdx#how-the-actions-are-written",
-    "state": "get-started/next-steps/first-device.mdx#how-the-actions-are-written",
-    "provisioning-and-connection": "reference/embedded.mdx#provisioning-and-login",
-    "what-is-not-there-yet": "reference/embedded.mdx#what-is-not-there-yet"
+    "declaring-actions": "develop/first-device.mdx#how-the-actions-are-written",
+    "state": "develop/first-device.mdx#how-the-actions-are-written",
+    "provisioning-and-connection": "develop/reference/embedded.mdx#provisioning-and-login",
+    "what-is-not-there-yet": "develop/reference/embedded.mdx#what-is-not-there-yet"
   }
 }

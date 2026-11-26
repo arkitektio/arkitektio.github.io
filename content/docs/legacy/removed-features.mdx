@@ -14,17 +14,17 @@ much of a mess (firewalls, changing addresses, blocked broadcasts, VPNs) for tha
 and it only ever worked within a single LAN.
 
 **Today:** apps discover a hub by the addresses it advertises, and across networks through the
-[mesh](/docs/concepts/deployment/topology#arkitekt-mesh).
+[mesh](/docs/get-started/deployment/topology#arkitekt-mesh).
 
 ## The Paper connection protocol [#paper-fakts]
 
 The Paper version connected apps with a custom `start`, `challenge` and `claim` sequence with its
 own `auth` block, and a separate OAuth2 client (Herre) for tokens. That protocol is retired. A
 deployment that still speaks it answers discovery but fails the endpoint check in
-[step 0](/docs/reference/protocols/fakts#step-0-discover-the-deployment) of the current protocol, so a
+[step 0](/docs/develop/protocols/fakts#step-0-discover-the-deployment) of the current protocol, so a
 client can tell "wrong protocol version" apart from "server unreachable".
 
-**Today:** one protocol, [Fakts](/docs/concepts/services/service-discovery), which is plain OAuth2 device
+**Today:** one protocol, [Fakts](/docs/develop/internals/service-discovery), which is plain OAuth2 device
 authorization. Every step of the old sequence has a counterpart in it. The mapping, including how
 to tell a Paper deployment apart from a current one, is in
 [What's changed: Connecting apps](/docs/legacy/whats-changed#connecting-apps).
@@ -34,11 +34,11 @@ to tell a Paper deployment apart from a current one, is in
 The Paper installer asked you to pick a channel (`paper`, `next`) and to fill in an admin user.
 
 **Today:** Konstruktor has no channel picker. A hub's channel is the set of image tags in its
-`hub_config.yaml`. See [How we version Arkitekt](/docs/concepts/deployment/versioning).
+`hub_config.yaml`. See [How we version Arkitekt](/docs/get-started/deployment/versioning).
 
 ## RabbitMQ as the task queue
 
-Older versions of [Rekuest](/docs/concepts/services/rekuest) queued tasks through a message broker
+Older versions of [Rekuest](/docs/develop/internals/rekuest) queued tasks through a message broker
 (RabbitMQ).
 
 **Today:** tasks are rows in Postgres, and Redis carries the queues to connected agents and the

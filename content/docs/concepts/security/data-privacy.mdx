@@ -39,14 +39,14 @@ as public and disposable; see the [Privacy Policy](/docs/privacy#tier-4-demoarki
 ## How data is stored
 
 Inside a deployment, Arkitekt separates **metadata** from **binary data**.
-[Mikro](/docs/concepts/services/mikro) keeps the image data in an S3 object store
+[Mikro](/docs/develop/internals/mikro) keeps the image data in an S3 object store
 served by MinIO and the queryable metadata in a relational database, and hands
 clients scoped, time-limited access to exactly the objects they need; see
-[Storage](/docs/concepts/services/mikro#storage) and
-[Metadata](/docs/concepts/services/mikro#metadata). [Fluss](/docs/concepts/services#fluss)
+[Storage](/docs/develop/internals/mikro#storage) and
+[Metadata](/docs/develop/internals/mikro#metadata). [Fluss](/docs/develop/internals#fluss)
 (workflows) stores only **references** to data, never the bytes themselves. MinIO is
 therefore the [mission-critical
-store](/docs/concepts/deployment/planning#how-much-data-will-be-streamed-through-arkitekt): it
+store](/docs/get-started/deployment/planning#how-much-data-will-be-streamed-through-arkitekt): it
 holds everything that streams through the platform.
 
 ## In transit and accountable

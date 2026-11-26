@@ -1,0 +1,231 @@
+---
+title: Durable execution
+description: "What happens when an agent dies mid-task, and how to write code that survives it: LOST tasks and AgentLost, effects claims, resumed workflows and determinism, task.retry, task.hold and task.guard, and the disconnect policy."
+type: guide
+---
+
+A workflow whose process dies is resumed where it was, without redoing finished steps. Every other
+loss is reported to whoever called, and your code decides what it means. This page shows how to use
+that from Python. The design page [Durable execution](/docs/develop/patterns/durability)
+explains what is persisted where and how a resume proceeds.
+
+## What survives what
+
+| What died | Who handles it | What happens |
+|---|---|---|
+| the agent of a **plain** task (`@app.action`) | whoever called it | the task ends **LOST**, and the caller's `call` raises `AgentLost` |
+| the agent of a **workflow** (`@app.workflow`) | the platform | the workflow is **resumed** in a new process |
+| the agent of a **step** a workflow called | the workflow's code | the step's call raises `AgentLost` inside the workflow |
+| the **caller** (the UI closed, a script disconnected) | nobody | nothing: the task continues |
+
+The server re-runs nothing on its own, except a task no agent ever picked up. "The agent died"
+means its process ended, or stayed disconnected past the server's grace window; a short network
+blip does not end a task (see [Disconnect policy](#disconnect-policy)).
+
+## LOST and `AgentLost`
+
+**LOST** means the outcome is unknown: the work may have completed, half-completed or never started.
+It is final, even if a result turns up later. The caller sees an `AgentLost` exception with what is
+known:
+
+| Attribute | Meaning |
+|---|---|
+| `started` | Whether the task ever started. **If `False`, nothing ran and sending it again is safe.** |
+| `last_progress` | The last progress percentage it reported, or `None` |
+| `effects` | The implementation's [effects](#effects) claim, as a string |
+| `task` | The lost task's id |
+
+```python
+from arkitekt import AgentLost
+
+try:
+    handler.dispense(well, volume_ul=v)
+except AgentLost as lost:
+    if not lost.started:
+        handler.dispense(well, volume_ul=v)      # never reached the robot: nothing happened
+    else:
+        task.hold(f"dispense into {well} was lost: check the well", lost=lost)
+```
+
+## Effects [#effects]
+
+`effects=` says what running an implementation again would do to the world:
+
+| `Effects` | Running it again… | Example |
+|---|---|---|
+| `NONE` | changes nothing | count cells, read absorbance |
+| `REPEATABLE` | leaves the same state as running it once | set a dataset's name |
+| `UNKNOWN` (default) | nobody has said | store a new label dataset |
+| `IRREVERSIBLE` | happens again, in the real world | dispense liquid, move a sample |
+
+```python
+from arkitekt import App, Effects
+
+app = App("liquid-handler", "0.1.0", effects=Effects.IRREVERSIBLE)   # default for this app
+
+
+@app.action(effects=Effects.NONE)     # an action's own claim wins
+def read_absorbance(well: str) -> float:
+    """Read Absorbance"""
+    ...
+```
+
+<Callout type="warn" title="Information, never a rule">
+
+Effects are shown on `AgentLost.effects`, on a hold and in the UI. Neither the server nor
+`task.retry` acts on them.
+
+</Callout>
+
+## Resumed workflows
+
+When the process running a workflow dies, the server sends the task again with the workflow's
+**journal**. A new process runs the function again from the top:
+
+- A call that already finished returns its recorded result, and is never redone. A stream replays
+  its yields. A call still running is followed live.
+- A value taken through the task (`task.now()`, `task.random()`, `task.record(fn)`, the deadline of
+  `task.sleep()`) returns its recorded value.
+- Once it catches up to where the first run died, it continues live.
+
+### Keep workflows deterministic
+
+Replay only works if the resumed run takes the same path. Take outside values only through calls and
+the task:
+
+| Instead of | Use |
+|---|---|
+| `time.time()`, `datetime.now()` | `task.now()` |
+| `random.random()`, `uuid4()` | `task.random(n)` (hex string of `n` random bytes) |
+| `time.sleep(s)` | `task.sleep(s)` |
+| reading a file, an HTTP request, an LLM completion | `task.record(lambda: ...)` (the value must be JSON) |
+
+```python
+import json
+from pathlib import Path
+
+
+@app.workflow
+def adaptive_scan(scope: Microscope, *, task: Task) -> int:   # Microscope: an @app.declare protocol
+    """Adaptive Scan"""
+    started = task.now()
+    plan = task.record(lambda: json.loads(Path("plan.json").read_text()))   # recorded
+    for position in plan["positions"]:
+        scope.acquire(position)                                              # a call: recorded
+    task.log(f"took {task.now() - started:.0f}s")
+    return len(plan["positions"])
+```
+
+`task.record` keys values by occurrence (`RECORD:1`, `RECORD:2`, …); pass `key=` when the order may
+vary. Every helper has an async twin (`anow`, `arecord`, …). A resumed run that diverges from the
+recorded one raises `NonDeterministicWorkflow`.
+
+### Limits
+
+- **Same code only.** If the workflow function's source changed before the resume, the task ends
+  LOST. Helpers it calls are not checked, so do not change them under a running workflow.
+- **At most three resumes**, then LOST.
+- **Same agent, same journal.** Values the dead process had not yet sent survive only in its on-disk
+  journal, so run the successor as the same agent with the same journal file (see the [design page](/docs/develop/patterns/durability#what-is-persisted-where)).
+- **Duplicates.** The resumed run reports progress, logs and the workflow's own yields again.
+
+## Handling a lost step [#handling-a-lost-step]
+
+Inside a workflow, a step whose agent died raises `AgentLost` at the call. Handle it like any
+exception, or use one of three helpers.
+
+### `task.retry`: try again when it is safe [#taskretry-try-again-when-it-is-safe]
+
+```python
+cells = task.retry(segmentation.count_cells, image, attempts=3, if_started=True)
+```
+
+`task.retry(call, *args, attempts=3, if_started=False, **kwargs)` calls again on `AgentLost`, only
+if the step never started or you pass `if_started=True`. Other exceptions propagate at once, there is
+no backoff, and the last `AgentLost` is raised when attempts run out. The async form is
+`await task.aretry(proxy.method.acall, ...)`.
+
+### `task.hold`: ask a person
+
+```python
+task.hold(f"Dispense of {volume} µl into {well} was lost: check the well, then resume or abandon.", lost=lost)
+```
+
+The workflow pauses with your message (and the lost step's details, with `lost=`). A person checks
+the real world in Orkestrator and resumes the task, which continues after `hold`, or cancels it. A
+resumed hold is recorded, so a later crash-resume does not stop there again.
+
+### `task.guard`: notice that the world changed [#guard]
+
+While a workflow is down, someone may swap the plate on the robot. A guard detects it:
+
+```python
+with task.guard(handler.plate, "barcode"):
+    handler.dispense(well, volume_ul=volume)
+```
+
+- `handler.plate` is a state demand of the protocol (an annotated attribute) that the other app
+  publishes with `@app.state(name="plate")`.
+- On the first run, entering the guard records the state's revision.
+- On a resumed run, entering it raises `StateChanged` if the guarded paths (here `barcode`, or the
+  whole state if none are given) were changed by anything other than this workflow's calls, or if
+  the other agent restarted and set its state up again.
+
+Nothing is locked while the workflow is down, changes made while it is running are not watched, and
+only a dependency resolved to exactly one agent can be guarded.
+
+[When an agent dies](/docs/develop/python/examples/recovery) walks through a complete workflow that
+uses all three helpers, with the two apps it calls.
+
+## Disconnect policy [#disconnect-policy]
+
+An agent that loses its connection for a moment has not died. By default a running task keeps
+going and reports when the link returns. For an action that must be stoppable, such as a stage that
+moves until told to stop, make losing the link a stop condition:
+
+```python
+from arkitekt import App, CancelOnDisconnect
+
+app = App("stage", "0.1.0")
+
+
+@app.action(policy=CancelOnDisconnect(grace=2.0))
+async def jog(direction: str) -> None:
+    """Jog
+
+    Moves until cancelled. Stops if control is lost for more than two seconds.
+    """
+    ...
+```
+
+The policy is enforced inside your process, because the server cannot reach a disconnected agent.
+An `async` action is cancelled at its next `await`. A sync action stops only at a
+`koil.check_cancelled()` call, so long sync loops must poll it (see
+[koil](/docs/develop/python/koil)). This is not a safety interlock: hardware that must stop needs its
+own watchdog.
+
+## From a script [#from-a-script]
+
+A script that calls actions is the caller, so it decides about a lost task. The top-level `retry`
+works like `task.retry`:
+
+```python
+from mikro import Mikro
+from rekuest.client.client import RekuestCaller
+
+from arkitekt import AgentLost, connect, retry
+
+with connect(RekuestCaller, Mikro, identifier="plate-runner") as (rekuest, mikro):
+    image = mikro.get_array_dataset("1234").lens()
+    cells = retry(rekuest.call, COUNT_CELLS_ID, image=image, attempts=3, if_started=True)
+    try:
+        rekuest.call(DISPENSE_ID, well="A1", volume_ul=0.5 * cells)
+    except AgentLost as lost:
+        if not lost.started:
+            rekuest.call(DISPENSE_ID, well="A1", volume_ul=0.5 * cells)
+        else:
+            print(f"Dispense lost at {lost.last_progress}% (effects: {lost.effects}): check A1.")
+```
+
+A script is not resumed. If it dies, the tasks it started keep running, but nothing waits for their
+results. Put orchestration that must survive a crash into an `@app.workflow`.

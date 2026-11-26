@@ -11,7 +11,7 @@ works consistently across every service.
 
 ## Lok, the coordinator
 
-[**Lok**](/docs/concepts/services#lok) is the service responsible for authentication
+[**Lok**](/docs/develop/internals#lok) is the service responsible for authentication
 and authorization. It fills the [**coordinator**](/docs/concepts#the-coordinator) role
 of the platform: everything else trusts the identities it issues.
 
@@ -36,12 +36,12 @@ more in [Apps](/docs/concepts/terminology#what-is-an-app).
 
 Apps also need to *find* a deployment and get their configuration. That is the job
 of the **Fakts** protocol, described step by step in [Service
-Discovery](/docs/concepts/services/service-discovery).
+Discovery](/docs/develop/internals/service-discovery).
 
 In short, Fakts is a standard **OAuth2 device authorization flow** (RFC 8628) with
 one Arkitekt-specific addition: the token response also carries the app's rendered
 service configuration. The app presents its
-[Manifest](/docs/reference/manifest), you review and approve it in a
+[Manifest](/docs/develop/reference/manifest), you review and approve it in a
 browser, and the app receives its tokens and configuration together, refreshed
 together from then on.
 
@@ -54,7 +54,7 @@ locally. The server side is Lok; on the client side the
 ## Scopes
 
 An app declares the access rights it needs as **scopes** in its
-[Manifest](/docs/reference/manifest), for example `openid` and `email`.
+[Manifest](/docs/develop/reference/manifest), for example `openid` and `email`.
 Scopes are how you reason about "what can this app actually do with my data" before
 you approve it.
 

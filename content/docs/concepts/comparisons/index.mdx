@@ -29,10 +29,10 @@ Arkitekt needs something else from its messaging:
 - **Easy to run on one machine.** Arkitekt has to start on a laptop. Kafka is only configurable as a
   distributed system with several broker instances.
 
-Older versions of [Rekuest](/docs/concepts/services/rekuest) queued tasks through RabbitMQ for these
+Older versions of [Rekuest](/docs/develop/internals/rekuest) queued tasks through RabbitMQ for these
 reasons. Today tasks are rows in Postgres, Redis carries the queues to connected agents, and
 Rekuest's Rust backend, takt, holds the agent connections. Durability comes from the agent's journal
-and the task history in Postgres (see [Durable execution](/docs/concepts/patterns/durability)), so
+and the task history in Postgres (see [Durable execution](/docs/develop/patterns/durability)), so
 there is no need for a separate log.
 
 ## Why not REST? [#why-not-rest]
@@ -40,8 +40,8 @@ there is no need for a separate log.
 Arkitekt's services speak GraphQL. Bioimage data is highly relational, and GraphQL lets a client ask
 for exactly the slice of that graph it needs in one strongly typed, self-documenting query, with
 subscriptions for live updates. The full argument, with examples you can run against your own
-server, is in [GraphQL: Why we like GraphQL](/docs/concepts/services/graphql#why-we-like-graphql).
-To write a client, see [Developing with GraphQL](/docs/guides/python/graphql).
+server, is in [GraphQL: Why we like GraphQL](/docs/develop/internals/graphql#why-we-like-graphql).
+To write a client, see [Developing with GraphQL](/docs/develop/python/graphql).
 
 GraphQL also brings problems that REST does not have:
 

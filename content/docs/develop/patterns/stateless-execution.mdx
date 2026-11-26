@@ -1,0 +1,58 @@
+---
+title: Stateless actions, explicit state
+description: "Why an Arkitekt action is a function of its arguments and what it is explicitly handed, how long-lived things are declared as context and state instead of globals, and what that makes possible: routing to any agent, retries, and honest effects."
+type: concept
+---
+
+A task is one call of an action. It gets its arguments, it gets what it asked to be
+[injected](/docs/develop/patterns/dependency-injection), it returns a result, and it is over. It
+should leave nothing behind in the process that the next task depends on, and depend on nothing
+that an earlier task left behind.
+
+Things that do live longer, such as a loaded model, an open device or the position of a stage, are
+not forbidden. They are **declared**, so the runtime knows they exist and who may use them:
+
+| Long-lived thing | Declared as | Visible to |
+|---|---|---|
+| A model, a device handle, a connection pool | `@app.context`, built in `@app.startup` | the app's own actions |
+| What the device is doing | `@app.state` | everyone, live |
+| This installation's configuration | `App(app_context=...)`, passed to `run` | the app's own actions |
+| A module-level variable | nothing: avoid it | nobody knows it exists |
+
+## The pattern
+
+This is **stateless execution**, as in stateless services and pure functions: a unit of work is
+determined by its inputs. Arkitekt does not require actions to be pure (an action that moves a
+stage is anything but). It requires that whatever an action depends on is **explicit**: an argument,
+or a declared context or state. Hidden state is the thing it rules out.
+
+## What it buys
+
+- **Any agent can run a task.** An action can be implemented by several agents, on several
+  machines. Because a task carries everything it needs, the platform can route it to whichever
+  agent is available, and nothing is lost by choosing one over another.
+- **Retries make sense.** A task that died can be run again, on the same or another agent, and do
+  the same thing. Whether that is *safe* is a separate question, which is why every action carries
+  an honest `effects=` claim: `NONE` for a computation, `IRREVERSIBLE` for a dispense.
+- **Concurrency is safe by default.** Two tasks that share nothing hidden cannot interfere. Where
+  they do share something, a device, it is a declared state with declared locks.
+- **Restarts are clean.** A crashed agent comes back with nothing to recover except what was
+  declared: context is rebuilt at startup, and state can be persisted (`persist=`).
+
+## What it costs
+
+- **No caching in globals.** A dictionary at module level that remembers earlier results works on
+  your laptop and breaks the moment the action runs on two agents, or after a restart.
+  `arkitekt inspect variables` lists such variables. Cache in a context, or in a data service.
+- **Expensive setup moves to startup.** Loading a model per task is slow; loading it at import is
+  wrong. A startup hook that returns a context is the place.
+- **Memory structures are hidden state.** An array returned as a memory structure stays on the agent
+  that made it, and the next task only works on that agent. It is the one place where the API lets
+  state in through the back door, so use it sparingly
+  ([Arrays between actions](/docs/develop/python/examples/in-memory#use-it-sparingly)).
+
+## Next
+
+- [Observable state](/docs/develop/patterns/observable-state): how declared state is shared.
+- [Durable execution](/docs/develop/patterns/durability): what happens when a task's agent dies.
+- Python: [State & lifecycle](/docs/develop/python/state-lifecycle).

@@ -5,7 +5,7 @@ type: reference
 ---
 
 The `arkitekt-next` Python package is retired. This page maps its names to the current
-[`arkitekt`](/docs/guides/python) package, for porting an old app.
+[`arkitekt`](/docs/develop/python) package, for porting an old app.
 
 `arkitekt` replaces the `arkitekt-next` package. The concepts are the same, but an app is now
 declared explicitly instead of being assembled from module-level decorators.
@@ -28,7 +28,7 @@ declared explicitly instead of being assembled from module-level decorators.
 <Callout type="warn" title="effects= changed meaning">
 
 If you used `effects=` on an action to attach UI effects to ports, that argument is now called
-`port_effects=`. `effects=` now takes an [`Effects`](/docs/guides/python/durable-execution#effects)
+`port_effects=`. `effects=` now takes an [`Effects`](/docs/develop/python/durable-execution#effects)
 claim about what running the action again would do.
 
 </Callout>

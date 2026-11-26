@@ -25,13 +25,13 @@ each step through the platform.
 ## Real-time by default
 
 - **GraphQL subscriptions.** Arkitekt exposes its functionality through
-  [GraphQL](/docs/concepts/services/graphql), including subscriptions that push updates
+  [GraphQL](/docs/develop/internals/graphql), including subscriptions that push updates
   to clients the moment state changes, no polling required.
-- **Websockets for task routing.** [Rekuest](/docs/concepts/services/rekuest) queues
+- **Websockets for task routing.** [Rekuest](/docs/develop/internals/rekuest) queues
   and distributes tasks over a message broker (RabbitMQ), thinly wrapped in a
   websocket API. The wrapper exists to add authentication, authorization and
   health-monitoring on top of the broker, not to get in the way of throughput.
-- **Live state.** Services like [Kabinet](/docs/concepts/services/kabinet) let clients
+- **Live state.** Services like [Kabinet](/docs/develop/internals/kabinet) let clients
   subscribe to changes, for example pod state, in real time.
 
 ## Keeping big data light
@@ -45,11 +45,11 @@ Loading](/docs/concepts/performance#lazy-loading).
 ## Scaling out
 
 - **Stateless, independent services scale horizontally.**
-  [Rekuest](/docs/concepts/services/rekuest) and [Kluster](/docs/concepts/services#kluster)
+  [Rekuest](/docs/develop/internals/rekuest) and [Kluster](/docs/develop/internals#kluster)
   are stateless, so you can run more replicas to handle more load, and the core
   services never talk to each other, so each scales on its own terms. The
   principles behind this are laid out in [Design
-  Principles](/docs/concepts/services#design-principles).
+  Principles](/docs/develop/internals#design-principles).
 - **Compute lives in the apps.** Arkitekt is the middleman; the actual computation
   is offloaded to client-side **apps** and the hardware they run on, so heavy work
   scales with *your* machines, not a central bottleneck.
@@ -60,10 +60,10 @@ Performance is bounded by physics, and we would rather name the limits than pret
 they don't exist:
 
 - The usual bottleneck is **storage throughput**, MinIO moving bytes, rather than
-  the API layer; see [how much data will be streamed](/docs/concepts/deployment/planning#how-much-data-will-be-streamed-through-arkitekt)
+  the API layer; see [how much data will be streamed](/docs/get-started/deployment/planning#how-much-data-will-be-streamed-through-arkitekt)
   in the deployment guide.
-- **GPU support is limited today**; see [GPU Support](/docs/guides/hub/running#arkitekt-and-the-gpu). In
-  the meantime, [App Flavours](/docs/concepts/services/kabinet#app-flavours) (build
+- **GPU support is limited today**; see [GPU Support](/docs/get-started/deployment/running#arkitekt-and-the-gpu). In
+  the meantime, [App Flavours](/docs/develop/internals/kabinet#app-flavours) (build
   variants such as CUDA vs CPU) let the platform pick the right build for the
   resources available.
 

@@ -1,11 +1,14 @@
 {
-  "title": "Get Started",
+  "title": "Get started",
+  "description": "Join a hub or bring your own, and deploy it for a lab",
   "icon": "Rocket",
+  "root": true,
   "pages": [
     "index",
-    "basics",
     "join",
     "own-hub",
-    "next-steps"
+    "downloads",
+    "---Advanced deployment---",
+    "...deployment"
   ]
 }

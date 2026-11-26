@@ -202,7 +202,7 @@ export default function HomePage() {
             first tool.
           </p>
           <Button asChild size="lg" className="mt-2 rounded-full">
-            <Link href="/docs/get-started/basics">
+            <Link href="/docs/concepts/basics">
               Start the tutorial
               <ArrowRight className="size-4" />
             </Link>

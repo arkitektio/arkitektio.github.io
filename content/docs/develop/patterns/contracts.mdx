@@ -1,0 +1,66 @@
+---
+title: Contracts and late binding
+description: "Why Arkitekt separates what is done (an action, defined by its typed ports) from who does it (an implementation in some app), and how callers state what they need as protocols that are matched to running agents at run time."
+type: concept
+---
+
+When you call "Segment" in Orkestrator, you do not call a function in a particular program. You
+call an **action**: a contract defined by its typed inputs and outputs. Any app that **implements**
+that action can do the work, and which one does is decided when the task is created.
+
+```python
+# In the segmentation app: an implementation of the action "count_cells"
+@app.action
+def count_cells(image: SingleChannelImage) -> int:
+    """Count Cells"""
+    ...
+
+
+# In the workflow app: a contract for what it needs, with no import of the other app
+@app.declare(app="segmentation", auto_resolvable=True, min=1)
+class Segmentation(Protocol):
+    def count_cells(self, image: SingleChannelImage) -> int:
+        """Count Cells"""
+        ...
+```
+
+## The patterns
+
+- **Interface and implementation.** The action is the interface, the implementation is the code
+  that fulfils it. Several apps can implement the same action, in different languages, on
+  different machines.
+- **Structural typing.** A workflow does not import another app. It describes what it needs as a
+  `Protocol`: a method's name, title and typed ports. Anything that matches satisfies it, the way a
+  Python `Protocol` or a Go interface is satisfied without being named.
+- **Late binding.** The match between a protocol and a running agent is made at run time:
+  automatically (`auto_resolvable=True`) or by a person when the workflow is set up, with as many
+  agents as `min=` and `max=` allow. A blok's references to states and actions by name work the
+  same way.
+- **Consumer-driven contracts.** The caller states exactly what it relies on, and that statement is
+  checked: when the app is assembled, and when it is matched against what is running.
+
+## What it buys
+
+- **Swap without changing callers.** Replace a segmentation app with a better one that implements
+  the same action, and every workflow and form that used it keeps working.
+- **Several implementations.** The same action on two microscopes, or a Fiji and a napari version
+  of "Show", side by side. The platform or a person chooses.
+- **Upgrades without breakage.** An app's code can change from version to version, and callers do
+  not notice, as long as its actions keep their ports.
+- **Language independence.** A Python workflow calls a Rust device driver through the same kind of
+  contract as a Python one.
+
+## What it costs
+
+- **Signatures are a promise.** Changing an action's ports makes it a different action. Callers
+  that relied on the old one no longer match. Treat ports like a public API.
+- **Matching is by meaning you write down.** Two actions with the same ports but different
+  behaviour would match each other. Names, titles and descriptions are part of the contract, so
+  keep them honest.
+- **Resolution can fail at run time.** If no running agent implements what a workflow needs, the
+  workflow cannot run. That is the price of not importing the other app.
+
+## Next
+
+- [Terminology: actions and implementations](/docs/concepts/terminology#what-is-an-action).
+- Python: [Workflows](/docs/develop/python/workflows), on `@app.declare`.

@@ -2,10 +2,10 @@
   "title": "Arkitekt",
   "pages": [
     "index",
+    "concepts",
     "get-started",
     "guides",
-    "reference",
-    "concepts",
+    "develop",
     "---Legal---",
     "privacy"
   ]

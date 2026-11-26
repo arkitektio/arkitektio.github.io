@@ -1,0 +1,16 @@
+{
+  "title": "Advanced deployment",
+  "pages": [
+    "what-you-are-setting-up",
+    "planning",
+    "topology",
+    "first-hub",
+    "install-cli",
+    "other-installation-strategies",
+    "running",
+    "versioning",
+    "troubleshooting",
+    "requirements",
+    "konstruktor"
+  ]
+}

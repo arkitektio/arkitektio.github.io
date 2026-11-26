@@ -35,18 +35,18 @@ sensor. Any code that reads or writes your data has to be an app, because the hu
 authenticated apps. The first time an app connects, you approve it and the
 permissions (scopes) it asks for through OAuth2, the flow behind "log in with Google". From then on
 the hub knows which app, in which version, acts for which user. Apps are
-[versioned](/docs/concepts/deployment/versioning) independently of the hub.
+[versioned](/docs/get-started/deployment/versioning) independently of the hub.
 
 An app may expose actions, but it does not have to: an app that only displays data is still an app.
 Standalone apps and plugins are described in [Apps](/docs/guides/apps).
 
 ## Apps vs services [#apps-vs-services]
 
-**Services** are the parts the hub is built from: [Rekuest](/docs/concepts/services/rekuest),
-[Mikro](/docs/concepts/services/mikro), [Fluss](/docs/concepts/services#fluss) and the others. They
+**Services** are the parts the hub is built from: [Rekuest](/docs/develop/internals/rekuest),
+[Mikro](/docs/develop/internals/mikro), [Fluss](/docs/develop/internals#fluss) and the others. They
 store and retrieve data and route work, but they do no analysis and are not used directly by people.
 **Apps** do the analysis, and use services to read inputs and store results. An app lists the
-services it requires in its [manifest](/docs/reference/manifest), you see them when you approve it,
+services it requires in its [manifest](/docs/develop/reference/manifest), you see them when you approve it,
 and it only works with a hub that runs them.
 
 ## What is an action? [#what-is-an-action]
@@ -95,11 +95,11 @@ An agent is the process that holds a connection to Rekuest, receives tasks, runs
 back. `arkitekt run` on your laptop is an agent, and so is a plugin container started by Kabinet or a
 Qt application with a connected MagicBar. One app can run as several agents, on different machines or
 for different users, and the platform picks one when it routes a task. An agent also owns the app's
-live [state](/docs/guides/python/state-lifecycle).
+live [state](/docs/develop/python/state-lifecycle).
 
 When an agent dies, its running tasks end [lost](#states), except workflow tasks, which the next
 process resumes from the agent's journal. A restarted agent keeps its name. See
-[Durable execution](/docs/concepts/patterns/durability).
+[Durable execution](/docs/develop/patterns/durability).
 
 <Callout type="info" title="Not an AI agent">
 
@@ -144,7 +144,7 @@ A task ends **lost** when its agent disappears for longer than the grace window,
 new process takes over the agent. Lost is neither success nor failure: the work may have finished,
 half-finished or never started.
 The event records what is known (whether it started, its last progress, the action's claimed
-[effects](/docs/concepts/patterns/durability#effects)). The platform does not run it again;
+[effects](/docs/develop/patterns/durability#effects)). The platform does not run it again;
 whoever called decides. Lost is final: a result that turns up later is kept in the history but does
 not change the state.
 
@@ -159,7 +159,7 @@ a core feature: a person must always be able to stop a running experiment
 
 Code stops only where it can: in Python, an `async` action at its next `await`, a synchronous one
 only where it checks for cancellation. Hardware needs its own watchdog. See
-[Disconnect policy](/docs/guides/python/durable-execution#disconnect-policy).
+[Disconnect policy](/docs/develop/python/durable-execution#disconnect-policy).
 
 </Callout>
 
@@ -187,8 +187,8 @@ organization, next to the user and the app ([Provenance](/docs/concepts/provenan
 A workflow is a graph of nodes. Each node runs an action, and each edge carries data from an output
 port to a matching input port. A workflow names actions, not apps, so the same blueprint can run in
 another lab on different apps; a node that no installed app implements shows in yellow until one
-does. Workflows are stored as JSON and run by [Fluss](/docs/concepts/services#fluss). To build one,
-follow [Your first workflow](/docs/get-started/next-steps/first-workflow).
+does. Workflows are stored as JSON and run by [Fluss](/docs/develop/internals#fluss). To build one,
+follow [Your first workflow](/docs/guides/first-workflow).
 
 ### Workflows are nodes [#workflows-are-just-nodes]
 
@@ -220,7 +220,7 @@ may be empty (nullable), and an optional label and description. Kinds are:
 - **Structures**: large or app-specific data, sent by reference (below).
 
 Ports decide what a caller may pass, which widget Orkestrator shows, and which actions can be wired
-together. How Python types map to ports is in [Types & data](/docs/guides/python/types).
+together. How Python types map to ports is in [Types & data](/docs/develop/python/types).
 
 ## Structure [#structure]
 

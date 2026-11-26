@@ -1,0 +1,30 @@
+{
+  "title": "Developer",
+  "description": "Write apps, connect code, understand the platform",
+  "icon": "Code",
+  "root": true,
+  "pages": [
+    "why-build",
+    "---Your first app---",
+    "first-python-app",
+    "first-rust-app",
+    "first-device",
+    "---Write apps---",
+    "python",
+    "rust",
+    "kotlin",
+    "connect",
+    "app-kinds",
+    "uc2",
+    "---Design---",
+    "shared-concepts",
+    "patterns",
+    "anti-patterns",
+    "---Look up---",
+    "...reference",
+    "protocols",
+    "---Platform---",
+    "internals",
+    "projects"
+  ]
+}

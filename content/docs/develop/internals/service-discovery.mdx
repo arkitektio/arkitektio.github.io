@@ -1,0 +1,66 @@
+---
+title: Service Discovery
+description: How Arkitekt's Fakts protocol lets apps authenticate and discover the services running in a deployment, using a standard OAuth2 device-authorization flow.
+type: concept
+---
+
+An Arkitekt deployment is not one program. It is a set of independent services
+that can live on one machine, be spread over several, or sit next to a compute
+cluster. A few typical setups:
+
+- **Single machine.** Every service runs on one host. This is the default and the
+  easiest way to get started.
+- **Multiple machines.** Several storage servers, each with its own backend, each
+  running its own storage service.
+- **Cluster.** A service with access to a computational cluster runs on a separate
+  machine and is connected to the rest of the platform.
+
+With this flexibility comes a question: how does an app that wants to connect
+learn *where* the services are, and how does it prove *who* it is before it is
+told? Arkitekt answers both with one protocol: **Fakts**.
+
+## Fakts in one paragraph
+
+Fakts is a thin layer on top of standard **OAuth2**. An app discovers a deployment
+through a well-known URL, registers itself as an OAuth2 client by presenting its
+[Manifest](/docs/develop/reference/manifest), and is then authorized with the
+**device authorization grant**
+([RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628)), the same flow you
+know from logging a TV or a CLI tool into an online account. The only
+Arkitekt-specific part is that a successful token response carries an extra
+**envelope** next to the access token: the rendered configuration of every
+service the app asked for. The tokens are ordinary OAuth2 tokens issued by
+[Lok](/docs/develop/internals#lok), and are refreshed through the ordinary OAuth2
+token endpoint.
+
+If you have implemented an OAuth2 device flow before, you already know almost all
+of Fakts. If you have not, [Fakts protocol](/docs/develop/protocols/fakts) walks through the four steps.
+
+
+## The flow
+
+| # | From → To | Message |
+|---|---|---|
+| 1 | App → Deployment (Lok) | `GET /.well-known/fakts` |
+| 2 | Deployment → App | the endpoint document (`device_authorization_endpoint`, `token_endpoint`, …) |
+| 3 | App → Deployment | `POST device_authorization_endpoint { manifest }` |
+| 4 | Deployment → App | `client_id`, `device_code`, `user_code`, `verification_uri_complete`, `interval` |
+| 5 | App → User | open `verification_uri_complete` |
+| 6 | User → Deployment | review the app, its scopes and requirements, pick instances, approve |
+| 7 | App → Deployment, every `interval` seconds | `POST token_endpoint grant_type=device_code`, answered with `400 { error: authorization_pending }` until step 6 is done |
+| 8 | Deployment → App | `200 { access_token, refresh_token, client_id, self, instances, statuses }` |
+| 9 | App → Deployment, later | `POST token_endpoint grant_type=refresh_token`, answered with new tokens and a re-rendered envelope |
+
+## Where the pieces live
+
+- The **server side** of Fakts is part of [Lok](/docs/develop/internals#lok), the
+  coordinator. It serves the well-known document, registers clients, runs the
+  configure page, and issues and refreshes tokens.
+- The **client side** is small enough to live inside each app. The Orkestrator
+  desktop app carries its own implementation, and the
+  [fakts](https://github.com/jhnnsrs/fakts) (Python) and
+  [fakts-ts](https://github.com/jhnnsrs/fakts-ts) (TypeScript) libraries do the
+  same for your own apps. Because every step is plain HTTP with standard OAuth2
+  semantics, any OAuth2 device-flow client can be adapted with a few lines.
+- Across networks, the same coordinator role is played by the coordination server
+  of the [mesh](/docs/concepts/security/mesh).

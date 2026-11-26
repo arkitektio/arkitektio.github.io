@@ -59,23 +59,23 @@ type Node = {
 };
 
 const services: Node[] = [
-  { label: 'Rekuest', sub: 'actions', icon: Network, href: '/docs/concepts/services/rekuest' },
-  { label: 'Mikro', sub: 'images', icon: Layers, href: '/docs/concepts/services/mikro' },
-  { label: 'Kraph', sub: 'graph', icon: Share2, href: '/docs/concepts/services' },
-  { label: 'Kabinet', sub: 'registry', icon: Box, href: '/docs/concepts/services/kabinet' },
-  { label: 'Yours?', sub: 'add a service', icon: Plus, placeholder: true, href: '/docs/reference/projects#contributing' },
+  { label: 'Rekuest', sub: 'actions', icon: Network, href: '/docs/develop/internals/rekuest' },
+  { label: 'Mikro', sub: 'images', icon: Layers, href: '/docs/develop/internals/mikro' },
+  { label: 'Kraph', sub: 'graph', icon: Share2, href: '/docs/develop/internals' },
+  { label: 'Kabinet', sub: 'registry', icon: Box, href: '/docs/develop/internals/kabinet' },
+  { label: 'Yours?', sub: 'add a service', icon: Plus, placeholder: true, href: '/docs/develop/projects#contributing' },
 ];
 
 // The AI Agent is one of the apps (just another caller of actions).
 const apps: Node[] = [
   { label: 'Acquire', sub: 'Capture from the scope', tech: 'µManager', icon: Aperture, hue: 195, href: '/docs/guides/apps' },
-  { label: 'Process', sub: 'Denoise & restore', tech: 'Python', icon: Workflow, hue: 92, href: '/docs/guides/python' },
+  { label: 'Process', sub: 'Denoise & restore', tech: 'Python', icon: Workflow, hue: 92, href: '/docs/develop/python' },
   { label: 'Segment', sub: 'Find the objects', tech: 'Docker', icon: Box, hue: 250, href: '/docs/guides/apps#segmentor' },
-  { label: 'Analyze', sub: 'Measure & quantify', tech: 'Jupyter', icon: LineChart, hue: 40, href: '/docs/guides/python/scripts' },
+  { label: 'Analyze', sub: 'Measure & quantify', tech: 'Jupyter', icon: LineChart, hue: 40, href: '/docs/develop/python/scripts' },
   { label: 'Visualize', sub: 'Inspect & validate', tech: 'napari', icon: Eye, hue: 320, href: '/docs/guides/apps/mikro-napari' },
-  { label: 'Protocol', sub: 'Adaptive routine', tech: 'custom', icon: FlaskConical, hue: 25, href: '/docs/get-started/next-steps/first-python-app' },
+  { label: 'Protocol', sub: 'Adaptive routine', tech: 'custom', icon: FlaskConical, hue: 25, href: '/docs/develop/first-python-app' },
   { label: 'AI Agent', sub: 'Plans & runs workflows', tech: 'LLM', icon: Bot, hue: 292, href: '/docs/guides/apps' },
-  { label: 'Your app', sub: 'Bring your own', icon: Plus, placeholder: true, href: '/docs/get-started/next-steps/first-python-app' },
+  { label: 'Your app', sub: 'Bring your own', icon: Plus, placeholder: true, href: '/docs/develop/first-python-app' },
 ];
 
 const N = apps.length;

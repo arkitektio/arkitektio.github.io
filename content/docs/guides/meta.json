@@ -1,19 +1,16 @@
 {
-  "title": "Guides",
+  "title": "Guides & tutorials",
+  "description": "Work with your data, apps and workflows",
   "icon": "Compass",
+  "root": true,
   "pages": [
-    "---Using Arkitekt---",
+    "---Tutorials---",
+    "first-workflow",
+    "napari-and-fiji",
+    "---Working with data---",
     "...using",
-    "apps",
-    "---Running a hub---",
-    "...hub",
-    "---Writing apps---",
-    "python",
-    "rust",
-    "kotlin",
-    "connect",
-    "app-kinds",
-    "uc2",
+    "---Apps---",
+    "...apps",
     "---When things break---",
     "troubleshooting"
   ]

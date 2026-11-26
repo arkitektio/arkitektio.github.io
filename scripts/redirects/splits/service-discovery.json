@@ -1,13 +1,13 @@
 {
   "source": "concepts/service-discovery.mdx",
-  "primary": "concepts/services/service-discovery.mdx",
+  "primary": "develop/internals/service-discovery.mdx",
   "anchors": {
-    "step-0-discover-the-deployment": "reference/protocols/fakts.mdx#step-0-discover-the-deployment",
-    "step-1-register-and-request-device-authorization": "reference/protocols/fakts.mdx#step-1-register-and-request-device-authorization",
-    "step-2-the-user-approves-the-app": "reference/protocols/fakts.mdx#step-2-the-user-approves-the-app",
-    "step-3-poll-the-token-endpoint": "reference/protocols/fakts.mdx#step-3-poll-the-token-endpoint",
-    "step-4-refresh-and-pick-up-configuration-changes": "reference/protocols/fakts.mdx#step-4-refresh-and-pick-up-configuration-changes",
-    "the-envelope": "reference/protocols/fakts.mdx#the-envelope",
-    "aliases-one-service-many-addresses": "reference/protocols/fakts.mdx#aliases-one-service-many-addresses"
+    "step-0-discover-the-deployment": "develop/protocols/fakts.mdx#step-0-discover-the-deployment",
+    "step-1-register-and-request-device-authorization": "develop/protocols/fakts.mdx#step-1-register-and-request-device-authorization",
+    "step-2-the-user-approves-the-app": "develop/protocols/fakts.mdx#step-2-the-user-approves-the-app",
+    "step-3-poll-the-token-endpoint": "develop/protocols/fakts.mdx#step-3-poll-the-token-endpoint",
+    "step-4-refresh-and-pick-up-configuration-changes": "develop/protocols/fakts.mdx#step-4-refresh-and-pick-up-configuration-changes",
+    "the-envelope": "develop/protocols/fakts.mdx#the-envelope",
+    "aliases-one-service-many-addresses": "develop/protocols/fakts.mdx#aliases-one-service-many-addresses"
   }
 }

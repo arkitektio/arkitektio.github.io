@@ -1,0 +1,122 @@
+---
+title: Embedded reference
+description: "Reference for Arkitekt on microcontrollers in Rust: the crates, what the board has to provide, provisioning and login, TLS, memory, the mesh, and what is not there yet."
+type: reference
+---
+
+Reference for the Rust embedded stack introduced in
+[Your first embedded device](/docs/develop/first-device). The firmware it describes is
+[`esp32-embassy-demo`](https://github.com/arkitektio/esp32-embassy-demo).
+
+## The crates
+
+Embedded devices use the [Rust client](/docs/develop/first-rust-app), built without the standard
+library. The app-facing API is the one in the [Rust reference](/docs/develop/reference/rust):
+`#[action]`, typed ports, `Task`, `StateMut<T>` and the lifecycle hooks.
+
+| Layer | Crate |
+|---|---|
+| The app: `App`, `#[action]`, `#[derive(State)]` | `arkitekt-spec` |
+| Connecting and serving on a platform | `arkitekt-core` (`Runtime`) |
+| The embassy platform: login, agent, HTTP, WebSocket, TLS | `arkitekt-embassy` (`Board`, `Embassy`, `NetHost`) |
+| Bluetooth provisioning | `arkitekt-ble-provisioning` |
+| The mesh (optional) | `arkitekt-mesh-embassy` |
+
+Below those, the demo uses the Rust ecosystem's own drivers for the chip: `esp-hal` for the
+peripherals, `esp-radio` for Wi-Fi and Bluetooth, `embassy-net` for IP, and `esp-storage` for
+flash.
+
+## What the board provides
+
+A desktop has an operating system. A board has to hand the runtime four things itself:
+
+| | Why |
+|---|---|
+| A TCP client and DNS | Every connection to the platform. The demo uses `embassy-net`. |
+| Randomness | TLS, ids and `task.random`. The demo uses the chip's hardware RNG. |
+| A wall clock | Certificates are checked against the date. The demo sets it over SNTP after Wi-Fi is up. |
+| Trusted root certificates | Which servers the device believes. See [TLS](#tls). |
+
+These go into `Board`, and `Runtime::connect(board, app, options)` logs the app in and returns a
+runtime whose `serve()` runs the agent. Porting to another chip means providing those four things.
+The app code does not change.
+
+## Provisioning and login
+
+A device has no browser, so it cannot go through the approval page a desktop app opens. Instead it
+is **provisioned** once:
+
+1. From boot the device advertises `ARKITEKT-xxxx` over Bluetooth and exposes its app identifier,
+   version and device id.
+2. In Orkestrator, **Lok → Provision a device** reads those, issues a key for exactly that device
+   and app, and sends one document: the Wi-Fi credentials, the address of the deployment and the
+   key.
+3. The device stores the document in its own flash partition (`arkitekt`).
+
+On every boot it joins the Wi-Fi, sets its clock, and logs in with the stored key. The login is
+ordinary [Fakts](/docs/develop/protocols/fakts): the device receives a token and the addresses of
+the services, opens the [agent socket](/docs/develop/protocols/agent) and registers.
+
+The device reports where it is in that sequence over Bluetooth, so Orkestrator can show it:
+`registered`, or `wifi_failed`, or `login_failed:<reason>`.
+
+**WPA2-Enterprise** (PEAP/TTLS, for example eduroam) is supported, with the identity, anonymous
+identity and CA certificate taken from Orkestrator. Without a CA the RADIUS server is not verified.
+
+**Reset.** Hold BOOT for 5 seconds while the device starts. Its configuration and login are erased
+and it can be provisioned again.
+
+## TLS [#tls]
+
+The login (`https://`) and the agent (`wss://`) use TLS 1.3 or 1.2, and **the server's certificate
+is verified**. The device trusts the root certificates compiled into the firmware. The demo ships
+the Let's Encrypt roots. For a deployment behind another certificate authority, add its root in
+DER form to the firmware's `certs/` directory and to its list of roots:
+
+```sh
+openssl x509 -in root.pem -outform der -out certs/my-root.der
+```
+
+Verifying a certificate chain costs a microcontroller about a second per signature. Sessions are
+resumed, and the login keeps its connection open between requests, so the device checks a server's
+chain once per boot and not once per request.
+
+## Memory
+
+Memory is the constraint that shapes the firmware:
+
+| | Heap |
+|---|---|
+| Wi-Fi | about 50 KiB |
+| Each TLS connection (the login's, the agent's) | 33 KiB of record buffers |
+| Bluetooth | its share, until it is switched off |
+
+This is why Bluetooth goes off 5 seconds after the device registers. On the classic ESP32, where
+Bluetooth and Wi-Fi together leave very little, Bluetooth goes off *before* the login.
+Orkestrator's provisioning page then reports the device as out of reach, and its Devices page
+shows it registering.
+
+## The mesh
+
+With the `mesh` feature, an ESP32-S3 with PSRAM joins the deployment's
+[mesh](/docs/concepts/security/mesh) and reaches services that are only available there, the same way
+a desktop app does. It needs about 200 KiB of heap while on the mesh, which is why it requires
+PSRAM. This variant is built but has not yet been run on a board.
+
+```sh
+cargo esp32s3 --features mesh
+```
+
+## What is not there yet [#what-is-not-there-yet]
+
+| | Status |
+|---|---|
+| Workflows, calling other actions | Not supported, as in the [desktop Rust client](/docs/develop/reference/rust#status) |
+| Service clients such as Mikro | Not on a board. A device offers actions and state. It does not read or write images. |
+| A journal that survives a reboot | Not on a board. A device that reboots mid-task leaves the task [lost](/docs/concepts/terminology#states). |
+| EAP-TLS (client certificates) for enterprise Wi-Fi | Not supported |
+| Encrypting the provisioning document over Bluetooth | Not yet |
+| Over-the-air firmware updates | Not yet |
+| The mesh on the classic ESP32 | Not possible without PSRAM |
+| Published crates | The demo still builds against sibling checkouts of some crates |
+| Other chips | Only the ESP32 and ESP32-S3 are wired up. Other embassy targets need their own `Board`. |

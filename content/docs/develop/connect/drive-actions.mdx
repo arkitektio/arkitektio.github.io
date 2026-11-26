@@ -1,0 +1,74 @@
+---
+title: Drive actions from code
+description: "Starting tasks on other apps from a script: connect(RekuestCaller), call an action by id, retry what is safe to repeat and decide about the rest when an agent dies. And when a script loop should become a workflow."
+type: guide
+---
+
+Anything a person can start from Orkestrator, code can start too: run a segmentation, move a
+stage, dispense into a well. The script is the caller. It starts a task on whichever agent offers
+the action, waits for the result and decides what to do next.
+
+## Use it when
+
+- A **script or a CI job** should run other apps' actions: a nightly re-analysis, an acquisition
+  plan, a test of a deployment.
+- You know the action at run time, by its id.
+
+## The shape
+
+```python
+from mikro import Mikro
+from rekuest.client.client import RekuestCaller
+
+from arkitekt import AgentLost, connect, retry
+
+COUNT_CELLS = "<action-id>"     # "Copy id" on the action in Orkestrator
+DISPENSE = "<action-id>"
+
+with connect(RekuestCaller, Mikro, identifier="plate-runner") as (rekuest, mikro):
+    image = mikro.get_array_dataset("1234").lens()
+
+    # Counting changes nothing: if its agent dies, simply count again.
+    cells = retry(rekuest.call, COUNT_CELLS, image=image, attempts=3, if_started=True)
+
+    try:
+        rekuest.call(DISPENSE, well="A1", volume_ul=0.5 * cells)
+    except AgentLost as lost:
+        if not lost.started:
+            rekuest.call(DISPENSE, well="A1", volume_ul=0.5 * cells)   # it never reached the robot
+        else:
+            print(f"Dispense lost at {lost.last_progress}% (effects: {lost.effects}). Check A1.")
+```
+
+- `RekuestCaller` is the client that starts tasks. `rekuest.call(...)` blocks until the result is
+  there, `await rekuest.acall(...)` is its async twin.
+- A call from a script is a **root task**: it has no parent, and it is recorded as started by you,
+  through this script.
+- **`AgentLost`** tells you an agent died while running your task: whether it had started, how far
+  it got, and what the action says repeating it would do (`effects`). The top-level `retry` handles
+  the common case.
+
+## When it should be a workflow
+
+A script is the right tool as long as losing **the script itself** is cheap. If it dies halfway,
+the tasks it started keep running, but nothing waits for their results and nobody decides about the
+next step. Make it an [`@app.workflow`](/docs/develop/app-kinds/workflow) when:
+
+- the sequence takes long, or involves hardware;
+- a crash halfway would leave something in an unknown state;
+- others should be able to start the same sequence from Orkestrator.
+
+A workflow is journaled and resumed on a new agent. The calls look almost the same, through a
+protocol instead of an id.
+
+## What to watch
+
+- **Not inside an action.** Calling through the client from inside a running action raises
+  `RootOnlyCallError`: it would create an unrelated root task instead of a child. Use a workflow.
+- **Ids are per deployment.** An action id copied from one server means nothing on another. A
+  workflow's protocol finds actions by what they are, wherever they run.
+
+## Next
+
+- Python: [Scripts & notebooks](/docs/develop/python/scripts#calling-actions) and
+  [Durable execution](/docs/develop/python/durable-execution#from-a-script).

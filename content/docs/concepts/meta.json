@@ -1,21 +1,20 @@
 {
-  "title": "Concepts",
+  "title": "What is Arkitekt?",
+  "description": "The idea, in plain words, then the deep dive",
   "icon": "Lightbulb",
+  "root": true,
   "pages": [
-    "---Arkitekt---",
+    "basics",
     "index",
+    "philosophy",
+    "comparisons",
+    "---Deep dive---",
     "terminology",
     "provenance",
-    "performance",
-    "ai",
-    "philosophy",
     "security",
-    "deployment",
-    "---Building on Arkitekt---",
-    "building",
-    "patterns",
-    "services",
-    "---Compared---",
-    "comparisons"
+    "coordinate-systems",
+    "lineage",
+    "performance",
+    "ai"
   ]
 }

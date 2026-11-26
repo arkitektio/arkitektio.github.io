@@ -135,7 +135,7 @@ Each folder uses a `meta.json` to control sidebar ordering and labels. To add a 
 `.mdx` file in the relevant folder with a `title` and `description` in its frontmatter, and add
 it to that folder's `meta.json`.
 
-Link to other pages with absolute URLs (`/docs/guides/python/workflows`), not relative paths.
+Link to other pages with absolute URLs (`/docs/develop/python/workflows`), not relative paths.
 
 MDX components (callouts, code blocks, custom React widgets) are available inside
 content. Frontmatter and MDX options are configured in

@@ -356,7 +356,7 @@ export function GetStartedPaths({ hub }: { hub: 'join' | 'own' }) {
             Docker.
           </Card>
           <Card
-            href="/docs/get-started/basics"
+            href="/docs/concepts/basics"
             says={COFFEE_BREAK}
             title="With a coffee"
             meta="The basics, then three short pages"
@@ -378,7 +378,7 @@ export function GetStartedPaths({ hub }: { hub: 'join' | 'own' }) {
             One command for the hub, one app, one result. No explanations on the way.
           </Card>
           <Card
-            href="/docs/get-started/basics"
+            href="/docs/concepts/basics"
             says={COFFEE_BREAK}
             title="With a coffee"
             meta="The basics, then five short pages"

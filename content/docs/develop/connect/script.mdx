@@ -1,0 +1,72 @@
+---
+title: Script
+description: "A program that connects, does its job and exits: uploading data, exporting results, a batch analysis. connect(Mikro), several clients at once, sync and async, and typed GraphQL for operations the client does not wrap."
+type: guide
+---
+
+The simplest way to use the platform: a Python file that connects, does one job and exits.
+Uploading a folder of images, exporting a table of results, re-running an analysis over last
+week's datasets.
+
+## Use it when
+
+- The program has a **beginning and an end**.
+- You run it yourself, or a scheduler does (see [Unattended](/docs/develop/connect/unattended)).
+- Nothing else needs to call it.
+
+## The shape
+
+```python
+import numpy as np
+import xarray as xr
+
+from arkitekt import connect
+from mikro import Mikro, dataset_arrays
+
+volume = xr.DataArray(np.random.rand(1, 20, 256, 256).astype("float32"), dims=("c", "z", "y", "x"))
+
+with connect(Mikro, identifier="volume-upload") as mikro:
+    folder = mikro.create_folder(name="examples")
+    level_zero, scales = dataset_arrays(volume, levels=3, method="mean")
+    dataset = mikro.create_array_dataset(
+        data=level_zero, scales=scales, name="random volume",
+        axes=["c", "z", "y", "x"], folder=folder.id,
+    )
+    print(dataset.id)
+```
+
+- **The identifier** is the app you approve, once, and what the platform records as having created
+  the data. It defaults to the file's name. Give it one that says what the script is for.
+- **Nothing connects before the block.** Entering logs in and connects, leaving disconnects.
+- **Several clients** come back as a tuple, in order: `with connect(Mikro, Fluss) as (mikro, fluss):`.
+- **Async** is the same object: `async with connect(Mikro) as mikro:`, and every client method has
+  an `a`-prefixed twin (`await mikro.acreate_folder(...)`).
+
+## When the client has no method for it
+
+Every client wraps the operations most people need. For anything else, write the GraphQL query
+yourself and generate a typed function for it:
+
+```bash
+uv run arkitekt gen init --client mikro     # a GraphQL config and a folder for your queries
+uvx --with mikro turms gen                  # generate code from them
+```
+
+The generated functions use the connected client, so call them inside the `connect(...)` block.
+See [GraphQL](/docs/develop/python/graphql).
+
+## What to watch
+
+- **Returned objects are snapshots.** Setting an attribute changes nothing on the server. Call the
+  matching mutation.
+- **Large data goes in as datasets**, with a pyramid if anyone will look at it, and with the axes
+  named. [Uploading data from a script](/docs/develop/python/examples/uploads) shows the axis-order
+  mistakes to avoid.
+- **A script is not resumed.** If it dies halfway, what it already created stays and the rest is
+  not done. For long multi-step jobs that start tasks on other apps, see
+  [Workflow](/docs/develop/app-kinds/workflow).
+
+## Next
+
+- Python: [Scripts & notebooks](/docs/develop/python/scripts) and
+  [Uploading data from a script](/docs/develop/python/examples/uploads).
