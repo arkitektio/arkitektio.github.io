@@ -1,0 +1,10 @@
+{
+  "title": "Using Arkitekt",
+  "pages": [
+    "upload-data",
+    "local-workflows",
+    "deep-learning",
+    "training",
+    "live"
+  ]
+}

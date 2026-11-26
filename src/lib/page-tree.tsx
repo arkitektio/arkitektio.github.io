@@ -9,7 +9,7 @@ import { GUIDE_PATH_ATTR } from './guide';
  * Fumadocs separators are plain text. In a meta.json, `---[Label](/url)---` parses
  * as a separator with icon `Label` and name `(/url)`; this turns such a separator
  * into a link to `/url` labelled `Label`, so a section heading can open its
- * overview page (e.g. `---[Apps](/docs/use/apps)---`).
+ * overview page (e.g. `---[Apps](/docs/guides/apps)---`).
  */
 const LINK_NAME = /^\((\/[^)]*)\)$/;
 
@@ -47,7 +47,7 @@ export function withLinkedSeparators(tree: Root): Root {
 
 const paths = new WeakMap<Node, string>();
 
-// `/docs/build/rust/guide` -> `build/rust/guide/`
+// `/docs/guides/rust` -> `build/rust/guide/`
 const docPath = (url: string) => {
   const path = url.replace(/^\/docs\/?/, '').replace(/\/$/, '');
   return path ? `${path}/` : '';

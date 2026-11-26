@@ -1,0 +1,149 @@
+---
+title: Kotlin / Java
+description: "The experimental Arkitekt client for the JVM: what it is for, how to declare an app with @Action in Kotlin, how it fits into a Java host such as Fiji, and what is not implemented yet."
+type: guide
+---
+
+import { GithubRepo } from "@/components/docs";
+
+<GithubRepo url="https://github.com/arkitektio/arkitekt-kotlin" title="arkitekt-kotlin" />
+
+`arkitekt-kotlin` is the Arkitekt client for Kotlin and the JVM. It follows the same model as the
+[Python](/docs/guides/python) and [Rust](/docs/get-started/next-steps/first-rust-app) clients: an **app** is a
+declaration, a runtime logs it in and serves it, and plain functions become **actions**. The
+[shared concepts](/docs/concepts/building/shared-concepts) page explains that model once for all languages.
+
+<Callout type="warn" title="Experimental">
+
+This client is experimental. We currently use it for one thing: the
+[ImageJ plugin](/docs/guides/apps/imagej-plugin), which runs an Arkitekt agent inside Fiji's own JVM.
+It implements what that plugin needs and little else. It is not published to a Maven repository,
+its API changes without notice, and [large parts of the platform](#not-implemented-yet) are
+missing. For anything that does not have to live inside a JVM host, use
+[Python](/docs/guides/python) or [Rust](/docs/get-started/next-steps/first-rust-app).
+
+</Callout>
+
+## When to use it
+
+Use it when your code has to run **inside a JVM application** that you do not control, and that
+application should become an agent. Fiji is the case it was built for: the plugin registers the
+running Fiji instance as an agent and offers ImageJ operations as actions, with no second process
+in between.
+
+If you only want to *call* a JVM tool from Arkitekt, wrapping it from a Python app is usually
+less work.
+
+## A first app
+
+```kotlin
+import live.arkitekt.Action
+import live.arkitekt.App
+import live.arkitekt.Runtime
+
+/**
+ * Greet
+ *
+ * Say hello to someone.
+ *
+ * @param name Who to greet
+ * @param times How often
+ * @return What was said
+ */
+@Action
+fun greet(name: String, times: Int = 1): String = "Hello $name! ".repeat(times).trim()
+
+suspend fun main() {
+    // A declaration: nothing is contacted here. `GreetAction` is generated from the function above.
+    val app = App("greeter", "0.1.0").action(GreetAction)
+
+    // `connect` authorizes the app (a browser page, once), builds its clients and registers its
+    // actions. `serve` runs what the platform assigns, until it is cancelled.
+    val connection = Runtime(app).connect("https://go.arkitekt.live")
+    connection.serve()
+}
+```
+
+`@Action` on a top-level function makes it an action. A
+[KSP](https://kotlinlang.org/docs/ksp-overview.html) processor reads the function at compile time
+and writes `<FunctionName>Action` next to it. Nothing is looked up by reflection at run time, and
+a function the processor cannot turn into an action fails the build with the reason.
+
+- **Ports** come from the signature: `String`, `Int`/`Long`, `Float`/`Double`, `Boolean`, a `List`
+  of those, and any class whose companion object is a `Structure`. A nullable type is a nullable
+  port. A parameter with a default value is optional (at most four per action).
+- **Words** come from the KDoc. With more than one paragraph, the first is the action's name and
+  the rest its description. `@param` describes a port and `@return` the result.
+- **`@Inject`** marks a parameter the app fills instead of the caller, found by its type: the
+  `Context`, a declared service's client, or a value given with `App.provide(…)`.
+
+## Services and host objects
+
+A service is declared once, next to its client, and the app asks for it:
+
+```kotlin
+val mikro = Service("mikro", "live.arkitekt.mikro") { Mikro(it.alias, it.tokens) }
+
+val app = App("my-app", "0.1.0").service(mikro)
+
+@Action
+suspend fun showLens(lens: Lens, @Inject mikro: Mikro): Lens { … }
+```
+
+Services are built in the order they are declared, so one can build on another. Rekuest is
+required by every app and needs no declaration. The library ships no ready-made Mikro client:
+the ImageJ plugin brings its own.
+
+`App.provide(…)` makes an object of the host application injectable the same way. This is how an
+action gets hold of the thing it is embedded in, such as the viewer:
+
+```kotlin
+val app = App("fiji", "0.1.0").provide(viewer)
+
+@Action
+suspend fun showLens(lens: Lens, @Inject viewer: Viewer): Lens { … }
+```
+
+## Using it from Java
+
+The library is built with JDK 17 and compiled to **Java 8 bytecode**, so older JVM hosts such as
+Fiji can load it. That makes it usable *in* a Java project, but the actions themselves are written
+in Kotlin: the processor reads Kotlin functions, and handlers are suspending functions.
+
+The practical setup is a mixed project. Keep the Java code as it is, and add Kotlin files for the
+app declaration and the actions, which then call into your Java classes. The ImageJ plugin is
+built this way.
+
+## Adding it to a build
+
+There is no published artifact yet. Use it as a Gradle composite build:
+
+```kotlin
+// settings.gradle.kts
+includeBuild("../arkitekt-kotlin")
+
+// build.gradle.kts
+plugins { id("com.google.devtools.ksp") version "2.1.0-1.0.29" }   // for @Action
+
+dependencies {
+    implementation("live.arkitekt:arkitekt-kotlin")
+    ksp("live.arkitekt:arkitekt-kotlin-ksp")
+}
+```
+
+## Not implemented yet [#not-implemented-yet]
+
+| Works | Not yet |
+|---|---|
+| Discovery, device-code login, token rotation, cached login | Workflows and child calls |
+| `@Action` with typed ports, defaults, KDoc and structures | Startup, background and shutdown hooks |
+| `@Requires` / `@Provides` constraints on structures | State kept across restarts, structures as state fields |
+| Services and `@Inject` | An action's own bloks (logo, asks) and blok assets |
+| [State](/docs/concepts/building/shared-concepts#state) with `@State`, `StateMut` / `StateRef`, published as it changes | Several returns, enums, dictionaries and dates as ports |
+| Locks: on a state, and `@Action(locks = [...])` | A journal that survives a restart |
+| A `Task` parameter for progress and logs | |
+| [Bloks](/docs/concepts/building/shared-concepts#bloks) as BSX source, `App.blok(key, source)` (rekuest-server 21.4+) | |
+| The agent socket, with reconnect and resend | |
+
+The [README](https://github.com/arkitektio/arkitekt-kotlin#readme) is the current reference and
+is updated with the code.

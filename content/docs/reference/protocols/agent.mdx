@@ -1,0 +1,318 @@
+---
+title: The agent protocol
+description: "The Rekuest agent protocol frame by frame: registering over the /agi WebSocket, heartbeats, running a task, numbering and acknowledgements, state, close codes, and the minimum an agent has to implement."
+type: reference
+---
+
+The agent protocol is the conversation between an app and
+[Rekuest](/docs/concepts/services/rekuest). It is the only interface an app has to implement (see
+[Bare protocols](/docs/reference/protocols)). This page describes it at the level you need to write an
+agent from scratch.
+
+## Transport
+
+| | |
+|---|---|
+| **Endpoint** | A WebSocket at `/agi` on the Rekuest instance: `wss://<host>/<path>/agi`. The host and path come from the Rekuest alias in the [Fakts envelope](/docs/reference/protocols/fakts#the-envelope). |
+| **Direction** | The agent dials out. Nothing connects to the agent. |
+| **Frames** | JSON text frames, one message each |
+| **Authentication** | The access token from the Fakts login, sent inside the first frame. Not a header. |
+
+Every frame is an object with a `type` and an `id`:
+
+```json
+{ "type": "HEARTBEAT_ANSWER", "id": "5b0c1a0e-…" }
+```
+
+`type` names the message, in capitals. `id` is a fresh UUID for each frame. Unknown fields in a
+frame are ignored, with one exception: `REGISTER` is strict, so a typo there is refused instead of
+silently dropped.
+
+## The life of a connection
+
+```text
+ agent                                              Rekuest
+   │ ── REGISTER {token, declaration, session_id} ───► │   who I am, what I offer
+   │ ◄─ INIT {agent, positions} ────────────────────── │   accepted
+   │ ── SESSION_INIT {states} ───────────────────────► │   my states after startup
+   │                                                   │
+   │ ◄─ HEARTBEAT ──────────────────────────────────── │   every 10 s
+   │ ── HEARTBEAT_ANSWER ────────────────────────────► │
+   │                                                   │
+   │ ◄─ ASSIGN {task, interface, args} ─────────────── │   run this
+   │ ── COMMAND_ACK ─────────────────────────────────► │   got it
+   │ ── STARTED / PROGRESS / LOG ────────────────────► │
+   │ ── YIELD {returns} ─────────────────────────────► │   a result
+   │ ── COMPLETED ───────────────────────────────────► │   done
+   │ ◄─ JOURNAL_ACK ────────────────────────────────── │   stored
+```
+
+### Register
+
+The first frame must be `REGISTER`. Anything else closes the socket.
+
+```json
+{
+  "type": "REGISTER",
+  "id": "…",
+  "token": "<access token>",
+  "session_id": "0f6d…",
+  "nonce": "a41c…",
+  "force": false,
+  "features": ["protocol_2"],
+  "commands_seen": 0,
+  "sessions": [],
+
+  "name": "hello:0.1.0",
+  "hash": "9c2e…",
+  "spec_version": "10.1.0",
+  "implementations": [ … ],
+  "states": [],
+  "locks": [],
+  "bloks": []
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `token` | Who the agent is. The server expands it into an app, a user and an organization, and creates the agent on first contact. |
+| `session_id` | A UUID the **process** picks once at startup. The same value on a reconnect says "the same process is back", and its running tasks stay its own. A new value says a new process started, so whatever the old one was running is treated as lost. |
+| `nonce` | New for every connection attempt. `INIT` repeats it, so an answer to an abandoned attempt can be ignored. |
+| `force` | Take the agent over from another live connection. Leave it `false` unless a person asked for it. |
+| `features` | Must contain `protocol_2`: positions and acknowledgements in both directions, as described [below](#numbering). |
+| `commands_seen`, `sessions` | Where this process stands, for resuming after a reconnect. `0` and `[]` for a fresh process. |
+
+The remaining fields are the **declaration**: what the app offers. Registering *is* implementing.
+The server reconciles its records with the declaration in one step: actions and implementations
+are created or updated, and ones no longer declared are removed.
+
+Each entry of `implementations` pairs an `interface`, the name the agent runs it under, with a
+`definition`, which is what a caller sees:
+
+```json
+{
+  "interface": "greet",
+  "definition": {
+    "key": "greet",
+    "name": "Greet",
+    "description": "Says hello, possibly several times.",
+    "kind": "FUNCTION",
+    "args": [
+      { "key": "name", "kind": "STRING", "description": "Who to greet", "nullable": false }
+    ],
+    "returns": [
+      { "key": "return0", "kind": "STRING", "description": "The greeting", "nullable": false }
+    ]
+  }
+}
+```
+
+`args` and `returns` are the [ports](/docs/concepts/terminology#port). This is what a client library
+derives from a function signature and its doc comment.
+
+`hash` is a hash of the declaration. When it equals the one the server already holds, nothing is
+reconciled, which makes a reconnect cheap. The declaration may also be left out and registered
+through Rekuest's GraphQL API instead (the `implementAgent` mutation, which runs the same code).
+The Kotlin client does this.
+
+### Init
+
+The server answers with `INIT`. It is the only proof the connection worked. Send nothing but
+`REGISTER` before it arrives.
+
+```json
+{ "type": "INIT", "id": "…", "agent": "42", "hash": "9c2e…", "nonce": "a41c…",
+  "diagnostics": [], "positions": { "0f6d…": 7 } }
+```
+
+`diagnostics` lists non-fatal findings about the declaration. `positions` says how far the server
+has stored each session named in `sessions`. A declaration the server refuses is answered with a
+`PROTOCOL_ERROR` naming the reason, followed by close code `4006`.
+
+After `INIT`, the agent sends `SESSION_INIT` with the value of every state it declared (an empty
+object when it has none). It is the first numbered report of the session.
+
+### Heartbeat
+
+The server sends `HEARTBEAT` at an interval, 10 seconds by default. Answer each with
+`HEARTBEAT_ANSWER`. An agent that does not answer in time is closed with code `3001`, and one that
+stays silent long enough is considered dead: its running tasks end
+[lost](/docs/concepts/terminology#states).
+
+Answer heartbeats from somewhere that is not blocked by a running task. An agent that computes on
+the thread that reads the socket will be dropped in the middle of long work.
+
+## Running a task
+
+The server hands out work with `ASSIGN`:
+
+```json
+{
+  "type": "ASSIGN", "id": "…", "pos": 12,
+  "task": "7e1f…",
+  "interface": "greet",
+  "args": { "name": "Ada", "times": 2 },
+  "user": "3", "org": "https://lab.example#1",
+  "action": "17", "implementation": "88",
+  "root": null, "parent": null
+}
+```
+
+`interface` names which of the declared implementations to run, and `args` holds the input ports by
+key. `task` identifies the task in every frame from here on. `user` and `org` say for whom it runs.
+`root` and `parent` are set when the task was started by another task and not directly by a person.
+
+The agent reports back, always naming the `task`:
+
+| Frame | Meaning | Ends the task? |
+|---|---|---|
+| `STARTED` | Work began | no |
+| `PROGRESS {progress, message}` | Percent done and a short message | no |
+| `LOG {message, level}` | A log line | no |
+| `YIELD {returns}` | A result: the output ports by key | no |
+| `COMPLETED` | Finished successfully | **yes** |
+| `FAILED {error, code?}` | Ended with an error | **yes** |
+| `CRITICAL {error}` | Ended with an error the caller should not retry | **yes** |
+
+A result and the end of the task are separate frames. An ordinary function sends one `YIELD` and
+then `COMPLETED`. A generator sends a `YIELD` per item and `COMPLETED` when it is exhausted. Nothing
+may be reported for a task after its terminal frame.
+
+Structures are not sent as data. An image in `args` or `returns` is its id as a string, and the
+agent fetches the object from the service that owns it.
+
+### Being steered
+
+A person or a workflow can steer a running task. Each request is confirmed by the agent once it has
+acted:
+
+| Server sends | Agent confirms with | |
+|---|---|---|
+| `CANCEL {task}` | `CANCELLED` | Stop cooperatively. Terminal. |
+| `INTERRUPT {task}` | `INTERRUPTED` | Stop now, a harder request than cancel. Terminal. |
+| `PAUSE {task}` | `PAUSED` | Stop at the next pausepoint |
+| `RESUME {task, step}` | `RESUMED` | Carry on. With `step`, pause again at the next pausepoint. |
+| `INQUIRE {task}` | `INQUIRY_ANSWER {task, status}` | "What became of this task?" Answer at once, from memory. |
+
+An agent that cannot pause or cancel may leave those unanswered. The task then simply runs to its
+end, and the caller sees the request as unconfirmed.
+
+## Numbering and acknowledgements [#numbering]
+
+Networks drop, and a result must not be lost or stored twice. So both directions are numbered and
+acknowledged, and both sides keep what they sent until the other confirms it.
+
+**What the agent reports** carries four extra fields:
+
+```json
+{ "type": "YIELD", "id": "…", "task": "7e1f…", "returns": { "return0": "Hello Ada!" },
+  "pos": 4, "journal_session": "0f6d…", "agent_ts": 1790000000.25, "task_step": 2 }
+```
+
+| Field | |
+|---|---|
+| `pos` | 1, 2, 3, … across everything this process reports, with no gaps |
+| `journal_session` | The `session_id` the process registered with |
+| `agent_ts` | When the agent recorded the frame, in epoch seconds |
+| `task_step` | 1, 2, 3, … within one task |
+
+The agent keeps every numbered frame until the server sends `JOURNAL_ACK {journal_session,
+through}`, which confirms everything up to `through`. After a reconnect it sends what is still
+unconfirmed, in order, before anything new. A frame the server has already stored is skipped and
+acknowledged again, so resending is always safe. If the server sees a gap it answers `JOURNAL_NACK
+{expected}`, and the agent sends again from there.
+
+**What the server commands** (`ASSIGN`, `CANCEL`, `PAUSE`, …) carries its own `pos`. The agent
+handles each position once and confirms with `COMMAND_ACK {through}`. Until then the server sends
+the command again, so the same `ASSIGN` can arrive twice. An agent must start a given `task` only
+once.
+
+Not numbered: `REGISTER`, heartbeats, the acknowledgements themselves, and inquiries. These belong
+to one connection or have their own reply.
+
+This is the delivery half of [durable execution](/docs/concepts/building/durable-execution). An agent that
+also persists its unconfirmed frames to disk can deliver a result that was computed just before a
+crash.
+
+## State
+
+An app that publishes [state](/docs/concepts/building/shared-concepts#state) declares its states in
+`REGISTER` and then keeps the server's copy current:
+
+| Frame | Meaning |
+|---|---|
+| `SESSION_INIT {session_id, states}` | The baseline: every state's value after startup |
+| `STATE_PATCH {state_name, op, path, value, global_rev, task_id?}` | One change, as an [RFC 6902](https://www.rfc-editor.org/rfc/rfc6902) operation such as `replace /frames 12` |
+| `STATE_SNAPSHOT {global_rev, snapshots}` | Every state in full at a revision |
+| `LOCK {key, task}` / `UNLOCK {key, task}` | A task took or released a lock |
+
+Patches are numbered like task reports, and `global_rev` orders them across all of the agent's
+states. `task_id` names the task that caused a change, which is how the platform can show what an
+action did to a device.
+
+## Optional parts
+
+An agent can stop at everything above. The rest of the protocol is for features an app opts into:
+
+| Feature | Frames |
+|---|---|
+| **Calling other actions** (workflows) | `ASSIGN_REQUEST` → `ASSIGN_RESPONSE`, then `…_EVENT` frames mirroring the child's progress. The same for `CANCEL_REQUEST`, `PAUSE_REQUEST` and so on. |
+| **Recorded effects** (replay) | `EFFECT {task, effect, key, value}` for the clock, randomness and sleeps. A resumed workflow gets them back in `ASSIGN.resume`. |
+| **Asking a person** | `HELD` → `DECIDE`, and `INFORM` to show a blok while the task carries on |
+| **Values kept in memory** | `SHELVE`, `UNSHELVE`, and `COLLECT` from the server |
+| **Guards on state** | `STATE_REVISION_REQUEST` → `STATE_REVISION_RESPONSE`, and `state_requires` on `ASSIGN` |
+
+An agent cannot start a **root** task over the socket. Every task tree starts with a person, through
+the GraphQL API. An agent can only request children of a task it is running. See
+[Humans first](/docs/concepts/philosophy#a-platform-for-humans).
+
+## One live connection
+
+Only one connection may hold an agent at a time. A second connection for the same app, user and
+organization is refused while the first is alive, unless it sets `force`. A connection that died
+without closing does not block the agent: once it stops answering heartbeats it is displaced
+without `force`.
+
+The server can also end a connection on purpose:
+
+| Frame | Meaning |
+|---|---|
+| `KICK {reason}` | Leave and do not come back |
+| `BOUNCE {duration}` | Disconnect and reconnect, after `duration` if given |
+| `PROTOCOL_ERROR {error}` | Why the socket is about to be closed |
+
+## Close codes
+
+The close code says whether reconnecting can help.
+
+| Code | Meaning | What to do |
+|---|---|---|
+| `3001` | A heartbeat was not answered in time | Reconnect |
+| `3002` | A frame was not valid JSON | Stop. Reconnecting sends the same frame again. |
+| `3003` | A frame did not match the schema. Also an invalid token. | Stop and fix the client or the login |
+| `3005` | The server could not deliver to this socket | Reconnect |
+| `4003` | The agent is blocked | Stop. An operator has to unblock it. |
+| `4004` | Another live connection holds the agent | Wait and try again, or ask a person before using `force` |
+| `4005` | Another connection took the agent over | Stop. Reconnecting at once would evict the other in a loop. |
+| `4006` | The declaration was refused | Stop and fix the declaration |
+| none | The connection dropped | Reconnect with backoff, with the same `session_id` |
+
+## The minimum agent
+
+To offer actions and nothing else, an agent has to:
+
+1. Log in with [Fakts](/docs/reference/protocols/fakts) and find the Rekuest alias.
+2. Open `/agi` and send `REGISTER` with its token, a `session_id`, `features: ["protocol_2"]` and
+   its declaration.
+3. Wait for `INIT`, then send `SESSION_INIT` with empty `states`.
+4. Answer every `HEARTBEAT` with `HEARTBEAT_ANSWER`.
+5. For each `ASSIGN`: send `COMMAND_ACK`, run the function once per `task`, and report `YIELD` and
+   `COMPLETED`, or `FAILED`.
+6. Number its reports with `pos`, `journal_session`, `agent_ts` and `task_step`, and keep them
+   until a `JOURNAL_ACK` covers them.
+7. Reconnect with backoff and the same `session_id`, unless the close code says to stop.
+
+That is what the Kotlin client implements, in one file. To check a new agent, run the
+[conformance suite](https://github.com/arkitektio/rekuest-agentd#the-contract) against it, and
+compare your frames with the canonical examples in
+[`agent_wire_examples.json`](https://github.com/arkitektio/arkirust/tree/main/crates/rekuest-protocol/tests/fixtures).

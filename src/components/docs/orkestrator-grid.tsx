@@ -20,7 +20,7 @@ const PLATFORMS = [
 
 const POKKET_APK =
   "https://github.com/arkitektio/pokket/releases/latest/download/pokket.apk";
-const POKKET_IOS = "/docs/use/apps/pokket#install";
+const POKKET_IOS = "/docs/guides/apps/pokket#install";
 
 const Tile = ({ href, label, kind, Icon, yours = false, external = false }) => (
   <a
@@ -99,7 +99,7 @@ export const OrkestratorGrid = ({ pokket = false }) => {
             <span className="mr-2 rounded bg-amber-500/20 px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">
               Experimental
             </span>
-            <Link href="/docs/use/apps/pokket" className="underline underline-offset-4 hover:text-fd-primary">
+            <Link href="/docs/guides/apps/pokket" className="underline underline-offset-4 hover:text-fd-primary">
               Pokket
             </Link>
             , the mobile companion app

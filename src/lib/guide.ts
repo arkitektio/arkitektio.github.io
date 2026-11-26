@@ -2,9 +2,9 @@
 // docs a reader does not need are put away (see src/components/site/guide.tsx).
 //
 // Everything is data: an option names the folders and pages it hides, as paths
-// under content/docs with a trailing slash (`build/rust/` hides the folder,
-// `run/install-cli/` the page, `build/~bare-protocols/` the sidebar heading
-// "Bare protocols", whose entries share no folder). A question with `when` is only asked after that
+// under content/docs with a trailing slash (`guides/python/` hides the folder,
+// `guides/rust/` the page, `guides/~writing-apps/` the sidebar heading "Writing apps",
+// whose entries share no folder). A question with `when` is only asked after that
 // answer was given. To personalise something new, add an option or a question
 // here; nothing has to be tagged on the pages.
 
@@ -25,117 +25,103 @@ export type GuideQuestion = {
   options: GuideOption[];
 };
 
+// The docs are split by kind (Get Started, Guides, Reference, Concepts), not by who
+// you are; Klippy only puts away what makes no sense for this reader.
+const CODE = [
+  'get-started/next-steps/first-python-app/',
+  'get-started/next-steps/first-rust-app/',
+  'get-started/next-steps/first-device/',
+  'guides/~writing-apps/',
+  'guides/python/',
+  'guides/rust/',
+  'guides/kotlin/',
+  'guides/connect/',
+  'guides/app-kinds/',
+  'guides/uc2/',
+  'reference/~formats-config/',
+  'reference/manifest/',
+  'reference/plugin-config/',
+  'reference/~protocols-clients/',
+  'reference/protocols/',
+  'reference/rust/',
+  'reference/embedded/',
+  'concepts/~building-on-arkitekt/',
+  'concepts/building/',
+  'concepts/patterns/',
+  'concepts/services/',
+];
+const LANGUAGES: Record<string, string[]> = {
+  python: ['guides/python/', 'get-started/next-steps/first-python-app/'],
+  rust: ['guides/rust/', 'reference/rust/', 'get-started/next-steps/first-rust-app/'],
+  kotlin: ['guides/kotlin/'],
+  embedded: ['reference/embedded/', 'get-started/next-steps/first-device/', 'guides/app-kinds/microcontroller/'],
+};
+const allBut = (keep: string) =>
+  Object.entries(LANGUAGES).flatMap(([lang, paths]) => (lang === keep ? [] : paths));
+
 export const guideQuestions: GuideQuestion[] = [
   {
-    id: 'goal',
-    text: 'What brings you here?',
-    options: [
-      {
-        value: 'use',
-        label: 'My lab runs Arkitekt, I want to use it',
-        hide: ['run/', 'build/'],
-        start: '/docs/use/joining',
-      },
-      {
-        value: 'run',
-        label: 'I want to set up a hub',
-        hide: ['use/', 'build/'],
-        start: '/docs/run/what-you-are-setting-up',
-      },
-      {
-        value: 'build',
-        label: 'I want to write my own apps',
-        hide: ['use/', 'run/'],
-        start: '/docs/build/why-build',
-      },
-      { value: 'curious', label: 'Just looking around', start: '/docs/about' },
-    ],
-  },
-  {
     id: 'experience',
-    text: 'Have you worked with Arkitekt before?',
-    when: { goal: 'use' },
+    text: 'Have you used Arkitekt before?',
     options: [
-      { value: 'new', label: 'No, start me at the beginning' },
+      { value: 'new', label: 'No, this is my first time', start: '/docs/get-started' },
       {
         value: 'returning',
         label: 'Yes, I know my way around',
-        hide: ['use/joining/', 'use/first-steps/'],
-        start: '/docs/use/advanced',
+        hide: ['get-started/'],
+        start: '/docs/guides/using/upload-data',
       },
     ],
   },
   {
-    id: 'install',
-    text: 'How would you rather install it?',
-    when: { goal: 'run' },
+    id: 'hub',
+    text: 'Do you run a hub yourself?',
     options: [
       {
-        value: 'desktop',
-        label: 'With a desktop app',
-        hide: ['run/install-cli/', 'run/other-installation-strategies/'],
+        value: 'no',
+        label: 'No, someone runs it for me',
+        hide: [
+          'get-started/own-hub/',
+          'guides/hub/',
+          'guides/troubleshooting/hub/',
+          'reference/konstruktor/',
+          'reference/requirements/',
+          'concepts/deployment/',
+        ],
       },
-      {
-        value: 'cli',
-        label: 'From the command line',
-        hide: ['run/first-hub/'],
-        start: '/docs/run/install-cli',
-      },
-      { value: 'unsure', label: 'Not sure yet' },
+      { value: 'yes', label: 'Yes, or I am about to' },
+    ],
+  },
+  {
+    id: 'code',
+    text: 'Do you write code?',
+    options: [
+      { value: 'no', label: 'No, I use the apps', hide: CODE },
+      { value: 'yes', label: 'Yes, I want to build apps' },
     ],
   },
   {
     id: 'language',
     text: 'What do you write?',
-    when: { goal: 'build' },
+    when: { code: 'yes' },
     options: [
-      {
-        value: 'python',
-        label: 'Python',
-        hide: ['build/rust/', 'build/kotlin/', 'build/embedded/'],
-        start: '/docs/build/python/first-app',
-      },
-      {
-        value: 'rust',
-        label: 'Rust',
-        hide: ['build/python/', 'build/kotlin/', 'build/embedded/'],
-        start: '/docs/build/rust/first-app',
-      },
-      {
-        value: 'kotlin',
-        label: 'Kotlin',
-        hide: ['build/python/', 'build/rust/', 'build/embedded/'],
-        start: '/docs/build/kotlin',
-      },
-      {
-        value: 'embedded',
-        label: 'Firmware for a device',
-        hide: ['build/python/', 'build/rust/', 'build/kotlin/'],
-        start: '/docs/build/embedded/first-device',
-      },
+      { value: 'python', label: 'Python', hide: allBut('python'), start: '/docs/get-started/next-steps/first-python-app' },
+      { value: 'rust', label: 'Rust', hide: allBut('rust'), start: '/docs/get-started/next-steps/first-rust-app' },
+      { value: 'kotlin', label: 'Kotlin', hide: allBut('kotlin'), start: '/docs/guides/kotlin' },
+      { value: 'embedded', label: 'Firmware for a device', hide: allBut('embedded'), start: '/docs/get-started/next-steps/first-device' },
       { value: 'several', label: 'A bit of everything' },
     ],
   },
   {
     id: 'internals',
     text: 'Do you want to know how the hub works inside?',
-    when: { goal: 'build' },
+    when: { code: 'yes' },
     options: [
       { value: 'yes', label: 'Yes, show me the internals' },
       {
         value: 'no',
         label: 'No, just let me build',
-        hide: [
-          'build/services/',
-          'build/service-discovery/',
-          'build/graphql/',
-          'build/~bare-protocols/',
-          'build/protocols/',
-          'build/agent-protocol/',
-          'build/fakts-protocol/',
-          'build/backend-libraries/',
-          'build/koherent/',
-        ],
+        hide: ['concepts/services/', 'reference/~protocols-clients/', 'reference/protocols/'],
       },
     ],
   },
@@ -194,9 +180,5 @@ export function guideCss(answers: GuideAnswers | undefined) {
       `[data-radix-popper-content-wrapper] a:has(${label})`,
     ].join(',');
   });
-  // A reader with a section of their own needs no switch between sections.
-  if (answers.goal && answers.goal !== 'curious') {
-    rules.push(':is(#nd-sidebar,#nd-sidebar-mobile) button[aria-haspopup="dialog"]:has(p)');
-  }
   return rules.length > 0 ? `${rules.join(',')}{display:none}` : '';
 }

@@ -3,10 +3,9 @@
   "pages": [
     "index",
     "get-started",
-    "use",
-    "run",
-    "build",
-    "about",
+    "guides",
+    "reference",
+    "concepts",
     "---Legal---",
     "privacy"
   ]

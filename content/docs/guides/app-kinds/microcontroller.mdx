@@ -1,0 +1,64 @@
+---
+title: Microcontroller
+description: "A board as an agent of its own: Rust without an operating system, the same App and #[action] as on a desktop, running on an ESP32 with embassy. When it is worth it, and where to start."
+type: guide
+---
+
+A stage controller, a shutter, a temperature probe or a pump often sits behind a microcontroller.
+Such a board can be an Arkitekt agent **itself**: it registers actions and publishes state, with
+no computer in between.
+
+It uses the same Rust crates as a desktop app, the same `App`, `#[action]` and
+`#[derive(State)]`, built without the standard library and run on
+[embassy](https://embassy.dev), an async runtime for bare metal.
+
+## Use it when
+
+- The device **has no computer** next to it, or should not depend on one.
+- It is **simple**: a few actions and a little state.
+
+If a PC is attached anyway, a [device app](/docs/guides/app-kinds/device) on that PC that talks to the
+board over serial is usually easier to write and to debug.
+
+## The shape
+
+From the [ESP32 demo](/docs/get-started/next-steps/first-device): an action drives a pin and publishes what
+the board is now.
+
+```rust
+#[derive(Clone, Debug, Serialize, Deserialize, State)]
+#[state(name = "Led")]
+struct LedState {
+    /// Whether the LED is on
+    on: bool,
+}
+
+/// LED
+///
+/// Switches the board's LED on or off.
+#[action]
+async fn set_led(on: bool, state: StateMut<LedState>) -> anyhow::Result<bool> {
+    led::set(on);                      // drive the pin
+    state.set(LedState::now())?;       // publish what it is now
+    Ok(state.read(|led| led.on))
+}
+```
+
+The board is provisioned over Bluetooth: in Orkestrator, under **Lok → Provision a device**, you
+pick it, and Orkestrator sends it the Wi-Fi credentials, the deployment's address and a key it
+issues for the board. The board keeps them in flash and dials out to the server like any agent. No
+port is opened on the board.
+
+## What to watch
+
+- **It is experimental.** The embedded stack is young and changes quickly. Do not use it for
+  safety-relevant hardware.
+- **State is precious here.** Every update is a frame over Wi-Fi from a small device. The demo's
+  sensor hook reads the chip once a second but publishes only when a value moved by a meaningful
+  step (half a degree, 3 dB), so noise never becomes a stream of updates. Do the same (see
+  [Anti-patterns](/docs/concepts/building/anti-patterns#frequency)).
+
+## Next
+
+- [Your first embedded device](/docs/get-started/next-steps/first-device): the ESP32 demo, step by step.
+- [Embedded reference](/docs/reference/embedded), including what is not there yet.

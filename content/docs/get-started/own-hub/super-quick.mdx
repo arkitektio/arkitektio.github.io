@@ -14,7 +14,7 @@ steps over five short pages.
 
 All you need is **Docker**, installed and running
 ([Docker Desktop](https://www.docker.com/products/docker-desktop/) on macOS and Windows), on a
-reasonably recent machine: 16 GB of RAM is recommended (see [Requirements](/docs/run/requirements)).
+reasonably recent machine: 16 GB of RAM is recommended (see [Requirements](/docs/reference/requirements)).
 
 <Steps>
 <Step>
@@ -27,9 +27,9 @@ ORCID or your institution's login.
 <Callout type="info" title="You don't need us">
 
 Arkitekt also runs without go.arkitekt.live, with your own coordination server and fully offline
-([how](/docs/run/topology#three-ways-to-meet)). For a first try, use go.arkitekt.live: it only
+([how](/docs/concepts/deployment/topology#three-ways-to-meet)). For a first try, use go.arkitekt.live: it only
 stores what a login needs ([privacy](/docs/privacy#tier-2-an-account-on-goarkitektlive)) and never
-sees your data ([the mesh](/docs/run/security/mesh)).
+sees your data ([the mesh](/docs/concepts/security/mesh)).
 
 </Callout>
 
@@ -94,7 +94,7 @@ Wait until the **Running** count in the app's header shows 1.
 4. Click the mask that pops up to view it.
 
 Done: you have a hub, an app and a first result. Arkitekt also recorded that the mask came from
-that image, by a <Term id="task">task</Term> you started. That record is [provenance](/docs/about/provenance).
+that image, by a <Term id="task">task</Term> you started. That record is [provenance](/docs/concepts/provenance).
 
 </Step>
 </Steps>
@@ -105,14 +105,14 @@ that image, by a <Term id="task">task</Term> you started. That record is [proven
   <Card title="Understand what you just did" href="/docs/get-started/basics">
     The basics first, then the same five steps again, one page each, with the idea behind every step.
   </Card>
-  <Card title="Use: do more with it" href="/docs/use/first-steps">
+  <Card title="Use: do more with it" href="/docs/get-started/basics">
     Upload your own data, install more apps from the App Store, use napari and Fiji, and chain
     actions into workflows.
   </Card>
-  <Card title="Build: write your own app" href="/docs/build/python/first-app">
+  <Card title="Build: write your own app" href="/docs/get-started/next-steps/first-python-app">
     Turn your own Python function into an action like the ones you just ran, in a few lines.
   </Card>
-  <Card title="Deploy: set it up for your lab" href="/docs/run/what-you-are-setting-up">
+  <Card title="Deploy: set it up for your lab" href="/docs/concepts/deployment/what-you-are-setting-up">
     Plan a hub for a lab or a facility, with storage, more machines, and the GPU.
   </Card>
 </Cards>
@@ -127,6 +127,6 @@ that image, by a <Term id="task">task</Term> you started. That record is [proven
 - **Generate Test Image is not in the Actions list.** The app is not running yet. Open the App
   Store, find Basiks and check that it shows as running.
 
-More in [Troubleshooting](/docs/use/troubleshooting).
+More in [Troubleshooting](/docs/guides/troubleshooting).
 
 </Callout>

@@ -1,0 +1,518 @@
+---
+title: Shared concepts
+description: "The model every Arkitekt client follows, whatever the language: an app is a declaration, functions become actions, service clients are injected, state is published live, and bloks are UI wired to both. Shown side by side in Python, Rust and Kotlin."
+type: concept
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+Arkitekt has clients in several languages, and they are deliberately not three different
+frameworks. The platform speaks one protocol, so every client has to describe the same things to
+it. Once you know the model in one language, the others are a change of syntax.
+
+Five ideas carry over unchanged:
+
+| Concept | What it is | Who sees it |
+|---|---|---|
+| **App** | A declaration: who the program is and what it offers | The platform, when the app connects |
+| **Action** | A function others can call, with typed inputs and outputs | Everyone in your organization |
+| **Service** | A part of the platform the app uses, such as Mikro for images | The app's own actions, as an injected client |
+| **State** | A small set of values the app publishes as they change | The UI and other apps, live |
+| **Blok** | A UI panel wired to actions and state | A person, in Orkestrator |
+
+They build on each other. An app offers actions and states, its actions reach the platform
+through services, and a blok puts a face on them.
+
+```text
+                    ┌─────────────────────────── App ───────────────────────────┐
+                    │                                                           │
+   a person ──────► │   Blok ──── calls ────► Action ──── changes ────► State   │
+   looks and clicks │     ▲                                                │    │
+                    │     └────────────────── shows, live ─────────────────┘    │
+                    └───────────────────────────────────────────────────────────┘
+```
+
+<Callout type="info" title="Not every client has everything yet">
+
+Python is the reference client and has all five, plus workflows. Rust and Kotlin have all five
+too: apps, actions, services, state with locks, and bloks. Neither has workflows yet. The concepts below are the same wherever they exist, and the
+[table at the end](#what-each-client-supports) says what is implemented where.
+
+</Callout>
+
+## The app
+
+An app is a **declaration**. It says who the program is (an identifier and a version), which
+services it needs, and what it offers. Declaring it contacts nothing. That holds in every
+language, and it is why an app can be inspected, tested and packaged without a server.
+
+A separate step **connects** it. The first time, that means authorizing the app in a browser. The
+credential is cached, so later runs connect straight away. Once connected, the process is an
+[agent](/docs/concepts/terminology#agent): it registers what the app declared and waits for tasks.
+
+<Tabs items={["Python", "Rust", "Kotlin"]}>
+<Tab value="Python">
+
+```python
+from arkitekt import App, run
+
+app = App("greeter", "0.1.0", description="Says hello")
+
+# ... actions and states are declared on `app` ...
+
+if __name__ == "__main__":
+    run(app)   # connects, registers, serves until stopped
+```
+
+</Tab>
+<Tab value="Rust">
+
+```rust
+use arkitekt::{run, App};
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let app = App::new("greeter", "0.1.0")
+        .description("Says hello");
+        // .action(..) and .state(..) are chained here
+
+    run(app).await   // connects, registers, serves until stopped
+}
+```
+
+</Tab>
+<Tab value="Kotlin">
+
+```kotlin
+import live.arkitekt.App
+import live.arkitekt.Runtime
+
+suspend fun main() {
+    val app = App("greeter", "0.1.0")
+        .description("Says hello")
+        // .action(..) is chained here
+
+    val connection = Runtime(app).connect("https://go.arkitekt.live")   // authorizes, registers
+    connection.serve()                                                  // serves until cancelled
+}
+```
+
+</Tab>
+</Tabs>
+
+What stays the same:
+
+- **Identifier and version** tell the platform which app an implementation belongs to. They make up
+  the app's [manifest](/docs/reference/manifest), which is computed from the declaration. There is no
+  manifest file to keep in sync.
+- **Services are asked for, not configured.** The app names the [services](#services) it uses
+  (Mikro, for example), and the person authorizing the app approves that list.
+- **Declare, then connect.** Nothing leaves the machine until you call `run` (or `connect` in
+  Kotlin).
+
+## Actions
+
+An action is a **plain function** that the client turns into something the platform can call. You
+do not write a schema. The client reads the function and derives one:
+
+- The **parameters** become input [ports](/docs/concepts/terminology#port), and the **return type**
+  becomes the output ports. The types drive validation, serialization and the form Orkestrator
+  generates.
+- The **doc comment** becomes the words a person reads: the action's name, its description, and a
+  description for each port.
+- A **default value** makes a port optional.
+
+<Tabs items={["Python", "Rust", "Kotlin"]}>
+<Tab value="Python">
+
+```python
+@app.action
+def greet(name: str, times: int = 1) -> str:
+    """Greet
+
+    Says hello, possibly several times.
+    """
+    return " ".join([f"Hello {name}!"] * times)
+```
+
+</Tab>
+<Tab value="Rust">
+
+```rust
+/// Greet
+///
+/// Says hello, possibly several times.
+///
+/// # Arguments
+/// * `name` - Who to greet
+/// * `times` - How often
+#[action]
+async fn greet(name: String, #[port(default = 1)] times: i64) -> String {
+    format!("Hello {name}! ").repeat(times.max(1) as usize).trim_end().to_owned()
+}
+
+// let app = App::new("greeter", "0.1.0").action(greet);
+```
+
+</Tab>
+<Tab value="Kotlin">
+
+```kotlin
+/**
+ * Greet
+ *
+ * Says hello, possibly several times.
+ *
+ * @param name Who to greet
+ * @param times How often
+ */
+@Action
+fun greet(name: String, times: Int = 1): String = "Hello $name! ".repeat(times).trim()
+
+// val app = App("greeter", "0.1.0").action(GreetAction)
+```
+
+</Tab>
+</Tabs>
+
+The mechanism differs by language, and the result does not. Python reads the function when the
+decorator runs. Rust's `#[action]` macro and Kotlin's KSP processor do the same work at compile
+time, so a function that cannot become an action fails the build. All three register the same
+definition, which is why a `Greet` written in Rust is indistinguishable from one written in Python
+once it is on the platform.
+
+Three more things are shared:
+
+**Large data travels by reference.** An image or a dataset is a
+[structure](/docs/concepts/terminology#structure): the caller passes an id, and the client expands it
+into an object before your function runs, then shrinks the result back to an id. Your function
+works with `Image`, `ArrayDataset` or `Lens`, and never with the bytes on the wire.
+
+**Some parameters are filled by the app, not the caller.** A [service client](#services), a
+[state](#state), or the running task is injected and does not show up as a port. Python does this
+by type annotation, Rust by parameter type and `#[inject]`, Kotlin by `@Inject`.
+
+**Action versus implementation.** The action is the abstract "what", defined by its ports. Your
+function is one [implementation](/docs/concepts/terminology#what-is-an-implementation) of it. Two
+apps, in two languages, can implement the same action, and the platform picks one when a task is
+created.
+
+## Services
+
+An app rarely works alone. It reads images, stores results and looks things up, and those live in
+the platform's [services](/docs/concepts/services): [Mikro](/docs/concepts/services/mikro) for
+microscopy data, [Kraph](/docs/concepts/services/kraph) for the knowledge graph,
+[Fluss](/docs/concepts/services/fluss) for workflows, and so on. Each is a separate server with its
+own GraphQL API.
+
+Your code never holds a URL or a token for any of them. Using a service takes two steps, and they
+are the same in every language:
+
+1. **The app says it uses the service.** In Rust and Kotlin this is part of the declaration, next
+   to the identifier and version. In Python the annotation in step 2 already says it.
+2. **An action asks for the client as a parameter.** The runtime builds the client when the app
+   connects and passes it in on every call. Like the task and the state, it is **injected**: it is
+   not a port, and the caller never sees it.
+
+<Tabs items={["Python", "Rust", "Kotlin"]}>
+<Tab value="Python">
+
+```python
+from arkitekt import App
+from mikro import Mikro
+from mikro.arkitekt.specs import Volume
+
+app = App("inspect-volume", "0.1.0")
+
+
+@app.action
+def describe(volume: Volume, mikro: Mikro) -> str:   # 1 and 2: the annotation is the declaration
+    """Describe Volume"""
+    return f"{volume.data.shape}"
+```
+
+The annotation `Mikro` marks the parameter as injected, and it is also what makes the app use
+Mikro: when the app is assembled, arkitekt reads every annotation and collects the clients they
+name. A client only a startup hook or a blok uses goes in `App(..., clients=[Mikro])`.
+
+</Tab>
+<Tab value="Rust">
+
+```rust
+use arkitekt::{action, App};
+use mikro::{ArrayDataset, Mikro};
+
+/// Mean Intensity
+#[action]
+async fn mean_intensity(
+    image: ArrayDataset,
+    #[inject] mikro: Mikro,                                      // 2. take the client
+) -> anyhow::Result<f64> {
+    let data = mikro.read_array::<u16>(&image, 0).await?;
+    Ok(data.mapv(|v| v as f64).mean().unwrap_or(0.0))
+}
+
+let app = App::new("inspect", "0.1.0")
+    .service(mikro::service)                                     // 1. declare
+    .action(mean_intensity);
+```
+
+`#[inject]` marks the parameter, and the value is found by its type.
+
+</Tab>
+<Tab value="Kotlin">
+
+```kotlin
+// A service is declared once, beside its client: a key, the server-side service it needs,
+// and how the client is built from what the server hands out.
+val mikro = Service("mikro", "live.arkitekt.mikro") { Mikro(it.alias, it.tokens) }
+
+@Action
+suspend fun showLens(lens: Lens, @Inject mikro: Mikro): Lens { … }   // 2. take the client
+
+val app = App("inspect", "0.1.0")
+    .service(mikro)                                                  // 1. declare
+    .action(ShowLensAction)
+```
+
+`@Inject` marks the parameter, and the value is found by its type. The Kotlin library ships the
+`Service` mechanism and the Rekuest client every app has. `Mikro` here is a client you define or
+depend on.
+
+</Tab>
+</Tabs>
+
+Declaring a service does three things, whatever the language:
+
+- **It states a requirement.** The app says it needs Mikro, by the service's name
+  (`live.arkitekt.mikro`), not by an address. The person who authorizes the app sees the list of
+  requirements and approves it, so an app cannot quietly reach a service it never asked for.
+- **It lets the server answer where and how.** When the app connects, the server replies with where
+  each required service lives on *this* deployment, and the client is built from that answer with
+  the app's own token. The same binary runs unchanged against a laptop install and an institute's
+  server. This is [service discovery](/docs/concepts/services/service-discovery).
+- **It brings the service's types.** The structures a service owns (Mikro's images and datasets)
+  become usable as ports, which is what lets an action take an image by id.
+
+The client an action receives is already connected and authenticated as the app, acting for the
+user who authorized it. One client is built per connection and shared by every action that asks
+for it.
+
+<Callout type="info" title="Why injection, and not a global client?">
+
+Because the function says what it needs in its signature, the runtime can check that every service
+an action uses was declared, and a test can call the function with a stand-in client. It also keeps
+actions free of connection code, which is why the same function body can be moved between a script
+and an app.
+
+</Callout>
+
+## State
+
+A task lives for one call. The position of a stage, or whether a camera is connected, lives as long
+as the app does. **State** is how an app shows those values to the world.
+
+A state is a small typed record the app **publishes**. The platform keeps a copy, Orkestrator shows
+it live, and other apps can watch it. When an action changes a field, the client sends the change
+as a patch. Nobody polls, and you do not write "getter" actions that only return what the state
+already says.
+
+<Tabs items={["Python", "Rust", "Kotlin"]}>
+<Tab value="Python">
+
+```python
+@app.state
+class CameraState:
+    """What the camera is doing."""
+
+    connected: bool = False
+    frames: int = 0
+
+
+@app.startup
+def connect_camera() -> CameraState:
+    return CameraState(connected=True)   # built once, before the first task
+
+
+@app.action
+def snap(state: CameraState) -> int:
+    """Snap"""
+    state.frames += 1                    # published as it changes
+    return state.frames
+```
+
+</Tab>
+<Tab value="Rust">
+
+```rust
+#[derive(Debug, Clone, Default, Serialize, Deserialize, State)]
+#[state(name = "CameraState", locks = ["camera"])]
+struct CameraState {
+    /// Whether the camera is connected
+    connected: bool,
+    /// Frames acquired so far
+    frames: i64,
+}
+
+#[action]
+async fn snap(camera: StateMut<CameraState>) -> anyhow::Result<i64> {
+    camera.update(|c| c.frames += 1)?;   // published as it changes
+    Ok(camera.read(|c| c.frames))
+}
+
+let app = App::new("camera", "0.1.0")
+    .state(CameraState::default())
+    .startup(|startup| async move {      // runs once, before the first task
+        startup.set_state(CameraState { connected: true, frames: 0 })?;
+        Ok(())
+    })
+    .action(snap);
+```
+
+</Tab>
+<Tab value="Kotlin">
+
+```kotlin
+@State(name = "CameraState", locks = ["camera"])
+data class Camera(val connected: Boolean = false, val frames: Int = 0)
+
+@Action
+suspend fun snap(camera: StateMut<Camera>): Int {
+    return camera.update { it.copy(frames = it.frames + 1) }.frames   // published as it changes
+}
+
+val app = App("camera", "0.1.0")
+    .state(CameraState, Camera(connected = true))
+    .action(SnapAction)
+```
+
+The KSP processor writes `CameraState` (the declaration of `Camera`) and `SnapAction` beside them. Kotlin has no
+startup hook yet, so the initial value is passed to `.state(…)`.
+
+</Tab>
+</Tabs>
+
+What stays the same:
+
+- **One instance, shared.** Every action that takes the state receives the same one, so there is
+  one source of truth per app.
+- **Built at startup.** A startup hook runs before the first task and sets the state's initial
+  value. A shutdown hook runs on the way out. Do device and model setup there, not at import or
+  module level.
+- **Locks guard it.** A state can name locks that an action must hold to change it, so two tasks
+  cannot move the same stage at once.
+- **Keep it small.** State is published on every change and recorded in the agent's journal.
+  Positions, flags and counters belong in it. A model or an image does not: keep those in a private
+  context that is shared between actions but never published.
+- **Keep it actionable.** Publish what a workflow could guard on or a person could act on, when it
+  changes meaningfully. State is not a real-time channel: a camera stream or a 1 kHz sensor
+  belongs in a stream. [Anti-patterns](/docs/concepts/building/anti-patterns#frequency) explains why.
+
+## Bloks
+
+A plugin app has no window of its own. A **blok** is how it gets a UI: a declarative panel that
+the app contributes and Orkestrator renders.
+
+A blok contains no code. It is written in BSX, which reads like JSX: a tree of components from a
+catalog the platform ships (`Card`, `Text`, `Button`, …), wrapped in one `<Blok>` that says what it
+is (`kind`) and what draws it (`context`). Inside `{...}`, a blok reads and calls the app it belongs
+to through `self`:
+
+| In the source | Meaning |
+|---|---|
+| `<Text>Camera</Text>` | A **static** value |
+| `{self.CameraState.frames}` | A **binding** to a state: the panel updates when the state does |
+| `onClick={self.snap() into snapping}` | A **callback** that calls an action. `into` names the call, so the panel can show `snapping.running` |
+
+```xml
+<Blok kind="agent" context="panel">
+  <Card>
+    <CardHeader><CardTitle>Camera</CardTitle></CardHeader>
+    <CardContent>
+      <Text>{self.CameraState.frames} frames</Text>
+      <Button onClick={self.snap() into snapping} disabled={snapping.running}>Snap</Button>
+    </CardContent>
+  </Card>
+</Blok>
+```
+
+This is where the model closes into a loop. The button calls an action, the action changes the
+state, and the text bound to that state updates.
+
+The source is the same in every language. Each client only hands it to the platform, next to the
+states and actions it reads:
+
+<Tabs items={["Python", "Rust", "Kotlin"]}>
+<Tab value="Python">
+
+```python
+app.blok("panel", CAMERA_PANEL, description="Camera dashboard")
+```
+
+</Tab>
+<Tab value="Rust">
+
+```rust
+let app = App::new("camera", "0.1.0")
+    .state(CameraState::default())
+    .action(snap)
+    .blok("panel", CAMERA_PANEL);
+```
+
+</Tab>
+<Tab value="Kotlin">
+
+```kotlin
+val app = App("camera", "0.1.0")
+    .state(CameraState, Camera())
+    .action(SnapAction)
+    .blok("panel", CAMERA_PANEL, description = "Camera dashboard")
+```
+
+</Tab>
+</Tabs>
+
+A blok refers to actions and states **by name**, not by language. It does not know or care what
+wrote them. A panel can show a state published by a Rust device driver and call an action
+implemented in a Kotlin plugin, because all of them look the same once registered. The platform
+works out a blok's dependencies from the source, so it knows what each panel needs, and refuses a
+blok that reads a state or calls an action the app does not declare. Python checks the source
+itself when the app is assembled. Rust and Kotlin leave that to the server, which needs to be
+rekuest-server 21.4 or newer.
+
+Write the source as a literal (or `include_str!` in Rust), not as a string built at run time. A
+blok keeps view state of its own, such as a slider before Apply, in a `<local>`. It never keeps its
+own copy of the app's state: see [Anti-patterns](/docs/concepts/building/anti-patterns#ui-state).
+
+See [Bloks: UIs from JSX](/docs/guides/python/bloks) for the component catalog and how to bind to
+another app.
+
+## What each client supports [#what-each-client-supports]
+
+| | Python | Rust | Kotlin |
+|---|---|---|---|
+| **App**: declare, connect, serve | yes | yes | yes |
+| **Actions** from functions | `@app.action` | `#[action]` | `@Action` |
+| Structures by id | yes | yes | yes |
+| **Services** declared and injected | the annotation (`clients=[...]` for extras) | `.service(..)` and `#[inject]` | `.service(..)` and `@Inject` |
+| Ready-made Mikro client | yes | yes (array datasets) | not yet |
+| Progress and logs from a task | yes | yes | yes |
+| **State**, published live | `@app.state` | `#[derive(State)]` | `@State` |
+| Startup, background, shutdown hooks | yes | yes | not yet |
+| Locks | yes | yes | yes |
+| **Bloks** declared on the app | `app.blok(...)` | `.blok(..)` | `.blok(..)` |
+| Workflows (actions calling actions) | yes | not yet | not yet |
+
+Where to go next:
+
+- **Any language**: [Anti-patterns](/docs/concepts/building/anti-patterns): what not to do with state, UIs and
+  data, and what to do instead.
+- **Why it is built this way**: [The patterns behind Arkitekt](/docs/concepts/patterns): dependency
+  injection, stateless actions, pass by reference, observable state, durable execution and more.
+
+- **Python**: [Core concepts](/docs/guides/python#core-concepts), then
+  [State & lifecycle](/docs/guides/python/state-lifecycle) and [Bloks](/docs/guides/python/bloks).
+- **Rust**: [Your first Rust app](/docs/get-started/next-steps/first-rust-app), then the
+  [guide](/docs/guides/rust#state-and-lifecycle) for state.
+- **Kotlin / Java**: [Kotlin / Java](/docs/guides/kotlin). The client is experimental and is
+  currently used only for the ImageJ plugin.

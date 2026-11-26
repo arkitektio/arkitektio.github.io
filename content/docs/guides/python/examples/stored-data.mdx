@@ -1,0 +1,416 @@
+---
+title: Actions on stored data
+description: "Walk through denoise_volume.py, upload_trace.py and detect_spikes.py: actions that take datasets from Mikro and Elektro through specs like Volume and SingleChannelTrace, use an injected client, and store results with derivation edges."
+type: guide
+---
+
+The previous page put data into Mikro from a script. This page writes **actions** that work on that
+stored data. The user picks a dataset in Orkestrator, the action fetches its pixels, computes, and
+stores a new dataset that is linked to the original. Two examples use images in Mikro. The other two
+do the same for electrophysiology traces in Elektro.
+
+<Prerequisites>
+
+- A server with Mikro (and, for the second half, Elektro) deployed
+- [Uploading data from a script](/docs/guides/python/examples/uploads), so you have a volume to work on
+
+</Prerequisites>
+
+<Learn>
+
+- Use a spec like `Volume` as a port, and what it tells the platform
+- Have a client injected into an action
+- Read a stored dataset lazily and store a result next to it
+- Record where a result came from with a derivation edge
+- Store a trace with its unit and sampling rate in Elektro
+
+</Learn>
+
+## `denoise_volume.py`: an image in, an image out
+
+```python title="denoise_volume.py"
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "arkitekt[rekuest,mikro]>=19",
+#   "scipy>=1.13",
+#   "xarray>=2024.3.0",
+#   "numpy>=1.26",
+# ]
+# ///
+"""Offering: an action that takes an image from mikro and writes one back.
+
+Run:  uv run --script examples/denoise_volume.py
+
+`Volume` is not a new type: it is a lens over a mikro array dataset, annotated
+with what the action needs to be true of it. Saying `Volume` in the signature is
+what makes the UI offer only volumes here — the check is in the type, not in a
+paragraph of prose.
+
+The result is uploaded as its own dataset with a derivation edge back to the
+input, so the server knows the two share a grid and the frontend can overlay
+them.
+"""
+
+from typing import Annotated
+
+import numpy as np
+import xarray as xr
+from scipy import ndimage
+
+from arkitekt import App, Description, Task, run
+from mikro import Mikro
+from mikro.arkitekt.specs import Volume
+
+app = App("denoise-volume", "0.1.0")
+
+
+@app.action
+def denoise(
+    mikro: Mikro,  # The mikro client creates the result dataset (arkitekt injects it automatically)
+    task: Task,  # The task is needed to report progress (arkitekt injects it automatically)
+    volume: Annotated[Volume, Description("The stack to smooth")],  # The input volume to denoise
+    sigma: Annotated[float, Description("Gaussian width, in pixels")] = 1.5,
+) -> Volume:
+    """Smooths a stack with a gaussian and stores the result on the same grid."""
+    # `.data` fetches the array behind the lens as a lazy s3 backed xarray DataArray
+    source = volume.data
+    task.progress(20, f"Smoothing {source.shape}")
+
+    smoothed = xr.DataArray(
+        ndimage.gaussian_filter(np.asarray(source), sigma=sigma), dims=source.dims
+    )
+    task.progress(70, "Uploading")
+
+    result = mikro.create_array_dataset(
+        data=smoothed,  # We just created this array, so we can pass it directly to mikro to store it.
+        scales=[],
+        name=f"denoised (sigma={sigma})",
+        # We need to tell mikro what axes the result has, so it can be used in the same way as the input. The lens' `carried_axes` method copies the axes from the input volume to the output.
+        axes=volume.carried_axes(smoothed.dims),
+        # Same grid as this very input, with the values transformed.
+        derived_from=[
+            # We transformed the values, but we neither translared nor rotated the original image so a point in the input corresponds to the same point in the output, however we changed the values, so we use TRANSFORMED. If we had rotated or translated the image, we would need to use a different volume.derive_affine(...) call to describe the relationship between the two datasets.
+            volume.derive_identity(value_relation="TRANSFORMED")
+        ],
+    )
+    return result.lens()
+
+
+if __name__ == "__main__":
+    run(app)
+```
+
+### The app uses Mikro, because its annotations say so
+
+```python
+app = App("denoise-volume", "0.1.0")
+```
+
+Nothing in the `App(...)` line mentions Mikro. The app uses Mikro because `denoise` takes a
+`Volume` (a Mikro type) and a `mikro: Mikro` client. When the app is assembled, arkitekt reads those
+annotations and adds Mikro to what the app needs. That has two effects. When the app logs in, it
+asks the server for access to Mikro. It also makes Mikro's types, like `Volume`, valid as ports.
+`arkitekt inspect clients` shows what an app uses.
+
+### `Volume`: a type that says what it needs
+
+```python
+volume: Annotated[Volume, Description("The stack to smooth")],
+```
+
+Mikro stores *array datasets*. A **lens** is a view on one of them. `Volume` is a lens with a
+condition attached: **exactly three spatial axes**. You can see that condition in what
+`arkitekt inspect` reports for this port:
+
+```json
+"identifier": "@mikro/arraylens",
+"requires": [{"key": "@mikro/n_space_axes", "operator": "EQUALS", "value": 3}]
+```
+
+As an input, `Volume` makes Orkestrator and the workflow editor offer **only datasets with three
+spatial axes**. Nobody can pass a 2D image to `denoise` by mistake. As the return type, the same
+condition is recorded as what the action *provides*, so the editor knows the output fits wherever a
+volume is expected. Mikro has more of these specs, among them `Image`, `SingleChannelImage`,
+`MultichannelVolume` and `LabelMask`. They are all the same class, narrowed by features of each
+instance: [Requires & provides](/docs/guides/python/requires-provides) explains how, and how to write
+your own.
+
+### Injected: the client and the task
+
+```python
+mikro: Mikro,
+task: Task,
+```
+
+Here the two injected parameters come first and are not keyword-only. That works too: arkitekt
+recognises `Mikro` and `Task` by their annotations, wherever they are in the signature. The form
+only shows `volume` and `sigma`.
+
+`mikro` is a connected client, the same kind of object `connect(Mikro)` returns in a script. The action needs
+it to store its result.
+
+### Reading the data
+
+```python
+source = volume.data
+```
+
+`.data` is an `xarray.DataArray` backed by the object store. It is **lazy**: nothing is downloaded
+until you use the values. `np.asarray(source)` then loads all of it. For a large dataset, you would
+slice first, and only the chunks you touch would be fetched.
+
+### Storing the result, with its origin
+
+```python
+result = mikro.create_array_dataset(
+    data=smoothed,
+    scales=[],
+    name=f"denoised (sigma={sigma})",
+    axes=volume.carried_axes(smoothed.dims),
+    derived_from=[volume.derive_identity(value_relation="TRANSFORMED")],
+)
+return result.lens()
+```
+
+The action doesn't return an array. It **stores** one and returns a lens on the new dataset. Two
+arguments do the bookkeeping:
+
+- `axes=volume.carried_axes(...)` describes the output's axes by copying each one's type (channel,
+  space, time) from the input, instead of guessing it again from the axis name.
+- `derived_from=[volume.derive_identity(value_relation="TRANSFORMED")]` records a **derivation
+  edge**: this dataset was made from that one, on the same grid (identity: no shift, no rotation),
+  with different values (`TRANSFORMED`). The provenance graph shows where the result came from, and
+  viewers can overlay the two because they know the pixels line up. If the action had cropped or
+  rotated the volume, it would describe that with an affine derivation instead.
+
+## Try it
+
+Run the app against your server:
+
+```bash
+uv run --script examples/denoise_volume.py
+```
+
+In Orkestrator, open **Denoise**. The volume picker lists only datasets with three spatial axes:
+the volumes you uploaded on the previous page appear, a 2D image would not. Pick the NIfTI volume
+(`synthetic.nii.gz`, a single-channel `z, y, x` stack) and run it. The result is a new dataset
+named `denoised (sigma=1.5)` in Mikro, linked back to the input.
+
+<Callout type="info" title="Volume says nothing about channels">
+
+`cells3d` also qualifies as a `Volume`: it has three spatial axes, plus a channel axis. But
+`gaussian_filter` with a single `sigma` smooths along **every** axis, so on `cells3d` it would blur
+the membrane and nuclei channels into each other. If an action can only handle one channel, say so
+in the type: `SingleChannelVolume` requires three spatial axes **and** at most one channel.
+
+</Callout>
+
+## Electrophysiology: the same pattern with Elektro
+
+Elektro is Mikro's counterpart for signals. Datasets are arrays here too, but ordered along a time
+axis. The two examples mirror the ones above: a script that uploads, and an action that works on
+what was uploaded.
+
+### `upload_trace.py`: units and sampling
+
+```python title="upload_trace.py"
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["arkitekt[elektro]>=19", "numpy>=1.26"]
+# ///
+"""Calling: an electrophysiology trace into elektro.
+
+Run:  uv run --script examples/upload_trace.py
+
+elektro is mikro's sibling for signals: the same array datasets, ordered by a
+time axis. Two things live somewhere other than where one first looks for them:
+
+- the **unit** of the values is on a coordinate anchor, not on the axis;
+- the **sampling rate** is not on the dataset at all. It belongs to a session —
+  the clock the recording was made against — so several datasets can share one.
+
+The trace here is a synthetic one second of membrane potential at 20 kHz.
+"""
+
+import numpy as np
+from numpy.typing import NDArray
+from kanne.scalars import Duration, Frequency, Unit
+
+from arkitekt import connect
+from elektro import Elektro
+from elektro.api.schema import CoordinateAnchorInput, SamplingInput, ValueUnitInput
+
+RATE_HZ = 20_000.0
+SECONDS = 1.0
+
+
+def synthesise() -> NDArray[np.float32]:
+    """One second of resting potential with a few spikes on top."""
+    rng = np.random.default_rng(7)
+    n = int(RATE_HZ * SECONDS)
+    trace = rng.normal(-65.0, 0.4, n).astype("float32")
+    for onset in rng.choice(n - 40, size=12, replace=False):
+        shape = np.array([-60, -30, 20, 35, 10, -70, -75, -70], dtype="float32")
+        trace[onset : onset + shape.size] = shape
+    return trace
+
+
+def main() -> None:
+    """Upload the trace, then give it the clock it was recorded against."""
+    trace = synthesise()
+
+    with connect(Elektro, identifier="trace-upload") as elektro:
+        folder = elektro.create_folder(name="examples")
+
+        dataset = elektro.create_array_dataset(
+            data=trace,
+            scales=[],
+            name="V soma",
+            axes=["t"],
+            folder=folder.id,
+            anchors=[
+                CoordinateAnchorInput(
+                    axis_anchors=[],
+                    value_unit=ValueUnitInput(unit=Unit("millivolt")),
+                )
+            ],
+        )
+
+        session = elektro.create_session(
+            name="example recording",
+            datasets=[dataset.id],
+            time_unit=Unit("millisecond"),
+            sampling=SamplingInput(
+                rate=Frequency(f"{RATE_HZ} Hz"), t_start=Duration("0 ms")
+            ),
+        )
+        print(f"uploaded {dataset.id} in session {session.id}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+The upload looks like the Mikro ones, with an axis named `t`. Two pieces of information are stored
+somewhere you might not expect:
+
+- **The unit of the values** (millivolts) goes on a coordinate anchor, as `value_unit`. It isn't
+  part of the axis, because the axis is time. The *values* are in millivolts.
+- **The sampling rate** (20 kHz) isn't on the dataset at all. It belongs to a **session**: the
+  clock the recording was made against. Several datasets recorded together, like a voltage and a
+  current channel, share one session and so one clock.
+
+`Unit`, `Frequency` and `Duration` come from `kanne.scalars`. They take values as strings with
+units, such as `"20000.0 Hz"` or `"0 ms"`.
+
+### `detect_spikes.py`: an action over a trace
+
+```python title="detect_spikes.py"
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["arkitekt[rekuest,elektro]>=19", "scipy>=1.13", "xarray>=2024.3.0", "numpy>=1.26"]
+# ///
+"""Offering: spike detection over a trace that already lives in elektro.
+
+Run:  uv run --script examples/detect_spikes.py
+
+`SingleChannelTrace` is a lens over an elektro dataset, annotated with what this
+action needs: a time axis, and at most one channel. A multichannel recording
+still fits once the caller pins a channel — the constraint is on what arrives,
+not on what is stored.
+
+The result goes back as a trace of the same shape, one where every sample is
+zero except the detected peaks. Upload it next to the recording and the frontend
+draws the two on one axis.
+"""
+
+from typing import Annotated
+
+import numpy as np
+import xarray as xr
+from scipy.signal import find_peaks
+
+from arkitekt import App, Description, Task, run
+from elektro import Elektro
+from elektro.specs import SingleChannelTrace, carried_axes
+
+app = App("detect-spikes", "0.1.0")
+
+
+@app.action
+def detect_spikes(
+    trace: Annotated[SingleChannelTrace, Description("The recording to search")],
+    threshold: Annotated[float, Description("Peaks above this count, in mV")] = -20.0,
+    refractory_samples: Annotated[int, Description("Minimum spacing, in samples")] = 20,
+    *,
+    elektro: Elektro,
+    task: Task,
+) -> SingleChannelTrace:
+    """Finds threshold crossings and stores them as a trace of the same length.
+    """
+    source = trace.data
+    values = np.asarray(source).squeeze()
+    task.progress(30, f"Searching {values.size} samples")
+
+    peaks, _ = find_peaks(values, height=threshold, distance=refractory_samples)
+    marks = np.zeros_like(values, dtype="float32")
+    marks[peaks] = 1.0
+    task.progress(70, f"Found {peaks.size} spikes")
+
+    result = elektro.create_array_dataset(
+        data=xr.DataArray(marks.reshape(source.shape), dims=source.dims),
+        scales=[],
+        name=f"spikes (>{threshold} mV)",
+        axes=carried_axes(trace, source.dims),
+    )
+    return result.lens()
+
+
+if __name__ == "__main__":
+    run(app)
+```
+
+This is `denoise` again, for signals:
+
+- `SingleChannelTrace` is a lens with conditions. `arkitekt inspect` shows exactly one time axis, no
+  space, frequency or index axes, and **at most one channel**. A multichannel recording still fits,
+  once the caller selects a channel. The condition is about what arrives, not about what is stored.
+- `elektro: Elektro` and `task: Task` are injected, here as keyword-only parameters.
+- The result is stored as a new trace of the same length, zero everywhere except at the detected
+  peaks. `carried_axes(trace, source.dims)` copies the time axis, so the spike trace lines up with
+  the recording and the two can be drawn on one plot.
+
+As with `denoise`, there is nothing to declare: `SingleChannelTrace` and `elektro: Elektro` are
+Elektro's, so the app uses Elektro. Only a client that no annotation names (because a startup hook
+or a blok's query uses it) needs listing: `App("detect-spikes", "0.1.0", clients=[Elektro])`.
+
+## Try it
+
+```bash
+uv run --script examples/upload_trace.py    # one second of synthetic membrane potential, 12 spikes
+uv run --script examples/detect_spikes.py
+```
+
+In Orkestrator, run **Detect Spikes** on the *V soma* trace. With the default threshold of -20 mV,
+the result marks the spikes that the upload script put into the trace.
+
+## Next
+
+- Specs, lenses and structures in detail: [Types & data](/docs/guides/python/types#service-structures-large-data-by-reference)
+- Next example: [Embedding in your own program](/docs/guides/python/examples/embedding)
+
+<Quiz>
+  <Question q="What does annotating a port with Volume instead of a plain lens change for the user?">
+    The picker in Orkestrator and the workflow editor only offers datasets with exactly three spatial axes, so the wrong kind of data can't be passed in.
+  </Question>
+  <Question q="Why does denoise return result.lens() instead of the smoothed array?">
+    Large data is stored in the data service and passed by reference. The action stores the array with `create_array_dataset` and returns a lens on the new dataset.
+  </Question>
+  <Question q="What does derived_from record?">
+    A derivation edge from the input dataset to the result. Here it says the result is on the same grid with transformed values, so provenance is kept and viewers can overlay the two.
+  </Question>
+  <Question q="Where does Elektro store a trace's sampling rate?">
+    On a session, the clock the recording was made against. Several datasets can share it.
+  </Question>
+</Quiz>

@@ -1,0 +1,109 @@
+---
+title: Device
+description: "An app that drives hardware: the stage, camera, pump or robot behind it held in a context, what it is doing published as state, locks so two tasks never command it at once, and honest effects and disconnect policies."
+type: guide
+---
+
+A **device app** wraps a piece of hardware: a stage, a camera, a light source, a pump, a liquid
+handler. It runs on the machine the hardware is plugged into, and makes the device callable and
+watchable from anywhere: Orkestrator, a script, a workflow on another machine.
+
+What sets it apart from a [plugin](/docs/guides/app-kinds/plugin) is that the world it acts on is
+physical. A repeated call moves something again. A crash can leave the device halfway. Two people
+can try to drive it at once. The platform has a tool for each of these, and a device app uses all
+of them.
+
+## Use it when
+
+- Your code talks to **hardware**, through a serial port, a vendor SDK, a network socket.
+- People and workflows need to know **what the device is doing right now**.
+
+If the hardware is already driven by a program with its own window (vendor software, Micro-Manager,
+your own GUI), the app usually lives [inside that program](/docs/guides/app-kinds/host-program) instead.
+
+## The shape
+
+```python title="app.py"
+from dataclasses import dataclass
+
+from arkitekt import App, CancelOnDisconnect, Effects, Task
+
+app = App("com.example.stage", "0.1.0", effects=Effects.IRREVERSIBLE)   # moving is real
+
+
+@app.context
+@dataclass
+class Hardware:
+    """What the device *is*: never published."""
+    driver: StageDriver
+
+
+@app.state(required_locks=["stage"], persist=1.0)
+class Stage:
+    """What the device *is doing*: published as it changes."""
+    x_um: float = 0.0
+    y_um: float = 0.0
+    moving: bool = False
+
+
+@app.startup
+def connect_stage(old: Stage | None) -> tuple[Hardware, Stage]:
+    driver = StageDriver("/dev/ttyUSB0")
+    x, y = driver.position()                       # trust the encoder, not the memory
+    return Hardware(driver), Stage(x_um=x, y_um=y)
+
+
+@app.shutdown
+def release(hardware: Hardware) -> None:
+    hardware.driver.close()
+
+
+@app.action(policy=CancelOnDisconnect(grace=2.0))
+async def move_to(x_um: float, y_um: float, stage: Stage, hardware: Hardware, task: Task) -> None:
+    """Move To"""
+    stage.moving = True
+    await hardware.driver.amove(x_um, y_um)       # async: cancelled at this await if the link drops
+    with task.updating(stage):                     # one update: nobody sees x new, y old
+        stage.x_um, stage.y_um = x_um, y_um
+        stage.moving = False
+
+
+@app.action(effects=Effects.NONE)
+def snap_focus_score(hardware: Hardware) -> float:
+    """Focus Score"""
+    ...
+```
+
+## The tools, and why each is there
+
+| Tool | What it prevents |
+|---|---|
+| `@app.context` | The driver being serialized, published or opened twice |
+| `@app.state` | Getter actions and polling: watchers see position and `moving` as they change |
+| `required_locks=` / `locks=` | Two tasks commanding the stage at the same time |
+| `effects=Effects.IRREVERSIBLE` | A lost "move" or "dispense" being retried blindly after a crash |
+| `policy=CancelOnDisconnect(...)` | A jog that keeps running after whoever started it lost the link |
+| `persist=` | Forgetting, after a restart, what the device was doing before |
+| `task.updating(...)` | Watchers seeing half of a change |
+
+## What to watch
+
+- **State is what someone acts on**, not every encoder reading. Publish `moving` and the settled
+  position, not a 1 kHz stream. Live images go through a stream, not state: see
+  [Anti-patterns](/docs/concepts/building/anti-patterns#frequency).
+- **The disconnect policy is not a safety interlock.** It runs inside your process. Hardware that
+  must stop needs its own watchdog.
+- **A sync action stops only where it checks.** A worker thread cannot be killed, so a sync action
+  with a disconnect policy stops only at `koil.check_cancelled()`. Arkitekt warns about this. Write such
+  actions `async`, as above.
+- **It usually is not containerized.** It runs where the hardware is, started with
+  `arkitekt run prod` or as a system service. Packaging it as a plugin works when the container can
+  reach the device.
+
+## Next
+
+- Python: [A device with live state](/docs/guides/python/examples/device-state) and
+  [State & lifecycle](/docs/guides/python/state-lifecycle).
+- Rust: [State and lifecycle](/docs/guides/rust#state-and-lifecycle).
+- Kotlin: [Kotlin / Java](/docs/guides/kotlin), for a device driven from the JVM.
+- After a crash: [Durable execution](/docs/guides/python/durable-execution).

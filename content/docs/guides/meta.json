@@ -1,0 +1,22 @@
+{
+  "title": "Guides",
+  "description": "How-tos: get a specific thing done",
+  "icon": "Compass",
+  "root": true,
+  "pages": [
+    "---Using Arkitekt---",
+    "...using",
+    "apps",
+    "---Running a hub---",
+    "...hub",
+    "---Writing apps---",
+    "python",
+    "rust",
+    "kotlin",
+    "connect",
+    "app-kinds",
+    "uc2",
+    "---When things break---",
+    "troubleshooting"
+  ]
+}

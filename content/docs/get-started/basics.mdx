@@ -59,7 +59,7 @@ It is fair to ask why apps can't just connect to the hub directly. Three reasons
 1. **Hubs are hard to find.** A hub in a lab usually sits behind a firewall, on a network that
    changes addresses and drops incoming connections. You can rarely "just point an app at a
    server". The coordinator knows where your hubs are, and can connect machines across networks
-   through the [mesh](/docs/run/security/mesh) when they are not on the same one.
+   through the [mesh](/docs/concepts/security/mesh) when they are not on the same one.
 2. **One account, many hubs.** Without a coordinator every hub would keep its own users and
    passwords, and you would have one login per hub: one for the facility, one for your lab, one on
    your laptop. With it, you sign in once, and every hub of your organization knows who you are.
@@ -75,7 +75,7 @@ it doesn't have.
 <Callout type="info" title="Does it have to be ours?">
 
 No. go.arkitekt.live is the easiest coordinator to start with, but you can use your institute's own
-or [run your own](/docs/run/topology#three-ways-to-meet), and work fully offline.
+or [run your own](/docs/concepts/deployment/topology#three-ways-to-meet), and work fully offline.
 
 </Callout>
 

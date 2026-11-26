@@ -1,7 +1,7 @@
 {
   "source": "tutorials/advanced/training.mdx",
-  "primary": "use/advanced/training.mdx",
+  "primary": "guides/using/training.mdx",
   "anchors": {
-    "the-developers-perspective": "about/legacy/training-example.mdx#the-developers-perspective"
+    "the-developers-perspective": "legacy/training-example.mdx#the-developers-perspective"
   }
 }

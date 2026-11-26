@@ -1,0 +1,83 @@
+---
+title: AI Agent Skill
+description: A SKILL.md file that teaches AI coding assistants like Claude Code how to build arkitekt apps correctly.
+type: guide
+---
+
+We publish an **Agent Skill** that teaches AI coding assistants (Claude Code,
+the Claude Agent SDK, and other tools that understand the open
+[`SKILL.md`](https://code.claude.com/docs) format) how to build apps with the
+`arkitekt` package: declaring an `App`, offering actions, publishing state,
+passing data by reference, writing workflows, and using the CLI.
+
+Drop it into your assistant and it will scaffold and edit apps following the
+conventions in these docs instead of guessing.
+
+## Get the skill
+
+The skill is a single self-contained `SKILL.md` file, hosted here:
+
+```bash
+curl -O https://arkitekt.live/skills/arkitekt/SKILL.md
+```
+
+You can also [view the raw file](/skills/arkitekt/SKILL.md) directly.
+
+<Callout type="info" title="Replaces the arkitekt-next skill">
+
+An earlier version of this skill, published under `/skills/arkitekt-next/`, taught the retired
+`arkitekt-next` package (`@register`, `easy` as the app, the `arkitekt-next` CLI). If you installed
+it, replace it with the file above and delete the old `building-arkitekt-next-apps` folder. The
+skill was updated for `arkitekt` 19 (clients by annotation, `connect(Mikro)` for scripts): download
+it again if you fetched it before.
+
+</Callout>
+
+## Install it
+
+### Claude Code
+
+Place the file in a skill directory so Claude Code discovers it. Project-local
+skills live under `.claude/skills/`:
+
+```bash
+mkdir -p .claude/skills/building-arkitekt-apps
+curl -o .claude/skills/building-arkitekt-apps/SKILL.md \
+  https://arkitekt.live/skills/arkitekt/SKILL.md
+```
+
+For a skill available in **every** project, use the user directory
+`~/.claude/skills/building-arkitekt-apps/SKILL.md` instead.
+
+Claude Code loads the skill's short description at startup and pulls in the full
+instructions automatically the moment you start working on an `arkitekt`
+app, with no manual invocation required.
+
+### Other agents
+
+Any tool that supports the `SKILL.md` convention can use the same file. Point it
+at the URL above, or vendor the file into your repository so it travels with the
+code.
+
+## What the skill covers
+
+- The mental model: an `App` is a declaration, `@app.action` functions become platform
+  **actions** whose ports, form and docs are derived from type hints and docstrings, and
+  `run(app)` serves them.
+- **Injection by annotation**: `Task` for logs and progress, clients like `Mikro` (the annotation
+  is the whole declaration), state, context and protocol proxies.
+- Passing large data by reference with mikro specs (`Volume`, `SingleChannelImage`, …), plus
+  `@app.model`, registered and memory structures.
+- `@app.state`, `@app.context` and the `@app.startup` / `@app.shutdown` / `@app.background` hooks,
+  and why state replaces getter actions.
+- Calling other apps from an `@app.workflow` through an `@app.declare` protocol, and `effects=`.
+- Calling the platform from scripts and notebooks with `connect(Mikro)` (`with`, `async with`,
+  `.enter()`) and `connect(app)`, and the Qt, FastAPI and blok integrations.
+- A **CLI cheat-sheet** (`create`, `run`, `inspect`, `call`, `gen`, `plugin`) and a pre-flight
+  checklist.
+
+<Callout type="info" title="Keep it in sync">
+The skill mirrors the guidance in the [Python guide](/docs/guides/python).
+If the API changes, update both `public/skills/arkitekt/SKILL.md` and the
+relevant docs pages together.
+</Callout>

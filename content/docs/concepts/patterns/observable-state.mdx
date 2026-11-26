@@ -1,0 +1,68 @@
+---
+title: Observable state
+description: "How an Arkitekt app publishes what it is doing instead of answering questions about it: one owner per state, changes sent as numbered JSON Patch updates, snapshots, a journal you can replay, and watchers that never poll."
+type: concept
+---
+
+A device app knows where its stage is. Instead of waiting to be asked, it **publishes** that
+knowledge, and everyone who cares watches it: the UI, a blok, a workflow deciding whether it is
+safe to dispense.
+
+```python
+@app.state
+class Stage:
+    x_um: float = 0.0
+    moving: bool = False
+
+
+@app.action
+def move_to(x_um: float, stage: Stage, task: Task) -> None:
+    """Move To"""
+    with task.updating(stage):      # one update
+        stage.x_um = x_um
+        stage.moving = False
+```
+
+Assigning to a field is all it takes. The runtime turns the change into JSON Patch operations, gives
+the state its next **revision**, and sends it as one update to the server, which passes it on to
+everyone watching.
+
+## The patterns
+
+Three well-known patterns meet here:
+
+- **Publish/subscribe (observer).** The app publishes, watchers subscribe. Nobody polls, and the
+  app does not know or care who is watching. This is why there are no getter actions: see
+  [Anti-patterns](/docs/concepts/building/anti-patterns#getters).
+- **Single writer.** A state has exactly one owner, the agent that declares it. Others read it and
+  ask the owner to change it by calling an action. Locks on the state (`required_locks=`) make sure
+  only one task commands it at a time.
+- **Event sourcing with snapshots.** Every update is numbered, recorded in the agent's journal and
+  in the server's history, and every 60th revision also carries a full snapshot of the app's states.
+  The state at any moment is the last snapshot plus the updates after it. That is what lets a blok
+  show the state as it was at an earlier moment.
+
+## What it buys
+
+- **One truth per device.** Every UI, script and workflow sees the same value, from the one process
+  that knows it. A UI keeping its own copy is the thing this replaces
+  ([Anti-patterns](/docs/concepts/building/anti-patterns#ui-state)).
+- **No polling.** Ten watchers cost the app nothing more than one.
+- **Guards for workflows.** A workflow can require that a device's state holds before acting on it
+  (`task.guard`), because the state is published where the workflow can see it.
+- **A history.** Because updates are numbered and recorded, what a device was doing is part of the
+  record, next to the tasks that changed it.
+
+## What it costs
+
+- **Every update is a frame.** Nothing is merged or dropped: an assignment in a tight loop is a
+  stream of frames, each stored. State must be **small** (no arrays) and **slow** (written when it
+  changes meaningfully, at a rate someone can act on). Live data goes through a stream. See
+  [Anti-patterns](/docs/concepts/building/anti-patterns#frequency).
+- **There is latency.** An update travels from the agent through the server to each watcher. State
+  is for knowing what is going on and deciding on it, not for closing a control loop.
+
+## Next
+
+- Python: [State & lifecycle](/docs/guides/python/state-lifecycle).
+- On the wire: state updates in the [agent protocol](/docs/reference/protocols/agent).

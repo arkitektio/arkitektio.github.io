@@ -1,21 +1,21 @@
 {
   "source": "tutorials/first-hub.mdx",
-  "primary": "run/first-hub.mdx",
+  "primary": "guides/hub/first-hub.mdx",
   "anchors": {
-    "konstruktor": "run/konstruktor.mdx#konstruktor",
-    "system-requirements": "run/requirements.mdx",
-    "cli": "run/install-cli.mdx",
-    "install-the-cli": "run/install-cli.mdx#install-the-cli",
-    "create-a-hub-1": "run/install-cli.mdx#create-a-hub",
-    "run-it": "run/install-cli.mdx#run-it",
-    "plugin-engine": "run/hub.mdx#add-a-plugin-engine",
-    "updating": "run/hub.mdx#update-a-hub",
-    "mesh": "run/hub.mdx#join-the-mesh",
-    "advertising": "about/legacy/removed-features.mdx#advertising",
-    "other-installation-strategies": "run/other-installation-strategies.mdx",
-    "custom-compose": "run/other-installation-strategies.mdx#custom-compose",
-    "docker-compose": "run/other-installation-strategies.mdx#docker-compose",
-    "helm-charts": "run/other-installation-strategies.mdx#helm-charts",
-    "custom-installation": "run/other-installation-strategies.mdx#custom-installation"
+    "konstruktor": "reference/konstruktor.mdx#konstruktor",
+    "system-requirements": "reference/requirements.mdx",
+    "cli": "guides/hub/install-cli.mdx",
+    "install-the-cli": "guides/hub/install-cli.mdx#install-the-cli",
+    "create-a-hub-1": "guides/hub/install-cli.mdx#create-a-hub",
+    "run-it": "guides/hub/install-cli.mdx#run-it",
+    "plugin-engine": "guides/hub/running.mdx#add-a-plugin-engine",
+    "updating": "guides/hub/running.mdx#update-a-hub",
+    "mesh": "guides/hub/running.mdx#join-the-mesh",
+    "advertising": "legacy/removed-features.mdx#advertising",
+    "other-installation-strategies": "guides/hub/other-installation-strategies.mdx",
+    "custom-compose": "guides/hub/other-installation-strategies.mdx#custom-compose",
+    "docker-compose": "guides/hub/other-installation-strategies.mdx#docker-compose",
+    "helm-charts": "guides/hub/other-installation-strategies.mdx#helm-charts",
+    "custom-installation": "guides/hub/other-installation-strategies.mdx#custom-installation"
   }
 }

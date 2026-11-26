@@ -1,0 +1,49 @@
+---
+title: Notebook
+description: "Using the platform from Jupyter: connect once with connect(Mikro).enter() and stay connected across cells, re-run cells safely, and what to keep in mind about results made from a notebook."
+type: guide
+---
+
+In a notebook a `with` block per cell is awkward: you want to connect once, then pull a dataset in
+one cell, look at it in the next and store a result three cells later.
+
+## Use it when
+
+- You **explore**: look at data, try a parameter, plot, try again.
+- A person is at the keyboard to approve the login.
+
+## The shape
+
+```python
+from arkitekt import connect
+from mikro import Mikro
+
+mikro = connect(Mikro, identifier="my-notebook").enter()
+```
+
+```python
+dataset = mikro.get_array_dataset("1234")
+image = dataset.data            # a lazy xarray: slicing loads only the chunks you touch
+image.isel(z=10).plot()
+```
+
+- `.enter()` connects and **stays connected** until the kernel exits.
+- **Re-running the cell** leaves the previous connection of that app first, so sessions do not pile
+  up.
+- **Blocking calls work** inside the notebook's own event loop, so you do not need `await`.
+- Several clients: `mikro, fluss = connect(Mikro, Fluss).enter()`.
+
+## What to watch
+
+- **Name the notebook.** Without `identifier=`, a notebook's app is named after the kernel's
+  file, which is rarely meaningful. The identifier is what the platform records as having created
+  any data.
+- **Exploration is not provenance.** A result stored from a notebook is attributed to the notebook,
+  not to the cells you ran. When a step is worth repeating, make it an
+  [action](/docs/guides/app-kinds/plugin): then every result records exactly which code made it.
+- **Load lazily.** `dataset.data` is backed by the object store. `np.asarray(...)` on a whole
+  volume downloads all of it.
+
+## Next
+
+- Python: [Scripts & notebooks](/docs/guides/python/scripts#notebooks-enter).

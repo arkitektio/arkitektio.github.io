@@ -1,0 +1,12 @@
+{
+  "title": "Kinds of apps",
+  "pages": [
+    "index",
+    "plugin",
+    "device",
+    "host-program",
+    "workflow",
+    "http",
+    "microcontroller"
+  ]
+}

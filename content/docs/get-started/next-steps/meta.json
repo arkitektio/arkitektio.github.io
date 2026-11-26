@@ -1,0 +1,11 @@
+{
+  "title": "Next steps",
+  "pages": [
+    "design-a-workflow",
+    "run-a-workflow",
+    "napari-and-fiji",
+    "first-python-app",
+    "first-rust-app",
+    "first-device"
+  ]
+}

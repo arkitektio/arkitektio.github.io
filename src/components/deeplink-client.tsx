@@ -22,10 +22,10 @@ import { appName } from '@/lib/shared';
 // Services that the legacy `?live=<url>` deep links can point at. The first
 // matching entry wins.
 const liveTargets: { name: string; href: string }[] = [
-  { name: 'rekuest', href: '/docs/build/services/rekuest' },
-  { name: 'mikro', href: '/docs/build/services/mikro' },
-  { name: 'fluss', href: '/docs/build/services/fluss' },
-  { name: 'lok', href: '/docs/build/services/lok' },
+  { name: 'rekuest', href: '/docs/concepts/services/rekuest' },
+  { name: 'mikro', href: '/docs/concepts/services/mikro' },
+  { name: 'fluss', href: '/docs/concepts/services/fluss' },
+  { name: 'lok', href: '/docs/concepts/services/lok' },
 ];
 
 type Status =

@@ -1,0 +1,89 @@
+---
+title: Plugin
+description: "The packaged app: an analysis tool, a model or a converter, built into a container image that a deployment installs and runs through Kabinet. When to use it, how it looks, and the path from arkitekt create to publish."
+type: guide
+---
+
+A **plugin** is an app packaged as a container image. You publish it once, and anyone on a
+deployment that knows your repository can install it from Orkestrator. The platform starts it,
+restarts it and updates it. Nobody has to open a terminal on the machine it runs on.
+
+This is the default pattern for anything that does not need a particular machine: segmentation,
+denoising, a deep-learning model, a file converter, a statistics step.
+
+## Use it when
+
+- Others should be able to **install and run** your tool without you.
+- It needs a **reproducible environment**: CUDA, system libraries, pinned versions.
+- Every result should record **exactly which version** of your code made it.
+
+**Not for** code that needs hardware, a GUI session or a running program on one machine. That is a
+[device](/docs/guides/app-kinds/device) or an app [inside your own program](/docs/guides/app-kinds/host-program).
+
+## The shape
+
+A project with one module that declares the app. Heavy things load once, in a startup hook, and
+data travels by reference:
+
+```python title="app.py"
+from dataclasses import dataclass
+
+from arkitekt import App, Effects
+from mikro.arkitekt.specs import LabelMask, SingleChannelImage
+
+app = App("com.example.nuclei", "0.1.0", description="Nucleus segmentation")
+
+
+@app.context
+@dataclass
+class Model:
+    net: object
+
+
+@app.startup
+def load_model() -> Model:
+    return Model(net=load_weights("nuclei.pt"))   # once per container, not per task
+
+
+@app.action(effects=Effects.NONE)
+def segment(image: SingleChannelImage, model: Model) -> LabelMask:
+    """Segment Nuclei"""
+    ...
+```
+
+There is no `run(app)` at the bottom and no manifest file. The CLI finds `app` in `app.py`, and
+everything the platform needs is computed from the declaration.
+
+## From idea to installed
+
+```bash
+uvx arkitekt create nuclei            # a project: app.py, tests, a flavour, a release workflow
+cd nuclei
+uv run arkitekt run dev               # connect and hot-reload while you write it
+uv run arkitekt check                 # every problem in the declaration, without connecting
+uv run arkitekt plugin build          # build the image, and inspect it from inside
+uv run arkitekt plugin stage          # run that image against your server
+uv run arkitekt plugin publish        # push it and record the release
+```
+
+A **flavour** is one way to build the image: `vanilla` for CPU, a `gpu` flavour with CUDA, each
+with its own Dockerfile and the hardware it needs. The deployment picks the flavour that fits the
+machine it installs on. See [Packaging](/docs/guides/python/packaging) and
+[Plugin config](/docs/reference/plugin-config).
+
+## What to watch
+
+- **Nothing happens at import.** The CLI imports `app.py` to inspect and build it, on your laptop
+  and in CI. Load models and open files in `@app.startup`.
+- **The UI is bloks.** A plugin has no window. Declare a [blok](/docs/concepts/building/shared-concepts#bloks)
+  if it should show a panel in Orkestrator.
+- **Say what is safe to repeat.** `effects=Effects.NONE` on actions that only compute tells the
+  platform it may simply run them again after a crash.
+- **One image, many users.** The container serves everyone who installed it on that deployment, so
+  keep per-user data out of globals and in the task's arguments.
+
+## Next
+
+- Python: [Your first app](/docs/get-started/next-steps/first-python-app), then [Packaging](/docs/guides/python/packaging).
+- How a deployment installs it: [Kabinet](/docs/concepts/services/kabinet) and
+  [Installing a tool](/docs/get-started/own-hub/app).

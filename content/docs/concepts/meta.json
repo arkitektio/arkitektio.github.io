@@ -1,0 +1,24 @@
+{
+  "title": "Concepts",
+  "description": "Explanation: how and why Arkitekt works",
+  "icon": "Lightbulb",
+  "root": true,
+  "pages": [
+    "---Arkitekt---",
+    "index",
+    "basics",
+    "terminology",
+    "provenance",
+    "performance",
+    "ai",
+    "philosophy",
+    "security",
+    "deployment",
+    "---Building on Arkitekt---",
+    "building",
+    "patterns",
+    "services",
+    "---Compared---",
+    "comparisons"
+  ]
+}

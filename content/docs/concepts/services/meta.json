@@ -1,0 +1,20 @@
+{
+  "title": "Platform internals",
+  "pages": [
+    "index",
+    "lok",
+    "rekuest",
+    "fluss",
+    "mikro",
+    "kraph",
+    "port",
+    "kabinet",
+    "kluster",
+    "omeroark",
+    "---Underneath---",
+    "service-discovery",
+    "graphql",
+    "backend-libraries",
+    "koherent"
+  ]
+}

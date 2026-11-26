@@ -16,25 +16,25 @@ export type GlossaryEntry = {
   aliases?: string[];
 };
 
-const T = '/docs/about/terminology';
+const T = '/docs/concepts/terminology';
 
 export const GLOSSARY = {
   hub: {
     term: 'Hub',
     definition: 'The server at the center: it stores your data and passes work between your apps.',
-    href: '/docs/about#the-hub',
+    href: '/docs/concepts#the-hub',
   },
   coordinator: {
     term: 'Coordinator',
     definition:
       'Knows who is who and introduces apps to hubs. It never sees your data. go.arkitekt.live is one.',
-    href: '/docs/about#the-coordinator',
+    href: '/docs/concepts#the-coordinator',
   },
   app: {
     term: 'App',
     definition: 'Any program that connects to a hub and does actual work, from Orkestrator to a script.',
     href: `${T}#what-is-an-app`,
-    aliases: ['/docs/about#apps'],
+    aliases: ['/docs/concepts#apps'],
   },
   action: {
     term: 'Action',
@@ -77,12 +77,12 @@ export const GLOSSARY = {
     term: 'Mesh',
     definition:
       "An encrypted network between your organization's machines, so apps reach a hub across networks.",
-    href: '/docs/run/security/mesh',
+    href: '/docs/concepts/security/mesh',
   },
   provenance: {
     term: 'Provenance',
     definition: 'The record of how each piece of data came to be: from what, by which task, started by whom.',
-    href: '/docs/about/provenance',
+    href: '/docs/concepts/provenance',
   },
 } satisfies Record<string, GlossaryEntry>;
 

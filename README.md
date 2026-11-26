@@ -92,7 +92,7 @@ One or two sentences on what this tutorial is about.
 
 <Prerequisites>
 
-- Orkestrator is connected to a hub ([Connect with Orkestrator](/docs/use/first-steps/connect-orkestrator)).
+- Orkestrator is connected to a hub ([Connect with Orkestrator](/docs/guides/apps/connect-orkestrator)).
 
 </Prerequisites>
 
@@ -125,7 +125,7 @@ tutorial, `<Steward>…</Steward>` puts a note from the steward next to a step.
 
 Core terms (hub, coordinator, app, action, task, organization, mesh, provenance and a few more) have a
 one-line definition in [`src/lib/glossary.ts`](src/lib/glossary.ts). Any docs link to one of those
-targets, such as `[task](/docs/about/terminology#task)`, opens a small popover with the definition
+targets, such as `[task](/docs/concepts/terminology#task)`, opens a small popover with the definition
 and a "Read more" link instead of navigating away; nothing to do in the content. For a plain word
 that is not a link, write `<Term id="hub">hubs</Term>`. Use it on first mentions in pages that skip
 the explanations (the super quick pages), not on every occurrence. To add a term, add an entry with
@@ -135,7 +135,7 @@ Each folder uses a `meta.json` to control sidebar ordering and labels. To add a 
 `.mdx` file in the relevant folder with a `title` and `description` in its frontmatter, and add
 it to that folder's `meta.json`.
 
-Link to other pages with absolute URLs (`/docs/build/python/workflows`), not relative paths.
+Link to other pages with absolute URLs (`/docs/guides/python/workflows`), not relative paths.
 
 MDX components (callouts, code blocks, custom React widgets) are available inside
 content. Frontmatter and MDX options are configured in

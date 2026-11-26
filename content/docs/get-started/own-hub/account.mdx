@@ -15,11 +15,11 @@ with your email address, Google, ORCID or your institution's login. That's all f
 <Callout type="info" title="You can go completely without us">
 
 Arkitekt does not need go.arkitekt.live. You can point it at your institute's own coordination
-server, or [self-host everything](/docs/run/topology#three-ways-to-meet), coordinator included,
+server, or [self-host everything](/docs/concepts/deployment/topology#three-ways-to-meet), coordinator included,
 and run fully offline. For your first experience, use go.arkitekt.live anyway: there is nothing to
 set up, and you can move away from it later. Before you sign up, you may want to read what we
 store ([privacy policy](/docs/privacy#tier-2-an-account-on-goarkitektlive)) and how the
-[mesh](/docs/run/security/mesh) connects machines without us seeing what they send.
+[mesh](/docs/concepts/security/mesh) connects machines without us seeing what they send.
 
 </Callout>
 
@@ -40,12 +40,12 @@ hub, never through it.
 
 This split is deliberate. Your data lives on hardware you control, and the coordinator only does
 the "meeting". If you later connect machines across networks (a laptop at home, a GPU in another
-building), the coordinator also hands out keys for the [mesh](/docs/run/security/mesh): an
+building), the coordinator also hands out keys for the [mesh](/docs/concepts/security/mesh): an
 encrypted network between *your* machines, where it still only knows *that* two machines talk, not
 *what* they say. This quickstart keeps everything on one network and does not use the mesh.
 
-More on the split between hub and coordinator in [Design](/docs/about#the-coordinator) and
-[Identity & Access](/docs/run/security/identity).
+More on the split between hub and coordinator in [Design](/docs/concepts#the-coordinator) and
+[Identity & Access](/docs/concepts/security/identity).
 
 <Quiz>
   <Question q="What does go.arkitekt.live store about you?">
