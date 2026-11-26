@@ -26,7 +26,7 @@ Running it goes through the same steps in every language:
 
 1. **Connect.** The first time, a person authorizes the app in a browser and approves the services it
    asks for. The credential is cached, so later runs connect straight away.
-2. **Register.** The process becomes an [agent](/docs/concepts/terminology#agent) and tells the
+2. **Register.** The process becomes an [agent](/docs/concepts/apps-and-actions#agent) and tells the
    platform which actions, states and bloks it has.
 3. **Start up.** When the agent starts providing, startup hooks run once, before the first task:
    open the device, load the model, set the initial state.
@@ -88,7 +88,7 @@ suspend fun main() {
 An action is a plain function that the client turns into something the platform can call. You do not
 write a schema; the client derives one from the function:
 
-- **Parameters** become input [ports](/docs/concepts/terminology#port), and the **return type**
+- **Parameters** become input [ports](/docs/concepts/workflows#port), and the **return type**
   becomes the output ports. The types drive validation, serialization and the form Orkestrator shows.
 - The **doc comment** becomes the action's name, its description and a description for each port.
 - A **default value** makes a port optional.
@@ -149,14 +149,14 @@ fun greet(name: String, times: Int = 1): String = "Hello $name! ".repeat(times).
 Rust and Kotlin derive the definition at compile time, Python when the decorator runs. All three
 register the same definition, so a `Greet` written in Rust looks exactly like one written in Python.
 
-Large data such as an image is a [structure](/docs/concepts/terminology#structure): only its id
+Large data such as an image is a [structure](/docs/concepts/workflows#structure): only its id
 travels, and the client turns it into an object for your function. A [service client](#services), a
 [state](#state) or the running task is injected by the app and does not appear as a port.
 
 ## How calls are routed [#routing]
 
 An action is the abstract "what", defined by its ports. Your function is one
-[implementation](/docs/concepts/terminology#what-is-an-implementation) of it, and several apps can
+[implementation](/docs/concepts/apps-and-actions#what-is-an-implementation) of it, and several apps can
 implement the same action. A call, from a form, a script or a workflow, becomes a **task** in
 [Rekuest](/docs/develop/internals/rekuest):
 

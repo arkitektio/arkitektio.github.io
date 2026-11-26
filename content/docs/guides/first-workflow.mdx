@@ -27,7 +27,7 @@ covered by cells. Then you run it and look at what it recorded.
 
 ## The workflow you will build
 
-A [workflow](/docs/concepts/terminology#workflow) is a graph of nodes wired together, so that data
+A [workflow](/docs/concepts/workflows) is a graph of nodes wired together, so that data
 streams from one node to the next. Each node runs an action of some app. This one has five nodes:
 
 1. **Input**: the image you run it on.
@@ -38,12 +38,12 @@ streams from one node to the next. Each node runs an action of some app. This on
 
 Every workflow has exactly one `Input` and one `Output` node. Whatever is connected to them becomes
 the workflow's parameters and results, so a finished workflow behaves like any other action
-([Workflows are just nodes](/docs/concepts/terminology#workflows-are-just-nodes)).
+([Workflows are just nodes](/docs/concepts/workflows#workflows-are-just-nodes)).
 
 The edges carry types. Between the first nodes you will see `@mikro/arraylens` (an image), and at
 the end `@mikro/metric`; the `@mikro` prefix marks a [Mikro](/docs/develop/internals/mikro) type.
 Data moves as a stream: each node processes an item as soon as it arrives and passes it on
-([Data flows as a stream](/docs/concepts/terminology#data-flows-as-a-stream)).
+([Data flows as a stream](/docs/concepts/workflows#data-flows-as-a-stream)).
 
 ## 1. Install the apps for the nodes
 

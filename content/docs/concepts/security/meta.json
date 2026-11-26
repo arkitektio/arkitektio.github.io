@@ -1,9 +1,8 @@
 {
-  "title": "Security & privacy",
+  "title": "Security & access",
   "pages": [
     "index",
     "identity",
-    "data-privacy",
     "mesh"
   ]
 }

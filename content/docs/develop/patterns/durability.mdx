@@ -39,7 +39,7 @@ For the Python API and examples, see [Durable execution](/docs/develop/python/du
 An agent counts as dead when it stays disconnected past the server's grace window, or at once when a
 new process takes it over.
 
-**LOST** is a final [task state](/docs/concepts/terminology#states) meaning the outcome is unknown.
+**LOST** is a final [task state](/docs/concepts/tasks#states) meaning the outcome is unknown.
 It carries whether the task ever started (if not, sending it again is safe), its last progress and its
 effects claim. A result that arrives later is kept but never replaces it.
 

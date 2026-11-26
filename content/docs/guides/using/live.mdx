@@ -22,11 +22,11 @@ explained in [Real-time](/docs/concepts/philosophy#everything-everywhere-all-at-
 ## How the stream works
 
 Most actions take an input and return a result once. A **stream action** yields results many
-times, over time ([Action can establish streams](/docs/concepts/terminology#action-can-establish-streams)).
+times, over time ([Action can establish streams](/docs/concepts/apps-and-actions#action-can-establish-streams)).
 Gucker's **Stream Files** action is one: it yields every new file that appears in a folder.
 
 Workflows pass items on as they arrive
-([Data flows as a stream](/docs/concepts/terminology#data-flows-as-a-stream)). Put a stream action
+([Data flows as a stream](/docs/concepts/workflows#data-flows-as-a-stream)). Put a stream action
 first, and every node after it runs once per file, while the acquisition continues.
 
 ## 1. Point Gucker at the microscope's folder

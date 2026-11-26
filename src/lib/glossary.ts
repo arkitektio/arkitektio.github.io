@@ -17,6 +17,7 @@ export type GlossaryEntry = {
 };
 
 const T = '/docs/concepts/terminology';
+const C = '/docs/concepts';
 
 export const GLOSSARY = {
   hub: {
@@ -33,45 +34,55 @@ export const GLOSSARY = {
   app: {
     term: 'App',
     definition: 'Any program that connects to a hub and does actual work, from Orkestrator to a script.',
-    href: `${T}#what-is-an-app`,
-    aliases: ['/docs/concepts#apps'],
+    href: `${C}/apps-and-actions#what-is-an-app`,
+    aliases: ['/docs/concepts#apps', `${T}#what-is-an-app`],
   },
   action: {
     term: 'Action',
     definition: 'Something an app can do, described by its inputs and outputs, like "Image → Mask".',
-    href: `${T}#what-is-an-action`,
+    href: `${C}/apps-and-actions#what-is-an-action`,
+    aliases: [`${T}#what-is-an-action`],
   },
   implementation: {
     term: 'Implementation',
     definition: 'How one particular app does an action. Several apps can implement the same action.',
-    href: `${T}#what-is-an-implementation`,
+    href: `${C}/apps-and-actions#what-is-an-implementation`,
+    aliases: [`${T}#what-is-an-implementation`],
   },
   agent: {
     term: 'Agent',
     definition: 'One running instance of an app, which receives tasks, runs them and reports back.',
-    href: `${T}#agent`,
+    href: `${C}/apps-and-actions#agent`,
+    aliases: [`${T}#agent`],
   },
   task: {
     term: 'Task',
     definition: 'One run of an action, with your inputs. The hub routes it to an app that can do it.',
-    href: `${T}#task`,
+    href: `${C}/tasks`,
+    aliases: [`${T}#task`],
   },
   organization: {
     term: 'Organization',
     definition:
       'The group your data belongs to, like a lab or a facility. Data never crosses between organizations.',
-    href: `${T}#organization`,
-    aliases: [`${T}#the-hard-boundary`, `${T}#open-by-default-within-your-organization`],
+    href: `${C}/organizations`,
+    aliases: [
+      `${T}#organization`,
+      `${C}/organizations#the-hard-boundary`,
+      `${C}/organizations#open-by-default-within-your-organization`,
+    ],
   },
   workflow: {
     term: 'Workflow',
     definition: 'Several actions chained together, designed once and run as one.',
-    href: `${T}#workflow`,
+    href: `${C}/workflows`,
+    aliases: [`${T}#workflow`],
   },
   port: {
     term: 'Port',
     definition: 'One typed input or output of an action, such as an image or a number.',
-    href: `${T}#port`,
+    href: `${C}/workflows#port`,
+    aliases: [`${T}#port`],
   },
   mesh: {
     term: 'Mesh',

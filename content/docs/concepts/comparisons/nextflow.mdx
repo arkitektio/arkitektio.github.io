@@ -14,7 +14,7 @@ Nextflow has its own language, a Groovy dialect with `process`, `channel` and op
 designed, but it is a language to learn and a boundary to cross when your logic outgrows it.
 
 In Arkitekt an action is a decorated Python function. Type hints become its input and output
-[ports](/docs/concepts/terminology#port), and the docstring becomes its description:
+[ports](/docs/concepts/workflows#port), and the docstring becomes its description:
 
 ```python
 from arkitekt import App
@@ -170,7 +170,7 @@ In Nextflow each `process` declares a container or conda environment, and the en
 each task. In Arkitekt an action can run when at least one agent that implements it is connected,
 and each task goes to a live agent when it is assigned. A workflow therefore knows before it starts
 whether every action it needs is available, and it reacts at once when an agent disconnects. See
-[Task](/docs/concepts/terminology#task).
+[Task](/docs/concepts/tasks).
 
 ## Integration ideas [#integration-ideas]
 

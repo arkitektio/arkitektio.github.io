@@ -1,0 +1,59 @@
+---
+title: Workflows, ports & data
+description: "How workflows chain actions into graphs, how data streams through them, and the ports and structures that decide what can be connected."
+type: concept
+---
+
+A workflow is a graph of nodes. Each node runs an action, and each edge carries data from an output
+port to a matching input port. A workflow names actions, not apps, so the same blueprint can run in
+another lab on different apps; a node that no installed app implements shows in yellow until one
+does. Workflows are stored as JSON and run by [Fluss](/docs/develop/internals#fluss). To build one,
+follow [Your first workflow](/docs/guides/first-workflow).
+
+## Workflows are nodes [#workflows-are-just-nodes]
+
+Every workflow has exactly one `Input` and one `Output` node. What you connect to `Input` becomes a
+parameter, what you connect to `Output` becomes a result. So a workflow is itself an action: you can
+nest workflows, and run one on your data like any other action.
+
+## Data flows as a stream [#data-flows-as-a-stream]
+
+Each node processes an item as soon as it arrives and passes the result on, without waiting for the
+rest. Together with [streaming actions](/docs/concepts/apps-and-actions#action-can-establish-streams), this lets a workflow work on
+data that is still being generated, such as images from a running acquisition.
+
+## Who runs a workflow
+
+You assign a workflow run to an app that becomes its **scheduler** and calls the other apps.
+Intermediate results are stored centrally and tracked for provenance. When that round trip costs too
+much, an app can run the workflow itself and keep intermediate data in memory; see
+[Local workflows](/docs/guides/using/local-workflows).
+
+## Port [#port]
+
+A port is one typed input or output of an action. It has a `key`, a kind, a flag saying whether it
+may be empty (nullable), and an optional label and description. Kinds are:
+
+- **Scalars**: strings, integers, floats, booleans and enums, sent as values.
+- **Containers**: lists, dictionaries and unions of other kinds.
+- **Models**: small records of named values, sent as values.
+- **Structures**: large or app-specific data, sent by reference (below).
+
+Ports decide what a caller may pass, which widget Orkestrator shows, and which actions can be wired
+together. How Python types map to ports is in [Types & data](/docs/develop/python/types).
+
+## Structure [#structure]
+
+Images, volumes and tables are too large to send through a task. A structure is a type that travels
+**by reference**: only an id crosses the network, and the receiving side resolves it.
+
+- **Service structures** live in a data service such as Mikro, which every app can reach. Any app
+  with the matching client can resolve them.
+- **In-memory structures** stay on the agent that made them. The next action on the same agent gets
+  the object back, but no other app can resolve the reference, and it is gone when the agent stops.
+
+### Shrink and expand [#shrink-and-expand]
+
+Turning an object into its reference is **shrinking**, turning it back is **expanding**. A service
+structure shrinks to its id in the service, and expanding fetches it. An in-memory structure is put
+on the agent's local shelf and expanded from there.

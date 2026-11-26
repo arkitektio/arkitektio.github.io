@@ -1,5 +1,5 @@
 ---
-title: Provenance & Audit Logging
+title: Provenance & audit log
 description: How Arkitekt records who changed what, under whose authority, and during which task. Every data change becomes a durable, queryable audit trail.
 type: concept
 ---
@@ -12,7 +12,7 @@ is honestly attributed and accounted for. Why we consider this non-negotiable is
 
 For this we ensure **provenance-aware audit logging**. Every create, update, and delete on a tracked
 record inside one of Arkitekt's services is captured as a history update and each update is attributed to *who* made the change,
-*which app* they used, the [organization](/docs/concepts/terminology#organization) it happened in, and, crucially, the verified **task** it happened under. This lets anyone ask
+*which app* they used, the [organization](/docs/concepts/organizations) it happened in, and, crucially, the verified **task** it happened under. This lets anyone ask
 
 > *"Which automated run touched this record, on whose authority, and what exactly did it change? And by the way what else did it touch?"*
 

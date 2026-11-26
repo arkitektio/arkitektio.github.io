@@ -1,5 +1,5 @@
 ---
-title: Security & Privacy
+title: Security overview
 description: "Arkitekt's trust model, the protections it has, where your data lives, and the limits of an early-stage platform."
 type: concept
 ---
@@ -16,13 +16,13 @@ data are kept to a minimum and described in the [Privacy Policy](/docs/privacy).
 
 - **Every request is authenticated and authorized.** See [Security Measures](#security-measures).
 - **The organization is the hard boundary.** See
-  [Organizations](/docs/concepts/terminology#the-hard-boundary).
+  [Organizations](/docs/concepts/organizations#the-hard-boundary).
 - **Open by default within your organization**, with role-based access control on top. See
-  [Open by default](/docs/concepts/terminology#open-by-default-within-your-organization).
+  [Open by default](/docs/concepts/organizations#open-by-default-within-your-organization).
 - **You and the machine stay distinct.** See [You and the Machine](#you-and-the-machine).
 
 The details are in [Identity & Access](/docs/concepts/security/identity) (how you and your apps log
-in), [Data & Privacy](/docs/concepts/security/data-privacy) (where your data lives),
+in), [Data & Privacy](/docs/concepts/data-privacy) (where your data lives),
 [The Mesh](/docs/concepts/security/mesh) (reaching a hub across networks) and
 [Performance & Real-time](/docs/concepts/performance).
 
@@ -61,7 +61,7 @@ hub exposes, including HTTPS, are listed in the [requirements](/docs/get-started
 
 **Multi-tenancy.** One hub can host several **organizations**, each with its own users, data and
 configuration, fully isolated from the others. Inside an organization, access is open by default and
-can be narrowed with roles. See [Organizations](/docs/concepts/terminology#organization).
+can be narrowed with roles. See [Organizations](/docs/concepts/organizations).
 
 **Admin configuration.** Administrators can configure apps, plugins and the system remotely, down to
 blocking a particular app for a day.

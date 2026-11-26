@@ -107,7 +107,7 @@ Each entry of `implementations` pairs an `interface`, the name the agent runs it
 }
 ```
 
-`args` and `returns` are the [ports](/docs/concepts/terminology#port). This is what a client library
+`args` and `returns` are the [ports](/docs/concepts/workflows#port). This is what a client library
 derives from a function signature and its doc comment.
 
 `hash` is a hash of the declaration. When it equals the one the server already holds, nothing is
@@ -137,7 +137,7 @@ object when it has none). It is the first numbered report of the session.
 The server sends `HEARTBEAT` at an interval, 10 seconds by default. Answer each with
 `HEARTBEAT_ANSWER`. An agent that does not answer in time is closed with code `3001`, and one that
 stays silent long enough is considered dead: its running tasks end
-[lost](/docs/concepts/terminology#states).
+[lost](/docs/concepts/tasks#states).
 
 Answer heartbeats from somewhere that is not blocked by a running task. An agent that computes on
 the thread that reads the socket will be dropped in the middle of long work.
